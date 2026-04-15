@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import AppLayout from "@/components/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,11 @@ import {
   Trophy,
   Star,
   Send,
+  Info,
+  Brain,
+  Loader2,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import {
   useWorkoutLogs,
@@ -29,6 +33,70 @@ import {
   type WorkoutSet,
 } from "@/hooks/useWorkoutLogs";
 import { toast } from "sonner";
+
+// AI explanation hook — streams from the chat edge function
+function useAIExplanation() {
+  const cache = useRef<Record<string, string>>({});
+  const [loading, setLoading] = useState<string | null>(null);
+  const [texts, setTexts] = useState<Record<string, string>>({});
+
+  const ask = useCallback(async (key: string, prompt: string) => {
+    if (cache.current[key]) {
+      setTexts((prev) => ({ ...prev, [key]: cache.current[key] }));
+      return;
+    }
+    setLoading(key);
+    try {
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            messages: [{ role: "user", content: prompt }],
+          }),
+        }
+      );
+      if (!resp.ok || !resp.body) throw new Error("Falha");
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+      let result = "";
+      let done = false;
+      while (!done) {
+        const { done: rd, value } = await reader.read();
+        if (rd) break;
+        buf += decoder.decode(value, { stream: true });
+        let nl: number;
+        while ((nl = buf.indexOf("\n")) !== -1) {
+          let line = buf.slice(0, nl);
+          buf = buf.slice(nl + 1);
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (!line.startsWith("data: ")) continue;
+          const json = line.slice(6).trim();
+          if (json === "[DONE]") { done = true; break; }
+          try {
+            const c = JSON.parse(json).choices?.[0]?.delta?.content;
+            if (c) {
+              result += c;
+              setTexts((prev) => ({ ...prev, [key]: result }));
+            }
+          } catch { buf = line + "\n" + buf; break; }
+        }
+      }
+      cache.current[key] = result;
+    } catch {
+      setTexts((prev) => ({ ...prev, [key]: "Erro ao carregar explicação." }));
+    } finally {
+      setLoading(null);
+    }
+  }, []);
+
+  return { ask, loading, texts };
+}
 
 const today = new Date().toISOString().split("T")[0];
 
@@ -41,6 +109,9 @@ const Training = () => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackRating, setFeedbackRating] = useState(0);
   const [feedbackNotes, setFeedbackNotes] = useState("");
+  const [showSplitExplanation, setShowSplitExplanation] = useState(false);
+  const [showExerciseInfo, setShowExerciseInfo] = useState<string | null>(null);
+  const ai = useAIExplanation();
 
   const training = (protocol?.training as any[]) || [];
   const day = training[selectedDay];
@@ -250,6 +321,40 @@ const Training = () => {
               )}
             </Card>
 
+            {/* Split explanation button */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full gap-2 text-xs"
+              onClick={() => {
+                setShowSplitExplanation(!showSplitExplanation);
+                if (!showSplitExplanation) {
+                  const allExercises = day.exercises.map((e: any) => e.name).join(", ");
+                  ai.ask(
+                    `split-${selectedDay}`,
+                    `Explique de forma breve (máximo 3 parágrafos) a lógica da periodização deste treino de ${day.muscleGroup}. Exercícios: ${allExercises}. Por que essa divisão muscular? Como os exercícios se complementam? Qual a lógica da ordem?`
+                  );
+                }
+              }}
+            >
+              <Brain size={14} />
+              {showSplitExplanation ? "Ocultar explicação" : "Por que esse treino?"}
+            </Button>
+
+            {showSplitExplanation && (
+              <Card className="p-4 border-primary/20 bg-primary/5">
+                {ai.loading === `split-${selectedDay}` && !ai.texts[`split-${selectedDay}`] ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 size={14} className="animate-spin" /> Analisando...
+                  </div>
+                ) : (
+                  <div className="prose prose-sm prose-invert max-w-none text-xs [&>p]:mb-2 [&>ul]:mb-2 [&>h1]:text-sm [&>h2]:text-xs [&>h3]:text-xs [&>p]:text-xs [&>li]:text-xs">
+                    <ReactMarkdown>{ai.texts[`split-${selectedDay}`] || ""}</ReactMarkdown>
+                  </div>
+                )}
+              </Card>
+            )}
+
             {/* Warmup instruction */}
             <Card className="p-3 border-border bg-muted/30">
               <div className="flex items-start gap-2">
@@ -324,6 +429,41 @@ const Training = () => {
                     {/* Expanded: Set tracking */}
                     {isExpanded && (
                       <div className="px-4 pb-4 space-y-3">
+                        {/* Exercise info button */}
+                        <button
+                          className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const infoKey = `ex-${ex.id}`;
+                            if (showExerciseInfo === ex.id) {
+                              setShowExerciseInfo(null);
+                            } else {
+                              setShowExerciseInfo(ex.id);
+                              ai.ask(
+                                infoKey,
+                                `Explique brevemente (máximo 2 parágrafos) o exercício "${ex.name}" no contexto de treino de ${day.muscleGroup}. Inclua: músculos trabalhados, por que foi escolhido para essa divisão, dica de execução. Seja direto.`
+                              );
+                            }
+                          }}
+                        >
+                          <Info size={12} />
+                          {showExerciseInfo === ex.id ? "Ocultar info" : "Por que este exercício?"}
+                        </button>
+
+                        {showExerciseInfo === ex.id && (
+                          <div className="rounded-lg bg-primary/5 border border-primary/20 p-3">
+                            {ai.loading === `ex-${ex.id}` && !ai.texts[`ex-${ex.id}`] ? (
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <Loader2 size={12} className="animate-spin" /> Analisando...
+                              </div>
+                            ) : (
+                              <div className="prose prose-sm prose-invert max-w-none text-xs [&>p]:mb-1 [&>p]:text-xs [&>li]:text-xs [&>ul]:mb-1">
+                                <ReactMarkdown>{ai.texts[`ex-${ex.id}`] || ""}</ReactMarkdown>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         {/* Previous best */}
                         {prev && (
                           <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-md p-2">
