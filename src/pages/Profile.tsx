@@ -2,12 +2,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import { useCheckins } from "@/hooks/useCheckins";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import AppLayout from "@/components/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, Shield, FileText, HelpCircle } from "lucide-react";
+import { LogOut, Settings, Shield, FileText, HelpCircle, Bell, BellOff, Loader2 } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { toast } from "sonner";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
@@ -15,6 +17,7 @@ const Profile = () => {
   const { data: protocol } = useActiveProtocol();
   const { data: checkins = [] } = useCheckins();
   const navigate = useNavigate();
+  const push = usePushNotifications();
 
   const name = profile?.full_name || user?.user_metadata?.full_name || "Atleta";
   const email = user?.email || "";
@@ -64,6 +67,43 @@ const Profile = () => {
             <div><p className="text-lg font-bold text-primary">{avgAdherence}%</p><p className="text-xs text-muted-foreground">Aderência</p></div>
           </div>
         </Card>
+
+        {/* Push notifications */}
+        {push.supported && (
+          <Card className="p-4 card-gradient border-border">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {push.isSubscribed ? <Bell size={18} className="text-primary" /> : <BellOff size={18} className="text-muted-foreground" />}
+                <div>
+                  <p className="text-sm font-medium text-foreground">Lembretes de treino</p>
+                  <p className="text-xs text-muted-foreground">
+                    {push.isSubscribed ? "Notificações ativadas" : "Receba lembretes no horário do treino"}
+                  </p>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                variant={push.isSubscribed ? "outline" : "default"}
+                disabled={push.loading}
+                onClick={async () => {
+                  if (push.isSubscribed) {
+                    await push.unsubscribe();
+                    toast.success("Notificações desativadas");
+                  } else {
+                    await push.subscribe();
+                    if (push.permission === "denied") {
+                      toast.error("Permissão negada. Ative nas configurações do navegador.");
+                    } else {
+                      toast.success("Notificações ativadas! 🔔");
+                    }
+                  }
+                }}
+              >
+                {push.loading ? <Loader2 size={14} className="animate-spin" /> : push.isSubscribed ? "Desativar" : "Ativar"}
+              </Button>
+            </div>
+          </Card>
+        )}
 
         <div className="space-y-1">
           {MENU_ITEMS.map(({ icon: Icon, label, onClick }) => (
