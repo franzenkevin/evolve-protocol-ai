@@ -17,6 +17,11 @@ import { Dumbbell, UtensilsCrossed, Camera, Activity, Calendar, Bell, Star, Send
 import { toast } from "sonner";
 
 const today = new Date().toISOString().split("T")[0];
+const WEEKDAY_MAP: Record<number, string> = {
+  0: "Domingo", 1: "Segunda", 2: "Terça", 3: "Quarta",
+  4: "Quinta", 5: "Sexta", 6: "Sábado",
+};
+const todayWeekday = WEEKDAY_MAP[new Date().getDay()];
 
 const QUICK_ACTIONS = [
   { to: "/training", icon: Dumbbell, label: "Treino", color: "text-primary" },
