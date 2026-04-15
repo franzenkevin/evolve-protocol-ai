@@ -36,7 +36,7 @@ export const useWorkoutLogs = (dayIndex: number, sessionDate: string) => {
         .eq("day_index", dayIndex)
         .eq("session_date", sessionDate);
       if (error) throw error;
-      return (data || []) as WorkoutLog[];
+      return (data || []) as unknown as WorkoutLog[];
     },
     enabled: !!user,
   });
@@ -58,7 +58,7 @@ export const usePreviousWorkoutLogs = (dayIndex: number, currentDate: string) =>
         .order("session_date", { ascending: false })
         .limit(20);
       if (error) throw error;
-      return (data || []) as WorkoutLog[];
+      return (data || []) as unknown as WorkoutLog[];
     },
     enabled: !!user,
   });
