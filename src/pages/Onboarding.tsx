@@ -15,22 +15,91 @@ import { generateProtocol } from "@/lib/generateProtocol";
 import { useToast } from "@/hooks/use-toast";
 import type { Profile } from "@/hooks/useProfile";
 
-const STEPS = ["Dados Pessoais", "Objetivo & Nível", "Treino", "Alimentação", "Estilo de Vida"];
+const STEPS = [
+  "Dados Pessoais",
+  "Objetivo & Nível",
+  "Treino",
+  "Alimentação",
+  "Doces & Suplementos",
+  "Estilo de Vida",
+];
+
 const GOALS = ["Hipertrofia", "Emagrecimento", "Recomposição Corporal", "Saúde Geral"];
 const ACTIVITY_LEVELS = ["Sedentário", "Levemente ativo", "Moderadamente ativo", "Muito ativo", "Extremamente ativo"];
 const EXPERIENCE_LEVELS = ["Iniciante (0-6 meses)", "Intermediário (6m-2 anos)", "Avançado (2+ anos)"];
 const GYM_TYPES = ["Academia completa", "Academia limitada", "Treino em casa"];
-const INJURY_OPTIONS = ["Nenhuma", "Joelho", "Ombro", "Lombar", "Cervical", "Punho", "Tornozelo"];
-const FOOD_OPTIONS = ["Frango", "Carne vermelha", "Peixe", "Ovos", "Arroz", "Batata doce", "Aveia", "Whey", "Frutas", "Vegetais", "Leite", "Queijo"];
 const TRAINING_DAYS = ["2", "3", "4", "5", "6"];
+const TRAINING_TIMES = ["Manhã (antes das 10h)", "Meio-dia (10h-14h)", "Tarde (14h-18h)", "Noite (após 18h)"];
 const NEAT_OPTIONS = ["Trabalho sentado", "Trabalho em pé", "Trabalho físico leve", "Trabalho físico pesado"];
 const STRESS_LEVELS = ["Baixo", "Moderado", "Alto", "Muito alto"];
+const MEAL_COUNTS = ["3", "4", "5", "6"];
+
+// Alergias em lista
+const ALLERGY_OPTIONS = [
+  "Intolerância à lactose",
+  "Celíaco (glúten)",
+  "Alergia a ovo",
+  "Alergia a frutos do mar",
+  "Alergia a proteína do soro do leite",
+  "Não tenho alergias",
+];
+
+// Doces — apenas 1
+const SWEET_OPTIONS = ["Açaí", "Doce de leite", "Leite condensado", "Sucrilhos", "Chocolate", "Nenhum"];
+
+// Suplementos
+const SUPPLEMENT_OPTIONS = ["Whey Protein", "Creatina", "Vitamina C", "Vitamina D", "Ômega 3", "Nenhum"];
+
+// Refeições livres
+const FREE_MEAL_OPTIONS = [
+  "Uma a cada 15 dias",
+  "Uma por semana",
+  "Duas por semana",
+];
+
+// Alimentos em lista organizada
+const FOOD_CATEGORIES: { label: string; items: string[] }[] = [
+  {
+    label: "Carboidratos",
+    items: ["Arroz", "Macarrão", "Batata inglesa", "Batata doce", "Mandioca", "Pão de forma", "Pão francês", "Pão de hambúrguer", "Rap10", "Cuscuz", "Tapioca"],
+  },
+  {
+    label: "Frutas",
+    items: ["Banana", "Mamão", "Melão", "Melancia", "Kiwi", "Uva", "Manga", "Abacate", "Laranja", "Limão", "Morango", "Maçã", "Pera", "Abacaxi"],
+  },
+  {
+    label: "Proteínas",
+    items: ["Peito de frango", "Sobrecoxa sem pele", "Patinho", "Músculo", "Filé mignon", "Coxão mole", "Salmão", "Tilápia", "Atum", "Ovo", "Queijo", "Leite desnatado", "Leite semi desnatado"],
+  },
+  {
+    label: "Outros",
+    items: ["Feijão", "Lentilha", "Granola", "Aveia", "Iogurte desnatado", "Requeijão light", "Vegetais e saladas em geral"],
+  },
+];
 
 interface FormData {
-  fullName: string; age: string; sex: string; weight: string; height: string;
-  goal: string; activityLevel: string; neat: string; trainingDays: string;
-  experience: string; gymType: string; injuries: string[]; foodsLike: string[];
-  foodsDislike: string; allergies: string; sleepHours: string; stressLevel: string;
+  fullName: string;
+  age: string;
+  sex: string;
+  weight: string;
+  height: string;
+  goal: string;
+  activityLevel: string;
+  neat: string;
+  trainingDays: string;
+  trainingTime: string;
+  experience: string;
+  gymType: string;
+  injuries: string;
+  foodsLike: string[];
+  foodsDislike: string;
+  allergies: string[];
+  sweetPreference: string;
+  supplements: string[];
+  freeMeals: string;
+  mealCount: string;
+  sleepHours: string;
+  stressLevel: string;
 }
 
 const Onboarding = () => {
@@ -38,9 +107,10 @@ const Onboarding = () => {
   const [saving, setSaving] = useState(false);
   const [data, setData] = useState<FormData>({
     fullName: "", age: "", sex: "", weight: "", height: "",
-    goal: "", activityLevel: "", neat: "", trainingDays: "",
-    experience: "", gymType: "", injuries: [], foodsLike: [],
-    foodsDislike: "", allergies: "", sleepHours: "", stressLevel: "",
+    goal: "", activityLevel: "", neat: "", trainingDays: "", trainingTime: "",
+    experience: "", gymType: "", injuries: "", foodsLike: [],
+    foodsDislike: "", allergies: [], sweetPreference: "", supplements: [],
+    freeMeals: "", mealCount: "", sleepHours: "", stressLevel: "",
   });
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -49,9 +119,22 @@ const Onboarding = () => {
 
   const update = (field: keyof FormData, value: any) => setData((prev) => ({ ...prev, [field]: value }));
 
-  const toggleArrayItem = (field: "injuries" | "foodsLike", item: string) => {
+  const toggleArrayItem = (field: "foodsLike" | "allergies" | "supplements", item: string) => {
     setData((prev) => {
       const arr = prev[field] as string[];
+      // Handle "Não tenho alergias" / "Nenhum" exclusive
+      if (field === "allergies" && item === "Não tenho alergias") {
+        return { ...prev, [field]: arr.includes(item) ? [] : [item] };
+      }
+      if (field === "allergies" && arr.includes("Não tenho alergias")) {
+        return { ...prev, [field]: [item] };
+      }
+      if (field === "supplements" && item === "Nenhum") {
+        return { ...prev, [field]: arr.includes(item) ? [] : [item] };
+      }
+      if (field === "supplements" && arr.includes("Nenhum")) {
+        return { ...prev, [field]: [item] };
+      }
       return { ...prev, [field]: arr.includes(item) ? arr.filter((i) => i !== item) : [...arr, item] };
     });
   };
@@ -64,7 +147,6 @@ const Onboarding = () => {
 
     setSaving(true);
     try {
-      // Save profile
       const profileData: Partial<Profile> = {
         full_name: data.fullName,
         age: data.age ? parseInt(data.age) : null,
@@ -75,12 +157,17 @@ const Onboarding = () => {
         activity_level: data.activityLevel,
         neat: data.neat,
         training_days: data.trainingDays ? parseInt(data.trainingDays) : null,
+        training_time: data.trainingTime,
         experience: data.experience,
         gym_type: data.gymType,
-        injuries: data.injuries.join(", "),
+        injuries: data.injuries,
         preferred_foods: data.foodsLike,
         disliked_foods: data.foodsDislike,
-        allergies: data.allergies,
+        allergies: data.allergies.filter(a => a !== "Não tenho alergias").join(", "),
+        sweet_preference: data.sweetPreference === "Nenhum" ? null : data.sweetPreference,
+        supplements: data.supplements.filter(s => s !== "Nenhum"),
+        free_meals: data.freeMeals,
+        meal_count: data.mealCount ? parseInt(data.mealCount) : null,
         sleep_hours: data.sleepHours ? parseFloat(data.sleepHours) : null,
         stress_level: data.stressLevel,
         onboarding_complete: true,
@@ -88,7 +175,6 @@ const Onboarding = () => {
 
       await updateProfile.mutateAsync(profileData);
 
-      // Generate and save protocol
       const protocol = generateProtocol(profileData as Profile);
       await createProtocol.mutateAsync(protocol);
 
@@ -104,6 +190,13 @@ const Onboarding = () => {
   const prev = () => step > 0 && setStep(step - 1);
   const progress = ((step + 1) / STEPS.length) * 100;
 
+  const radioOption = (value: string, id: string, label: string) => (
+    <div key={id} className="flex items-center gap-2 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors">
+      <RadioGroupItem value={value} id={id} />
+      <Label htmlFor={id} className="flex-1 cursor-pointer">{label}</Label>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <div className="p-4 border-b border-border">
@@ -115,6 +208,8 @@ const Onboarding = () => {
 
       <div className="flex-1 overflow-auto p-4">
         <div className="max-w-lg mx-auto animate-fade-in space-y-5">
+
+          {/* STEP 0 — Dados Pessoais */}
           {step === 0 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Dados Pessoais</h2>
@@ -133,17 +228,15 @@ const Onboarding = () => {
               </div>
             </>
           )}
+
+          {/* STEP 1 — Objetivo & Nível */}
           {step === 1 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Objetivo & Nível</h2>
               <div>
                 <Label>Objetivo principal</Label>
                 <RadioGroup value={data.goal} onValueChange={(v) => update("goal", v)} className="mt-2 space-y-2">
-                  {GOALS.map((g) => (
-                    <div key={g} className="flex items-center gap-2 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors">
-                      <RadioGroupItem value={g} id={g} /><Label htmlFor={g} className="flex-1 cursor-pointer">{g}</Label>
-                    </div>
-                  ))}
+                  {GOALS.map((g) => radioOption(g, g, g))}
                 </RadioGroup>
               </div>
               <div>
@@ -156,15 +249,13 @@ const Onboarding = () => {
               <div>
                 <Label>Experiência com treino</Label>
                 <RadioGroup value={data.experience} onValueChange={(v) => update("experience", v)} className="mt-2 space-y-2">
-                  {EXPERIENCE_LEVELS.map((l) => (
-                    <div key={l} className="flex items-center gap-2 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors">
-                      <RadioGroupItem value={l} id={l} /><Label htmlFor={l} className="flex-1 cursor-pointer">{l}</Label>
-                    </div>
-                  ))}
+                  {EXPERIENCE_LEVELS.map((l) => radioOption(l, l, l))}
                 </RadioGroup>
               </div>
             </>
           )}
+
+          {/* STEP 2 — Treino */}
           {step === 2 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Treino</h2>
@@ -177,57 +268,121 @@ const Onboarding = () => {
                 </RadioGroup>
               </div>
               <div>
-                <Label>Tipo de academia</Label>
-                <RadioGroup value={data.gymType} onValueChange={(v) => update("gymType", v)} className="mt-2 space-y-2">
-                  {GYM_TYPES.map((g) => (
-                    <div key={g} className="flex items-center gap-2 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors">
-                      <RadioGroupItem value={g} id={g} /><Label htmlFor={g} className="flex-1 cursor-pointer">{g}</Label>
-                    </div>
-                  ))}
+                <Label>Horário preferido de treino</Label>
+                <RadioGroup value={data.trainingTime} onValueChange={(v) => update("trainingTime", v)} className="mt-2 space-y-2">
+                  {TRAINING_TIMES.map((t) => radioOption(t, `tt-${t}`, t))}
                 </RadioGroup>
               </div>
               <div>
-                <Label>Lesões ou dores</Label>
-                <div className="mt-2 grid grid-cols-2 gap-2">
-                  {INJURY_OPTIONS.map((i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <Checkbox checked={data.injuries.includes(i)} onCheckedChange={() => toggleArrayItem("injuries", i)} id={`inj-${i}`} />
-                      <Label htmlFor={`inj-${i}`} className="cursor-pointer">{i}</Label>
-                    </div>
-                  ))}
-                </div>
+                <Label>Tipo de academia</Label>
+                <RadioGroup value={data.gymType} onValueChange={(v) => update("gymType", v)} className="mt-2 space-y-2">
+                  {GYM_TYPES.map((g) => radioOption(g, `gym-${g}`, g))}
+                </RadioGroup>
+              </div>
+              <div>
+                <Label>Lesões, dores ou limitações</Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">Descreva com detalhes para que o treino seja adaptado.</p>
+                <Textarea
+                  value={data.injuries}
+                  onChange={(e) => update("injuries", e.target.value)}
+                  placeholder="Ex: Dor no ombro direito ao fazer supino, hérnia de disco L4-L5, tendinite no joelho esquerdo..."
+                  className="min-h-[100px]"
+                />
               </div>
             </>
           )}
+
+          {/* STEP 3 — Alimentação */}
           {step === 3 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Alimentação</h2>
+
               <div>
-                <Label>Alimentos que você gosta</Label>
-                <div className="mt-2 grid grid-cols-2 gap-2">
-                  {FOOD_OPTIONS.map((f) => (
-                    <div key={f} className="flex items-center gap-2">
-                      <Checkbox checked={data.foodsLike.includes(f)} onCheckedChange={() => toggleArrayItem("foodsLike", f)} id={`food-${f}`} />
-                      <Label htmlFor={`food-${f}`} className="cursor-pointer">{f}</Label>
+                <Label>Quantas refeições por dia?</Label>
+                <RadioGroup value={data.mealCount} onValueChange={(v) => update("mealCount", v)} className="flex gap-3 mt-2">
+                  {MEAL_COUNTS.map((m) => (
+                    <div key={m} className="flex items-center gap-1"><RadioGroupItem value={m} id={`mc-${m}`} /><Label htmlFor={`mc-${m}`}>{m}</Label></div>
+                  ))}
+                </RadioGroup>
+              </div>
+
+              <div>
+                <Label>Alimentos que você gosta (marque todos)</Label>
+                {FOOD_CATEGORIES.map((cat) => (
+                  <div key={cat.label} className="mt-3">
+                    <p className="text-xs font-semibold text-primary mb-1.5">{cat.label}</p>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {cat.items.map((f) => (
+                        <div key={f} className="flex items-center gap-2">
+                          <Checkbox checked={data.foodsLike.includes(f)} onCheckedChange={() => toggleArrayItem("foodsLike", f)} id={`food-${f}`} />
+                          <Label htmlFor={`food-${f}`} className="cursor-pointer text-sm">{f}</Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div>
+                <Label>Alimentos que NÃO gosta</Label>
+                <Textarea value={data.foodsDislike} onChange={(e) => update("foodsDislike", e.target.value)} placeholder="Liste os alimentos que não gosta..." className="mt-1" />
+              </div>
+
+              <div>
+                <Label>Alergias ou intolerâncias</Label>
+                <div className="mt-2 space-y-2">
+                  {ALLERGY_OPTIONS.map((a) => (
+                    <div key={a} className="flex items-center gap-2">
+                      <Checkbox checked={data.allergies.includes(a)} onCheckedChange={() => toggleArrayItem("allergies", a)} id={`allergy-${a}`} />
+                      <Label htmlFor={`allergy-${a}`} className="cursor-pointer text-sm">{a}</Label>
                     </div>
                   ))}
                 </div>
               </div>
-              <div><Label>Alimentos que não gosta</Label><Textarea value={data.foodsDislike} onChange={(e) => update("foodsDislike", e.target.value)} placeholder="Liste os alimentos..." className="mt-1" /></div>
-              <div><Label>Alergias ou restrições</Label><Input value={data.allergies} onChange={(e) => update("allergies", e.target.value)} placeholder="Ex: lactose, glúten" className="mt-1" /></div>
+
+              <div>
+                <Label>Refeições livres por semana</Label>
+                <RadioGroup value={data.freeMeals} onValueChange={(v) => update("freeMeals", v)} className="mt-2 space-y-2">
+                  {FREE_MEAL_OPTIONS.map((fm) => radioOption(fm, `fm-${fm}`, fm))}
+                </RadioGroup>
+              </div>
             </>
           )}
+
+          {/* STEP 4 — Doces & Suplementos */}
           {step === 4 && (
+            <>
+              <h2 className="text-2xl font-heading font-bold text-foreground">Doces & Suplementos</h2>
+
+              <div>
+                <Label>Gostaria de incluir um doce no plano? (escolha apenas um)</Label>
+                <RadioGroup value={data.sweetPreference} onValueChange={(v) => update("sweetPreference", v)} className="mt-2 space-y-2">
+                  {SWEET_OPTIONS.map((s) => radioOption(s, `sweet-${s}`, s))}
+                </RadioGroup>
+              </div>
+
+              <div>
+                <Label>Suplementos que usa ou pretende usar</Label>
+                <div className="mt-2 space-y-2">
+                  {SUPPLEMENT_OPTIONS.map((s) => (
+                    <div key={s} className="flex items-center gap-2">
+                      <Checkbox checked={data.supplements.includes(s)} onCheckedChange={() => toggleArrayItem("supplements", s)} id={`supp-${s}`} />
+                      <Label htmlFor={`supp-${s}`} className="cursor-pointer text-sm">{s}</Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* STEP 5 — Estilo de Vida */}
+          {step === 5 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Estilo de Vida</h2>
               <div>
                 <Label>NEAT (rotina diária)</Label>
                 <RadioGroup value={data.neat} onValueChange={(v) => update("neat", v)} className="mt-2 space-y-2">
-                  {NEAT_OPTIONS.map((n) => (
-                    <div key={n} className="flex items-center gap-2 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors">
-                      <RadioGroupItem value={n} id={n} /><Label htmlFor={n} className="flex-1 cursor-pointer">{n}</Label>
-                    </div>
-                  ))}
+                  {NEAT_OPTIONS.map((n) => radioOption(n, `neat-${n}`, n))}
                 </RadioGroup>
               </div>
               <div><Label>Horas de sono por noite</Label><Input type="number" value={data.sleepHours} onChange={(e) => update("sleepHours", e.target.value)} placeholder="7" className="mt-1" /></div>
@@ -235,7 +390,7 @@ const Onboarding = () => {
                 <Label>Nível de estresse</Label>
                 <RadioGroup value={data.stressLevel} onValueChange={(v) => update("stressLevel", v)} className="flex gap-3 mt-2 flex-wrap">
                   {STRESS_LEVELS.map((s) => (
-                    <div key={s} className="flex items-center gap-1"><RadioGroupItem value={s} id={s} /><Label htmlFor={s}>{s}</Label></div>
+                    <div key={s} className="flex items-center gap-1"><RadioGroupItem value={s} id={`stress-${s}`} /><Label htmlFor={`stress-${s}`}>{s}</Label></div>
                   ))}
                 </RadioGroup>
               </div>
