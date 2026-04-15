@@ -13,6 +13,9 @@ import { useUpdateProfile } from "@/hooks/useProfile";
 import { useCreateProtocol } from "@/hooks/useProtocol";
 import { generateProtocol } from "@/lib/generateProtocol";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { BodyPhotoUpload } from "@/components/onboarding/BodyPhotoUpload";
+import { AssessmentResults } from "@/components/onboarding/AssessmentResults";
 import type { Profile } from "@/hooks/useProfile";
 
 const STEPS = [
@@ -22,6 +25,7 @@ const STEPS = [
   "Alimentação",
   "Doces & Suplementos",
   "Estilo de Vida",
+  "Avaliação Física",
 ];
 
 const GOALS = ["Hipertrofia", "Emagrecimento", "Recomposição Corporal", "Saúde Geral"];
@@ -105,6 +109,9 @@ interface FormData {
 const Onboarding = () => {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [assessmentPhotos, setAssessmentPhotos] = useState<Record<string, string>>({});
+  const [assessment, setAssessment] = useState<any>(null);
+  const [analyzing, setAnalyzing] = useState(false);
   const [data, setData] = useState<FormData>({
     fullName: "", age: "", sex: "", weight: "", height: "",
     goal: "", activityLevel: "", neat: "", trainingDays: "", trainingTime: "",
@@ -139,7 +146,36 @@ const Onboarding = () => {
     });
   };
 
+  const runAssessment = async () => {
+    const photoPaths = Object.values(assessmentPhotos);
+    if (photoPaths.length === 0) return;
+    setAnalyzing(true);
+    try {
+      const { data: fnData, error } = await supabase.functions.invoke("analyze-body", {
+        body: {
+          photoPaths,
+          sex: data.sex,
+          weight: data.weight,
+          height: data.height,
+          age: data.age,
+        },
+      });
+      if (error) throw error;
+      setAssessment(fnData.assessment);
+    } catch (err: any) {
+      toast({ title: "Erro na análise", description: err.message, variant: "destructive" });
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   const next = async () => {
+    // On step 6 (assessment), trigger analysis if photos exist and no assessment yet
+    if (step === 6 && Object.keys(assessmentPhotos).length > 0 && !assessment && !analyzing) {
+      await runAssessment();
+      return;
+    }
+
     if (step < STEPS.length - 1) {
       setStep(step + 1);
       return;
@@ -396,14 +432,22 @@ const Onboarding = () => {
               </div>
             </>
           )}
+
+          {/* STEP 6 — Avaliação Física */}
+          {step === 6 && (
+            <>
+              <BodyPhotoUpload photos={assessmentPhotos} onPhotosChange={setAssessmentPhotos} />
+              <AssessmentResults assessment={assessment} loading={analyzing} />
+            </>
+          )}
         </div>
       </div>
 
       <div className="p-4 border-t border-border">
         <div className="max-w-lg mx-auto flex gap-3">
-          {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving}>Voltar</Button>}
-          <Button onClick={next} className="flex-1 glow" disabled={saving}>
-            {saving ? "Salvando..." : step === STEPS.length - 1 ? "Finalizar" : "Próximo"}
+          {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving || analyzing}>Voltar</Button>}
+          <Button onClick={next} className="flex-1 glow" disabled={saving || analyzing}>
+            {saving ? "Salvando..." : analyzing ? "Analisando..." : step === 6 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar Fotos" : step === STEPS.length - 1 ? "Finalizar" : "Próximo"}
           </Button>
         </div>
       </div>
