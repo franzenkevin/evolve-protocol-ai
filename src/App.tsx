@@ -19,6 +19,7 @@ import Exams from "./pages/Exams";
 import Journal from "./pages/Journal";
 import Chat from "./pages/Chat";
 import Admin from "./pages/Admin";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
