@@ -181,6 +181,18 @@ const FOOD_DB: Record<string, FoodItem> = {
   "Granola": { name: "Granola", amount: "40g", protein: 3, carbs: 28, fat: 5, calories: 170 },
   "Aveia": { name: "Aveia", amount: "40g", protein: 5, carbs: 28, fat: 3, calories: 150 },
   "Vegetais": { name: "Vegetais e salada", amount: "à vontade", protein: 2, carbs: 5, fat: 0, calories: 25 },
+  "Inhame": { name: "Inhame", amount: "200g (cozido)", protein: 3, carbs: 36, fat: 0, calories: 158 },
+  "Milho": { name: "Milho cozido", amount: "1 espiga", protein: 4, carbs: 25, fat: 1, calories: 120 },
+  "Sardinha": { name: "Sardinha em lata", amount: "1 lata (125g)", protein: 25, carbs: 0, fat: 8, calories: 170 },
+  "Camarão": { name: "Camarão cozido", amount: "150g", protein: 30, carbs: 1, fat: 2, calories: 140 },
+  "Carne de porco magra": { name: "Lombo suíno grelhado", amount: "150g", protein: 38, carbs: 0, fat: 6, calories: 210 },
+  "Goiaba": { name: "Goiaba", amount: "1 unidade", protein: 2, carbs: 14, fat: 1, calories: 68 },
+  "Ameixa": { name: "Ameixa", amount: "3 unidades", protein: 1, carbs: 18, fat: 0, calories: 70 },
+  "Pêssego": { name: "Pêssego", amount: "1 unidade", protein: 1, carbs: 15, fat: 0, calories: 60 },
+  "Grão de bico": { name: "Grão de bico", amount: "100g (cozido)", protein: 9, carbs: 22, fat: 3, calories: 140 },
+  "Pasta de amendoim": { name: "Pasta de amendoim", amount: "20g", protein: 5, carbs: 3, fat: 10, calories: 120 },
+  "Castanhas": { name: "Castanhas mistas", amount: "30g", protein: 5, carbs: 5, fat: 15, calories: 175 },
+  "Azeite de oliva": { name: "Azeite de oliva", amount: "1 colher sopa", protein: 0, carbs: 0, fat: 14, calories: 120 },
 
   // Fruits
   "Banana": { name: "Banana", amount: "1 unidade", protein: 1, carbs: 27, fat: 0, calories: 105 },
@@ -467,14 +479,16 @@ function generateDiet(p: Profile) {
     }
   }
 
-  // Add creatina note if user uses it
+  // Add supplement notes with correct dosages
   const notes: string[] = [];
   if (supplements.includes("Creatina")) {
-    notes.push("Creatina: 5g por dia, pode tomar a qualquer hora com água.");
+    const creatinaDose = sex === "F" ? "5g" : "7g";
+    notes.push(`Creatina: ${creatinaDose} por dia, pode tomar a qualquer hora com água.`);
   }
   if (supplements.includes("Vitamina C")) notes.push("Vitamina C: 1g por dia.");
-  if (supplements.includes("Vitamina D")) notes.push("Vitamina D: 2000UI por dia, junto com gordura.");
+  if (supplements.includes("Vitamina D")) notes.push("Vitamina D: 6000UI por dia, junto com refeição com gordura.");
   if (supplements.includes("Ômega 3")) notes.push("Ômega 3: 1-2g EPA+DHA por dia, junto com refeição.");
+  if (supplements.includes("Whey Protein")) notes.push("Whey Protein: usado como complemento proteico na dieta. Dose conforme necessidade de encaixe de macros.");
 
   return {
     totalCalories: tdee,
