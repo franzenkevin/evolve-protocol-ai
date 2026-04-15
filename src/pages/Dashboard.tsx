@@ -59,12 +59,14 @@ const Dashboard = () => {
   const trainingDays = profile?.training_days || 0;
   const diet = protocol?.diet as any;
   const training = protocol?.training as any;
-  const todayTraining = training?.[0];
+  const todayTrainingIndex = training?.findIndex((d: any) => d.weekday === todayWeekday) ?? -1;
+  const todayTraining = todayTrainingIndex >= 0 ? training[todayTrainingIndex] : null;
+  const isRestDay = training?.length > 0 && todayTrainingIndex < 0;
   const latestAssessment = assessments[0];
   const weightHistory = checkins.filter((c) => c.weight).slice(0, 10).reverse();
 
   // Check if today's workout is completed via logs
-  const { data: todayLogs } = useWorkoutLogs(0, today);
+  const { data: todayLogs } = useWorkoutLogs(todayTrainingIndex >= 0 ? todayTrainingIndex : 0, today);
   const isTodayWorkoutDone = todayTraining?.exercises?.length > 0 && todayLogs && todayLogs.length > 0 &&
     todayTraining.exercises.every((ex: any) => {
       const log = todayLogs.find((l: any) => l.exercise_id === ex.id);
