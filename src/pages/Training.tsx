@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import AppLayout from "@/components/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,11 @@ import {
   Trophy,
   Star,
   Send,
+  Info,
+  Brain,
+  Loader2,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import {
   useWorkoutLogs,
@@ -29,6 +33,70 @@ import {
   type WorkoutSet,
 } from "@/hooks/useWorkoutLogs";
 import { toast } from "sonner";
+
+// AI explanation hook — streams from the chat edge function
+function useAIExplanation() {
+  const cache = useRef<Record<string, string>>({});
+  const [loading, setLoading] = useState<string | null>(null);
+  const [texts, setTexts] = useState<Record<string, string>>({});
+
+  const ask = useCallback(async (key: string, prompt: string) => {
+    if (cache.current[key]) {
+      setTexts((prev) => ({ ...prev, [key]: cache.current[key] }));
+      return;
+    }
+    setLoading(key);
+    try {
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            messages: [{ role: "user", content: prompt }],
+          }),
+        }
+      );
+      if (!resp.ok || !resp.body) throw new Error("Falha");
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+      let result = "";
+      let done = false;
+      while (!done) {
+        const { done: rd, value } = await reader.read();
+        if (rd) break;
+        buf += decoder.decode(value, { stream: true });
+        let nl: number;
+        while ((nl = buf.indexOf("\n")) !== -1) {
+          let line = buf.slice(0, nl);
+          buf = buf.slice(nl + 1);
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (!line.startsWith("data: ")) continue;
+          const json = line.slice(6).trim();
+          if (json === "[DONE]") { done = true; break; }
+          try {
+            const c = JSON.parse(json).choices?.[0]?.delta?.content;
+            if (c) {
+              result += c;
+              setTexts((prev) => ({ ...prev, [key]: result }));
+            }
+          } catch { buf = line + "\n" + buf; break; }
+        }
+      }
+      cache.current[key] = result;
+    } catch {
+      setTexts((prev) => ({ ...prev, [key]: "Erro ao carregar explicação." }));
+    } finally {
+      setLoading(null);
+    }
+  }, []);
+
+  return { ask, loading, texts };
+}
 
 const today = new Date().toISOString().split("T")[0];
 
