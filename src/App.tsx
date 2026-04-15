@@ -31,7 +31,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const OnboardingGate = ({ children }: { children: React.ReactNode }) => {
   const { data: profile, isLoading } = useProfile();
   if (isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
-  if (profile && !profile.onboarding_complete) return <Navigate to="/onboarding" replace />;
+  if (!profile || !profile.onboarding_complete) return <Navigate to="/onboarding" replace />;
   return <>{children}</>;
 };
 
