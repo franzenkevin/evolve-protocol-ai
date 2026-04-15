@@ -321,6 +321,40 @@ const Training = () => {
               )}
             </Card>
 
+            {/* Split explanation button */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full gap-2 text-xs"
+              onClick={() => {
+                setShowSplitExplanation(!showSplitExplanation);
+                if (!showSplitExplanation) {
+                  const allExercises = day.exercises.map((e: any) => e.name).join(", ");
+                  ai.ask(
+                    `split-${selectedDay}`,
+                    `Explique de forma breve (máximo 3 parágrafos) a lógica da periodização deste treino de ${day.muscleGroup}. Exercícios: ${allExercises}. Por que essa divisão muscular? Como os exercícios se complementam? Qual a lógica da ordem?`
+                  );
+                }
+              }}
+            >
+              <Brain size={14} />
+              {showSplitExplanation ? "Ocultar explicação" : "Por que esse treino?"}
+            </Button>
+
+            {showSplitExplanation && (
+              <Card className="p-4 border-primary/20 bg-primary/5">
+                {ai.loading === `split-${selectedDay}` && !ai.texts[`split-${selectedDay}`] ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 size={14} className="animate-spin" /> Analisando...
+                  </div>
+                ) : (
+                  <div className="prose prose-sm prose-invert max-w-none text-xs [&>p]:mb-2 [&>ul]:mb-2 [&>h1]:text-sm [&>h2]:text-xs [&>h3]:text-xs [&>p]:text-xs [&>li]:text-xs">
+                    <ReactMarkdown>{ai.texts[`split-${selectedDay}`] || ""}</ReactMarkdown>
+                  </div>
+                )}
+              </Card>
+            )}
+
             {/* Warmup instruction */}
             <Card className="p-3 border-border bg-muted/30">
               <div className="flex items-start gap-2">
