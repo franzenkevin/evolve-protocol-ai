@@ -193,7 +193,6 @@ const FOOD_DB: Record<string, FoodItem> = {
   "Pasta de amendoim": { name: "Pasta de amendoim", amount: "20g", protein: 5, carbs: 3, fat: 10, calories: 120 },
   "Castanhas": { name: "Castanhas mistas", amount: "30g", protein: 5, carbs: 5, fat: 15, calories: 175 },
   "Azeite de oliva": { name: "Azeite de oliva", amount: "1 colher sopa", protein: 0, carbs: 0, fat: 14, calories: 120 },
-  "Vegetais": { name: "Vegetais e salada", amount: "à vontade", protein: 2, carbs: 5, fat: 0, calories: 25 },
 
   // Fruits
   "Banana": { name: "Banana", amount: "1 unidade", protein: 1, carbs: 27, fat: 0, calories: 105 },
