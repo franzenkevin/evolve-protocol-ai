@@ -9,36 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUpdateProfile } from "@/hooks/useProfile";
+import { useCreateProtocol } from "@/hooks/useProtocol";
+import { generateProtocol } from "@/lib/generateProtocol";
 import { useToast } from "@/hooks/use-toast";
+import type { Profile } from "@/hooks/useProfile";
 
-export interface OnboardingData {
-  fullName: string;
-  age: string;
-  sex: string;
-  weight: string;
-  height: string;
-  goal: string;
-  activityLevel: string;
-  neat: string;
-  trainingDays: string;
-  experience: string;
-  gymType: string;
-  injuries: string[];
-  foodsLike: string[];
-  foodsDislike: string;
-  allergies: string;
-  sleepHours: string;
-  stressLevel: string;
-}
-
-const STEPS = [
-  "Dados Pessoais",
-  "Objetivo & Nível",
-  "Treino",
-  "Alimentação",
-  "Estilo de Vida",
-];
-
+const STEPS = ["Dados Pessoais", "Objetivo & Nível", "Treino", "Alimentação", "Estilo de Vida"];
 const GOALS = ["Hipertrofia", "Emagrecimento", "Recomposição Corporal", "Saúde Geral"];
 const ACTIVITY_LEVELS = ["Sedentário", "Levemente ativo", "Moderadamente ativo", "Muito ativo", "Extremamente ativo"];
 const EXPERIENCE_LEVELS = ["Iniciante (0-6 meses)", "Intermediário (6m-2 anos)", "Avançado (2+ anos)"];
@@ -49,9 +26,17 @@ const TRAINING_DAYS = ["2", "3", "4", "5", "6"];
 const NEAT_OPTIONS = ["Trabalho sentado", "Trabalho em pé", "Trabalho físico leve", "Trabalho físico pesado"];
 const STRESS_LEVELS = ["Baixo", "Moderado", "Alto", "Muito alto"];
 
+interface FormData {
+  fullName: string; age: string; sex: string; weight: string; height: string;
+  goal: string; activityLevel: string; neat: string; trainingDays: string;
+  experience: string; gymType: string; injuries: string[]; foodsLike: string[];
+  foodsDislike: string; allergies: string; sleepHours: string; stressLevel: string;
+}
+
 const Onboarding = () => {
   const [step, setStep] = useState(0);
-  const [data, setData] = useState<OnboardingData>({
+  const [saving, setSaving] = useState(false);
+  const [data, setData] = useState<FormData>({
     fullName: "", age: "", sex: "", weight: "", height: "",
     goal: "", activityLevel: "", neat: "", trainingDays: "",
     experience: "", gymType: "", injuries: [], foodsLike: [],
@@ -59,10 +44,10 @@ const Onboarding = () => {
   });
   const navigate = useNavigate();
   const { toast } = useToast();
+  const updateProfile = useUpdateProfile();
+  const createProtocol = useCreateProtocol();
 
-  const update = (field: keyof OnboardingData, value: any) => {
-    setData((prev) => ({ ...prev, [field]: value }));
-  };
+  const update = (field: keyof FormData, value: any) => setData((prev) => ({ ...prev, [field]: value }));
 
   const toggleArrayItem = (field: "injuries" | "foodsLike", item: string) => {
     setData((prev) => {
@@ -71,18 +56,52 @@ const Onboarding = () => {
     });
   };
 
-  const next = () => {
-    if (step < STEPS.length - 1) setStep(step + 1);
-    else {
-      // Save onboarding data (will be persisted to DB later)
-      localStorage.setItem("hypertrophy_onboarding", JSON.stringify(data));
-      toast({ title: "Onboarding completo!", description: "Gerando seu protocolo..." });
+  const next = async () => {
+    if (step < STEPS.length - 1) {
+      setStep(step + 1);
+      return;
+    }
+
+    setSaving(true);
+    try {
+      // Save profile
+      const profileData: Partial<Profile> = {
+        full_name: data.fullName,
+        age: data.age ? parseInt(data.age) : null,
+        sex: data.sex,
+        weight: data.weight ? parseFloat(data.weight) : null,
+        height: data.height ? parseFloat(data.height) : null,
+        goal: data.goal,
+        activity_level: data.activityLevel,
+        neat: data.neat,
+        training_days: data.trainingDays ? parseInt(data.trainingDays) : null,
+        experience: data.experience,
+        gym_type: data.gymType,
+        injuries: data.injuries.join(", "),
+        preferred_foods: data.foodsLike,
+        disliked_foods: data.foodsDislike,
+        allergies: data.allergies,
+        sleep_hours: data.sleepHours ? parseFloat(data.sleepHours) : null,
+        stress_level: data.stressLevel,
+        onboarding_complete: true,
+      };
+
+      await updateProfile.mutateAsync(profileData);
+
+      // Generate and save protocol
+      const protocol = generateProtocol(profileData as Profile);
+      await createProtocol.mutateAsync(protocol);
+
+      toast({ title: "Onboarding completo!", description: "Seu protocolo foi gerado com sucesso." });
       navigate("/dashboard");
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
     }
   };
 
   const prev = () => step > 0 && setStep(step - 1);
-
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
@@ -114,7 +133,6 @@ const Onboarding = () => {
               </div>
             </>
           )}
-
           {step === 1 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Objetivo & Nível</h2>
@@ -147,7 +165,6 @@ const Onboarding = () => {
               </div>
             </>
           )}
-
           {step === 2 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Treino</h2>
@@ -155,9 +172,7 @@ const Onboarding = () => {
                 <Label>Dias de treino por semana</Label>
                 <RadioGroup value={data.trainingDays} onValueChange={(v) => update("trainingDays", v)} className="flex gap-2 mt-2">
                   {TRAINING_DAYS.map((d) => (
-                    <div key={d} className="flex items-center gap-1">
-                      <RadioGroupItem value={d} id={`d${d}`} /><Label htmlFor={`d${d}`}>{d}x</Label>
-                    </div>
+                    <div key={d} className="flex items-center gap-1"><RadioGroupItem value={d} id={`d${d}`} /><Label htmlFor={`d${d}`}>{d}x</Label></div>
                   ))}
                 </RadioGroup>
               </div>
@@ -184,7 +199,6 @@ const Onboarding = () => {
               </div>
             </>
           )}
-
           {step === 3 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Alimentação</h2>
@@ -199,17 +213,10 @@ const Onboarding = () => {
                   ))}
                 </div>
               </div>
-              <div>
-                <Label>Alimentos que não gosta</Label>
-                <Textarea value={data.foodsDislike} onChange={(e) => update("foodsDislike", e.target.value)} placeholder="Liste os alimentos..." className="mt-1" />
-              </div>
-              <div>
-                <Label>Alergias ou restrições</Label>
-                <Input value={data.allergies} onChange={(e) => update("allergies", e.target.value)} placeholder="Ex: lactose, glúten" className="mt-1" />
-              </div>
+              <div><Label>Alimentos que não gosta</Label><Textarea value={data.foodsDislike} onChange={(e) => update("foodsDislike", e.target.value)} placeholder="Liste os alimentos..." className="mt-1" /></div>
+              <div><Label>Alergias ou restrições</Label><Input value={data.allergies} onChange={(e) => update("allergies", e.target.value)} placeholder="Ex: lactose, glúten" className="mt-1" /></div>
             </>
           )}
-
           {step === 4 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Estilo de Vida</h2>
@@ -223,17 +230,12 @@ const Onboarding = () => {
                   ))}
                 </RadioGroup>
               </div>
-              <div>
-                <Label>Horas de sono por noite</Label>
-                <Input type="number" value={data.sleepHours} onChange={(e) => update("sleepHours", e.target.value)} placeholder="7" className="mt-1" />
-              </div>
+              <div><Label>Horas de sono por noite</Label><Input type="number" value={data.sleepHours} onChange={(e) => update("sleepHours", e.target.value)} placeholder="7" className="mt-1" /></div>
               <div>
                 <Label>Nível de estresse</Label>
                 <RadioGroup value={data.stressLevel} onValueChange={(v) => update("stressLevel", v)} className="flex gap-3 mt-2 flex-wrap">
                   {STRESS_LEVELS.map((s) => (
-                    <div key={s} className="flex items-center gap-1">
-                      <RadioGroupItem value={s} id={s} /><Label htmlFor={s}>{s}</Label>
-                    </div>
+                    <div key={s} className="flex items-center gap-1"><RadioGroupItem value={s} id={s} /><Label htmlFor={s}>{s}</Label></div>
                   ))}
                 </RadioGroup>
               </div>
@@ -244,9 +246,9 @@ const Onboarding = () => {
 
       <div className="p-4 border-t border-border">
         <div className="max-w-lg mx-auto flex gap-3">
-          {step > 0 && <Button variant="outline" onClick={prev} className="flex-1">Voltar</Button>}
-          <Button onClick={next} className="flex-1 glow">
-            {step === STEPS.length - 1 ? "Finalizar" : "Próximo"}
+          {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving}>Voltar</Button>}
+          <Button onClick={next} className="flex-1 glow" disabled={saving}>
+            {saving ? "Salvando..." : step === STEPS.length - 1 ? "Finalizar" : "Próximo"}
           </Button>
         </div>
       </div>
