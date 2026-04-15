@@ -12,19 +12,20 @@ import {
   Zap,
   Info,
   Leaf,
+  RefreshCw,
 } from "lucide-react";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 
 const Diet = () => {
   const { data: protocol, isLoading } = useActiveProtocol();
   const [expandedMeal, setExpandedMeal] = useState<number | null>(0);
-  const [activeOption, setActiveOption] = useState<Record<number, "fixed" | "flexible">>({});
+  const [activeOption, setActiveOption] = useState<Record<number, number>>({});
   const [showSubs, setShowSubs] = useState<number | null>(null);
 
   const diet = protocol?.diet as any;
   const meals = diet?.meals || [];
 
-  const getOption = (idx: number) => activeOption[idx] || "fixed";
+  const getOption = (idx: number) => activeOption[idx] || 0;
 
   if (isLoading) {
     return (
@@ -92,9 +93,10 @@ const Diet = () => {
         {/* Meals */}
         {meals.map((meal: any, idx: number) => {
           const isExpanded = expandedMeal === idx;
-          const option = getOption(idx);
-          const currentMeal = option === "fixed" ? meal.fixed : meal.flexible;
-          const totalCal = currentMeal?.foods?.reduce(
+          const optionIdx = getOption(idx);
+          const options = meal.options || [];
+          const currentOption = options[optionIdx] || options[0];
+          const totalCal = currentOption?.foods?.reduce(
             (a: number, f: any) => a + (f.calories || 0),
             0
           ) || 0;
@@ -109,7 +111,7 @@ const Diet = () => {
                 <div>
                   <h3 className="font-heading font-semibold text-foreground">{meal.label}</h3>
                   <p className="text-xs text-muted-foreground">
-                    {meal.time} • {currentMeal?.foods?.length || 0} alimentos
+                    {meal.time} • {currentOption?.foods?.length || 0} alimentos
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -124,41 +126,37 @@ const Diet = () => {
 
               {isExpanded && (
                 <div className="px-4 pb-4 space-y-3 border-t border-border pt-3">
-                  {/* Fixed / Flexible toggle */}
-                  <div className="flex gap-2">
-                    <Button
-                      variant={option === "fixed" ? "default" : "outline"}
-                      size="sm"
-                      className="gap-1.5 text-xs flex-1"
-                      onClick={() => setActiveOption((p) => ({ ...p, [idx]: "fixed" }))}
-                    >
-                      <Leaf size={12} />
-                      Fixa
-                    </Button>
-                    <Button
-                      variant={option === "flexible" ? "default" : "outline"}
-                      size="sm"
-                      className="gap-1.5 text-xs flex-1"
-                      onClick={() => setActiveOption((p) => ({ ...p, [idx]: "flexible" }))}
-                    >
-                      <Utensils size={12} />
-                      Flexível
-                    </Button>
-                  </div>
+                  {/* Option selector */}
+                  {options.length > 1 && (
+                    <div className="flex gap-1.5 flex-wrap">
+                      {options.map((opt: any, oi: number) => (
+                        <Button
+                          key={oi}
+                          variant={optionIdx === oi ? "default" : "outline"}
+                          size="sm"
+                          className="gap-1.5 text-[10px] h-7 px-2"
+                          onClick={() => setActiveOption((p) => ({ ...p, [idx]: oi }))}
+                        >
+                          {oi === 0 ? <Leaf size={10} /> : <Utensils size={10} />}
+                          {opt.label}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Food list */}
-                  {currentMeal?.foods?.map((food: any, fi: number) => (
-                    <div key={fi} className="flex items-center justify-between py-1.5">
+                  {currentOption?.foods?.map((food: any, fi: number) => (
+                    <div key={fi} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0">
                       <div className="flex-1">
-                        <p className="text-sm text-foreground">{food.name}</p>
-                        <p className="text-xs text-muted-foreground">{food.amount}</p>
+                        <p className="text-sm text-foreground font-medium">{food.name}</p>
+                        <p className="text-xs text-primary/80 font-mono">{food.amount}</p>
                       </div>
                       <div className="text-right">
                         <span className="text-xs text-muted-foreground block">
                           {food.calories} kcal
                         </span>
                         <span className="text-[10px] text-muted-foreground">
-                          P:{food.protein} C:{food.carbs} G:{food.fat}
+                          P:{food.protein}g C:{food.carbs}g G:{food.fat}g
                         </span>
                       </div>
                     </div>

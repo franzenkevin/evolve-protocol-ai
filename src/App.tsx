@@ -15,7 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import Training from "./pages/Training";
 import Diet from "./pages/Diet";
 import Progress from "./pages/Progress";
-// Profile moved to sidebar
+import Exams from "./pages/Exams";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -53,7 +53,7 @@ const App = () => (
             <Route path="/training" element={<ProtectedRoute><OnboardingGate><Training /></OnboardingGate></ProtectedRoute>} />
             <Route path="/diet" element={<ProtectedRoute><OnboardingGate><Diet /></OnboardingGate></ProtectedRoute>} />
             <Route path="/progress" element={<ProtectedRoute><OnboardingGate><Progress /></OnboardingGate></ProtectedRoute>} />
-            {/* Profile is now in the sidebar */}
+            <Route path="/exams" element={<ProtectedRoute><OnboardingGate><Exams /></OnboardingGate></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
