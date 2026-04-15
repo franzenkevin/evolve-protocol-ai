@@ -38,7 +38,6 @@ const NEAT_OPTIONS = ["Trabalho sentado", "Trabalho em pé", "Trabalho físico l
 const STRESS_LEVELS = ["Baixo", "Moderado", "Alto", "Muito alto"];
 const MEAL_COUNTS = ["3", "4", "5", "6"];
 
-// Alergias em lista
 const ALLERGY_OPTIONS = [
   "Intolerância à lactose",
   "Celíaco (glúten)",
@@ -48,20 +47,15 @@ const ALLERGY_OPTIONS = [
   "Não tenho alergias",
 ];
 
-// Doces — apenas 1
 const SWEET_OPTIONS = ["Açaí", "Doce de leite", "Leite condensado", "Sucrilhos", "Chocolate", "Nenhum"];
-
-// Suplementos
 const SUPPLEMENT_OPTIONS = ["Whey Protein", "Creatina", "Vitamina C", "Vitamina D", "Ômega 3", "Multivitamínico", "Nenhum"];
 
-// Refeições livres
 const FREE_MEAL_OPTIONS = [
   "Uma a cada 15 dias",
   "Uma por semana",
   "Duas por semana",
 ];
 
-// Alimentos em lista organizada
 const FOOD_CATEGORIES: { label: string; items: string[] }[] = [
   {
     label: "🍚 Carboidratos",
@@ -112,6 +106,7 @@ const Onboarding = () => {
   const [assessmentPhotos, setAssessmentPhotos] = useState<Record<string, string>>({});
   const [assessment, setAssessment] = useState<any>(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [validationError, setValidationError] = useState("");
   const [data, setData] = useState<FormData>({
     fullName: "", age: "", sex: "", weight: "", height: "",
     goal: "", activityLevel: "", neat: "", trainingDays: "", trainingTime: "",
@@ -124,12 +119,15 @@ const Onboarding = () => {
   const updateProfile = useUpdateProfile();
   const createProtocol = useCreateProtocol();
 
-  const update = (field: keyof FormData, value: any) => setData((prev) => ({ ...prev, [field]: value }));
+  const update = (field: keyof FormData, value: any) => {
+    setData((prev) => ({ ...prev, [field]: value }));
+    setValidationError("");
+  };
 
   const toggleArrayItem = (field: "foodsLike" | "allergies" | "supplements", item: string) => {
+    setValidationError("");
     setData((prev) => {
       const arr = prev[field] as string[];
-      // Handle "Não tenho alergias" / "Nenhum" exclusive
       if (field === "allergies" && item === "Não tenho alergias") {
         return { ...prev, [field]: arr.includes(item) ? [] : [item] };
       }
@@ -147,6 +145,47 @@ const Onboarding = () => {
   };
 
   const { user } = useAuth();
+
+  // Validation per step
+  const validateStep = (): string | null => {
+    switch (step) {
+      case 0:
+        if (!data.fullName.trim()) return "Preencha seu nome completo.";
+        if (!data.age) return "Informe sua idade.";
+        if (!data.sex) return "Selecione seu sexo.";
+        if (!data.weight) return "Informe seu peso.";
+        if (!data.height) return "Informe sua altura.";
+        return null;
+      case 1:
+        if (!data.goal) return "Selecione seu objetivo.";
+        if (!data.activityLevel) return "Selecione seu nível de atividade.";
+        if (!data.experience) return "Selecione sua experiência com treino.";
+        return null;
+      case 2:
+        if (!data.trainingDays) return "Selecione os dias de treino.";
+        if (!data.trainingTime) return "Selecione o horário de treino.";
+        if (!data.gymType) return "Selecione o tipo de academia.";
+        return null;
+      case 3:
+        if (!data.mealCount) return "Selecione quantas refeições por dia.";
+        if (data.foodsLike.length === 0) return "Selecione ao menos 5 alimentos que gosta.";
+        if (data.foodsLike.length < 5) return "Selecione ao menos 5 alimentos que gosta.";
+        if (data.allergies.length === 0) return "Selecione suas alergias ou marque 'Não tenho alergias'.";
+        if (!data.freeMeals) return "Selecione a frequência de refeições livres.";
+        return null;
+      case 4:
+        if (!data.sweetPreference) return "Selecione uma opção de doce ou 'Nenhum'.";
+        if (data.supplements.length === 0) return "Selecione suplementos ou marque 'Nenhum'.";
+        return null;
+      case 5:
+        if (!data.neat) return "Selecione sua rotina diária (NEAT).";
+        if (!data.sleepHours) return "Informe suas horas de sono.";
+        if (!data.stressLevel) return "Selecione seu nível de estresse.";
+        return null;
+      default:
+        return null;
+    }
+  };
 
   const runAssessment = async () => {
     const photoPaths = Object.values(assessmentPhotos);
@@ -166,7 +205,6 @@ const Onboarding = () => {
       const result = fnData.assessment;
       setAssessment(result);
 
-      // Save to database
       if (user && result) {
         await supabase.from("body_assessments").insert({
           user_id: user.id,
@@ -189,6 +227,13 @@ const Onboarding = () => {
   };
 
   const next = async () => {
+    // Validate current step
+    const error = validateStep();
+    if (error) {
+      setValidationError(error);
+      return;
+    }
+
     // On step 6 (assessment), trigger analysis if photos exist and no assessment yet
     if (step === 6 && Object.keys(assessmentPhotos).length > 0 && !assessment && !analyzing) {
       await runAssessment();
@@ -197,6 +242,7 @@ const Onboarding = () => {
 
     if (step < STEPS.length - 1) {
       setStep(step + 1);
+      setValidationError("");
       return;
     }
 
@@ -242,7 +288,7 @@ const Onboarding = () => {
     }
   };
 
-  const prev = () => step > 0 && setStep(step - 1);
+  const prev = () => { step > 0 && setStep(step - 1); setValidationError(""); };
   const progress = ((step + 1) / STEPS.length) * 100;
 
   const radioOption = (value: string, id: string, label: string) => (
@@ -268,18 +314,18 @@ const Onboarding = () => {
           {step === 0 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Dados Pessoais</h2>
-              <div><Label>Nome completo</Label><Input value={data.fullName} onChange={(e) => update("fullName", e.target.value)} placeholder="Seu nome" className="mt-1" /></div>
-              <div><Label>Idade</Label><Input type="number" value={data.age} onChange={(e) => update("age", e.target.value)} placeholder="25" className="mt-1" /></div>
+              <div><Label>Nome completo *</Label><Input value={data.fullName} onChange={(e) => update("fullName", e.target.value)} placeholder="Seu nome" className="mt-1" /></div>
+              <div><Label>Idade *</Label><Input type="number" value={data.age} onChange={(e) => update("age", e.target.value)} placeholder="25" className="mt-1" /></div>
               <div>
-                <Label>Sexo</Label>
+                <Label>Sexo *</Label>
                 <RadioGroup value={data.sex} onValueChange={(v) => update("sex", v)} className="flex gap-4 mt-1">
                   <div className="flex items-center gap-2"><RadioGroupItem value="M" id="m" /><Label htmlFor="m">Masculino</Label></div>
                   <div className="flex items-center gap-2"><RadioGroupItem value="F" id="f" /><Label htmlFor="f">Feminino</Label></div>
                 </RadioGroup>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div><Label>Peso (kg)</Label><Input type="number" value={data.weight} onChange={(e) => update("weight", e.target.value)} placeholder="80" className="mt-1" /></div>
-                <div><Label>Altura (cm)</Label><Input type="number" value={data.height} onChange={(e) => update("height", e.target.value)} placeholder="175" className="mt-1" /></div>
+                <div><Label>Peso (kg) *</Label><Input type="number" value={data.weight} onChange={(e) => update("weight", e.target.value)} placeholder="80" className="mt-1" /></div>
+                <div><Label>Altura (cm) *</Label><Input type="number" value={data.height} onChange={(e) => update("height", e.target.value)} placeholder="175" className="mt-1" /></div>
               </div>
             </>
           )}
@@ -289,20 +335,20 @@ const Onboarding = () => {
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Objetivo & Nível</h2>
               <div>
-                <Label>Objetivo principal</Label>
+                <Label>Objetivo principal *</Label>
                 <RadioGroup value={data.goal} onValueChange={(v) => update("goal", v)} className="mt-2 space-y-2">
                   {GOALS.map((g) => radioOption(g, g, g))}
                 </RadioGroup>
               </div>
               <div>
-                <Label>Nível de atividade</Label>
+                <Label>Nível de atividade *</Label>
                 <Select value={data.activityLevel} onValueChange={(v) => update("activityLevel", v)}>
                   <SelectTrigger className="mt-1"><SelectValue placeholder="Selecione" /></SelectTrigger>
                   <SelectContent>{ACTIVITY_LEVELS.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Experiência com treino</Label>
+                <Label>Experiência com treino *</Label>
                 <RadioGroup value={data.experience} onValueChange={(v) => update("experience", v)} className="mt-2 space-y-2">
                   {EXPERIENCE_LEVELS.map((l) => radioOption(l, l, l))}
                 </RadioGroup>
@@ -315,7 +361,7 @@ const Onboarding = () => {
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Treino</h2>
               <div>
-                <Label>Dias de treino por semana</Label>
+                <Label>Dias de treino por semana *</Label>
                 <RadioGroup value={data.trainingDays} onValueChange={(v) => update("trainingDays", v)} className="flex gap-2 mt-2">
                   {TRAINING_DAYS.map((d) => (
                     <div key={d} className="flex items-center gap-1"><RadioGroupItem value={d} id={`d${d}`} /><Label htmlFor={`d${d}`}>{d}x</Label></div>
@@ -323,13 +369,13 @@ const Onboarding = () => {
                 </RadioGroup>
               </div>
               <div>
-                <Label>Horário preferido de treino</Label>
+                <Label>Horário preferido de treino *</Label>
                 <RadioGroup value={data.trainingTime} onValueChange={(v) => update("trainingTime", v)} className="mt-2 space-y-2">
                   {TRAINING_TIMES.map((t) => radioOption(t, `tt-${t}`, t))}
                 </RadioGroup>
               </div>
               <div>
-                <Label>Tipo de academia</Label>
+                <Label>Tipo de academia *</Label>
                 <RadioGroup value={data.gymType} onValueChange={(v) => update("gymType", v)} className="mt-2 space-y-2">
                   {GYM_TYPES.map((g) => radioOption(g, `gym-${g}`, g))}
                 </RadioGroup>
@@ -353,7 +399,7 @@ const Onboarding = () => {
               <h2 className="text-2xl font-heading font-bold text-foreground">Alimentação</h2>
 
               <div>
-                <Label>Quantas refeições por dia?</Label>
+                <Label>Quantas refeições por dia? *</Label>
                 <RadioGroup value={data.mealCount} onValueChange={(v) => update("mealCount", v)} className="flex gap-3 mt-2">
                   {MEAL_COUNTS.map((m) => (
                     <div key={m} className="flex items-center gap-1"><RadioGroupItem value={m} id={`mc-${m}`} /><Label htmlFor={`mc-${m}`}>{m}</Label></div>
@@ -362,7 +408,7 @@ const Onboarding = () => {
               </div>
 
               <div>
-                <Label>Alimentos que você gosta (marque todos)</Label>
+                <Label>Alimentos que você gosta (marque ao menos 5) *</Label>
                 {FOOD_CATEGORIES.map((cat) => (
                   <div key={cat.label} className="mt-3">
                     <p className="text-xs font-semibold text-primary mb-1.5">{cat.label}</p>
@@ -384,7 +430,7 @@ const Onboarding = () => {
               </div>
 
               <div>
-                <Label>Alergias ou intolerâncias</Label>
+                <Label>Alergias ou intolerâncias *</Label>
                 <div className="mt-2 space-y-2">
                   {ALLERGY_OPTIONS.map((a) => (
                     <div key={a} className="flex items-center gap-2">
@@ -396,7 +442,7 @@ const Onboarding = () => {
               </div>
 
               <div>
-                <Label>Refeições livres por semana</Label>
+                <Label>Refeições livres por semana *</Label>
                 <RadioGroup value={data.freeMeals} onValueChange={(v) => update("freeMeals", v)} className="mt-2 space-y-2">
                   {FREE_MEAL_OPTIONS.map((fm) => radioOption(fm, `fm-${fm}`, fm))}
                 </RadioGroup>
@@ -410,14 +456,14 @@ const Onboarding = () => {
               <h2 className="text-2xl font-heading font-bold text-foreground">Doces & Suplementos</h2>
 
               <div>
-                <Label>Gostaria de incluir um doce no plano? (escolha apenas um)</Label>
+                <Label>Gostaria de incluir um doce no plano? (escolha apenas um) *</Label>
                 <RadioGroup value={data.sweetPreference} onValueChange={(v) => update("sweetPreference", v)} className="mt-2 space-y-2">
                   {SWEET_OPTIONS.map((s) => radioOption(s, `sweet-${s}`, s))}
                 </RadioGroup>
               </div>
 
               <div>
-                <Label>Suplementos que usa ou pretende usar</Label>
+                <Label>Suplementos que usa ou pretende usar *</Label>
                 <div className="mt-2 space-y-2">
                   {SUPPLEMENT_OPTIONS.map((s) => (
                     <div key={s} className="flex items-center gap-2">
@@ -438,14 +484,14 @@ const Onboarding = () => {
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Estilo de Vida</h2>
               <div>
-                <Label>NEAT (rotina diária)</Label>
+                <Label>NEAT (rotina diária) *</Label>
                 <RadioGroup value={data.neat} onValueChange={(v) => update("neat", v)} className="mt-2 space-y-2">
                   {NEAT_OPTIONS.map((n) => radioOption(n, `neat-${n}`, n))}
                 </RadioGroup>
               </div>
-              <div><Label>Horas de sono por noite</Label><Input type="number" value={data.sleepHours} onChange={(e) => update("sleepHours", e.target.value)} placeholder="7" className="mt-1" /></div>
+              <div><Label>Horas de sono por noite *</Label><Input type="number" value={data.sleepHours} onChange={(e) => update("sleepHours", e.target.value)} placeholder="7" className="mt-1" /></div>
               <div>
-                <Label>Nível de estresse</Label>
+                <Label>Nível de estresse *</Label>
                 <RadioGroup value={data.stressLevel} onValueChange={(v) => update("stressLevel", v)} className="flex gap-3 mt-2 flex-wrap">
                   {STRESS_LEVELS.map((s) => (
                     <div key={s} className="flex items-center gap-1"><RadioGroupItem value={s} id={`stress-${s}`} /><Label htmlFor={`stress-${s}`}>{s}</Label></div>
@@ -466,11 +512,16 @@ const Onboarding = () => {
       </div>
 
       <div className="p-4 border-t border-border">
-        <div className="max-w-lg mx-auto flex gap-3">
-          {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving || analyzing}>Voltar</Button>}
-          <Button onClick={next} className="flex-1 glow" disabled={saving || analyzing}>
-            {saving ? "Salvando..." : analyzing ? "Analisando..." : step === 6 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar Fotos" : step === STEPS.length - 1 ? "Finalizar" : "Próximo"}
-          </Button>
+        <div className="max-w-lg mx-auto">
+          {validationError && (
+            <p className="text-destructive text-sm mb-2 text-center">{validationError}</p>
+          )}
+          <div className="flex gap-3">
+            {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving || analyzing}>Voltar</Button>}
+            <Button onClick={next} className="flex-1 glow" disabled={saving || analyzing}>
+              {saving ? "Salvando..." : analyzing ? "Analisando..." : step === 6 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar Fotos" : step === STEPS.length - 1 ? "Finalizar" : "Próximo"}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
