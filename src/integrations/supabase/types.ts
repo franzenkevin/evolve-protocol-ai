@@ -175,6 +175,75 @@ export type Database = {
         }
         Relationships: []
       }
+      journal_articles: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          published_at: string
+          source_url: string | null
+          summary: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          published_at?: string
+          source_url?: string | null
+          summary: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          published_at?: string
+          source_url?: string | null
+          summary?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      live_meetings: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          meeting_url: string | null
+          scheduled_at: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          meeting_url?: string | null
+          scheduled_at: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          meeting_url?: string | null
+          scheduled_at?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           activity_level: string | null
@@ -301,6 +370,84 @@ export type Database = {
           updated_at?: string
           user_id?: string
           version?: number
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          cashback_amount: number | null
+          created_at: string
+          id: string
+          paid: boolean | null
+          referral_code: string
+          referred_user_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cashback_amount?: number | null
+          created_at?: string
+          id?: string
+          paid?: boolean | null
+          referral_code: string
+          referred_user_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cashback_amount?: number | null
+          created_at?: string
+          id?: string
+          paid?: boolean | null
+          referral_code?: string
+          referred_user_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          next_billing_date: string | null
+          payment_brand: string | null
+          payment_last4: string | null
+          payment_method: string | null
+          plan_type: string
+          start_date: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          next_billing_date?: string | null
+          payment_brand?: string | null
+          payment_last4?: string | null
+          payment_method?: string | null
+          plan_type?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          next_billing_date?: string | null
+          payment_brand?: string | null
+          payment_last4?: string | null
+          payment_method?: string | null
+          plan_type?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
