@@ -282,10 +282,41 @@ const Onboarding = () => {
 
       await updateProfile.mutateAsync(profileData);
 
-      const protocol = generateProtocol(profileData as Profile);
-      await createProtocol.mutateAsync(protocol);
+      // Try AI-generated protocol first, fallback to rule-based
+      let protocol: { training: any; diet: any };
+      try {
+        // Fetch latest body assessment if available
+        let bodyAssessment = assessment;
+        if (!bodyAssessment && user) {
+          const { data: assessData } = await supabase
+            .from("body_assessments")
+            .select("*")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          bodyAssessment = assessData;
+        }
 
-      toast({ title: "Onboarding completo!", description: "Seu protocolo foi gerado com sucesso." });
+        toast({ title: "🤖 Gerando protocolo com IA...", description: "Isso pode levar alguns segundos." });
+
+        const { data: aiResult, error: aiError } = await supabase.functions.invoke("generate-protocol", {
+          body: { profile: profileData, bodyAssessment },
+        });
+
+        if (aiError) throw aiError;
+        if (aiResult?.fallback) throw new Error("Fallback requested");
+        if (!aiResult?.training || !aiResult?.diet) throw new Error("Invalid AI response");
+
+        protocol = { training: aiResult.training, diet: aiResult.diet };
+        toast({ title: "✨ Protocolo personalizado gerado!", description: "Seu plano foi criado com inteligência artificial." });
+      } catch (aiErr) {
+        console.warn("AI protocol generation failed, using fallback:", aiErr);
+        protocol = generateProtocol(profileData as Profile);
+        toast({ title: "Protocolo gerado!", description: "Seu protocolo foi criado com sucesso." });
+      }
+
+      await createProtocol.mutateAsync(protocol);
       navigate("/dashboard");
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
