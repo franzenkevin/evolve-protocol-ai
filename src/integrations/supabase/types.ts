@@ -138,19 +138,24 @@ export type Database = {
           created_at: string
           disliked_foods: string | null
           experience: string | null
+          free_meals: string | null
           full_name: string | null
           goal: string | null
           gym_type: string | null
           height: number | null
           id: string
           injuries: string | null
+          meal_count: number | null
           neat: string | null
           onboarding_complete: boolean
           preferred_foods: string[] | null
           sex: string | null
           sleep_hours: number | null
           stress_level: string | null
+          supplements: string[] | null
+          sweet_preference: string | null
           training_days: number | null
+          training_time: string | null
           updated_at: string
           user_id: string
           weight: number | null
@@ -162,19 +167,24 @@ export type Database = {
           created_at?: string
           disliked_foods?: string | null
           experience?: string | null
+          free_meals?: string | null
           full_name?: string | null
           goal?: string | null
           gym_type?: string | null
           height?: number | null
           id?: string
           injuries?: string | null
+          meal_count?: number | null
           neat?: string | null
           onboarding_complete?: boolean
           preferred_foods?: string[] | null
           sex?: string | null
           sleep_hours?: number | null
           stress_level?: string | null
+          supplements?: string[] | null
+          sweet_preference?: string | null
           training_days?: number | null
+          training_time?: string | null
           updated_at?: string
           user_id: string
           weight?: number | null
@@ -186,19 +196,24 @@ export type Database = {
           created_at?: string
           disliked_foods?: string | null
           experience?: string | null
+          free_meals?: string | null
           full_name?: string | null
           goal?: string | null
           gym_type?: string | null
           height?: number | null
           id?: string
           injuries?: string | null
+          meal_count?: number | null
           neat?: string | null
           onboarding_complete?: boolean
           preferred_foods?: string[] | null
           sex?: string | null
           sleep_hours?: number | null
           stress_level?: string | null
+          supplements?: string[] | null
+          sweet_preference?: string | null
           training_days?: number | null
+          training_time?: string | null
           updated_at?: string
           user_id?: string
           weight?: number | null
