@@ -14,43 +14,112 @@ export function generateProtocol(profile: Profile) {
 
 function generateTraining(p: Profile) {
   const days = p.training_days || 4;
+  const weekdays = p.training_weekdays || [];
 
-  const templates: Record<number, { label: string; muscleGroup: string }[]> = {
+  // Map weekday names to numeric index (0=Monday ... 6=Sunday)
+  const WEEKDAY_ORDER: Record<string, number> = {
+    "Segunda": 0, "Terça": 1, "Quarta": 2, "Quinta": 3,
+    "Sexta": 4, "Sábado": 5, "Domingo": 6,
+  };
+
+  // Sort selected weekdays by their position in the week
+  const sortedWeekdays = [...weekdays].sort((a, b) => (WEEKDAY_ORDER[a] ?? 0) - (WEEKDAY_ORDER[b] ?? 0));
+
+  // Muscle group templates — ordered to maximize rest between synergistic groups
+  // Synergies: Peito→Tríceps/Ombro, Costas→Bíceps, Quad↔Post
+  // We define multiple orderings and pick the best one for the selected days
+  const templates: Record<number, { muscleGroup: string; synergy: string[] }[]> = {
     2: [
-      { label: "Dia A", muscleGroup: "Full Body A" },
-      { label: "Dia B", muscleGroup: "Full Body B" },
+      { muscleGroup: "Full Body A", synergy: ["all"] },
+      { muscleGroup: "Full Body B", synergy: ["all"] },
     ],
     3: [
-      { label: "Dia A", muscleGroup: "Peito, Ombros & Tríceps" },
-      { label: "Dia B", muscleGroup: "Costas & Bíceps" },
-      { label: "Dia C", muscleGroup: "Pernas & Core" },
+      { muscleGroup: "Peito, Ombros & Tríceps", synergy: ["push"] },
+      { muscleGroup: "Costas & Bíceps", synergy: ["pull"] },
+      { muscleGroup: "Pernas & Core", synergy: ["legs"] },
     ],
     4: [
-      { label: "Dia A", muscleGroup: "Peito & Tríceps" },
-      { label: "Dia B", muscleGroup: "Costas & Bíceps" },
-      { label: "Dia C", muscleGroup: "Pernas (Quad)" },
-      { label: "Dia D", muscleGroup: "Ombros & Pernas (Post)" },
+      { muscleGroup: "Peito & Tríceps", synergy: ["chest", "triceps"] },
+      { muscleGroup: "Costas & Bíceps", synergy: ["back", "biceps"] },
+      { muscleGroup: "Pernas (Quad)", synergy: ["quad"] },
+      { muscleGroup: "Ombros & Pernas (Post)", synergy: ["shoulders", "posterior"] },
     ],
     5: [
-      { label: "Dia A", muscleGroup: "Peito" },
-      { label: "Dia B", muscleGroup: "Costas" },
-      { label: "Dia C", muscleGroup: "Pernas (Quad)" },
-      { label: "Dia D", muscleGroup: "Ombros & Tríceps" },
-      { label: "Dia E", muscleGroup: "Bíceps & Pernas (Post)" },
+      { muscleGroup: "Peito", synergy: ["chest"] },
+      { muscleGroup: "Costas", synergy: ["back"] },
+      { muscleGroup: "Pernas (Quad)", synergy: ["quad"] },
+      { muscleGroup: "Ombros & Tríceps", synergy: ["shoulders", "triceps"] },
+      { muscleGroup: "Bíceps & Pernas (Post)", synergy: ["biceps", "posterior"] },
     ],
     6: [
-      { label: "Dia A", muscleGroup: "Peito" },
-      { label: "Dia B", muscleGroup: "Costas" },
-      { label: "Dia C", muscleGroup: "Pernas (Quad)" },
-      { label: "Dia D", muscleGroup: "Ombros" },
-      { label: "Dia E", muscleGroup: "Braços" },
-      { label: "Dia F", muscleGroup: "Pernas (Post) & Core" },
+      { muscleGroup: "Peito", synergy: ["chest"] },
+      { muscleGroup: "Costas", synergy: ["back"] },
+      { muscleGroup: "Pernas (Quad)", synergy: ["quad"] },
+      { muscleGroup: "Ombros", synergy: ["shoulders"] },
+      { muscleGroup: "Braços", synergy: ["triceps", "biceps"] },
+      { muscleGroup: "Pernas (Post) & Core", synergy: ["posterior"] },
     ],
   };
 
-  // Valid sets based on experience: beginner=1, intermediate=2, advanced=3
+  // Smart ordering: arrange muscle groups to maximize gap between conflicting synergies
+  // Conflicts: chest↔shoulders/triceps, back↔biceps, quad↔posterior
+  function orderSplit(split: typeof templates[4], dayIndices: number[]) {
+    if (split.length <= 2) return split;
+
+    const conflicts: [string, string[]][] = [
+      ["chest", ["shoulders", "triceps", "push"]],
+      ["shoulders", ["chest", "triceps", "push"]],
+      ["triceps", ["chest", "shoulders", "push"]],
+      ["back", ["biceps", "pull"]],
+      ["biceps", ["back", "pull"]],
+      ["quad", ["posterior", "legs"]],
+      ["posterior", ["quad", "legs"]],
+    ];
+
+    // Calculate gap in days between two positions (wrapping around the week)
+    const gap = (i: number, j: number) => {
+      const a = dayIndices[i], b = dayIndices[j];
+      return Math.min(Math.abs(b - a), 7 - Math.abs(b - a));
+    };
+
+    // Try all permutations for small arrays (up to 6! = 720)
+    const permutations = <T>(arr: T[]): T[][] => {
+      if (arr.length <= 1) return [arr];
+      return arr.flatMap((item, i) =>
+        permutations([...arr.slice(0, i), ...arr.slice(i + 1)]).map(p => [item, ...p])
+      );
+    };
+
+    let bestOrder = split;
+    let bestMinGap = -1;
+
+    for (const perm of permutations(split)) {
+      let minGap = Infinity;
+      for (let i = 0; i < perm.length; i++) {
+        for (let j = i + 1; j < perm.length; j++) {
+          const hasConflict = perm[i].synergy.some(s =>
+            conflicts.some(([key, conf]) => s === key && perm[j].synergy.some(t => conf.includes(t)))
+          );
+          if (hasConflict) {
+            minGap = Math.min(minGap, gap(i, j));
+          }
+        }
+      }
+      if (minGap > bestMinGap) {
+        bestMinGap = minGap;
+        bestOrder = perm;
+      }
+    }
+    return bestOrder;
+  }
+
+  const rawSplit = templates[days] || templates[4];
+  const dayIndices = sortedWeekdays.map(d => WEEKDAY_ORDER[d] ?? 0);
+  const orderedSplit = orderSplit(rawSplit, dayIndices.length === rawSplit.length ? dayIndices : Array.from({ length: rawSplit.length }, (_, i) => i));
+
+  // Valid sets based on experience
   const expLevel = p.experience || "Intermediário";
-  const validSetsCount = expLevel === "Iniciante" ? 1 : expLevel === "Avançado" ? 3 : 2;
+  const validSetsCount = expLevel.startsWith("Iniciante") ? 1 : expLevel.startsWith("Avançado") ? 3 : 2;
 
   const exerciseDB: Record<string, { name: string; sets: number; reps: string; rest: string }[]> = {
     "Peito": [
@@ -98,9 +167,10 @@ function generateTraining(p: Profile) {
     ],
   };
 
-  const split = templates[days] || templates[4];
+  return orderedSplit.map((day, i) => {
+    const weekday = sortedWeekdays[i] || "";
+    const label = weekday ? `${weekday} — ${day.muscleGroup}` : `Dia ${String.fromCharCode(65 + i)} — ${day.muscleGroup}`;
 
-  return split.map((day, i) => {
     const groups = day.muscleGroup.split(/[&,]/).map((g) => g.trim());
     const exercises = groups.flatMap((g) => {
       const key = Object.keys(exerciseDB).find((k) => g.includes(k) || k.includes(g));
@@ -108,7 +178,9 @@ function generateTraining(p: Profile) {
     });
 
     return {
-      ...day,
+      label,
+      muscleGroup: day.muscleGroup,
+      weekday,
       exercises: exercises.map((ex, j) => ({
         id: `${i}-${j}`,
         ...ex,
