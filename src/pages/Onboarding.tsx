@@ -75,6 +75,8 @@ const FOOD_CATEGORIES: { label: string; items: string[] }[] = [
   },
 ];
 
+const WEEKDAYS = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+
 interface FormData {
   fullName: string;
   age: string;
@@ -85,6 +87,7 @@ interface FormData {
   activityLevel: string;
   neat: string;
   trainingDays: string;
+  trainingWeekdays: string[];
   trainingTime: string;
   experience: string;
   gymType: string;
@@ -109,7 +112,7 @@ const Onboarding = () => {
   const [validationError, setValidationError] = useState("");
   const [data, setData] = useState<FormData>({
     fullName: "", age: "", sex: "", weight: "", height: "",
-    goal: "", activityLevel: "", neat: "", trainingDays: "", trainingTime: "",
+    goal: "", activityLevel: "", neat: "", trainingDays: "", trainingWeekdays: [], trainingTime: "",
     experience: "", gymType: "", injuries: "", foodsLike: [],
     foodsDislike: "", allergies: [], sweetPreference: "", supplements: [],
     freeMeals: "", mealCount: "", sleepHours: "", stressLevel: "",
@@ -124,7 +127,7 @@ const Onboarding = () => {
     setValidationError("");
   };
 
-  const toggleArrayItem = (field: "foodsLike" | "allergies" | "supplements", item: string) => {
+  const toggleArrayItem = (field: "foodsLike" | "allergies" | "supplements" | "trainingWeekdays", item: string) => {
     setValidationError("");
     setData((prev) => {
       const arr = prev[field] as string[];
@@ -163,6 +166,8 @@ const Onboarding = () => {
         return null;
       case 2:
         if (!data.trainingDays) return "Selecione os dias de treino.";
+        if (data.trainingWeekdays.length === 0) return "Selecione quais dias da semana você vai treinar.";
+        if (data.trainingWeekdays.length !== parseInt(data.trainingDays)) return `Selecione exatamente ${data.trainingDays} dias da semana.`;
         if (!data.trainingTime) return "Selecione o horário de treino.";
         if (!data.gymType) return "Selecione o tipo de academia.";
         return null;
@@ -258,6 +263,7 @@ const Onboarding = () => {
         activity_level: data.activityLevel,
         neat: data.neat,
         training_days: data.trainingDays ? parseInt(data.trainingDays) : null,
+        training_weekdays: data.trainingWeekdays,
         training_time: data.trainingTime,
         experience: data.experience,
         gym_type: data.gymType,
@@ -362,12 +368,36 @@ const Onboarding = () => {
               <h2 className="text-2xl font-heading font-bold text-foreground">Treino</h2>
               <div>
                 <Label>Dias de treino por semana *</Label>
-                <RadioGroup value={data.trainingDays} onValueChange={(v) => update("trainingDays", v)} className="flex gap-2 mt-2">
+                <RadioGroup value={data.trainingDays} onValueChange={(v) => { update("trainingDays", v); setData(prev => ({ ...prev, trainingWeekdays: [] })); }} className="flex gap-2 mt-2">
                   {TRAINING_DAYS.map((d) => (
                     <div key={d} className="flex items-center gap-1"><RadioGroupItem value={d} id={`d${d}`} /><Label htmlFor={`d${d}`}>{d}x</Label></div>
                   ))}
                 </RadioGroup>
               </div>
+              {data.trainingDays && (
+                <div>
+                  <Label>Quais dias da semana? * (selecione {data.trainingDays})</Label>
+                  <p className="text-xs text-muted-foreground mt-1 mb-2">A divisão do treino será montada respeitando o descanso muscular adequado.</p>
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    {WEEKDAYS.map((day) => (
+                      <div
+                        key={day}
+                        className="flex items-center gap-2 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
+                        onClick={() => {
+                          if (!data.trainingWeekdays.includes(day) && data.trainingWeekdays.length >= parseInt(data.trainingDays)) return;
+                          toggleArrayItem("trainingWeekdays", day);
+                        }}
+                      >
+                        <Checkbox
+                          checked={data.trainingWeekdays.includes(day)}
+                          disabled={!data.trainingWeekdays.includes(day) && data.trainingWeekdays.length >= parseInt(data.trainingDays)}
+                        />
+                        <Label className="cursor-pointer">{day}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div>
                 <Label>Horário preferido de treino *</Label>
                 <RadioGroup value={data.trainingTime} onValueChange={(v) => update("trainingTime", v)} className="mt-2 space-y-2">
