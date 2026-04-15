@@ -127,7 +127,7 @@ const Onboarding = () => {
     setValidationError("");
   };
 
-  const toggleArrayItem = (field: "foodsLike" | "allergies" | "supplements", item: string) => {
+  const toggleArrayItem = (field: "foodsLike" | "allergies" | "supplements" | "trainingWeekdays", item: string) => {
     setValidationError("");
     setData((prev) => {
       const arr = prev[field] as string[];
@@ -166,6 +166,8 @@ const Onboarding = () => {
         return null;
       case 2:
         if (!data.trainingDays) return "Selecione os dias de treino.";
+        if (data.trainingWeekdays.length === 0) return "Selecione quais dias da semana você vai treinar.";
+        if (data.trainingWeekdays.length !== parseInt(data.trainingDays)) return `Selecione exatamente ${data.trainingDays} dias da semana.`;
         if (!data.trainingTime) return "Selecione o horário de treino.";
         if (!data.gymType) return "Selecione o tipo de academia.";
         return null;
