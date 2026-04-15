@@ -16,6 +16,8 @@ import Training from "./pages/Training";
 import Diet from "./pages/Diet";
 import Progress from "./pages/Progress";
 import Exams from "./pages/Exams";
+import Journal from "./pages/Journal";
+import Chat from "./pages/Chat";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
