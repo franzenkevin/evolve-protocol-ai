@@ -300,6 +300,7 @@ export type Database = {
           sweet_preference: string | null
           training_days: number | null
           training_time: string | null
+          training_weekdays: string[] | null
           updated_at: string
           user_id: string
           weight: number | null
@@ -329,6 +330,7 @@ export type Database = {
           sweet_preference?: string | null
           training_days?: number | null
           training_time?: string | null
+          training_weekdays?: string[] | null
           updated_at?: string
           user_id: string
           weight?: number | null
@@ -358,6 +360,7 @@ export type Database = {
           sweet_preference?: string | null
           training_days?: number | null
           training_time?: string | null
+          training_weekdays?: string[] | null
           updated_at?: string
           user_id?: string
           weight?: number | null
