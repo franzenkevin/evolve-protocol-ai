@@ -137,11 +137,7 @@ interface MealOption {
 interface Meal {
   label: string;
   time: string;
-  /** The "clean/fixed" option */
-  fixed: MealOption;
-  /** The "flexible/tasty" alternative */
-  flexible: MealOption;
-  /** Substitution groups the user can swap within */
+  options: MealOption[];
   substitutions: { category: string; options: string[] }[];
 }
 
