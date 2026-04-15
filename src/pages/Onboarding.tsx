@@ -75,6 +75,8 @@ const FOOD_CATEGORIES: { label: string; items: string[] }[] = [
   },
 ];
 
+const WEEKDAYS = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+
 interface FormData {
   fullName: string;
   age: string;
@@ -85,6 +87,7 @@ interface FormData {
   activityLevel: string;
   neat: string;
   trainingDays: string;
+  trainingWeekdays: string[];
   trainingTime: string;
   experience: string;
   gymType: string;

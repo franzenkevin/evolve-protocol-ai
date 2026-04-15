@@ -14,6 +14,7 @@ export interface Profile {
   activity_level: string | null;
   neat: string | null;
   training_days: number | null;
+  training_weekdays: string[] | null;
   experience: string | null;
   gym_type: string | null;
   injuries: string | null;
