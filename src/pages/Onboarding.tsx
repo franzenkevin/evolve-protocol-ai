@@ -146,6 +146,8 @@ const Onboarding = () => {
     });
   };
 
+  const { user } = useAuth();
+
   const runAssessment = async () => {
     const photoPaths = Object.values(assessmentPhotos);
     if (photoPaths.length === 0) return;
@@ -161,7 +163,24 @@ const Onboarding = () => {
         },
       });
       if (error) throw error;
-      setAssessment(fnData.assessment);
+      const result = fnData.assessment;
+      setAssessment(result);
+
+      // Save to database
+      if (user && result) {
+        await supabase.from("body_assessments").insert({
+          user_id: user.id,
+          photo_paths: photoPaths,
+          body_fat_estimate: result.body_fat_estimate || null,
+          body_fat_category: result.body_fat_category || null,
+          posture_deviations: result.posture_deviations || [],
+          strong_points: result.strong_points || [],
+          weak_points: result.weak_points || [],
+          muscle_development: result.muscle_development || {},
+          recommendations: result.recommendations || [],
+          overall_summary: result.overall_summary || null,
+        });
+      }
     } catch (err: any) {
       toast({ title: "Erro na análise", description: err.message, variant: "destructive" });
     } finally {
