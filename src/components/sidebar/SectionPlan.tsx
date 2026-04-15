@@ -1,0 +1,51 @@
+import { useSubscription } from "@/hooks/useSubscription";
+import { Card } from "@/components/ui/card";
+import { CreditCard, Calendar, Crown } from "lucide-react";
+
+const SectionPlan = () => {
+  const { data: sub } = useSubscription();
+
+  const planLabel = sub?.plan_type === "annual" ? "Anual" : "Mensal";
+  const statusLabel = sub?.status === "active" ? "Ativo" : sub?.status || "Sem plano";
+
+  return (
+    <div className="space-y-2">
+      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">Plano</h3>
+      <Card className="p-3 card-gradient border-border space-y-3">
+        <div className="flex items-center gap-2">
+          <Crown size={16} className="text-primary" />
+          <span className="text-sm text-foreground font-medium">{sub ? `Plano ${planLabel}` : "Sem plano ativo"}</span>
+          <span className={`ml-auto text-[10px] px-2 py-0.5 rounded-full ${sub?.status === "active" ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
+            {statusLabel}
+          </span>
+        </div>
+
+        {sub && (
+          <>
+            <div className="space-y-1 text-xs">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Calendar size={12} />
+                <span>Início: {new Date(sub.start_date).toLocaleDateString("pt-BR")}</span>
+              </div>
+              {sub.next_billing_date && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Calendar size={12} />
+                  <span>Próxima cobrança: {new Date(sub.next_billing_date).toLocaleDateString("pt-BR")}</span>
+                </div>
+              )}
+            </div>
+
+            {sub.payment_brand && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground border-t border-border pt-2">
+                <CreditCard size={12} />
+                <span>{sub.payment_brand} •••• {sub.payment_last4}</span>
+              </div>
+            )}
+          </>
+        )}
+      </Card>
+    </div>
+  );
+};
+
+export default SectionPlan;
