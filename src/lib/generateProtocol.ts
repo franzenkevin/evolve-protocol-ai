@@ -48,49 +48,53 @@ function generateTraining(p: Profile) {
     ],
   };
 
+  // Valid sets based on experience: beginner=1, intermediate=2, advanced=3
+  const expLevel = p.experience || "Intermediário";
+  const validSetsCount = expLevel === "Iniciante" ? 1 : expLevel === "Avançado" ? 3 : 2;
+
   const exerciseDB: Record<string, { name: string; sets: number; reps: string; rest: string }[]> = {
     "Peito": [
-      { name: "Supino reto com barra", sets: 4, reps: "8-12", rest: "90s" },
-      { name: "Supino inclinado halteres", sets: 3, reps: "10-12", rest: "90s" },
-      { name: "Crucifixo máquina", sets: 3, reps: "12-15", rest: "60s" },
-      { name: "Crossover", sets: 3, reps: "12-15", rest: "60s" },
+      { name: "Supino reto com barra", sets: validSetsCount, reps: "8-12", rest: "90s" },
+      { name: "Supino inclinado halteres", sets: validSetsCount, reps: "10-12", rest: "90s" },
+      { name: "Crucifixo máquina", sets: validSetsCount, reps: "12-15", rest: "60s" },
+      { name: "Crossover", sets: validSetsCount, reps: "12-15", rest: "60s" },
     ],
     "Costas": [
-      { name: "Puxada frontal", sets: 4, reps: "8-12", rest: "90s" },
-      { name: "Remada curvada", sets: 4, reps: "8-12", rest: "90s" },
-      { name: "Remada unilateral", sets: 3, reps: "10-12", rest: "60s" },
-      { name: "Pulldown corda", sets: 3, reps: "12-15", rest: "60s" },
+      { name: "Puxada frontal", sets: validSetsCount, reps: "8-12", rest: "90s" },
+      { name: "Remada curvada", sets: validSetsCount, reps: "8-12", rest: "90s" },
+      { name: "Remada unilateral", sets: validSetsCount, reps: "10-12", rest: "60s" },
+      { name: "Pulldown corda", sets: validSetsCount, reps: "12-15", rest: "60s" },
     ],
     "Pernas (Quad)": [
-      { name: "Agachamento livre", sets: 4, reps: "8-10", rest: "120s" },
-      { name: "Leg press 45°", sets: 4, reps: "10-12", rest: "90s" },
-      { name: "Cadeira extensora", sets: 3, reps: "12-15", rest: "60s" },
-      { name: "Passada com halteres", sets: 3, reps: "12/lado", rest: "60s" },
+      { name: "Agachamento livre", sets: validSetsCount, reps: "8-10", rest: "120s" },
+      { name: "Leg press 45°", sets: validSetsCount, reps: "10-12", rest: "90s" },
+      { name: "Cadeira extensora", sets: validSetsCount, reps: "12-15", rest: "60s" },
+      { name: "Passada com halteres", sets: validSetsCount, reps: "12/lado", rest: "60s" },
     ],
     "Ombros": [
-      { name: "Desenvolvimento com halteres", sets: 4, reps: "8-12", rest: "90s" },
-      { name: "Elevação lateral", sets: 3, reps: "12-15", rest: "60s" },
-      { name: "Elevação frontal", sets: 3, reps: "12-15", rest: "60s" },
-      { name: "Face pull", sets: 3, reps: "15-20", rest: "60s" },
+      { name: "Desenvolvimento com halteres", sets: validSetsCount, reps: "8-12", rest: "90s" },
+      { name: "Elevação lateral", sets: validSetsCount, reps: "12-15", rest: "60s" },
+      { name: "Elevação frontal", sets: validSetsCount, reps: "12-15", rest: "60s" },
+      { name: "Face pull", sets: validSetsCount, reps: "15-20", rest: "60s" },
     ],
     "Tríceps": [
-      { name: "Tríceps pulley corda", sets: 3, reps: "12-15", rest: "60s" },
-      { name: "Tríceps testa barra EZ", sets: 3, reps: "10-12", rest: "60s" },
-      { name: "Mergulho no banco", sets: 3, reps: "falha", rest: "60s" },
+      { name: "Tríceps pulley corda", sets: validSetsCount, reps: "12-15", rest: "60s" },
+      { name: "Tríceps testa barra EZ", sets: validSetsCount, reps: "10-12", rest: "60s" },
+      { name: "Mergulho no banco", sets: validSetsCount, reps: "falha", rest: "60s" },
     ],
     "Bíceps": [
-      { name: "Rosca direta barra", sets: 3, reps: "10-12", rest: "60s" },
-      { name: "Rosca martelo", sets: 3, reps: "12-15", rest: "60s" },
-      { name: "Rosca concentrada", sets: 3, reps: "12-15", rest: "60s" },
+      { name: "Rosca direta barra", sets: validSetsCount, reps: "10-12", rest: "60s" },
+      { name: "Rosca martelo", sets: validSetsCount, reps: "12-15", rest: "60s" },
+      { name: "Rosca concentrada", sets: validSetsCount, reps: "12-15", rest: "60s" },
     ],
     "Pernas (Post)": [
-      { name: "Stiff", sets: 4, reps: "8-12", rest: "90s" },
-      { name: "Mesa flexora", sets: 3, reps: "12-15", rest: "60s" },
-      { name: "Elevação pélvica", sets: 3, reps: "12-15", rest: "60s" },
+      { name: "Stiff", sets: validSetsCount, reps: "8-12", rest: "90s" },
+      { name: "Mesa flexora", sets: validSetsCount, reps: "12-15", rest: "60s" },
+      { name: "Elevação pélvica", sets: validSetsCount, reps: "12-15", rest: "60s" },
     ],
     "Core": [
-      { name: "Prancha", sets: 3, reps: "45s", rest: "30s" },
-      { name: "Abdominal infra", sets: 3, reps: "15-20", rest: "30s" },
+      { name: "Prancha", sets: validSetsCount, reps: "45s", rest: "30s" },
+      { name: "Abdominal infra", sets: validSetsCount, reps: "15-20", rest: "30s" },
     ],
   };
 
