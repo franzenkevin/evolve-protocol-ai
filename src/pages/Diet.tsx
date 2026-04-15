@@ -4,15 +4,27 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeftRight } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  ArrowLeftRight,
+  Utensils,
+  Zap,
+  Info,
+  Leaf,
+} from "lucide-react";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 
 const Diet = () => {
   const { data: protocol, isLoading } = useActiveProtocol();
   const [expandedMeal, setExpandedMeal] = useState<number | null>(0);
+  const [activeOption, setActiveOption] = useState<Record<number, "fixed" | "flexible">>({});
+  const [showSubs, setShowSubs] = useState<number | null>(null);
 
   const diet = protocol?.diet as any;
   const meals = diet?.meals || [];
+
+  const getOption = (idx: number) => activeOption[idx] || "fixed";
 
   if (isLoading) {
     return (
@@ -31,7 +43,9 @@ const Diet = () => {
     return (
       <AppLayout>
         <div className="p-4 max-w-lg mx-auto text-center pt-20">
-          <p className="text-muted-foreground">Nenhuma dieta disponível. Complete o onboarding primeiro.</p>
+          <p className="text-muted-foreground">
+            Nenhuma dieta disponível. Complete o onboarding primeiro.
+          </p>
         </div>
       </AppLayout>
     );
@@ -39,46 +53,178 @@ const Diet = () => {
 
   return (
     <AppLayout>
-      <div className="p-4 max-w-lg mx-auto space-y-4 animate-fade-in">
+      <div className="p-4 max-w-lg mx-auto space-y-4 animate-fade-in pb-24">
         <h1 className="text-2xl font-heading font-bold text-foreground pt-2">Dieta</h1>
 
+        {/* Macros summary */}
         <Card className="p-4 card-gradient border-border">
           <h3 className="font-heading font-semibold text-foreground mb-3">Resumo do dia</h3>
           <div className="grid grid-cols-4 gap-2 text-center">
-            <div><p className="text-lg font-bold text-primary">{diet.totalCalories}</p><p className="text-xs text-muted-foreground">Kcal</p></div>
-            <div><p className="text-lg font-bold text-info">{diet.protein}g</p><p className="text-xs text-muted-foreground">Prot</p></div>
-            <div><p className="text-lg font-bold text-warning">{diet.carbs}g</p><p className="text-xs text-muted-foreground">Carb</p></div>
-            <div><p className="text-lg font-bold text-destructive">{diet.fat}g</p><p className="text-xs text-muted-foreground">Gord</p></div>
+            <div>
+              <p className="text-lg font-bold text-primary">{diet.totalCalories}</p>
+              <p className="text-xs text-muted-foreground">Kcal</p>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-info">{diet.protein}g</p>
+              <p className="text-xs text-muted-foreground">Prot</p>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-warning">{diet.carbs}g</p>
+              <p className="text-xs text-muted-foreground">Carb</p>
+            </div>
+            <div>
+              <p className="text-lg font-bold text-destructive">{diet.fat}g</p>
+              <p className="text-xs text-muted-foreground">Gord</p>
+            </div>
           </div>
         </Card>
 
-        {meals.map((meal: any, idx: number) => (
-          <Card key={idx} className="overflow-hidden">
-            <button className="w-full p-4 flex items-center justify-between text-left" onClick={() => setExpandedMeal(expandedMeal === idx ? null : idx)}>
-              <div>
-                <h3 className="font-heading font-semibold text-foreground">{meal.label}</h3>
-                <p className="text-xs text-muted-foreground">{meal.time} • {meal.foods.length} alimentos</p>
-              </div>
-              <Badge variant="secondary">{meal.foods.reduce((a: number, f: any) => a + f.calories, 0)} kcal</Badge>
-            </button>
-            {expandedMeal === idx && (
-              <div className="px-4 pb-4 space-y-2 border-t border-border pt-3">
-                {meal.foods.map((food: any, fi: number) => (
-                  <div key={fi} className="flex items-center justify-between py-1.5">
-                    <div className="flex-1">
-                      <p className="text-sm text-foreground">{food.name}</p>
-                      <p className="text-xs text-muted-foreground">{food.amount}</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-muted-foreground">{food.calories} kcal</span>
-                      <Button variant="ghost" size="icon" className="h-7 w-7"><ArrowLeftRight size={14} className="text-primary" /></Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+        {/* Carb front loading note */}
+        {diet.carbFrontLoading && (
+          <Card className="p-3 border-border bg-muted/30">
+            <div className="flex items-start gap-2">
+              <Zap size={16} className="text-primary mt-0.5 shrink-0" />
+              <p className="text-xs text-muted-foreground">{diet.carbFrontLoading}</p>
+            </div>
           </Card>
-        ))}
+        )}
+
+        {/* Meals */}
+        {meals.map((meal: any, idx: number) => {
+          const isExpanded = expandedMeal === idx;
+          const option = getOption(idx);
+          const currentMeal = option === "fixed" ? meal.fixed : meal.flexible;
+          const totalCal = currentMeal?.foods?.reduce(
+            (a: number, f: any) => a + (f.calories || 0),
+            0
+          ) || 0;
+
+          return (
+            <Card key={idx} className="overflow-hidden">
+              {/* Meal header */}
+              <button
+                className="w-full p-4 flex items-center justify-between text-left"
+                onClick={() => setExpandedMeal(isExpanded ? null : idx)}
+              >
+                <div>
+                  <h3 className="font-heading font-semibold text-foreground">{meal.label}</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {meal.time} • {currentMeal?.foods?.length || 0} alimentos
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">{totalCal} kcal</Badge>
+                  {isExpanded ? (
+                    <ChevronUp size={16} className="text-muted-foreground" />
+                  ) : (
+                    <ChevronDown size={16} className="text-muted-foreground" />
+                  )}
+                </div>
+              </button>
+
+              {isExpanded && (
+                <div className="px-4 pb-4 space-y-3 border-t border-border pt-3">
+                  {/* Fixed / Flexible toggle */}
+                  <div className="flex gap-2">
+                    <Button
+                      variant={option === "fixed" ? "default" : "outline"}
+                      size="sm"
+                      className="gap-1.5 text-xs flex-1"
+                      onClick={() => setActiveOption((p) => ({ ...p, [idx]: "fixed" }))}
+                    >
+                      <Leaf size={12} />
+                      Fixa
+                    </Button>
+                    <Button
+                      variant={option === "flexible" ? "default" : "outline"}
+                      size="sm"
+                      className="gap-1.5 text-xs flex-1"
+                      onClick={() => setActiveOption((p) => ({ ...p, [idx]: "flexible" }))}
+                    >
+                      <Utensils size={12} />
+                      Flexível
+                    </Button>
+                  </div>
+
+                  {/* Food list */}
+                  {currentMeal?.foods?.map((food: any, fi: number) => (
+                    <div key={fi} className="flex items-center justify-between py-1.5">
+                      <div className="flex-1">
+                        <p className="text-sm text-foreground">{food.name}</p>
+                        <p className="text-xs text-muted-foreground">{food.amount}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs text-muted-foreground block">
+                          {food.calories} kcal
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">
+                          P:{food.protein} C:{food.carbs} G:{food.fat}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Substitutions toggle */}
+                  {meal.substitutions && meal.substitutions.length > 0 && (
+                    <div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1.5 text-xs text-primary w-full"
+                        onClick={() => setShowSubs(showSubs === idx ? null : idx)}
+                      >
+                        <ArrowLeftRight size={12} />
+                        {showSubs === idx ? "Ocultar substituições" : "Ver substituições"}
+                      </Button>
+
+                      {showSubs === idx && (
+                        <div className="mt-2 space-y-2">
+                          {meal.substitutions.map((sub: any, si: number) => (
+                            <div key={si} className="bg-muted/30 rounded-md p-2">
+                              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                                {sub.category}
+                              </p>
+                              <div className="flex flex-wrap gap-1">
+                                {sub.options.map((opt: string, oi: number) => (
+                                  <Badge
+                                    key={oi}
+                                    variant="outline"
+                                    className="text-[10px] py-0"
+                                  >
+                                    {opt}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </Card>
+          );
+        })}
+
+        {/* Supplement notes */}
+        {diet.notes && diet.notes.length > 0 && (
+          <Card className="p-4 border-border">
+            <div className="flex items-center gap-2 mb-2">
+              <Info size={14} className="text-primary" />
+              <h3 className="font-heading font-semibold text-sm text-foreground">
+                Suplementação
+              </h3>
+            </div>
+            <div className="space-y-1">
+              {diet.notes.map((note: string, i: number) => (
+                <p key={i} className="text-xs text-muted-foreground">
+                  • {note}
+                </p>
+              ))}
+            </div>
+          </Card>
+        )}
       </div>
     </AppLayout>
   );
