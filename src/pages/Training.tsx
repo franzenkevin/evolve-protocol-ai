@@ -121,7 +121,17 @@ const Training = () => {
   const ai = useAIExplanation();
 
   const training = (protocol?.training as any[]) || [];
-  const day = training[selectedDay];
+
+  // Auto-select today's training day on first load
+  useEffect(() => {
+    if (initialized || training.length === 0) return;
+    const todayIndex = training.findIndex((d: any) => d.weekday === todayWeekday);
+    setSelectedDay(todayIndex >= 0 ? todayIndex : 0);
+    setInitialized(true);
+  }, [training.length, initialized]);
+
+  const day = selectedDay >= 0 ? training[selectedDay] : null;
+  const isTodayDay = (d: any) => d.weekday === todayWeekday;
 
   const { data: currentLogs } = useWorkoutLogs(selectedDay, sessionDate);
   const { data: previousLogs } = usePreviousWorkoutLogs(selectedDay, sessionDate);
