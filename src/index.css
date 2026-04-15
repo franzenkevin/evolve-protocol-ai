@@ -6,55 +6,55 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 220 15% 15%;
+    --background: 220 10% 8%;
+    --foreground: 30 20% 90%;
 
-    --card: 0 0% 97%;
-    --card-foreground: 220 15% 15%;
+    --card: 220 10% 11%;
+    --card-foreground: 30 20% 90%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 15% 15%;
+    --popover: 220 10% 11%;
+    --popover-foreground: 30 20% 90%;
 
     --primary: 30 100% 50%;
-    --primary-foreground: 0 0% 100%;
+    --primary-foreground: 220 10% 8%;
 
-    --secondary: 220 10% 93%;
-    --secondary-foreground: 220 15% 25%;
+    --secondary: 220 10% 15%;
+    --secondary-foreground: 30 15% 80%;
 
-    --muted: 220 10% 95%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 220 8% 14%;
+    --muted-foreground: 220 8% 50%;
 
     --accent: 30 100% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent-foreground: 220 10% 8%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 10% 88%;
-    --input: 220 10% 88%;
+    --border: 220 8% 18%;
+    --input: 220 8% 18%;
     --ring: 30 100% 50%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 220 15% 25%;
+    --sidebar-background: 220 10% 9%;
+    --sidebar-foreground: 30 15% 80%;
     --sidebar-primary: 30 100% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 10% 93%;
-    --sidebar-accent-foreground: 220 15% 25%;
-    --sidebar-border: 220 10% 90%;
+    --sidebar-primary-foreground: 220 10% 8%;
+    --sidebar-accent: 220 8% 14%;
+    --sidebar-accent-foreground: 30 15% 80%;
+    --sidebar-border: 220 8% 18%;
     --sidebar-ring: 30 100% 50%;
 
     --success: 142 72% 45%;
     --warning: 38 92% 50%;
     --info: 217 91% 60%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(30 100% 50%), hsl(25 100% 45%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 98%), hsl(0 0% 96%));
+    --gradient-primary: linear-gradient(135deg, hsl(30 100% 50%), hsl(25 100% 42%));
+    --gradient-card: linear-gradient(145deg, hsl(220 10% 12%), hsl(220 10% 9%));
     --gradient-glow: radial-gradient(circle at 50% 50%, hsl(30 100% 50% / 0.12), transparent 70%);
 
     --shadow-glow: 0 0 20px hsl(30 100% 50% / 0.2);
-    --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.06);
+    --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.3);
 
     --font-heading: 'Space Grotesk', sans-serif;
     --font-body: 'Inter', sans-serif;
