@@ -1,0 +1,67 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+
+export interface Profile {
+  id: string;
+  user_id: string;
+  full_name: string | null;
+  age: number | null;
+  sex: string | null;
+  weight: number | null;
+  height: number | null;
+  goal: string | null;
+  activity_level: string | null;
+  neat: string | null;
+  training_days: number | null;
+  experience: string | null;
+  gym_type: string | null;
+  injuries: string | null;
+  preferred_foods: string[] | null;
+  disliked_foods: string | null;
+  allergies: string | null;
+  sleep_hours: number | null;
+  stress_level: string | null;
+  onboarding_complete: boolean;
+}
+
+export const useProfile = () => {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+      if (error) throw error;
+      return data as Profile;
+    },
+    enabled: !!user,
+  });
+};
+
+export const useUpdateProfile = () => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (updates: Partial<Profile>) => {
+      if (!user) throw new Error("Not authenticated");
+      const { data, error } = await supabase
+        .from("profiles")
+        .update(updates)
+        .eq("user_id", user.id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile", user?.id] });
+    },
+  });
+};
