@@ -432,6 +432,14 @@ const Onboarding = () => {
               </div>
             </>
           )}
+
+          {/* STEP 6 — Avaliação Física */}
+          {step === 6 && (
+            <>
+              <BodyPhotoUpload photos={assessmentPhotos} onPhotosChange={setAssessmentPhotos} />
+              <AssessmentResults assessment={assessment} loading={analyzing} />
+            </>
+          )}
         </div>
       </div>
 
