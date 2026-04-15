@@ -15,7 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import Training from "./pages/Training";
 import Diet from "./pages/Diet";
 import Progress from "./pages/Progress";
-// Profile moved to sidebar
+import Exams from "./pages/Exams";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
