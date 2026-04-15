@@ -100,9 +100,16 @@ function useAIExplanation() {
 
 const today = new Date().toISOString().split("T")[0];
 
+const WEEKDAY_MAP: Record<number, string> = {
+  0: "Domingo", 1: "Segunda", 2: "Terça", 3: "Quarta",
+  4: "Quinta", 5: "Sexta", 6: "Sábado",
+};
+const todayWeekday = WEEKDAY_MAP[new Date().getDay()];
+
 const Training = () => {
   const { data: protocol, isLoading } = useActiveProtocol();
-  const [selectedDay, setSelectedDay] = useState(0);
+  const [selectedDay, setSelectedDay] = useState(-1); // -1 = not yet initialized
+  const [initialized, setInitialized] = useState(false);
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
   const [exerciseSets, setExerciseSets] = useState<Record<string, WorkoutSet[]>>({});
   const [sessionDate] = useState(today);
