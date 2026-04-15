@@ -426,6 +426,9 @@ const Onboarding = () => {
                     </div>
                   ))}
                 </div>
+                <p className="text-xs text-muted-foreground mt-2 italic">
+                  💡 Estes são suplementos básicos. Para protocolos avançados (hormonal, etc.), faça seus exames e adquira a análise completa.
+                </p>
               </div>
             </>
           )}
