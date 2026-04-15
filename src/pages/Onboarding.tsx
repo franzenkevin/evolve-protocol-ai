@@ -13,6 +13,9 @@ import { useUpdateProfile } from "@/hooks/useProfile";
 import { useCreateProtocol } from "@/hooks/useProtocol";
 import { generateProtocol } from "@/lib/generateProtocol";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { BodyPhotoUpload } from "@/components/onboarding/BodyPhotoUpload";
+import { AssessmentResults } from "@/components/onboarding/AssessmentResults";
 import type { Profile } from "@/hooks/useProfile";
 
 const STEPS = [
@@ -22,6 +25,7 @@ const STEPS = [
   "Alimentação",
   "Doces & Suplementos",
   "Estilo de Vida",
+  "Avaliação Física",
 ];
 
 const GOALS = ["Hipertrofia", "Emagrecimento", "Recomposição Corporal", "Saúde Geral"];
