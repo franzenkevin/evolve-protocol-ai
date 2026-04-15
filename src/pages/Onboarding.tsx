@@ -146,7 +146,36 @@ const Onboarding = () => {
     });
   };
 
+  const runAssessment = async () => {
+    const photoPaths = Object.values(assessmentPhotos);
+    if (photoPaths.length === 0) return;
+    setAnalyzing(true);
+    try {
+      const { data: fnData, error } = await supabase.functions.invoke("analyze-body", {
+        body: {
+          photoPaths,
+          sex: data.sex,
+          weight: data.weight,
+          height: data.height,
+          age: data.age,
+        },
+      });
+      if (error) throw error;
+      setAssessment(fnData.assessment);
+    } catch (err: any) {
+      toast({ title: "Erro na análise", description: err.message, variant: "destructive" });
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   const next = async () => {
+    // On step 6 (assessment), trigger analysis if photos exist and no assessment yet
+    if (step === 6 && Object.keys(assessmentPhotos).length > 0 && !assessment && !analyzing) {
+      await runAssessment();
+      return;
+    }
+
     if (step < STEPS.length - 1) {
       setStep(step + 1);
       return;
