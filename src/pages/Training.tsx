@@ -302,7 +302,7 @@ const Training = () => {
                               {set.type === "warmup" ? (
                                 <Badge
                                   variant="outline"
-                                  className="text-[10px] px-1.5 py-0 border-orange-500/40 text-orange-400 bg-orange-500/10"
+                                  className="text-[10px] px-1.5 py-0 border-warning/40 text-warning bg-warning/10"
                                 >
                                   AQ {si + 1}
                                 </Badge>
