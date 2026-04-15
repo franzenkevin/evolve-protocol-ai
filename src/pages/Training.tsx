@@ -345,7 +345,8 @@ const Training = () => {
                               />
                             </div>
                           </div>
-                        ))}
+                          );
+                        })}
 
                         {/* Progression hint */}
                         {prev && (
