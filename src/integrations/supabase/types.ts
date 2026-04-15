@@ -106,6 +106,36 @@ export type Database = {
           },
         ]
       }
+      daily_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          rated_date: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          rated_date?: string
+          rating?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          rated_date?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       exercises: {
         Row: {
           category: string
