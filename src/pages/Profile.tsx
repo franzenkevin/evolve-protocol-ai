@@ -2,12 +2,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import { useCheckins } from "@/hooks/useCheckins";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import AppLayout from "@/components/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, Shield, FileText, HelpCircle } from "lucide-react";
+import { LogOut, Settings, Shield, FileText, HelpCircle, Bell, BellOff, Loader2 } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { toast } from "sonner";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
