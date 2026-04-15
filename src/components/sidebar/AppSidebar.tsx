@@ -4,10 +4,10 @@ import SidebarHeader from "./SidebarHeader";
 import SectionMyData from "./SectionMyData";
 import SectionReferrals from "./SectionReferrals";
 import SectionPlan from "./SectionPlan";
-import SectionExams from "./SectionExams";
 import SectionJournal from "./SectionJournal";
 import SectionMeetings from "./SectionMeetings";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { SheetDescription } from "@/components/ui/sheet";
 
 interface AppSidebarProps {
   open: boolean;
@@ -20,6 +20,7 @@ const AppSidebar = ({ open, onOpenChange }: AppSidebarProps) => {
       <SheetContent side="left" className="p-0 w-[320px] sm:w-[360px] bg-background border-border">
         <VisuallyHidden>
           <SheetTitle>Menu</SheetTitle>
+          <SheetDescription>Menu lateral do aplicativo</SheetDescription>
         </VisuallyHidden>
         <SidebarHeader />
         <ScrollArea className="h-[calc(100vh-80px)]">
@@ -27,7 +28,6 @@ const AppSidebar = ({ open, onOpenChange }: AppSidebarProps) => {
             <SectionMyData />
             <SectionReferrals />
             <SectionPlan />
-            <SectionExams />
             <SectionJournal />
             <SectionMeetings />
           </div>
