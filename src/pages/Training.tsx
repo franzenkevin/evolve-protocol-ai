@@ -70,8 +70,8 @@ const Training = () => {
       } else {
         const prev = prevBestMap[ex.id];
         const maxWeight = prev?.weight || 0;
-        // 2 warmup + validSets valid
-        const validSets = ex.sets || 2;
+        // 2 warmup + valid sets from protocol (1-3 based on experience)
+        const validSets = Math.min(Math.max(ex.sets || 2, 1), 3);
         initial[ex.id] = [
           { type: "warmup", weight: Math.round(maxWeight * 0.5), reps: 12, completed: false },
           { type: "warmup", weight: Math.round(maxWeight * 0.75), reps: 10, completed: false },
@@ -287,7 +287,11 @@ const Training = () => {
                         </div>
 
                         {/* Sets */}
-                        {sets.map((set, si) => (
+                        {sets.map((set, si) => {
+                          const validIndex = set.type === "valid"
+                            ? sets.slice(0, si).filter((s) => s.type === "valid").length + 1
+                            : 0;
+                          return (
                           <div
                             key={si}
                             className={`grid grid-cols-[60px_1fr_1fr_40px] gap-2 items-center ${
@@ -298,7 +302,7 @@ const Training = () => {
                               {set.type === "warmup" ? (
                                 <Badge
                                   variant="outline"
-                                  className="text-[10px] px-1.5 py-0 border-accent/30 text-accent-foreground"
+                                  className="text-[10px] px-1.5 py-0 border-orange-500/40 text-orange-400 bg-orange-500/10"
                                 >
                                   AQ {si + 1}
                                 </Badge>
@@ -308,7 +312,7 @@ const Training = () => {
                                   className="text-[10px] px-1.5 py-0 border-primary/30 text-primary"
                                 >
                                   <Target size={8} className="mr-0.5" />
-                                  {si - 1}
+                                  {validIndex}
                                 </Badge>
                               )}
                             </div>
