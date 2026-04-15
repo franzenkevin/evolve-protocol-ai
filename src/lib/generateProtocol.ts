@@ -467,14 +467,16 @@ function generateDiet(p: Profile) {
     }
   }
 
-  // Add creatina note if user uses it
+  // Add supplement notes with correct dosages
   const notes: string[] = [];
   if (supplements.includes("Creatina")) {
-    notes.push("Creatina: 5g por dia, pode tomar a qualquer hora com água.");
+    const creatinaDose = sex === "F" ? "5g" : "7g";
+    notes.push(`Creatina: ${creatinaDose} por dia, pode tomar a qualquer hora com água.`);
   }
   if (supplements.includes("Vitamina C")) notes.push("Vitamina C: 1g por dia.");
-  if (supplements.includes("Vitamina D")) notes.push("Vitamina D: 2000UI por dia, junto com gordura.");
+  if (supplements.includes("Vitamina D")) notes.push("Vitamina D: 6000UI por dia, junto com refeição com gordura.");
   if (supplements.includes("Ômega 3")) notes.push("Ômega 3: 1-2g EPA+DHA por dia, junto com refeição.");
+  if (supplements.includes("Whey Protein")) notes.push("Whey Protein: usado como complemento proteico na dieta. Dose conforme necessidade de encaixe de macros.");
 
   return {
     totalCalories: tdee,
