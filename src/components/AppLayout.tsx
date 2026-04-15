@@ -8,6 +8,7 @@ import { useProfile } from "@/hooks/useProfile";
 const NAV_ITEMS = [
   { to: "/dashboard", icon: Home, label: "Início" },
   { to: "/training", icon: Dumbbell, label: "Treino" },
+  { to: "/diet", icon: UtensilsCrossed, label: "Dieta" },
   { to: "/chat", icon: MessageCircle, label: "Chat IA" },
   { to: "/journal", icon: Newspaper, label: "Journal" },
   { to: "/exams", icon: FlaskConical, label: "Exames" },

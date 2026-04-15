@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import AppLayout from "@/components/AppLayout";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Bot, User, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import ReactMarkdown from "react-markdown";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -58,7 +57,6 @@ const Chat = () => {
       let assistantSoFar = "";
       let streamDone = false;
 
-      // Add placeholder assistant message
       setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
       while (!streamDone) {
@@ -105,7 +103,6 @@ const Chat = () => {
   return (
     <AppLayout>
       <div className="flex flex-col h-[calc(100vh-7.5rem)] max-w-lg mx-auto">
-        {/* Messages */}
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-3 pb-4">
             {messages.length === 0 && (
@@ -127,7 +124,15 @@ const Chat = () => {
                     ? "bg-primary text-primary-foreground rounded-br-sm"
                     : "bg-secondary text-secondary-foreground rounded-bl-sm"
                 }`}>
-                  {msg.content || (isLoading && i === messages.length - 1 ? (
+                  {msg.content ? (
+                    msg.role === "assistant" ? (
+                      <div className="prose prose-sm prose-invert max-w-none [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2 [&>h1]:text-base [&>h2]:text-sm [&>h3]:text-sm [&>p]:text-sm [&>ul]:text-sm [&>ol]:text-sm [&>li]:text-sm [&>blockquote]:text-sm [&>blockquote]:border-primary/30">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      msg.content
+                    )
+                  ) : (isLoading && i === messages.length - 1 ? (
                     <Loader2 size={14} className="animate-spin" />
                   ) : null)}
                 </div>
@@ -142,7 +147,6 @@ const Chat = () => {
           </div>
         </ScrollArea>
 
-        {/* Input */}
         <div className="p-3 border-t border-border glass">
           <div className="flex gap-2 max-w-lg mx-auto">
             <Input
