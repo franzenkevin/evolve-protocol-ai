@@ -100,9 +100,16 @@ function useAIExplanation() {
 
 const today = new Date().toISOString().split("T")[0];
 
+const WEEKDAY_MAP: Record<number, string> = {
+  0: "Domingo", 1: "Segunda", 2: "Terça", 3: "Quarta",
+  4: "Quinta", 5: "Sexta", 6: "Sábado",
+};
+const todayWeekday = WEEKDAY_MAP[new Date().getDay()];
+
 const Training = () => {
   const { data: protocol, isLoading } = useActiveProtocol();
-  const [selectedDay, setSelectedDay] = useState(0);
+  const [selectedDay, setSelectedDay] = useState(-1); // -1 = not yet initialized
+  const [initialized, setInitialized] = useState(false);
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
   const [exerciseSets, setExerciseSets] = useState<Record<string, WorkoutSet[]>>({});
   const [sessionDate] = useState(today);
@@ -114,7 +121,17 @@ const Training = () => {
   const ai = useAIExplanation();
 
   const training = (protocol?.training as any[]) || [];
-  const day = training[selectedDay];
+
+  // Auto-select today's training day on first load
+  useEffect(() => {
+    if (initialized || training.length === 0) return;
+    const todayIndex = training.findIndex((d: any) => d.weekday === todayWeekday);
+    setSelectedDay(todayIndex >= 0 ? todayIndex : 0);
+    setInitialized(true);
+  }, [training.length, initialized]);
+
+  const day = selectedDay >= 0 ? training[selectedDay] : null;
+  const isTodayDay = (d: any) => d.weekday === todayWeekday;
 
   const { data: currentLogs } = useWorkoutLogs(selectedDay, sessionDate);
   const { data: previousLogs } = usePreviousWorkoutLogs(selectedDay, sessionDate);
@@ -270,17 +287,20 @@ const Training = () => {
 
         {/* Day selector */}
         <div className="flex gap-2 overflow-x-auto pb-2">
-          {training.map((d: any, i: number) => (
-            <Button
-              key={d.label}
-              variant={i === selectedDay ? "default" : "outline"}
-              size="sm"
-              onClick={() => { setSelectedDay(i); setShowFeedback(false); }}
-              className="whitespace-nowrap"
-            >
-              {d.label}
-            </Button>
-          ))}
+          {training.map((d: any, i: number) => {
+            const isToday = isTodayDay(d);
+            return (
+              <Button
+                key={d.label}
+                variant={i === selectedDay ? "default" : "outline"}
+                size="sm"
+                onClick={() => { setSelectedDay(i); setShowFeedback(false); }}
+                className={`whitespace-nowrap ${isToday && i !== selectedDay ? "border-primary/60 text-primary" : ""}`}
+              >
+                {isToday && "📍 "}{d.weekday || d.label}
+              </Button>
+            );
+          })}
         </div>
 
         {day && (
