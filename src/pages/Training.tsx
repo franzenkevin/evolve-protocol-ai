@@ -109,6 +109,9 @@ const Training = () => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackRating, setFeedbackRating] = useState(0);
   const [feedbackNotes, setFeedbackNotes] = useState("");
+  const [showSplitExplanation, setShowSplitExplanation] = useState(false);
+  const [showExerciseInfo, setShowExerciseInfo] = useState<string | null>(null);
+  const ai = useAIExplanation();
 
   const training = (protocol?.training as any[]) || [];
   const day = training[selectedDay];
