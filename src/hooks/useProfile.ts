@@ -22,6 +22,11 @@ export interface Profile {
   allergies: string | null;
   sleep_hours: number | null;
   stress_level: string | null;
+  training_time: string | null;
+  sweet_preference: string | null;
+  supplements: string[] | null;
+  free_meals: string | null;
+  meal_count: number | null;
   onboarding_complete: boolean;
 }
 
