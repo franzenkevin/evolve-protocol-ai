@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      body_assessments: {
+        Row: {
+          body_fat_category: string | null
+          body_fat_estimate: string | null
+          created_at: string
+          id: string
+          muscle_development: Json | null
+          overall_summary: string | null
+          photo_paths: string[]
+          posture_deviations: string[] | null
+          recommendations: string[] | null
+          strong_points: string[] | null
+          user_id: string
+          weak_points: string[] | null
+        }
+        Insert: {
+          body_fat_category?: string | null
+          body_fat_estimate?: string | null
+          created_at?: string
+          id?: string
+          muscle_development?: Json | null
+          overall_summary?: string | null
+          photo_paths?: string[]
+          posture_deviations?: string[] | null
+          recommendations?: string[] | null
+          strong_points?: string[] | null
+          user_id: string
+          weak_points?: string[] | null
+        }
+        Update: {
+          body_fat_category?: string | null
+          body_fat_estimate?: string | null
+          created_at?: string
+          id?: string
+          muscle_development?: Json | null
+          overall_summary?: string | null
+          photo_paths?: string[]
+          posture_deviations?: string[] | null
+          recommendations?: string[] | null
+          strong_points?: string[] | null
+          user_id?: string
+          weak_points?: string[] | null
+        }
+        Relationships: []
+      }
       checkins: {
         Row: {
           adherence: number | null
