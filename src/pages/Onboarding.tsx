@@ -368,7 +368,7 @@ const Onboarding = () => {
               <h2 className="text-2xl font-heading font-bold text-foreground">Treino</h2>
               <div>
                 <Label>Dias de treino por semana *</Label>
-                <RadioGroup value={data.trainingDays} onValueChange={(v) => update("trainingDays", v)} className="flex gap-2 mt-2">
+                <RadioGroup value={data.trainingDays} onValueChange={(v) => { update("trainingDays", v); setData(prev => ({ ...prev, trainingWeekdays: [] })); }} className="flex gap-2 mt-2">
                   {TRAINING_DAYS.map((d) => (
                     <div key={d} className="flex items-center gap-1"><RadioGroupItem value={d} id={`d${d}`} /><Label htmlFor={`d${d}`}>{d}x</Label></div>
                   ))}
