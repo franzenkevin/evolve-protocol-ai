@@ -41,7 +41,7 @@ export const useProfile = () => {
         .from("profiles")
         .select("*")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data as Profile;
     },
@@ -56,14 +56,31 @@ export const useUpdateProfile = () => {
   return useMutation({
     mutationFn: async (updates: Partial<Profile>) => {
       if (!user) throw new Error("Not authenticated");
-      const { data, error } = await supabase
+      // Try update first
+      const { data: existing } = await supabase
         .from("profiles")
-        .update(updates)
+        .select("id")
         .eq("user_id", user.id)
-        .select()
-        .single();
-      if (error) throw error;
-      return data;
+        .maybeSingle();
+
+      if (existing) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .update(updates)
+          .eq("user_id", user.id)
+          .select()
+          .single();
+        if (error) throw error;
+        return data;
+      } else {
+        const { data, error } = await supabase
+          .from("profiles")
+          .insert({ ...updates, user_id: user.id })
+          .select()
+          .single();
+        if (error) throw error;
+        return data;
+      }
     },
     onSuccess: (data) => {
       queryClient.setQueryData(["profile", user?.id], data);
