@@ -120,24 +120,66 @@ const Dashboard = () => {
           </Card>
         )}
 
-        {/* Today's training */}
-        {todayTraining && (
+        {/* Today's training or rest day */}
+        {isRestDay ? (
           <Card className="p-4 card-gradient border-border">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-heading font-semibold text-foreground text-sm">Treino de Hoje</h3>
-              <div className="flex items-center gap-1 text-[10px] text-muted-foreground"><Calendar size={10} /><span>{todayTraining.label}</span></div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-success/15 flex items-center justify-center">
+                <span className="text-lg">😴</span>
+              </div>
+              <div>
+                <h3 className="font-heading font-semibold text-foreground text-sm">Dia de Descanso</h3>
+                <p className="text-xs text-muted-foreground">
+                  {todayWeekday} — Recupere-se para o próximo treino!
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-secondary-foreground mb-2">{todayTraining.muscleGroup} — {todayTraining.exercises?.length || 0} exercícios</p>
+            {training?.length > 0 && (() => {
+              const nextDays = training.map((d: any) => {
+                const idx = Object.entries(WEEKDAY_MAP).find(([, v]) => v === d.weekday)?.[0];
+                return { ...d, dayIdx: idx ? parseInt(idx) : 99 };
+              });
+              const todayIdx = new Date().getDay();
+              const upcoming = nextDays
+                .filter((d: any) => d.dayIdx > todayIdx)
+                .sort((a: any, b: any) => a.dayIdx - b.dayIdx);
+              const next = upcoming[0] || nextDays.sort((a: any, b: any) => a.dayIdx - b.dayIdx)[0];
+              return next ? (
+                <p className="text-[10px] text-muted-foreground mt-2">
+                  Próximo treino: <span className="text-primary font-medium">{next.weekday} — {next.muscleGroup}</span>
+                </p>
+              ) : null;
+            })()}
+          </Card>
+        ) : todayTraining ? (
+          <Card className="p-4 card-gradient border-primary/20">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
+                  <Dumbbell size={16} className="text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-semibold text-foreground text-sm">Treino de Hoje</h3>
+                  <p className="text-[10px] text-muted-foreground">{todayWeekday}</p>
+                </div>
+              </div>
+              <Badge className="bg-primary/20 text-primary border-primary/30 text-[10px]">
+                📍 Hoje
+              </Badge>
+            </div>
+            <p className="text-xs text-secondary-foreground mb-3">
+              <span className="font-medium text-foreground">{todayTraining.muscleGroup}</span> — {todayTraining.exercises?.length || 0} exercícios
+            </p>
             {isTodayWorkoutDone ? (
               <div className="flex items-center gap-2 p-2 bg-success/10 rounded-md border border-success/20">
                 <CheckCircle size={16} className="text-success" />
                 <span className="text-sm font-medium text-success">Treino concluído! 💪</span>
               </div>
             ) : (
-              <Link to="/training"><Button className="w-full glow" size="sm">Iniciar Treino</Button></Link>
+              <Link to="/training"><Button className="w-full glow" size="sm">🏋️ Iniciar Treino</Button></Link>
             )}
           </Card>
-        )}
+        ) : null}
 
         {/* Daily Rating */}
         <Card className="p-4 card-gradient border-border">
