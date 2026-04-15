@@ -1,19 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import { useCheckins } from "@/hooks/useCheckins";
 import { useBodyAssessments } from "@/hooks/useBodyAssessments";
 import { useDailyRatings, useTodayRating, useSaveDailyRating } from "@/hooks/useDailyRatings";
+import { useWorkoutLogs } from "@/hooks/useWorkoutLogs";
 import AppLayout from "@/components/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { Dumbbell, UtensilsCrossed, Camera, Activity, Calendar, Bell, Star, Send, Eye } from "lucide-react";
+import { Dumbbell, UtensilsCrossed, Camera, Activity, Calendar, Bell, Star, Send, Eye, Trophy, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+
+const today = new Date().toISOString().split("T")[0];
 
 const QUICK_ACTIONS = [
   { to: "/training", icon: Dumbbell, label: "Treino", color: "text-primary" },
@@ -32,17 +35,17 @@ const Dashboard = () => {
   const { data: todayRating } = useTodayRating();
   const saveRating = useSaveDailyRating();
 
-  const [starRating, setStarRating] = useState(todayRating?.rating || 0);
-  const [ratingNotes, setRatingNotes] = useState(todayRating?.notes || "");
+  const [starRating, setStarRating] = useState(0);
+  const [ratingNotes, setRatingNotes] = useState("");
   const [showAssessment, setShowAssessment] = useState(false);
 
   // Sync today's rating when loaded
-  useState(() => {
+  useEffect(() => {
     if (todayRating) {
       setStarRating(todayRating.rating);
       setRatingNotes(todayRating.notes || "");
     }
-  });
+  }, [todayRating]);
 
   const name = profile?.full_name || user?.user_metadata?.full_name || "Atleta";
   const daysLeft = protocol
@@ -53,8 +56,17 @@ const Dashboard = () => {
   const training = protocol?.training as any;
   const todayTraining = training?.[0];
   const latestAssessment = assessments[0];
-
   const weightHistory = checkins.filter((c) => c.weight).slice(0, 10).reverse();
+
+  // Check if today's workout is completed via logs
+  const { data: todayLogs } = useWorkoutLogs(0, today);
+  const isTodayWorkoutDone = todayTraining?.exercises?.length > 0 && todayLogs && todayLogs.length > 0 &&
+    todayTraining.exercises.every((ex: any) => {
+      const log = todayLogs.find((l: any) => l.exercise_id === ex.id);
+      if (!log) return false;
+      const sets = (log.sets as any[]) || [];
+      return sets.filter((s: any) => s.type === "valid").every((s: any) => s.completed);
+    });
 
   const handleSaveRating = async () => {
     try {
@@ -78,6 +90,47 @@ const Dashboard = () => {
             <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary" />
           </Button>
         </div>
+
+        {/* Protocol summary with days left */}
+        {loadingProtocol ? (
+          <Skeleton className="h-28 w-full" />
+        ) : protocol ? (
+          <Card className="p-4 card-gradient border-border">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-heading font-semibold text-foreground text-sm">Protocolo Atual</h3>
+              <Badge className="bg-primary/20 text-primary border-primary/30 text-[10px]">Ativo</Badge>
+            </div>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div><p className="text-lg font-bold text-foreground">{trainingDays}x</p><p className="text-[10px] text-muted-foreground">Dias/semana</p></div>
+              <div><p className="text-lg font-bold text-primary">{daysLeft}</p><p className="text-[10px] text-muted-foreground">Dias p/ troca</p></div>
+              <div><p className="text-lg font-bold text-foreground">v{protocol.version}</p><p className="text-[10px] text-muted-foreground">Versão</p></div>
+            </div>
+          </Card>
+        ) : (
+          <Card className="p-4 card-gradient border-border text-center">
+            <p className="text-muted-foreground mb-3 text-sm">Nenhum protocolo ativo</p>
+            <Link to="/onboarding"><Button className="glow">Criar protocolo</Button></Link>
+          </Card>
+        )}
+
+        {/* Today's training */}
+        {todayTraining && (
+          <Card className="p-4 card-gradient border-border">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-heading font-semibold text-foreground text-sm">Treino de Hoje</h3>
+              <div className="flex items-center gap-1 text-[10px] text-muted-foreground"><Calendar size={10} /><span>{todayTraining.label}</span></div>
+            </div>
+            <p className="text-xs text-secondary-foreground mb-2">{todayTraining.muscleGroup} — {todayTraining.exercises?.length || 0} exercícios</p>
+            {isTodayWorkoutDone ? (
+              <div className="flex items-center gap-2 p-2 bg-success/10 rounded-md border border-success/20">
+                <CheckCircle size={16} className="text-success" />
+                <span className="text-sm font-medium text-success">Treino concluído! 💪</span>
+              </div>
+            ) : (
+              <Link to="/training"><Button className="w-full glow" size="sm">Iniciar Treino</Button></Link>
+            )}
+          </Card>
+        )}
 
         {/* Daily Rating */}
         <Card className="p-4 card-gradient border-border">
@@ -120,6 +173,34 @@ const Dashboard = () => {
                   </span>
                 </div>
               ))}
+            </div>
+          </Card>
+        )}
+
+        {/* Weight Evolution */}
+        {weightHistory.length > 0 && (
+          <Card className="p-4 card-gradient border-border">
+            <h3 className="font-heading font-semibold text-foreground mb-2 text-sm">Evolução do Peso</h3>
+            <div className="flex items-end gap-1 h-24">
+              {weightHistory.map((w, i) => {
+                const min = Math.min(...weightHistory.map((h) => h.weight!));
+                const max = Math.max(...weightHistory.map((h) => h.weight!));
+                const range = max - min || 1;
+                const pct = ((w.weight! - min) / range) * 80 + 20;
+                return (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
+                    <span className="text-[8px] text-muted-foreground">{w.weight}</span>
+                    <div className="w-full rounded-t bg-primary/60 hover:bg-primary transition-all" style={{ height: `${pct}%` }} />
+                    <span className="text-[8px] text-muted-foreground">
+                      {new Date(w.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+              <span>Início: {weightHistory[0]?.weight}kg</span>
+              <span className="text-primary font-medium">Atual: {weightHistory[weightHistory.length - 1]?.weight}kg</span>
             </div>
           </Card>
         )}
@@ -180,56 +261,6 @@ const Dashboard = () => {
           </Card>
         )}
 
-        {/* Weight Evolution */}
-        {weightHistory.length > 0 && (
-          <Card className="p-4 card-gradient border-border">
-            <h3 className="font-heading font-semibold text-foreground mb-2 text-sm">Evolução do Peso</h3>
-            <div className="flex items-end gap-1 h-24">
-              {weightHistory.map((w, i) => {
-                const min = Math.min(...weightHistory.map((h) => h.weight!));
-                const max = Math.max(...weightHistory.map((h) => h.weight!));
-                const range = max - min || 1;
-                const pct = ((w.weight! - min) / range) * 80 + 20;
-                return (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
-                    <span className="text-[8px] text-muted-foreground">{w.weight}</span>
-                    <div className="w-full rounded-t bg-primary/60 hover:bg-primary transition-all" style={{ height: `${pct}%` }} />
-                    <span className="text-[8px] text-muted-foreground">
-                      {new Date(w.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="mt-1 flex justify-between text-xs text-muted-foreground">
-              <span>Início: {weightHistory[0]?.weight}kg</span>
-              <span className="text-primary font-medium">Atual: {weightHistory[weightHistory.length - 1]?.weight}kg</span>
-            </div>
-          </Card>
-        )}
-
-        {/* Protocol */}
-        {loadingProtocol ? (
-          <Skeleton className="h-28 w-full" />
-        ) : protocol ? (
-          <Card className="p-4 card-gradient border-border">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-heading font-semibold text-foreground text-sm">Protocolo Atual</h3>
-              <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-medium">Ativo</span>
-            </div>
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div><p className="text-lg font-bold text-foreground">{trainingDays}x</p><p className="text-[10px] text-muted-foreground">Dias/semana</p></div>
-              <div><p className="text-lg font-bold text-foreground">{daysLeft}</p><p className="text-[10px] text-muted-foreground">Dias restantes</p></div>
-              <div><p className="text-lg font-bold text-primary">v{protocol.version}</p><p className="text-[10px] text-muted-foreground">Versão</p></div>
-            </div>
-          </Card>
-        ) : (
-          <Card className="p-4 card-gradient border-border text-center">
-            <p className="text-muted-foreground mb-3 text-sm">Nenhum protocolo ativo</p>
-            <Link to="/onboarding"><Button className="glow">Criar protocolo</Button></Link>
-          </Card>
-        )}
-
         {/* Quick actions */}
         <div>
           <h3 className="font-heading font-semibold text-foreground mb-2 text-sm">Ações rápidas</h3>
@@ -244,18 +275,6 @@ const Dashboard = () => {
             ))}
           </div>
         </div>
-
-        {/* Today's training */}
-        {todayTraining && (
-          <Card className="p-4 card-gradient border-border">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-heading font-semibold text-foreground text-sm">Treino de Hoje</h3>
-              <div className="flex items-center gap-1 text-[10px] text-muted-foreground"><Calendar size={10} /><span>{todayTraining.label}</span></div>
-            </div>
-            <p className="text-xs text-secondary-foreground mb-2">{todayTraining.muscleGroup} — {todayTraining.exercises?.length || 0} exercícios</p>
-            <Link to="/training"><Button className="w-full glow" size="sm">Iniciar Treino</Button></Link>
-          </Card>
-        )}
 
         {/* Macros */}
         {diet && (

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import AppLayout from "@/components/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import {
   ChevronDown,
   ChevronUp,
@@ -16,6 +17,9 @@ import {
   History,
   Flame,
   Target,
+  Trophy,
+  Star,
+  Send,
 } from "lucide-react";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import {
@@ -34,6 +38,9 @@ const Training = () => {
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
   const [exerciseSets, setExerciseSets] = useState<Record<string, WorkoutSet[]>>({});
   const [sessionDate] = useState(today);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [feedbackNotes, setFeedbackNotes] = useState("");
 
   const training = (protocol?.training as any[]) || [];
   const day = training[selectedDay];
@@ -47,7 +54,6 @@ const Training = () => {
   if (previousLogs) {
     for (const log of previousLogs) {
       if (!prevBestMap[log.exercise_id]) {
-        // Most recent session's last valid set
         const validSets = (log.sets as WorkoutSet[]).filter(
           (s) => s.type === "valid" && s.completed
         );
@@ -70,7 +76,6 @@ const Training = () => {
       } else {
         const prev = prevBestMap[ex.id];
         const maxWeight = prev?.weight || 0;
-        // 2 warmup + valid sets from protocol (1-3 based on experience)
         const validSets = Math.min(Math.max(ex.sets || 2, 1), 3);
         initial[ex.id] = [
           { type: "warmup", weight: Math.round(maxWeight * 0.5), reps: 12, completed: false },
@@ -131,6 +136,31 @@ const Training = () => {
     return "same";
   };
 
+  // Calculate tonnage for current workout
+  const totalTonnage = useMemo(() => {
+    if (!day?.exercises) return 0;
+    let total = 0;
+    for (const ex of day.exercises) {
+      const sets = exerciseSets[ex.id] || [];
+      for (const set of sets) {
+        if (set.completed && set.weight > 0 && set.reps > 0) {
+          total += set.weight * set.reps;
+        }
+      }
+    }
+    return total;
+  }, [day?.exercises, exerciseSets]);
+
+  // Check if all exercises are completed
+  const isWorkoutComplete = useMemo(() => {
+    if (!day?.exercises || day.exercises.length === 0) return false;
+    return day.exercises.every((e: any) => {
+      const sets = exerciseSets[e.id] || [];
+      const validSets = sets.filter((s) => s.type === "valid");
+      return validSets.length > 0 && validSets.every((s) => s.completed);
+    });
+  }, [day?.exercises, exerciseSets]);
+
   if (isLoading) {
     return (
       <AppLayout>
@@ -174,7 +204,7 @@ const Training = () => {
               key={d.label}
               variant={i === selectedDay ? "default" : "outline"}
               size="sm"
-              onClick={() => setSelectedDay(i)}
+              onClick={() => { setSelectedDay(i); setShowFeedback(false); }}
               className="whitespace-nowrap"
             >
               {d.label}
@@ -195,10 +225,29 @@ const Training = () => {
                     {total} exercícios • {sessionDate}
                   </p>
                 </div>
-                <Badge variant={completedCount === total ? "default" : "secondary"}>
-                  {completedCount}/{total}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  {isWorkoutComplete && (
+                    <Badge className="bg-success/20 text-success border-success/30">
+                      <Trophy size={10} className="mr-1" />Concluído
+                    </Badge>
+                  )}
+                  <Badge variant={completedCount === total ? "default" : "secondary"}>
+                    {completedCount}/{total}
+                  </Badge>
+                </div>
               </div>
+
+              {/* Tonnage display */}
+              {totalTonnage > 0 && (
+                <div className="mt-3 pt-3 border-t border-border">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Tonelagem total</span>
+                    <span className="text-lg font-bold text-primary font-heading">
+                      {totalTonnage.toLocaleString("pt-BR")} kg
+                    </span>
+                  </div>
+                </div>
+              )}
             </Card>
 
             {/* Warmup instruction */}
@@ -226,6 +275,12 @@ const Training = () => {
                   .every((s) => s.completed);
                 const progression = getProgression(ex.id);
                 const prev = prevBestMap[ex.id];
+
+                // Exercise tonnage
+                const exTonnage = sets.reduce((acc, s) => {
+                  if (s.completed && s.weight > 0 && s.reps > 0) return acc + s.weight * s.reps;
+                  return acc;
+                }, 0);
 
                 return (
                   <Card
@@ -256,6 +311,7 @@ const Training = () => {
                         </div>
                         <p className="text-xs text-muted-foreground">
                           {ex.sets}x{ex.reps} • Descanso: {ex.rest}
+                          {exTonnage > 0 && ` • ${exTonnage.toLocaleString("pt-BR")}kg`}
                         </p>
                       </div>
                       {isExpanded ? (
@@ -372,6 +428,57 @@ const Training = () => {
                 );
               })}
             </div>
+
+            {/* Post-workout feedback */}
+            {isWorkoutComplete && !showFeedback && (
+              <Card className="p-4 card-gradient border-primary/30">
+                <div className="flex items-center gap-3 mb-3">
+                  <Trophy size={24} className="text-primary" />
+                  <div>
+                    <h3 className="font-heading font-semibold text-foreground">Treino concluído! 🔥</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Tonelagem: {totalTonnage.toLocaleString("pt-BR")} kg
+                    </p>
+                  </div>
+                </div>
+                <Button className="w-full" onClick={() => setShowFeedback(true)}>
+                  Dar feedback do treino
+                </Button>
+              </Card>
+            )}
+
+            {showFeedback && (
+              <Card className="p-4 card-gradient border-border">
+                <h3 className="font-heading font-semibold text-foreground text-sm mb-2">Feedback do treino</h3>
+                <div className="flex items-center gap-1 mb-2">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <button key={s} onClick={() => setFeedbackRating(s)} className="p-0.5">
+                      <Star
+                        size={24}
+                        className={s <= feedbackRating ? "fill-primary text-primary" : "text-muted-foreground"}
+                      />
+                    </button>
+                  ))}
+                  <span className="text-xs text-muted-foreground ml-2">{feedbackRating}/5</span>
+                </div>
+                <Textarea
+                  placeholder="Como foi o treino? Sentiu algo? Alguma observação..."
+                  value={feedbackNotes}
+                  onChange={(e) => setFeedbackNotes(e.target.value)}
+                  className="h-16 text-xs resize-none mb-2"
+                />
+                <Button
+                  size="sm"
+                  className="w-full gap-1"
+                  onClick={() => {
+                    toast.success("Feedback salvo! 💪");
+                    setShowFeedback(false);
+                  }}
+                >
+                  <Send size={12} />Enviar feedback
+                </Button>
+              </Card>
+            )}
           </>
         )}
       </div>

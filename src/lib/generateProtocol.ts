@@ -441,8 +441,13 @@ function generateDiet(p: Profile) {
       const opt2: FoodItem[] = [];
       const opt3: FoodItem[] = [];
 
+      // Filter grain/cereal options respecting dislikes
+      const grainOptions = filterList(["Aveia", "Granola", "Tapioca"], preferred, disliked, allergies);
+      const grainPick = grainOptions.length > 0 ? grainOptions[0] : null;
+
       if (hasWhey) {
-        opt1.push(getFood("Whey Protein"), getFood(fruit), getFood("Aveia"));
+        opt1.push(getFood("Whey Protein"), getFood(fruit));
+        if (grainPick) opt1.push(getFood(grainPick));
         opt2.push(getFood(carbSnack), getFood(protSnackItem), getFood(fruit));
         opt3.push(getFood("Whey Protein"), getFood(fruit2));
         const dairySnack = dairy.length > 0 ? pick(dairy) : null;
@@ -452,7 +457,8 @@ function generateDiet(p: Profile) {
         opt2.push(getFood(carbSnack2), getFood(protSnackItem), getFood(fruit2));
         const dairySnack = dairy.length > 0 ? pick(dairy) : null;
         if (dairySnack) {
-          opt3.push(getFood(dairySnack), getFood(fruit), getFood("Aveia"));
+          opt3.push(getFood(dairySnack), getFood(fruit));
+          if (grainPick) opt3.push(getFood(grainPick));
         } else {
           opt3.push(getFood(carbSnack), getFood(fruit));
         }
