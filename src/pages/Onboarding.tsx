@@ -263,6 +263,7 @@ const Onboarding = () => {
         activity_level: data.activityLevel,
         neat: data.neat,
         training_days: data.trainingDays ? parseInt(data.trainingDays) : null,
+        training_weekdays: data.trainingWeekdays,
         training_time: data.trainingTime,
         experience: data.experience,
         gym_type: data.gymType,
