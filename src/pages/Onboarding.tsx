@@ -112,7 +112,7 @@ const Onboarding = () => {
   const [validationError, setValidationError] = useState("");
   const [data, setData] = useState<FormData>({
     fullName: "", age: "", sex: "", weight: "", height: "",
-    goal: "", activityLevel: "", neat: "", trainingDays: "", trainingTime: "",
+    goal: "", activityLevel: "", neat: "", trainingDays: "", trainingWeekdays: [], trainingTime: "",
     experience: "", gymType: "", injuries: "", foodsLike: [],
     foodsDislike: "", allergies: [], sweetPreference: "", supplements: [],
     freeMeals: "", mealCount: "", sleepHours: "", stressLevel: "",
