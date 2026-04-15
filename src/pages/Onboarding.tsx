@@ -445,9 +445,9 @@ const Onboarding = () => {
 
       <div className="p-4 border-t border-border">
         <div className="max-w-lg mx-auto flex gap-3">
-          {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving}>Voltar</Button>}
-          <Button onClick={next} className="flex-1 glow" disabled={saving}>
-            {saving ? "Salvando..." : step === STEPS.length - 1 ? "Finalizar" : "Próximo"}
+          {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving || analyzing}>Voltar</Button>}
+          <Button onClick={next} className="flex-1 glow" disabled={saving || analyzing}>
+            {saving ? "Salvando..." : analyzing ? "Analisando..." : step === 6 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar Fotos" : step === STEPS.length - 1 ? "Finalizar" : "Próximo"}
           </Button>
         </div>
       </div>
