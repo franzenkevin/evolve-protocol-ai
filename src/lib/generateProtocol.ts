@@ -343,27 +343,32 @@ function generateDiet(p: Profile) {
     const isSnack = slot.label.includes("Lanche") || slot.label.includes("Pré-treino");
 
     if (isBreakfast) {
-      const carbFixed = pick(carbBreakfast);
-      const protFixed = pick(protBreakfast);
+      const c1 = pick(carbBreakfast);
+      const c2 = carbBreakfast.find(c => c !== c1) || c1;
+      const c3 = carbBreakfast.find(c => c !== c1 && c !== c2) || c1;
+      const p1 = pick(protBreakfast);
+      const p2 = protBreakfast.find(p => p !== p1) || p1;
       const fruit = pick(fruits);
+      const fruit2 = fruits.find(f => f !== fruit) || fruit;
       const dairyItem = dairy.length > 0 ? pick(dairy) : null;
 
-      const fixedFoods = [getFood(carbFixed), getFood(protFixed), getFood(fruit)];
-      if (dairyItem) fixedFoods.push(getFood(dairyItem));
+      const opt1Foods = [getFood(c1), getFood(p1), getFood(fruit)];
+      if (dairyItem) opt1Foods.push(getFood(dairyItem));
 
-      // Flexible: different carb + sweet if applicable
-      const carbFlex = carbBreakfast.find(c => c !== carbFixed) || carbFixed;
-      const flexFoods = [getFood(carbFlex), getFood(protFixed), getFood(fruit)];
-      if (sweet !== "Nenhum" && isTrainingMorning) {
-        flexFoods.push(getFood(sweet));
-      } else if (dairyItem) {
-        flexFoods.push(getFood(dairyItem));
-      }
+      const opt2Foods = [getFood(c2), getFood(p2), getFood(fruit2)];
+      if (dairyItem) opt2Foods.push(getFood(dairyItem));
+
+      const opt3Foods = [getFood(c3), getFood(p1), getFood(fruit)];
+      if (sweet !== "Nenhum") opt3Foods.push(getFood(sweet));
+      else if (dairyItem) opt3Foods.push(getFood(dairyItem));
 
       meals.push({
         ...slot,
-        fixed: { label: "Opção fixa", foods: fixedFoods },
-        flexible: { label: "Opção flexível", foods: flexFoods },
+        options: [
+          { label: "Opção 1", foods: opt1Foods },
+          { label: "Opção 2", foods: opt2Foods },
+          { label: "Opção 3", foods: opt3Foods },
+        ],
         substitutions: [
           { category: "Carboidrato", options: carbBreakfast },
           { category: "Proteína", options: protBreakfast },
@@ -371,21 +376,20 @@ function generateDiet(p: Profile) {
         ],
       });
     } else if (isLunch) {
-      const carb = pick(carbMain);
-      const prot = pick(protMain);
-      const carbAlt = carbMain.find(c => c !== carb) || carb;
-      const protAlt = protMain.find(p => p !== prot) || prot;
+      const c1 = pick(carbMain);
+      const c2 = carbMain.find(c => c !== c1) || c1;
+      const c3 = carbMain.find(c => c !== c1 && c !== c2) || c1;
+      const p1 = pick(protMain);
+      const p2 = protMain.find(p => p !== p1) || p1;
+      const p3 = protMain.find(p => p !== p1 && p !== p2) || p1;
 
       meals.push({
         ...slot,
-        fixed: {
-          label: "Opção fixa",
-          foods: [getFood(carb), getFood("Feijão"), getFood(prot), getFood("Vegetais")],
-        },
-        flexible: {
-          label: "Opção flexível",
-          foods: [getFood(carbAlt), getFood("Feijão"), getFood(protAlt), getFood("Vegetais")],
-        },
+        options: [
+          { label: "Opção 1", foods: [getFood(c1), getFood("Feijão"), getFood(p1), getFood("Vegetais")] },
+          { label: "Opção 2", foods: [getFood(c2), getFood("Feijão"), getFood(p2), getFood("Vegetais")] },
+          { label: "Opção 3", foods: [getFood(c3), getFood("Lentilha"), getFood(p3), getFood("Vegetais")] },
+        ],
         substitutions: [
           { category: "Carboidrato", options: carbMain },
           { category: "Proteína", options: protMain },
@@ -393,23 +397,20 @@ function generateDiet(p: Profile) {
         ],
       });
     } else if (isDinner) {
-      const carb = pick(carbMain);
-      const prot = protMain.length > 1 ? protMain[1] : pick(protMain);
+      const c1 = pick(carbMain);
+      const c2 = carbMain.find(c => c !== c1) || c1;
+      const p1 = protMain.length > 1 ? protMain[1] : pick(protMain);
+      const p2 = protMain.length > 2 ? protMain[2] : pick(protMain);
       const fruit = fruits.length > 1 ? fruits[1] : pick(fruits);
-
-      // Dinner flexible: pão com frango option
       const carbBr = pick(carbBreakfast);
 
       meals.push({
         ...slot,
-        fixed: {
-          label: "Opção fixa",
-          foods: [getFood(carb), getFood(prot), getFood("Vegetais"), getFood(fruit)],
-        },
-        flexible: {
-          label: "Opção flexível",
-          foods: [getFood(carbBr), getFood(pick(protSnack)), getFood(fruit)],
-        },
+        options: [
+          { label: "Opção 1", foods: [getFood(c1), getFood(p1), getFood("Vegetais"), getFood(fruit)] },
+          { label: "Opção 2", foods: [getFood(c2), getFood(p2), getFood("Vegetais"), getFood(fruit)] },
+          { label: "Opção 3", foods: [getFood(carbBr), getFood(pick(protSnack)), getFood("Vegetais"), getFood(fruit)] },
+        ],
         substitutions: [
           { category: "Carboidrato", options: [...carbMain, ...carbBreakfast] },
           { category: "Proteína", options: protMain },
@@ -419,34 +420,44 @@ function generateDiet(p: Profile) {
     } else if (isSnack) {
       const hasWhey = supplements.includes("Whey Protein") && !allergies.some(a => a.toLowerCase().includes("soro do leite"));
       const fruit = fruits.length > 2 ? fruits[2] : pick(fruits);
+      const fruit2 = fruits.length > 3 ? fruits[3] : pick(fruits);
       const carbSnack = pick(carbBreakfast);
+      const carbSnack2 = carbBreakfast.find(c => c !== carbSnack) || carbSnack;
       const protSnackItem = pick(protSnack);
 
-      const fixedFoods: FoodItem[] = [];
-      const flexFoods: FoodItem[] = [];
+      const opt1: FoodItem[] = [];
+      const opt2: FoodItem[] = [];
+      const opt3: FoodItem[] = [];
 
       if (hasWhey) {
-        fixedFoods.push(getFood("Whey Protein"), getFood(fruit));
-        flexFoods.push(getFood(carbSnack), getFood(protSnackItem), getFood(fruit));
+        opt1.push(getFood("Whey Protein"), getFood(fruit), getFood("Aveia"));
+        opt2.push(getFood(carbSnack), getFood(protSnackItem), getFood(fruit));
+        opt3.push(getFood("Whey Protein"), getFood(fruit2));
+        const dairySnack = dairy.length > 0 ? pick(dairy) : null;
+        if (dairySnack) opt3.push(getFood(dairySnack));
       } else {
-        fixedFoods.push(getFood(carbSnack), getFood(protSnackItem));
+        opt1.push(getFood(carbSnack), getFood(protSnackItem), getFood(fruit));
+        opt2.push(getFood(carbSnack2), getFood(protSnackItem), getFood(fruit2));
         const dairySnack = dairy.length > 0 ? pick(dairy) : null;
         if (dairySnack) {
-          flexFoods.push(getFood(dairySnack), getFood(fruit));
+          opt3.push(getFood(dairySnack), getFood(fruit), getFood("Aveia"));
         } else {
-          flexFoods.push(getFood(carbSnack), getFood(fruit));
+          opt3.push(getFood(carbSnack), getFood(fruit));
         }
       }
 
-      // Add sweet to one snack if training is afternoon/night
+      // Add sweet to last snack option
       if (sweet !== "Nenhum" && i === mealSlots.length - 2 && !isTrainingMorning) {
-        flexFoods.push(getFood(sweet));
+        opt3.push(getFood(sweet));
       }
 
       meals.push({
         ...slot,
-        fixed: { label: "Opção fixa", foods: fixedFoods },
-        flexible: { label: "Opção flexível", foods: flexFoods },
+        options: [
+          { label: "Opção 1", foods: opt1 },
+          { label: "Opção 2", foods: opt2 },
+          { label: "Opção 3", foods: opt3 },
+        ],
         substitutions: [
           { category: "Carboidrato", options: carbBreakfast },
           { category: "Proteína", options: [...protSnack, ...(hasWhey ? ["Whey Protein"] : [])] },
