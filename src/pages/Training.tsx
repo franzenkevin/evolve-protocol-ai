@@ -429,6 +429,41 @@ const Training = () => {
                     {/* Expanded: Set tracking */}
                     {isExpanded && (
                       <div className="px-4 pb-4 space-y-3">
+                        {/* Exercise info button */}
+                        <button
+                          className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const infoKey = `ex-${ex.id}`;
+                            if (showExerciseInfo === ex.id) {
+                              setShowExerciseInfo(null);
+                            } else {
+                              setShowExerciseInfo(ex.id);
+                              ai.ask(
+                                infoKey,
+                                `Explique brevemente (máximo 2 parágrafos) o exercício "${ex.name}" no contexto de treino de ${day.muscleGroup}. Inclua: músculos trabalhados, por que foi escolhido para essa divisão, dica de execução. Seja direto.`
+                              );
+                            }
+                          }}
+                        >
+                          <Info size={12} />
+                          {showExerciseInfo === ex.id ? "Ocultar info" : "Por que este exercício?"}
+                        </button>
+
+                        {showExerciseInfo === ex.id && (
+                          <div className="rounded-lg bg-primary/5 border border-primary/20 p-3">
+                            {ai.loading === `ex-${ex.id}` && !ai.texts[`ex-${ex.id}`] ? (
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <Loader2 size={12} className="animate-spin" /> Analisando...
+                              </div>
+                            ) : (
+                              <div className="prose prose-sm prose-invert max-w-none text-xs [&>p]:mb-1 [&>p]:text-xs [&>li]:text-xs [&>ul]:mb-1">
+                                <ReactMarkdown>{ai.texts[`ex-${ex.id}`] || ""}</ReactMarkdown>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         {/* Previous best */}
                         {prev && (
                           <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-md p-2">
