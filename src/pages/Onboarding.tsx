@@ -373,6 +373,30 @@ const Onboarding = () => {
                   ))}
                 </RadioGroup>
               </div>
+              {data.trainingDays && (
+                <div>
+                  <Label>Quais dias da semana? * (selecione {data.trainingDays})</Label>
+                  <p className="text-xs text-muted-foreground mt-1 mb-2">A divisão do treino será montada respeitando o descanso muscular adequado.</p>
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    {WEEKDAYS.map((day) => (
+                      <div
+                        key={day}
+                        className="flex items-center gap-2 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
+                        onClick={() => {
+                          if (!data.trainingWeekdays.includes(day) && data.trainingWeekdays.length >= parseInt(data.trainingDays)) return;
+                          toggleArrayItem("trainingWeekdays", day);
+                        }}
+                      >
+                        <Checkbox
+                          checked={data.trainingWeekdays.includes(day)}
+                          disabled={!data.trainingWeekdays.includes(day) && data.trainingWeekdays.length >= parseInt(data.trainingDays)}
+                        />
+                        <Label className="cursor-pointer">{day}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div>
                 <Label>Horário preferido de treino *</Label>
                 <RadioGroup value={data.trainingTime} onValueChange={(v) => update("trainingTime", v)} className="mt-2 space-y-2">
