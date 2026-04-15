@@ -1,16 +1,15 @@
 import { ReactNode, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Dumbbell, UtensilsCrossed, TrendingUp, FlaskConical, Menu } from "lucide-react";
+import { Home, Dumbbell, UtensilsCrossed, MessageCircle, Newspaper, FlaskConical, Menu } from "lucide-react";
 import AppSidebar from "@/components/sidebar/AppSidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
-import logo from "@/assets/logo.png";
 
 const NAV_ITEMS = [
   { to: "/dashboard", icon: Home, label: "Início" },
   { to: "/training", icon: Dumbbell, label: "Treino" },
-  { to: "/diet", icon: UtensilsCrossed, label: "Dieta" },
-  { to: "/progress", icon: TrendingUp, label: "Progresso" },
+  { to: "/chat", icon: MessageCircle, label: "Chat IA" },
+  { to: "/journal", icon: Newspaper, label: "Journal" },
   { to: "/exams", icon: FlaskConical, label: "Exames" },
 ];
 
@@ -32,33 +31,33 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
             onClick={() => setSidebarOpen(true)}
             className="flex items-center gap-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
           >
-            <Menu size={20} />
+            <Menu size={18} />
             <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center">
               <span className="text-[10px] font-bold text-primary">{initials}</span>
             </div>
           </button>
           <span className="text-sm font-heading font-semibold text-foreground">Hypertrophy</span>
-          <div className="w-14" /> {/* spacer to balance */}
+          <div className="w-12" />
         </div>
       </header>
 
       <main className="flex-1 overflow-auto pb-20">{children}</main>
 
-      {/* Bottom nav - 5 items */}
+      {/* Bottom nav */}
       <nav className="fixed bottom-0 left-0 right-0 glass border-t border-border z-50">
-        <div className="flex justify-around items-center h-16 max-w-lg mx-auto">
+        <div className="flex justify-around items-center h-14 max-w-lg mx-auto">
           {NAV_ITEMS.map(({ to, icon: Icon, label }) => {
             const active = location.pathname === to;
             return (
               <Link
                 key={to}
                 to={to}
-                className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-colors ${
+                className={`flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg transition-colors ${
                   active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Icon size={20} strokeWidth={active ? 2.5 : 1.5} />
-                <span className="text-[10px] font-medium">{label}</span>
+                <Icon size={18} strokeWidth={active ? 2.5 : 1.5} />
+                <span className="text-[9px] font-medium">{label}</span>
               </Link>
             );
           })}

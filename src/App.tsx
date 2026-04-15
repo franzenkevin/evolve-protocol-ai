@@ -16,6 +16,8 @@ import Training from "./pages/Training";
 import Diet from "./pages/Diet";
 import Progress from "./pages/Progress";
 import Exams from "./pages/Exams";
+import Journal from "./pages/Journal";
+import Chat from "./pages/Chat";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -54,6 +56,8 @@ const App = () => (
             <Route path="/diet" element={<ProtectedRoute><OnboardingGate><Diet /></OnboardingGate></ProtectedRoute>} />
             <Route path="/progress" element={<ProtectedRoute><OnboardingGate><Progress /></OnboardingGate></ProtectedRoute>} />
             <Route path="/exams" element={<ProtectedRoute><OnboardingGate><Exams /></OnboardingGate></ProtectedRoute>} />
+            <Route path="/journal" element={<ProtectedRoute><OnboardingGate><Journal /></OnboardingGate></ProtectedRoute>} />
+            <Route path="/chat" element={<ProtectedRoute><OnboardingGate><Chat /></OnboardingGate></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
