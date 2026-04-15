@@ -52,7 +52,7 @@ const ALLERGY_OPTIONS = [
 const SWEET_OPTIONS = ["Açaí", "Doce de leite", "Leite condensado", "Sucrilhos", "Chocolate", "Nenhum"];
 
 // Suplementos
-const SUPPLEMENT_OPTIONS = ["Whey Protein", "Creatina", "Vitamina C", "Vitamina D", "Ômega 3", "Nenhum"];
+const SUPPLEMENT_OPTIONS = ["Whey Protein", "Creatina", "Vitamina C", "Vitamina D", "Ômega 3", "Multivitamínico", "Nenhum"];
 
 // Refeições livres
 const FREE_MEAL_OPTIONS = [
@@ -64,20 +64,20 @@ const FREE_MEAL_OPTIONS = [
 // Alimentos em lista organizada
 const FOOD_CATEGORIES: { label: string; items: string[] }[] = [
   {
-    label: "Carboidratos",
-    items: ["Arroz", "Macarrão", "Batata inglesa", "Batata doce", "Mandioca", "Pão de forma", "Pão francês", "Pão de hambúrguer", "Rap10", "Cuscuz", "Tapioca"],
+    label: "🍚 Carboidratos",
+    items: ["Arroz", "Macarrão", "Batata inglesa", "Batata doce", "Mandioca", "Pão de forma", "Pão francês", "Pão de hambúrguer", "Rap10", "Cuscuz", "Tapioca", "Inhame", "Milho"],
   },
   {
-    label: "Frutas",
-    items: ["Banana", "Mamão", "Melão", "Melancia", "Kiwi", "Uva", "Manga", "Abacate", "Laranja", "Limão", "Morango", "Maçã", "Pera", "Abacaxi"],
+    label: "🍌 Frutas",
+    items: ["Banana", "Mamão", "Melão", "Melancia", "Kiwi", "Uva", "Manga", "Abacate", "Laranja", "Limão", "Morango", "Maçã", "Pera", "Abacaxi", "Goiaba", "Ameixa", "Pêssego"],
   },
   {
-    label: "Proteínas",
-    items: ["Peito de frango", "Sobrecoxa sem pele", "Patinho", "Músculo", "Filé mignon", "Coxão mole", "Salmão", "Tilápia", "Atum", "Ovo", "Queijo", "Leite desnatado", "Leite semi desnatado"],
+    label: "🥩 Proteínas",
+    items: ["Peito de frango", "Sobrecoxa sem pele", "Patinho", "Músculo", "Filé mignon", "Coxão mole", "Salmão", "Tilápia", "Atum", "Ovo", "Queijo", "Leite desnatado", "Leite semi desnatado", "Sardinha", "Camarão", "Carne de porco magra"],
   },
   {
-    label: "Outros",
-    items: ["Feijão", "Lentilha", "Granola", "Aveia", "Iogurte desnatado", "Requeijão light", "Vegetais e saladas em geral"],
+    label: "🥗 Outros",
+    items: ["Feijão", "Lentilha", "Granola", "Aveia", "Iogurte desnatado", "Requeijão light", "Vegetais e saladas em geral", "Grão de bico", "Pasta de amendoim", "Castanhas", "Azeite de oliva"],
   },
 ];
 
