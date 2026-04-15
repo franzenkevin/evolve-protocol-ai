@@ -109,6 +109,9 @@ interface FormData {
 const Onboarding = () => {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [assessmentPhotos, setAssessmentPhotos] = useState<Record<string, string>>({});
+  const [assessment, setAssessment] = useState<any>(null);
+  const [analyzing, setAnalyzing] = useState(false);
   const [data, setData] = useState<FormData>({
     fullName: "", age: "", sex: "", weight: "", height: "",
     goal: "", activityLevel: "", neat: "", trainingDays: "", trainingTime: "",
