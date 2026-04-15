@@ -287,17 +287,20 @@ const Training = () => {
 
         {/* Day selector */}
         <div className="flex gap-2 overflow-x-auto pb-2">
-          {training.map((d: any, i: number) => (
-            <Button
-              key={d.label}
-              variant={i === selectedDay ? "default" : "outline"}
-              size="sm"
-              onClick={() => { setSelectedDay(i); setShowFeedback(false); }}
-              className="whitespace-nowrap"
-            >
-              {d.label}
-            </Button>
-          ))}
+          {training.map((d: any, i: number) => {
+            const isToday = isTodayDay(d);
+            return (
+              <Button
+                key={d.label}
+                variant={i === selectedDay ? "default" : "outline"}
+                size="sm"
+                onClick={() => { setSelectedDay(i); setShowFeedback(false); }}
+                className={`whitespace-nowrap ${isToday && i !== selectedDay ? "border-primary/60 text-primary" : ""}`}
+              >
+                {isToday && "📍 "}{d.weekday || d.label}
+              </Button>
+            );
+          })}
         </div>
 
         {day && (
