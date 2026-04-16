@@ -207,35 +207,50 @@ export type Database = {
       }
       journal_articles: {
         Row: {
+          author: string | null
           category: string | null
+          content: string | null
           created_at: string
+          excerpt: string | null
           id: string
           image_url: string | null
           published_at: string
+          read_time_minutes: number | null
           source_url: string | null
           summary: string
+          tags: string[] | null
           title: string
           updated_at: string
         }
         Insert: {
+          author?: string | null
           category?: string | null
+          content?: string | null
           created_at?: string
+          excerpt?: string | null
           id?: string
           image_url?: string | null
           published_at?: string
+          read_time_minutes?: number | null
           source_url?: string | null
           summary: string
+          tags?: string[] | null
           title: string
           updated_at?: string
         }
         Update: {
+          author?: string | null
           category?: string | null
+          content?: string | null
           created_at?: string
+          excerpt?: string | null
           id?: string
           image_url?: string | null
           published_at?: string
+          read_time_minutes?: number | null
           source_url?: string | null
           summary?: string
+          tags?: string[] | null
           title?: string
           updated_at?: string
         }
@@ -593,6 +608,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_monthly_ranking: {
+        Args: { _month_start?: string }
+        Returns: {
+          avatar_url: string
+          checkins_count: number
+          is_current_user: boolean
+          nickname: string
+          rank: number
+          total_score: number
+          user_id: string
+          workouts_count: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
