@@ -86,10 +86,45 @@ IMPORTANTE: Use esses dados para PRIORIZAR grupos musculares fracos no treino e 
 - Organizar os dias da semana para MAXIMIZAR o descanso entre sinergias
 - Se o aluno treina Seg/Ter/Qua/Sex, NÃO colocar Peito na seg e Ombros na ter (sinérgicos em dias consecutivos)
 
-### Volume por nível de experiência:
-- Iniciante (0-6 meses): 10-12 séries por grupo/semana, 1-2 exercícios por grupo, 2-3 séries cada
-- Intermediário (6m-2 anos): 14-18 séries por grupo/semana, 2-3 exercícios por grupo, 3 séries cada
-- Avançado (2+ anos): 18-24+ séries por grupo/semana, 3-4 exercícios por grupo, 3-4 séries cada
+### Volume e seleção POR NÍVEL DE EXPERIÊNCIA:
+
+**Iniciante e Intermediário (METODOLOGIA PADRÃO):**
+- Cada exercício: 1 série de aquecimento + 3 séries válidas
+- Estrutura das séries (NUNCA mude essa ordem):
+  1. Aquecimento: 50% da carga máxima, 12 reps (não próximo da falha)
+  2. Válida 1: carga próxima do máximo, ALVO 10 reps próximas da falha
+  3. Válida 2: mesma carga (ou levemente reduzida), ALVO 8 reps próximas da falha
+  4. Válida 3: REPETIR A CARGA da série 2, indo ATÉ A FALHA TOTAL
+- Zona alvo de falha: 8 a 12 reps. Se passar de 12 na falha, AUMENTAR carga próxima sessão.
+- Iniciante: 1-2 exercícios por grupo muscular
+- Intermediário: 2-3 exercícios por grupo muscular
+
+**Avançado (PROGRESSÃO COM TÉCNICAS):**
+- Cada exercício: 2 séries de aquecimento (50% e 75%) + 3 séries válidas próximas da falha
+- 3-4 exercícios por grupo, 18-24+ séries por grupo/semana
+- Variar a ZONA DE REPS entre exercícios e entre protocolos (6-8, 8-12, 12-15, 15-20)
+- A cada novo protocolo (próximos 60 dias), incorporar UMA destas técnicas em pelo menos 30% dos exercícios:
+  • **Backoff set**: após séries pesadas, 1 série leve (50-60% da carga) com reps altas
+  • **Pico de contração**: pausa de 1-2s na contração máxima de cada rep
+  • **Cluster set**: dividir uma série em mini-séries (ex: 3 reps + 15s descanso + 3 reps + 15s + 3 reps)
+- Indicar a técnica no campo "technique" do exercício quando aplicável (ex: "backoff", "peak_contraction", "cluster", "standard")
+
+### DIFERENÇAS POR SEXO (CRÍTICO):
+
+**MULHERES:**
+- Peitoral: APENAS 1 exercício por sessão (priorizar inclinado leve ou crucifixo). NUNCA 2+ exercícios de peito.
+- Tríceps: 1 exercício é suficiente (não é foco estético feminino)
+- Glúteos e posterior de coxa: PRIORIDADE — 3-4 exercícios entre quadríceps/posterior, com VOLUME EXTRA em glúteo (elevação pélvica, hip thrust, abdução)
+- Quadríceps: 1-2 exercícios (não hipertrofiar excessivamente se não for objetivo)
+- Ombros (deltoide lateral): 2 exercícios (elevação lateral em alto volume)
+- Costas: volume normal, foco em densidade
+- Core: SEMPRE incluir (importante pós-parto e estética)
+
+**HOMENS:**
+- Peitoral: 2-4 exercícios conforme nível, foco em supinos
+- Costas em alto volume (espessura + largura)
+- Braços (bíceps + tríceps): foco estético
+- Glúteos: 1 exercício é suficiente (incluído nos compostos)
 
 ### Seleção de exercícios:
 - SEMPRE incluir pelo menos 1 exercício composto por grupo muscular
@@ -97,19 +132,24 @@ IMPORTANTE: Use esses dados para PRIORIZAR grupos musculares fracos no treino e 
 - Adaptar ao tipo de academia (completa, limitada, casa)
 - Respeitar lesões informadas — NÃO prescrever exercícios que agravem a lesão
 - Se houver avaliação corporal: PRIORIZAR exercícios para os pontos fracos identificados, adicionar volume extra (2-4 séries a mais)
-- Repetições: compostos 6-10, isolados 10-15, core/panturrilha 15-20
 - Descanso: compostos pesados 90-120s, acessórios 60-90s, isolados leves 45-60s
 
 ### Banco de exercícios disponíveis (usar APENAS estes):
 Peito: Supino reto barra, Supino inclinado halteres, Supino declinado, Crucifixo máquina, Crossover, Flexão, Fly inclinado halteres, Peck deck
 Costas: Puxada frontal, Remada curvada, Remada unilateral, Pulldown corda, Remada cavaleiro, Barra fixa, Remada baixa, Pullover
 Pernas(Quad): Agachamento livre, Leg press 45°, Cadeira extensora, Passada halteres, Hack squat, Agachamento búlgaro, Sissy squat
-Pernas(Post): Stiff, Mesa flexora, Elevação pélvica, Cadeira flexora, Good morning, Nordic curl
+Pernas(Post)/Glúteo: Stiff, Mesa flexora, Elevação pélvica, Hip thrust, Cadeira flexora, Good morning, Nordic curl, Abdução máquina, Coice na polia
 Ombros: Desenvolvimento halteres, Elevação lateral, Elevação frontal, Face pull, Arnold press, Desenvolvimento máquina
 Tríceps: Tríceps pulley corda, Tríceps testa EZ, Mergulho banco, Tríceps francês, Tríceps coice
 Bíceps: Rosca direta barra, Rosca martelo, Rosca concentrada, Rosca scott, Rosca inversa
 Core: Prancha, Abdominal infra, Crunch, Abdominal oblíquo, Roda abdominal
 Panturrilha: Panturrilha em pé, Panturrilha sentado
+
+### NOTA DE DINÂMICA OBRIGATÓRIA:
+Para CADA dia de treino, gerar um campo "dynamicNotes" curto (2-3 frases) explicando:
+- A LÓGICA da ordem dos exercícios (por que esse antes daquele)
+- A dinâmica de execução (aquecimento → válidas próximas da falha → última à falha)
+- NÃO explicar tecnicamente cada exercício, só a dinâmica geral do treino
 
 ## DIETA
 
@@ -175,8 +215,9 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
       "label": "Segunda — Peito & Tríceps",
       "muscleGroup": "Peito & Tríceps",
       "weekday": "Segunda",
+      "dynamicNotes": "Comece pelo composto pesado (supino reto) para máxima carga, depois isole. Faça 1 aquecimento a 50% e progrida até a falha nas válidas. Última série: vai até a falha total.",
       "exercises": [
-        { "id": "0-0", "name": "Supino reto barra", "sets": 3, "reps": "8-12", "rest": "90s", "done": false }
+        { "id": "0-0", "name": "Supino reto barra", "sets": 3, "reps": "8-12", "rest": "90s", "technique": "standard", "done": false }
       ]
     }
   ],
