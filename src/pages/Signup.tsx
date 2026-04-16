@@ -4,13 +4,17 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { CURRENT_TERMS_VERSION } from "@/lib/terms";
 import logo from "@/assets/logo.png";
 
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
   const { toast } = useToast();
@@ -22,15 +26,43 @@ const Signup = () => {
       toast({ title: "Senha fraca", description: "Mínimo 6 caracteres", variant: "destructive" });
       return;
     }
+    if (!acceptedTerms) {
+      toast({
+        title: "Aceite necessário",
+        description: "Você precisa aceitar os Termos de Uso e a Política de Privacidade para continuar.",
+        variant: "destructive",
+      });
+      return;
+    }
     setLoading(true);
     const { error } = await signUp(email, password, name);
-    setLoading(false);
     if (error) {
+      setLoading(false);
       toast({ title: "Erro ao cadastrar", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Conta criada!", description: "Verifique seu e-mail para confirmar." });
-      navigate("/login");
+      return;
     }
+
+    // Persist terms acceptance on the profile (created automatically via trigger).
+    // Best-effort: if user must confirm email first, we still try; failure is silent.
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const uid = sessionData.session?.user?.id;
+      if (uid) {
+        await supabase
+          .from("profiles")
+          .update({
+            terms_version: CURRENT_TERMS_VERSION,
+            terms_accepted_at: new Date().toISOString(),
+          })
+          .eq("user_id", uid);
+      }
+    } catch {
+      // ignore — will be re-prompted on first authenticated access if missing
+    }
+
+    setLoading(false);
+    toast({ title: "Conta criada!", description: "Verifique seu e-mail para confirmar." });
+    navigate("/login");
   };
 
   return (
@@ -56,7 +88,23 @@ const Signup = () => {
             <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" required className="mt-1" />
           </div>
 
-          <Button type="submit" className="w-full glow" disabled={loading}>
+          <div className="flex items-start gap-2 pt-1">
+            <Checkbox
+              id="terms"
+              checked={acceptedTerms}
+              onCheckedChange={(v) => setAcceptedTerms(v === true)}
+              className="mt-1"
+            />
+            <Label htmlFor="terms" className="text-sm font-normal leading-snug text-muted-foreground cursor-pointer">
+              Li e aceito os{" "}
+              <Link to="/terms" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                Termos de Uso e a Política de Privacidade
+              </Link>
+              .
+            </Label>
+          </div>
+
+          <Button type="submit" className="w-full glow" disabled={loading || !acceptedTerms}>
             {loading ? "Criando..." : "Criar conta"}
           </Button>
         </form>
