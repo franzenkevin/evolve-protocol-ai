@@ -6,6 +6,7 @@ import { useCheckins } from "@/hooks/useCheckins";
 import { useBodyAssessments } from "@/hooks/useBodyAssessments";
 import { useDailyRatings, useTodayRating, useSaveDailyRating } from "@/hooks/useDailyRatings";
 import { useWorkoutLogs, useAllWorkoutLogs } from "@/hooks/useWorkoutLogs";
+import { useJournalArticles } from "@/hooks/useJournal";
 import AppLayout from "@/components/AppLayout";
 import ProtocolProgressWidget from "@/components/ProtocolProgressWidget";
 import { Card } from "@/components/ui/card";
@@ -14,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { Dumbbell, UtensilsCrossed, Camera, Activity, Calendar, Bell, Star, Send, Eye, Trophy, CheckCircle } from "lucide-react";
+import { Dumbbell, Bell, Star, Send, Eye, CheckCircle, BookOpen, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 const today = new Date().toISOString().split("T")[0];
@@ -23,13 +24,6 @@ const WEEKDAY_MAP: Record<number, string> = {
   4: "Quinta", 5: "Sexta", 6: "Sábado",
 };
 const todayWeekday = WEEKDAY_MAP[new Date().getDay()];
-
-const QUICK_ACTIONS = [
-  { to: "/training", icon: Dumbbell, label: "Treino", color: "text-primary" },
-  { to: "/diet", icon: UtensilsCrossed, label: "Dieta", color: "text-warning" },
-  { to: "/progress", icon: Camera, label: "Fotos", color: "text-info" },
-  { to: "/progress", icon: Activity, label: "Check-in", color: "text-success" },
-];
 
 const Dashboard = () => {
   const { user } = useAuth();
