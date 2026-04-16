@@ -30,8 +30,45 @@ const Progress = () => {
 
   const weightHistory = checkins.filter((c) => c.weight).slice(0, 10).reverse();
   const photoCheckins = checkins.filter((c) => c.photo_front || c.photo_side || c.photo_back);
-  const firstPhotos = photoCheckins[photoCheckins.length - 1];
-  const latestPhotos = photoCheckins[0];
+  // Oldest -> newest
+  const photoCheckinsAsc = [...photoCheckins].sort(
+    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+  );
+
+  // Photo windows based on protocol start date (day 0, 30, 60)
+  const protocolStart = protocol?.start_date ? new Date(protocol.start_date) : null;
+  const daysSinceStart = protocolStart
+    ? Math.floor((Date.now() - protocolStart.getTime()) / 86400000)
+    : 0;
+
+  const offsetDate = (offset: number) => {
+    if (!protocolStart) return null;
+    const d = new Date(protocolStart);
+    d.setDate(d.getDate() + offset);
+    return d;
+  };
+  const day30Date = offsetDate(30);
+  const day60Date = offsetDate(60);
+
+  const findPhotoInWindow = (centerDate: Date | null, tolDays = 7) => {
+    if (!centerDate) return null;
+    const center = centerDate.getTime();
+    const tol = tolDays * 86400000;
+    return (
+      photoCheckinsAsc.find((c) => {
+        const t = new Date(c.created_at).getTime();
+        return Math.abs(t - center) <= tol;
+      }) || null
+    );
+  };
+
+  const photoDay0 = photoCheckinsAsc[0] || null;
+  const photoDay30 = daysSinceStart >= 30 ? findPhotoInWindow(day30Date) : null;
+  const photoDay60 = daysSinceStart >= 60 ? findPhotoInWindow(day60Date) : null;
+  const day30Unlocked = daysSinceStart >= 30;
+  const day60Unlocked = daysSinceStart >= 60;
+  const daysUntilDay30 = Math.max(0, 30 - daysSinceStart);
+  const daysUntilDay60 = Math.max(0, 60 - daysSinceStart);
 
   // Stats: tonnage, sessions, streak, PRs
   const stats = useMemo(() => {
