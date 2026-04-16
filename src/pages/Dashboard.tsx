@@ -39,6 +39,7 @@ const Dashboard = () => {
   const { data: assessments = [] } = useBodyAssessments();
   const { data: ratings = [] } = useDailyRatings(14);
   const { data: todayRating } = useTodayRating();
+  const { data: allLogs = [] } = useAllWorkoutLogs();
   const saveRating = useSaveDailyRating();
 
   const [starRating, setStarRating] = useState(0);
