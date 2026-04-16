@@ -482,7 +482,7 @@ const Progress = () => {
                 <Camera size={16} className="text-primary mt-0.5 shrink-0" />
                 <div className="text-xs text-muted-foreground space-y-1">
                   <p className="font-semibold text-foreground">Como funcionam as fotos do protocolo</p>
-                  <p>📸 <span className="text-foreground font-medium">Início (dia 0)</span>: tire suas primeiras fotos nos 3 ângulos (frente, lado, costas) ao começar o protocolo.</p>
+                  <p>📸 <span className="text-foreground font-medium">Dia 0</span>: usamos automaticamente as fotos que você enviou na <span className="text-primary">avaliação corporal do onboarding</span>.</p>
                   <p>🔓 <span className="text-foreground font-medium">Dia 30</span>: nova janela libera para refazer as fotos nos mesmos ângulos e comparar a evolução de meio de ciclo.</p>
                   <p>🏁 <span className="text-foreground font-medium">Dia 60</span>: última janela libera ao fim do protocolo — fotos finais usadas na troca para o próximo treino.</p>
                 </div>
