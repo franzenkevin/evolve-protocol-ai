@@ -533,7 +533,76 @@ const Training = () => {
                           </div>
                         )}
 
-                        {/* Previous best */}
+                        {/* Swap exercise button */}
+                        <button
+                          className="flex items-center gap-1.5 text-xs text-warning hover:text-warning/80 transition-colors disabled:opacity-50"
+                          disabled={swapping === ex.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSwapExercise(ex);
+                          }}
+                        >
+                          {swapping === ex.id ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <Replace size={12} />
+                          )}
+                          Não tenho esse equipamento — sugerir substituição
+                        </button>
+
+                        {swapResults[ex.id] && (
+                          <div className={`rounded-lg border p-3 ${swapResults[ex.id].available ? "bg-warning/10 border-warning/30" : "bg-muted/30 border-border"}`}>
+                            {swapResults[ex.id].available ? (
+                              <div className="space-y-2">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle2 size={14} className="text-warning mt-0.5 shrink-0" />
+                                  <div className="flex-1">
+                                    <p className="text-xs font-semibold text-foreground">
+                                      Substituir por: <span className="text-warning">{swapResults[ex.id].newExercise}</span>
+                                    </p>
+                                    <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                                      {swapResults[ex.id].reason}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-7 text-[11px] flex-1"
+                                    onClick={() => acceptSwap(ex.id)}
+                                  >
+                                    Aceitar substituição
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-7 text-[11px]"
+                                    onClick={() => setSwapResults((prev) => { const n = { ...prev }; delete n[ex.id]; return n; })}
+                                  >
+                                    Cancelar
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex items-start gap-2">
+                                <XCircle size={14} className="text-muted-foreground mt-0.5 shrink-0" />
+                                <div className="flex-1">
+                                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                    {swapResults[ex.id].message}
+                                  </p>
+                                  <button
+                                    onClick={() => setSwapResults((prev) => { const n = { ...prev }; delete n[ex.id]; return n; })}
+                                    className="text-[10px] text-primary hover:underline mt-1"
+                                  >
+                                    Fechar
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         {prev && (
                           <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-md p-2">
                             <History size={12} />
