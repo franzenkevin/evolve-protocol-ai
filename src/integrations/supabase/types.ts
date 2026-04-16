@@ -718,6 +718,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_admin_metrics: { Args: never; Returns: Json }
       get_monthly_ranking: {
         Args: { _month_start?: string }
         Returns: {
