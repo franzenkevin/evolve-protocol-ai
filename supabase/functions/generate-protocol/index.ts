@@ -186,6 +186,9 @@ Regras de prescrição:
 5. Para cada sessão de cardio, especificar: type ("LISS"|"HIIT"|"Moderado"), modality (caminhada inclinada, bike, esteira, etc.), duration (em min), intensity (descrever em zona de FC ou RPE), notes (orientação prática), videoQuery
 6. Se cardio_enabled for false, OMITIR completamente os campos cardio/cardioPlan.
 
+### VIDEO DE EXECUÇÃO (OBRIGATÓRIO em CADA exercício):
+Para CADA exercício prescrito (treino, mobilidade e cardio), incluir o campo "videoQuery" — uma string curta otimizada para busca no YouTube em português que retorne um bom tutorial de execução. Formato: "[nome do exercício] execução correta" ou "[nome do exercício] como fazer".
+
 ### NOTA DE DINÂMICA OBRIGATÓRIA:
 Para CADA dia de treino, gerar um campo "dynamicNotes" curto (2-3 frases) explicando:
 - A LÓGICA da ordem dos exercícios (por que esse antes daquele)
