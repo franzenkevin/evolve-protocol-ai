@@ -45,7 +45,45 @@ const Admin = () => {
   const [foodCal, setFoodCal] = useState("");
   const [foodDialogOpen, setFoodDialogOpen] = useState(false);
 
+  // Journal form
+  const [artTitle, setArtTitle] = useState("");
+  const [artCategory, setArtCategory] = useState("");
+  const [artExcerpt, setArtExcerpt] = useState("");
+  const [artContent, setArtContent] = useState("");
+  const [artImageUrl, setArtImageUrl] = useState("");
+  const [artSourceUrl, setArtSourceUrl] = useState("");
+  const [artTags, setArtTags] = useState("");
+  const [artReadTime, setArtReadTime] = useState("3");
+  const [artDialogOpen, setArtDialogOpen] = useState(false);
+
   const handleLogout = async () => { await signOut(); navigate("/login"); };
+
+  const handleAddArticle = async () => {
+    if (!artTitle || !artContent) {
+      toast({ title: "Preencha título e conteúdo", variant: "destructive" });
+      return;
+    }
+    try {
+      const tags = artTags.split(",").map((t) => t.trim()).filter(Boolean);
+      await createArticle.mutateAsync({
+        title: artTitle,
+        summary: artExcerpt || artContent.slice(0, 200),
+        excerpt: artExcerpt || undefined,
+        content: artContent,
+        category: artCategory || "fitness",
+        image_url: artImageUrl || undefined,
+        source_url: artSourceUrl || undefined,
+        tags: tags.length ? tags : undefined,
+        read_time_minutes: parseInt(artReadTime) || 3,
+      });
+      toast({ title: "Artigo publicado!", description: "Notificação enviada aos usuários." });
+      setArtTitle(""); setArtCategory(""); setArtExcerpt(""); setArtContent("");
+      setArtImageUrl(""); setArtSourceUrl(""); setArtTags(""); setArtReadTime("3");
+      setArtDialogOpen(false);
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    }
+  };
 
   const handleAddExercise = async () => {
     if (!exName || !exCategory) return;
