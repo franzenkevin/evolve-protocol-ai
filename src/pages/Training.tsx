@@ -222,6 +222,62 @@ const Training = () => {
     }
   };
 
+  // Sync existing feedback when day changes
+  useEffect(() => {
+    if (existingFeedback) {
+      setFeedbackRating(existingFeedback.rating);
+      setFeedbackNotes(existingFeedback.notes || "");
+    } else {
+      setFeedbackRating(0);
+      setFeedbackNotes("");
+    }
+  }, [existingFeedback?.id, selectedDay]);
+
+  const handleFinishWorkout = async () => {
+    if (!day?.exercises) return;
+    try {
+      // Save all exercises that have any data entered
+      await Promise.all(
+        day.exercises.map((ex: any) => {
+          const sets = exerciseSets[ex.id];
+          if (!sets) return Promise.resolve();
+          return saveLog.mutateAsync({
+            protocol_id: protocol?.id,
+            day_index: selectedDay,
+            exercise_id: ex.id,
+            exercise_name: swappedNames[ex.id] || ex.name,
+            session_date: sessionDate,
+            sets,
+          });
+        })
+      );
+      toast.success("Treino finalizado! 💪");
+      setShowFeedback(true);
+    } catch {
+      toast.error("Erro ao finalizar treino");
+    }
+  };
+
+  const handleSubmitFeedback = async () => {
+    if (feedbackRating === 0) {
+      toast.error("Escolha uma nota de 1 a 5");
+      return;
+    }
+    try {
+      await saveFeedback.mutateAsync({
+        protocol_id: protocol?.id || null,
+        day_index: selectedDay,
+        session_date: sessionDate,
+        rating: feedbackRating,
+        notes: feedbackNotes || null,
+      });
+      toast.success("Feedback registrado! Obrigado.");
+      setShowFeedback(false);
+    } catch {
+      toast.error("Erro ao salvar feedback");
+    }
+  };
+
   const handleSwapExercise = async (ex: any) => {
     setSwapping(ex.id);
     try {
