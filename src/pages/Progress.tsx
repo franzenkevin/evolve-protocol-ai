@@ -1,15 +1,18 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import AppLayout from "@/components/AppLayout";
 import ProtocolProgressWidget from "@/components/ProtocolProgressWidget";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Camera, TrendingUp, Scale, Upload, Loader2, BarChart3, Flame, Trophy, Dumbbell as DumbbellIcon } from "lucide-react";
+import { Camera, TrendingUp, Scale, Upload, Loader2, BarChart3, Flame, Trophy, Dumbbell as DumbbellIcon, Star, Lock, Clock } from "lucide-react";
 import { useCheckins, useCreateCheckin, uploadPhoto } from "@/hooks/useCheckins";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import { useAllWorkoutLogs } from "@/hooks/useWorkoutLogs";
+import { useBodyAssessments } from "@/hooks/useBodyAssessments";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -18,6 +21,7 @@ const Progress = () => {
   const { data: checkins = [] } = useCheckins();
   const { data: protocol } = useActiveProtocol();
   const { data: allLogs = [] } = useAllWorkoutLogs();
+  const { data: assessments = [] } = useBodyAssessments();
   const createCheckin = useCreateCheckin();
   const { toast } = useToast();
 
@@ -25,8 +29,10 @@ const Progress = () => {
   const [savingWeight, setSavingWeight] = useState(false);
   const [photos, setPhotos] = useState<{ front?: File; side?: File; back?: File }>({});
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
-  const [checkinAdherence, setCheckinAdherence] = useState<number | null>(null);
+  const [checkinRating, setCheckinRating] = useState(0);
+  const [checkinNotes, setCheckinNotes] = useState("");
   const [savingCheckin, setSavingCheckin] = useState(false);
+  const [assessmentPhotoUrls, setAssessmentPhotoUrls] = useState<{ front?: string; side?: string; back?: string } | null>(null);
 
   const weightHistory = checkins.filter((c) => c.weight).slice(0, 10).reverse();
   const photoCheckins = checkins.filter((c) => c.photo_front || c.photo_side || c.photo_back);
@@ -34,6 +40,43 @@ const Progress = () => {
   const photoCheckinsAsc = [...photoCheckins].sort(
     (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
   );
+
+  // Latest assessment (used as fallback for Day 0 photos)
+  const latestAssessment = assessments[0] as any | undefined;
+
+  // Resolve assessment photos to public-ish URLs (signed)
+  useEffect(() => {
+    let cancelled = false;
+    const resolve = async () => {
+      if (!latestAssessment?.photo_paths?.length) {
+        setAssessmentPhotoUrls(null);
+        return;
+      }
+      const paths: string[] = latestAssessment.photo_paths;
+      // photo_paths from onboarding follow pattern <user>/assessment/{front|back|left|right}.<ext>
+      const pickByAngle = (angle: string) =>
+        paths.find((p) => p.toLowerCase().includes(`/${angle}.`)) ||
+        paths.find((p) => p.toLowerCase().includes(angle));
+      const targets = {
+        front: pickByAngle("front"),
+        side: pickByAngle("right") || pickByAngle("left") || pickByAngle("side"),
+        back: pickByAngle("back"),
+      };
+      const out: { front?: string; side?: string; back?: string } = {};
+      for (const [k, p] of Object.entries(targets)) {
+        if (!p) continue;
+        const { data } = await supabase.storage
+          .from("photos")
+          .createSignedUrl(p, 60 * 60 * 24 * 7);
+        if (data?.signedUrl) (out as any)[k] = data.signedUrl;
+      }
+      if (!cancelled) setAssessmentPhotoUrls(out);
+    };
+    resolve();
+    return () => {
+      cancelled = true;
+    };
+  }, [latestAssessment?.id]);
 
   // Photo windows based on protocol start date (day 0, 30, 60)
   const protocolStart = protocol?.start_date ? new Date(protocol.start_date) : null;
@@ -62,13 +105,33 @@ const Progress = () => {
     );
   };
 
-  const photoDay0 = photoCheckinsAsc[0] || null;
+  // Day 0: prefer assessment photos (from onboarding), fallback to first checkin photos
+  const assessmentDay0 = assessmentPhotoUrls && (assessmentPhotoUrls.front || assessmentPhotoUrls.side || assessmentPhotoUrls.back)
+    ? {
+        photo_front: assessmentPhotoUrls.front || null,
+        photo_side: assessmentPhotoUrls.side || null,
+        photo_back: assessmentPhotoUrls.back || null,
+        created_at: latestAssessment?.created_at || protocol?.start_date || new Date().toISOString(),
+        source: "assessment" as const,
+      }
+    : null;
+  const photoDay0: any = assessmentDay0 || photoCheckinsAsc[0] || null;
   const photoDay30 = daysSinceStart >= 30 ? findPhotoInWindow(day30Date) : null;
   const photoDay60 = daysSinceStart >= 60 ? findPhotoInWindow(day60Date) : null;
   const day30Unlocked = daysSinceStart >= 30;
   const day60Unlocked = daysSinceStart >= 60;
   const daysUntilDay30 = Math.max(0, 30 - daysSinceStart);
   const daysUntilDay60 = Math.max(0, 60 - daysSinceStart);
+
+  // Last weekly check-in (only entries with rating in notes/adherence — we mark check-ins by adherence presence and absence of weight/photos)
+  const lastCheckin = useMemo(() => {
+    return checkins.find((c) => c.adherence != null && !c.weight && !c.photo_front && !c.photo_side && !c.photo_back) || null;
+  }, [checkins]);
+  const daysSinceLastCheckin = lastCheckin
+    ? Math.floor((Date.now() - new Date(lastCheckin.created_at).getTime()) / 86400000)
+    : null;
+  const checkinUnlocked = daysSinceLastCheckin === null || daysSinceLastCheckin >= 7;
+  const daysUntilCheckin = checkinUnlocked ? 0 : Math.max(0, 7 - (daysSinceLastCheckin || 0));
 
   // Stats: tonnage, sessions, streak, PRs
   const stats = useMemo(() => {
@@ -206,12 +269,23 @@ const Progress = () => {
   };
 
   const handleCheckin = async () => {
-    if (checkinAdherence === null) return;
+    if (!checkinUnlocked) return;
+    if (checkinRating === 0) {
+      toast({ title: "Escolha de 1 a 5 estrelas", variant: "destructive" });
+      return;
+    }
     setSavingCheckin(true);
     try {
-      await createCheckin.mutateAsync({ adherence: checkinAdherence, protocol_id: protocol?.id });
+      // Map 1-5 stars to 20-100 adherence score for stats compatibility
+      const adherenceScore = checkinRating * 20;
+      await createCheckin.mutateAsync({
+        adherence: adherenceScore,
+        notes: checkinNotes || null,
+        protocol_id: protocol?.id,
+      });
       toast({ title: "Check-in enviado!" });
-      setCheckinAdherence(null);
+      setCheckinRating(0);
+      setCheckinNotes("");
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
     } finally {
@@ -408,7 +482,7 @@ const Progress = () => {
                 <Camera size={16} className="text-primary mt-0.5 shrink-0" />
                 <div className="text-xs text-muted-foreground space-y-1">
                   <p className="font-semibold text-foreground">Como funcionam as fotos do protocolo</p>
-                  <p>📸 <span className="text-foreground font-medium">Início (dia 0)</span>: tire suas primeiras fotos nos 3 ângulos (frente, lado, costas) ao começar o protocolo.</p>
+                  <p>📸 <span className="text-foreground font-medium">Dia 0</span>: usamos automaticamente as fotos que você enviou na <span className="text-primary">avaliação corporal do onboarding</span>.</p>
                   <p>🔓 <span className="text-foreground font-medium">Dia 30</span>: nova janela libera para refazer as fotos nos mesmos ângulos e comparar a evolução de meio de ciclo.</p>
                   <p>🏁 <span className="text-foreground font-medium">Dia 60</span>: última janela libera ao fim do protocolo — fotos finais usadas na troca para o próximo treino.</p>
                 </div>
@@ -533,36 +607,86 @@ const Progress = () => {
           </TabsContent>
 
           <TabsContent value="checkin" className="space-y-4 mt-4">
-            <Card className="p-4 card-gradient border-border">
-              <h3 className="font-heading font-semibold text-foreground mb-3">Check-in semanal</h3>
-              <div className="space-y-3">
-                <div>
-                  <Label>Como está sua aderência geral?</Label>
-                  <div className="flex gap-2 mt-1">
-                    {[
-                      { emoji: "😴", value: 25 },
-                      { emoji: "😐", value: 50 },
-                      { emoji: "💪", value: 75 },
-                      { emoji: "🔥", value: 100 },
-                    ].map(({ emoji, value }) => (
-                      <Button
-                        key={value}
-                        variant={checkinAdherence === value ? "default" : "outline"}
-                        size="sm"
-                        className="flex-1 text-lg"
-                        onClick={() => setCheckinAdherence(value)}
-                      >
-                        {emoji}
-                      </Button>
-                    ))}
+            {/* Status: locked or unlocked */}
+            {!checkinUnlocked ? (
+              <Card className="p-6 card-gradient border-border text-center">
+                <Lock size={28} className="mx-auto text-muted-foreground mb-2" />
+                <h3 className="font-heading font-semibold text-foreground text-sm mb-1">
+                  Check-in semanal bloqueado
+                </h3>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Faltam <span className="text-primary font-semibold">{daysUntilCheckin} dia(s)</span> para liberar o próximo check-in.
+                </p>
+                {lastCheckin && (
+                  <div className="bg-secondary/40 rounded-md p-3 text-left">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Clock size={12} className="text-muted-foreground" />
+                      <p className="text-[11px] text-muted-foreground">
+                        Último check-in: {new Date(lastCheckin.created_at).toLocaleDateString("pt-BR")}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 mb-1">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star
+                          key={s}
+                          size={14}
+                          className={s <= Math.round((lastCheckin.adherence || 0) / 20) ? "fill-primary text-primary" : "text-muted-foreground"}
+                        />
+                      ))}
+                      <span className="text-[10px] text-muted-foreground ml-1">
+                        {Math.round((lastCheckin.adherence || 0) / 20)}/5
+                      </span>
+                    </div>
+                    {lastCheckin.notes && (
+                      <p className="text-[11px] text-foreground italic">"{lastCheckin.notes}"</p>
+                    )}
                   </div>
+                )}
+              </Card>
+            ) : (
+              <Card className="p-4 card-gradient border-border">
+                <h3 className="font-heading font-semibold text-foreground mb-1">Check-in semanal</h3>
+                <p className="text-[11px] text-muted-foreground mb-3">
+                  Avalie como foi sua semana de 0 a 5 estrelas. Descrição opcional.
+                  {lastCheckin && (
+                    <> Último: {new Date(lastCheckin.created_at).toLocaleDateString("pt-BR")} ({Math.round((lastCheckin.adherence || 0) / 20)}/5)</>
+                  )}
+                </p>
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs">Sua nota da semana</Label>
+                    <div className="flex items-center gap-1 mt-1">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <button key={s} type="button" onClick={() => setCheckinRating(s)} className="p-0.5">
+                          <Star
+                            size={28}
+                            className={s <= checkinRating ? "fill-primary text-primary" : "text-muted-foreground"}
+                          />
+                        </button>
+                      ))}
+                      <span className="text-xs text-muted-foreground ml-2">{checkinRating}/5</span>
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Observações (opcional)</Label>
+                    <Textarea
+                      value={checkinNotes}
+                      onChange={(e) => setCheckinNotes(e.target.value)}
+                      placeholder="Como foi a semana? Aderência ao treino e dieta, dificuldades..."
+                      className="h-20 text-xs resize-none mt-1"
+                    />
+                  </div>
+                  <Button
+                    className="w-full mt-2 glow"
+                    onClick={handleCheckin}
+                    disabled={savingCheckin || checkinRating === 0}
+                  >
+                    {savingCheckin ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
+                    Enviar check-in
+                  </Button>
                 </div>
-                <Button className="w-full mt-2 glow" onClick={handleCheckin} disabled={savingCheckin || checkinAdherence === null}>
-                  {savingCheckin ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
-                  Enviar check-in
-                </Button>
-              </div>
-            </Card>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </div>

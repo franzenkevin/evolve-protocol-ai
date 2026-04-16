@@ -74,9 +74,9 @@ const Profile = () => {
   };
 
   const MENU_ITEMS = [
-    { icon: Settings, label: "Editar perfil", onClick: () => {} },
+    { icon: Settings, label: "Editar perfil", onClick: () => navigate("/profile/edit") },
     { icon: FileText, label: "Meu protocolo", onClick: () => navigate("/training") },
-    { icon: Shield, label: "Privacidade", onClick: () => {} },
+    { icon: Shield, label: "Termos e Política de Privacidade", onClick: () => navigate("/terms") },
     { icon: HelpCircle, label: "Ajuda", onClick: () => {} },
   ];
 

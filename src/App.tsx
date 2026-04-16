@@ -21,6 +21,8 @@ import Chat from "./pages/Chat";
 import Admin from "./pages/Admin";
 import Terms from "./pages/Terms";
 import AcceptTerms from "./pages/AcceptTerms";
+import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 import NotFound from "./pages/NotFound";
 import { CURRENT_TERMS_VERSION } from "@/lib/terms";
 
@@ -64,6 +66,8 @@ const App = () => (
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/accept-terms" element={<ProtectedRoute><AcceptTerms /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><OnboardingGate><Profile /></OnboardingGate></ProtectedRoute>} />
+            <Route path="/profile/edit" element={<ProtectedRoute><OnboardingGate><EditProfile /></OnboardingGate></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

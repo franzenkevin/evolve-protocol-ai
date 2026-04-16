@@ -38,6 +38,7 @@ import {
   useSaveWorkoutLog,
   type WorkoutSet,
 } from "@/hooks/useWorkoutLogs";
+import { useWorkoutFeedback, useSaveWorkoutFeedback } from "@/hooks/useWorkoutFeedback";
 import { toast } from "sonner";
 
 // AI explanation hook — streams from the chat edge function
@@ -144,7 +145,9 @@ const Training = () => {
 
   const { data: currentLogs } = useWorkoutLogs(selectedDay, sessionDate);
   const { data: previousLogs } = usePreviousWorkoutLogs(selectedDay, sessionDate);
+  const { data: existingFeedback } = useWorkoutFeedback(selectedDay >= 0 ? selectedDay : 0, sessionDate);
   const saveLog = useSaveWorkoutLog();
+  const saveFeedback = useSaveWorkoutFeedback();
 
   // Build a map of previous best per exercise
   const prevBestMap: Record<string, { weight: number; reps: number }> = {};
@@ -216,6 +219,62 @@ const Training = () => {
       toast.success("Exercício salvo!");
     } catch {
       toast.error("Erro ao salvar");
+    }
+  };
+
+  // Sync existing feedback when day changes
+  useEffect(() => {
+    if (existingFeedback) {
+      setFeedbackRating(existingFeedback.rating);
+      setFeedbackNotes(existingFeedback.notes || "");
+    } else {
+      setFeedbackRating(0);
+      setFeedbackNotes("");
+    }
+  }, [existingFeedback?.id, selectedDay]);
+
+  const handleFinishWorkout = async () => {
+    if (!day?.exercises) return;
+    try {
+      // Save all exercises that have any data entered
+      await Promise.all(
+        day.exercises.map((ex: any) => {
+          const sets = exerciseSets[ex.id];
+          if (!sets) return Promise.resolve();
+          return saveLog.mutateAsync({
+            protocol_id: protocol?.id,
+            day_index: selectedDay,
+            exercise_id: ex.id,
+            exercise_name: swappedNames[ex.id] || ex.name,
+            session_date: sessionDate,
+            sets,
+          });
+        })
+      );
+      toast.success("Treino finalizado! 💪");
+      setShowFeedback(true);
+    } catch {
+      toast.error("Erro ao finalizar treino");
+    }
+  };
+
+  const handleSubmitFeedback = async () => {
+    if (feedbackRating === 0) {
+      toast.error("Escolha uma nota de 1 a 5");
+      return;
+    }
+    try {
+      await saveFeedback.mutateAsync({
+        protocol_id: protocol?.id || null,
+        day_index: selectedDay,
+        session_date: sessionDate,
+        rating: feedbackRating,
+        notes: feedbackNotes || null,
+      });
+      toast.success("Feedback registrado! Obrigado.");
+      setShowFeedback(false);
+    } catch {
+      toast.error("Erro ao salvar feedback");
     }
   };
 
@@ -780,32 +839,46 @@ const Training = () => {
               })}
             </div>
 
-            {/* Post-workout feedback */}
-            {isWorkoutComplete && !showFeedback && (
-              <Card className="p-4 card-gradient border-primary/30">
+            {/* Finalize workout button */}
+            {!showFeedback && (
+              <Card className={`p-4 card-gradient ${isWorkoutComplete ? "border-primary/30" : "border-border"}`}>
                 <div className="flex items-center gap-3 mb-3">
-                  <Trophy size={24} className="text-primary" />
-                  <div>
-                    <h3 className="font-heading font-semibold text-foreground">Treino concluído! 🔥</h3>
-                    <p className="text-xs text-muted-foreground">
-                      Tonelagem: {totalTonnage.toLocaleString("pt-BR")} kg
+                  <Trophy size={20} className={isWorkoutComplete ? "text-primary" : "text-muted-foreground"} />
+                  <div className="flex-1">
+                    <h3 className="font-heading font-semibold text-foreground text-sm">
+                      {isWorkoutComplete ? "Treino concluído! 🔥" : "Finalizar treino"}
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground">
+                      Salva todos exercícios e pede um feedback rápido.
+                      {totalTonnage > 0 && ` • ${totalTonnage.toLocaleString("pt-BR")} kg`}
                     </p>
                   </div>
                 </div>
-                <Button className="w-full" onClick={() => setShowFeedback(true)}>
-                  Dar feedback do treino
+                <Button
+                  className="w-full glow"
+                  onClick={handleFinishWorkout}
+                  disabled={saveLog.isPending}
+                >
+                  {saveLog.isPending ? <Loader2 size={14} className="mr-2 animate-spin" /> : <CheckCircle2 size={14} className="mr-2" />}
+                  Finalizar treino
                 </Button>
+                {existingFeedback && (
+                  <p className="text-[10px] text-muted-foreground text-center mt-2">
+                    Feedback já registrado: {existingFeedback.rating}/5 ⭐
+                  </p>
+                )}
               </Card>
             )}
 
             {showFeedback && (
-              <Card className="p-4 card-gradient border-border">
-                <h3 className="font-heading font-semibold text-foreground text-sm mb-2">Feedback do treino</h3>
-                <div className="flex items-center gap-1 mb-2">
+              <Card className="p-4 card-gradient border-primary/30">
+                <h3 className="font-heading font-semibold text-foreground text-sm mb-1">Como foi o treino?</h3>
+                <p className="text-[11px] text-muted-foreground mb-3">Avalie de 0 a 5 estrelas (descrição opcional).</p>
+                <div className="flex items-center gap-1 mb-3">
                   {[1, 2, 3, 4, 5].map((s) => (
-                    <button key={s} onClick={() => setFeedbackRating(s)} className="p-0.5">
+                    <button key={s} onClick={() => setFeedbackRating(s)} className="p-0.5" type="button">
                       <Star
-                        size={24}
+                        size={28}
                         className={s <= feedbackRating ? "fill-primary text-primary" : "text-muted-foreground"}
                       />
                     </button>
@@ -813,21 +886,31 @@ const Training = () => {
                   <span className="text-xs text-muted-foreground ml-2">{feedbackRating}/5</span>
                 </div>
                 <Textarea
-                  placeholder="Como foi o treino? Sentiu algo? Alguma observação..."
+                  placeholder="Como foi a execução? Sentiu algo? (opcional)"
                   value={feedbackNotes}
                   onChange={(e) => setFeedbackNotes(e.target.value)}
-                  className="h-16 text-xs resize-none mb-2"
+                  className="h-20 text-xs resize-none mb-2"
                 />
-                <Button
-                  size="sm"
-                  className="w-full gap-1"
-                  onClick={() => {
-                    toast.success("Feedback salvo! 💪");
-                    setShowFeedback(false);
-                  }}
-                >
-                  <Send size={12} />Enviar feedback
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setShowFeedback(false)}
+                    disabled={saveFeedback.isPending}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="flex-1 gap-1"
+                    onClick={handleSubmitFeedback}
+                    disabled={saveFeedback.isPending || feedbackRating === 0}
+                  >
+                    {saveFeedback.isPending ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                    Enviar feedback
+                  </Button>
+                </div>
               </Card>
             )}
           </>
