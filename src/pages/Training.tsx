@@ -26,7 +26,9 @@ import {
   Replace,
   CheckCircle2,
   XCircle,
+  Activity,
 } from "lucide-react";
+import ExerciseVideo from "@/components/ExerciseVideo";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import { useActiveProtocol } from "@/hooks/useProtocol";
@@ -439,6 +441,64 @@ const Training = () => {
                 </div>
               </div>
             </Card>
+
+            {/* Mobility & stretching (based on posture deviations) */}
+            {Array.isArray(day.mobility) && day.mobility.length > 0 && (
+              <Card className="p-4 border-warning/20 bg-warning/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Activity size={16} className="text-warning" />
+                  <h3 className="font-heading font-semibold text-sm text-foreground">
+                    Mobilidade & alongamento
+                  </h3>
+                </div>
+                <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">
+                  Faça <span className="text-foreground font-medium">antes das séries válidas</span>. Itens prescritos para corrigir desvios identificados na sua avaliação corporal.
+                </p>
+                <div className="space-y-3">
+                  {day.mobility.map((m: any, mi: number) => {
+                    const mobKey = `mob-${selectedDay}-${mi}`;
+                    const expanded = expandedExercise === mobKey;
+                    return (
+                      <div key={mi} className="rounded-lg border border-border/50 bg-background/40 overflow-hidden">
+                        <button
+                          className="w-full p-3 flex items-start gap-2 text-left"
+                          onClick={() => setExpandedExercise(expanded ? null : mobKey)}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                              <p className="text-sm font-medium text-foreground">{m.name}</p>
+                              {m.type && (
+                                <Badge variant="outline" className="text-[9px] px-1 py-0 border-warning/30 text-warning bg-warning/5 capitalize">
+                                  {m.type}
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-muted-foreground">
+                              {m.duration}
+                              {m.target && <span className="opacity-70"> · corrige: {m.target}</span>}
+                            </p>
+                          </div>
+                          {expanded ? (
+                            <ChevronUp size={14} className="text-muted-foreground mt-1" />
+                          ) : (
+                            <ChevronDown size={14} className="text-muted-foreground mt-1" />
+                          )}
+                        </button>
+                        {expanded && (
+                          <div className="px-3 pb-3">
+                            <ExerciseVideo
+                              exerciseName={m.name}
+                              videoUrl={m.videoUrl}
+                              videoQuery={m.videoQuery}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </Card>
+            )}
 
             {/* Exercise list */}
             <div className="space-y-3">
