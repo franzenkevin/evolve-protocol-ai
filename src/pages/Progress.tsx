@@ -1,15 +1,18 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import AppLayout from "@/components/AppLayout";
 import ProtocolProgressWidget from "@/components/ProtocolProgressWidget";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Camera, TrendingUp, Scale, Upload, Loader2, BarChart3, Flame, Trophy, Dumbbell as DumbbellIcon } from "lucide-react";
+import { Camera, TrendingUp, Scale, Upload, Loader2, BarChart3, Flame, Trophy, Dumbbell as DumbbellIcon, Star, Lock, Clock } from "lucide-react";
 import { useCheckins, useCreateCheckin, uploadPhoto } from "@/hooks/useCheckins";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import { useAllWorkoutLogs } from "@/hooks/useWorkoutLogs";
+import { useBodyAssessments } from "@/hooks/useBodyAssessments";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
