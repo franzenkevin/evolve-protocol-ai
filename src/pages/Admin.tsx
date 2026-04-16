@@ -12,11 +12,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useExercises, useCreateExercise, useDeleteExercise } from "@/hooks/useExercises";
 import { useFoods, useCreateFood, useDeleteFood } from "@/hooks/useFoods";
 import { useJournalArticles, useCreateJournalArticle, useDeleteJournalArticle } from "@/hooks/useJournal";
-import { Users, Dumbbell, UtensilsCrossed, Settings, LogOut, LayoutDashboard, ArrowLeft, Plus, Trash2, Newspaper } from "lucide-react";
+import { LogOut, ArrowLeft, Plus, Trash2, Newspaper, Dumbbell, UtensilsCrossed, Settings, BarChart3, CreditCard, Calendar, UserCog, Megaphone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import VideoUploader from "@/components/admin/VideoUploader";
+import AdminMetrics from "@/components/admin/AdminMetrics";
+import AdminSales from "@/components/admin/AdminSales";
+import AdminRenewals from "@/components/admin/AdminRenewals";
+import AdminLeads from "@/components/admin/AdminLeads";
+import AdminUsers from "@/components/admin/AdminUsers";
 
 const Admin = () => {
-  const [search, setSearch] = useState("");
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -35,6 +40,8 @@ const Admin = () => {
   const [exName, setExName] = useState("");
   const [exCategory, setExCategory] = useState("");
   const [exEquipment, setExEquipment] = useState("");
+  const [exVideoUrl, setExVideoUrl] = useState<string | null>(null);
+  const [exInstructions, setExInstructions] = useState("");
   const [exDialogOpen, setExDialogOpen] = useState(false);
 
   // Food form
@@ -57,6 +64,41 @@ const Admin = () => {
   const [artDialogOpen, setArtDialogOpen] = useState(false);
 
   const handleLogout = async () => { await signOut(); navigate("/login"); };
+
+  const handleAddExercise = async () => {
+    if (!exName || !exCategory) return;
+    try {
+      await createExercise.mutateAsync({
+        name: exName,
+        category: exCategory,
+        equipment: exEquipment || null,
+        video_url: exVideoUrl,
+        instructions: exInstructions || null,
+      });
+      toast({ title: "Exercício adicionado!" });
+      setExName(""); setExCategory(""); setExEquipment(""); setExVideoUrl(null); setExInstructions(""); setExDialogOpen(false);
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    }
+  };
+
+  const handleAddFood = async () => {
+    if (!foodName) return;
+    try {
+      await createFood.mutateAsync({
+        name: foodName,
+        protein: parseFloat(foodProtein) || 0,
+        carbs: parseFloat(foodCarbs) || 0,
+        fat: parseFloat(foodFat) || 0,
+        calories: parseFloat(foodCal) || 0,
+        category: null,
+      });
+      toast({ title: "Alimento adicionado!" });
+      setFoodName(""); setFoodProtein(""); setFoodCarbs(""); setFoodFat(""); setFoodCal(""); setFoodDialogOpen(false);
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    }
+  };
 
   const handleAddArticle = async () => {
     if (!artTitle || !artContent) {
@@ -85,82 +127,54 @@ const Admin = () => {
     }
   };
 
-  const handleAddExercise = async () => {
-    if (!exName || !exCategory) return;
-    try {
-      await createExercise.mutateAsync({ name: exName, category: exCategory, equipment: exEquipment || null, video_url: null, instructions: null });
-      toast({ title: "Exercício adicionado!" });
-      setExName(""); setExCategory(""); setExEquipment(""); setExDialogOpen(false);
-    } catch (err: any) {
-      toast({ title: "Erro", description: err.message, variant: "destructive" });
-    }
-  };
-
-  const handleAddFood = async () => {
-    if (!foodName) return;
-    try {
-      await createFood.mutateAsync({
-        name: foodName,
-        protein: parseFloat(foodProtein) || 0,
-        carbs: parseFloat(foodCarbs) || 0,
-        fat: parseFloat(foodFat) || 0,
-        calories: parseFloat(foodCal) || 0,
-        category: null,
-      });
-      toast({ title: "Alimento adicionado!" });
-      setFoodName(""); setFoodProtein(""); setFoodCarbs(""); setFoodFat(""); setFoodCal(""); setFoodDialogOpen(false);
-    } catch (err: any) {
-      toast({ title: "Erro", description: err.message, variant: "destructive" });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
-      <div className="border-b border-border p-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
+      <div className="border-b border-border p-4 sticky top-0 bg-background/95 backdrop-blur z-10">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")}><ArrowLeft size={18} /></Button>
-            <h1 className="text-xl font-heading font-bold text-foreground">Painel Admin</h1>
+            <h1 className="text-xl font-heading font-bold text-foreground">Painel do Criador</h1>
           </div>
           <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2"><LogOut size={14} />Sair</Button>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto p-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          {[
-            { icon: Users, label: "Clientes", value: "—", color: "text-primary" },
-            { icon: Dumbbell, label: "Exercícios", value: String(exercises.length), color: "text-info" },
-            { icon: UtensilsCrossed, label: "Alimentos", value: String(foods.length), color: "text-warning" },
-            { icon: Newspaper, label: "Artigos", value: String(articles.length), color: "text-success" },
-          ].map(({ icon: Icon, label, value, color }) => (
-            <Card key={label} className="p-4 card-gradient border-border">
-              <Icon size={20} className={color} />
-              <p className="text-2xl font-bold text-foreground mt-1">{value}</p>
-              <p className="text-xs text-muted-foreground">{label}</p>
-            </Card>
-          ))}
-        </div>
-
-        <Tabs defaultValue="exercises">
-          <TabsList className="w-full md:w-auto">
+      <div className="max-w-6xl mx-auto p-4">
+        <Tabs defaultValue="overview">
+          <TabsList className="w-full flex flex-wrap h-auto justify-start gap-1">
+            <TabsTrigger value="overview" className="gap-1"><BarChart3 size={14} />Visão geral</TabsTrigger>
+            <TabsTrigger value="sales" className="gap-1"><CreditCard size={14} />Vendas</TabsTrigger>
+            <TabsTrigger value="renewals" className="gap-1"><Calendar size={14} />Renovações</TabsTrigger>
+            <TabsTrigger value="leads" className="gap-1"><Megaphone size={14} />Leads</TabsTrigger>
             <TabsTrigger value="exercises" className="gap-1"><Dumbbell size={14} />Exercícios</TabsTrigger>
             <TabsTrigger value="foods" className="gap-1"><UtensilsCrossed size={14} />Alimentos</TabsTrigger>
             <TabsTrigger value="journal" className="gap-1"><Newspaper size={14} />Journal</TabsTrigger>
+            <TabsTrigger value="users" className="gap-1"><UserCog size={14} />Usuários</TabsTrigger>
             <TabsTrigger value="settings" className="gap-1"><Settings size={14} />Config</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="overview" className="mt-4"><AdminMetrics /></TabsContent>
+          <TabsContent value="sales" className="mt-4"><AdminSales /></TabsContent>
+          <TabsContent value="renewals" className="mt-4"><AdminRenewals /></TabsContent>
+          <TabsContent value="leads" className="mt-4"><AdminLeads /></TabsContent>
+          <TabsContent value="users" className="mt-4"><AdminUsers /></TabsContent>
 
           <TabsContent value="exercises" className="mt-4 space-y-3">
             <div className="flex justify-between items-center">
               <p className="text-sm text-muted-foreground">{exercises.length} exercícios cadastrados</p>
               <Dialog open={exDialogOpen} onOpenChange={setExDialogOpen}>
                 <DialogTrigger asChild><Button size="sm" className="gap-1"><Plus size={14} />Adicionar</Button></DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-h-[90vh] overflow-y-auto">
                   <DialogHeader><DialogTitle>Novo Exercício</DialogTitle></DialogHeader>
                   <div className="space-y-3">
                     <div><Label>Nome</Label><Input value={exName} onChange={(e) => setExName(e.target.value)} className="mt-1" /></div>
                     <div><Label>Categoria</Label><Input value={exCategory} onChange={(e) => setExCategory(e.target.value)} placeholder="Ex: Peito, Costas..." className="mt-1" /></div>
                     <div><Label>Equipamento</Label><Input value={exEquipment} onChange={(e) => setExEquipment(e.target.value)} placeholder="Ex: Barra, Halteres..." className="mt-1" /></div>
+                    <VideoUploader value={exVideoUrl} onChange={setExVideoUrl} />
+                    <div>
+                      <Label>Instruções</Label>
+                      <Textarea value={exInstructions} onChange={(e) => setExInstructions(e.target.value)} placeholder="Como executar..." className="mt-1 h-20 resize-none" />
+                    </div>
                     <Button onClick={handleAddExercise} className="w-full" disabled={createExercise.isPending}>
                       {createExercise.isPending ? "Salvando..." : "Salvar"}
                     </Button>
@@ -169,12 +183,12 @@ const Admin = () => {
               </Dialog>
             </div>
             {exercises.map((ex) => (
-              <Card key={ex.id} className="p-3 flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-sm text-foreground">{ex.name}</p>
-                  <p className="text-xs text-muted-foreground">{ex.category}{ex.equipment ? ` • ${ex.equipment}` : ""}</p>
+              <Card key={ex.id} className="p-3 flex items-center justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm text-foreground truncate">{ex.name}</p>
+                  <p className="text-xs text-muted-foreground truncate">{ex.category}{ex.equipment ? ` • ${ex.equipment}` : ""}{ex.video_url ? " • 🎥" : ""}</p>
                 </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteExercise.mutate(ex.id)}>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive shrink-0" onClick={() => deleteExercise.mutate(ex.id)}>
                   <Trash2 size={14} />
                 </Button>
               </Card>
@@ -224,9 +238,7 @@ const Admin = () => {
               <Dialog open={artDialogOpen} onOpenChange={setArtDialogOpen}>
                 <DialogTrigger asChild><Button size="sm" className="gap-1"><Plus size={14} />Novo artigo</Button></DialogTrigger>
                 <DialogContent className="max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Publicar no Journal</DialogTitle>
-                  </DialogHeader>
+                  <DialogHeader><DialogTitle>Publicar no Journal</DialogTitle></DialogHeader>
                   <p className="text-xs text-muted-foreground -mt-2">📲 Os usuários receberão uma notificação push automaticamente.</p>
                   <div className="space-y-3 mt-2">
                     <div>
@@ -249,20 +261,11 @@ const Admin = () => {
                     </div>
                     <div>
                       <Label>Conteúdo completo *</Label>
-                      <Textarea value={artContent} onChange={(e) => setArtContent(e.target.value)} placeholder="Texto completo do artigo (suporta múltiplos parágrafos)" className="mt-1 h-40 resize-none" />
+                      <Textarea value={artContent} onChange={(e) => setArtContent(e.target.value)} placeholder="Texto completo do artigo" className="mt-1 h-40 resize-none" />
                     </div>
-                    <div>
-                      <Label>URL da imagem de capa</Label>
-                      <Input value={artImageUrl} onChange={(e) => setArtImageUrl(e.target.value)} placeholder="https://..." className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>URL da fonte/estudo</Label>
-                      <Input value={artSourceUrl} onChange={(e) => setArtSourceUrl(e.target.value)} placeholder="https://..." className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>Tags (separadas por vírgula)</Label>
-                      <Input value={artTags} onChange={(e) => setArtTags(e.target.value)} placeholder="creatina, força, suplementação" className="mt-1" />
-                    </div>
+                    <div><Label>URL da imagem de capa</Label><Input value={artImageUrl} onChange={(e) => setArtImageUrl(e.target.value)} placeholder="https://..." className="mt-1" /></div>
+                    <div><Label>URL da fonte/estudo</Label><Input value={artSourceUrl} onChange={(e) => setArtSourceUrl(e.target.value)} placeholder="https://..." className="mt-1" /></div>
+                    <div><Label>Tags (separadas por vírgula)</Label><Input value={artTags} onChange={(e) => setArtTags(e.target.value)} placeholder="creatina, força" className="mt-1" /></div>
                     <Button onClick={handleAddArticle} className="w-full glow" disabled={createArticle.isPending}>
                       {createArticle.isPending ? "Publicando..." : "📰 Publicar e notificar"}
                     </Button>
@@ -272,9 +275,7 @@ const Admin = () => {
             </div>
             {articles.map((art) => (
               <Card key={art.id} className="p-3 flex items-center gap-3">
-                {art.image_url && (
-                  <img src={art.image_url} alt={art.title} className="w-14 h-14 rounded object-cover shrink-0" />
-                )}
+                {art.image_url && <img src={art.image_url} alt={art.title} className="w-14 h-14 rounded object-cover shrink-0" />}
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm text-foreground line-clamp-1">{art.title}</p>
                   <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
@@ -286,9 +287,7 @@ const Admin = () => {
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 text-destructive shrink-0"
-                  onClick={() => {
-                    if (confirm(`Apagar artigo "${art.title}"?`)) deleteArticle.mutate(art.id);
-                  }}
+                  onClick={() => { if (confirm(`Apagar artigo "${art.title}"?`)) deleteArticle.mutate(art.id); }}
                 >
                   <Trash2 size={14} />
                 </Button>
@@ -301,14 +300,17 @@ const Admin = () => {
 
           <TabsContent value="settings" className="mt-4 space-y-4">
             <Card className="p-4 card-gradient border-border">
-              <h3 className="font-heading font-semibold text-foreground mb-2">Regras da Metodologia</h3>
-              <p className="text-sm text-muted-foreground">Configure as regras de treino, dieta, progressão e revisão do protocolo.</p>
-              <Button variant="outline" size="sm" className="mt-3">Configurar</Button>
+              <h3 className="font-heading font-semibold text-foreground mb-2">Versão dos Termos</h3>
+              <p className="text-sm text-muted-foreground">
+                A versão atual está definida em <code className="text-xs bg-muted px-1 rounded">src/lib/terms.ts</code>.
+                Para forçar re-aceite de todos os usuários, altere o valor de <code className="text-xs bg-muted px-1 rounded">CURRENT_TERMS_VERSION</code>.
+              </p>
             </Card>
             <Card className="p-4 card-gradient border-border">
-              <h3 className="font-heading font-semibold text-foreground mb-2">Protocolo de 60 dias</h3>
-              <p className="text-sm text-muted-foreground">Defina ciclo, critérios de troca e regras de revisão automática.</p>
-              <Button variant="outline" size="sm" className="mt-3">Configurar</Button>
+              <h3 className="font-heading font-semibold text-foreground mb-2">Regras da Metodologia</h3>
+              <p className="text-sm text-muted-foreground">
+                As regras vivem em <code className="text-xs bg-muted px-1 rounded">.lovable/memory/features/methodology.md</code> e são aplicadas pelo motor de geração de protocolo.
+              </p>
             </Card>
           </TabsContent>
         </Tabs>
