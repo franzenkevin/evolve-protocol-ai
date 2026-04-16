@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { useAdminMetrics } from "@/hooks/useAdminData";
 import { Users, UserPlus, Activity, Dumbbell, ClipboardCheck, CreditCard, Calendar, TrendingUp } from "lucide-react";
+import RevenueChart from "./RevenueChart";
 
 const AdminMetrics = () => {
   const { data, isLoading } = useAdminMetrics();
@@ -24,6 +25,8 @@ const AdminMetrics = () => {
 
   return (
     <div className="space-y-4">
+      <RevenueChart />
+
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {cards.map(({ icon: Icon, label, value, color }) => (
           <Card key={label} className="p-4 card-gradient border-border">
