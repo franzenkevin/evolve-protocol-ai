@@ -12,8 +12,8 @@ const SidebarHeader = () => {
 
   const name = profile?.full_name || user?.user_metadata?.full_name || "Atleta";
   const email = user?.email || "";
-  const avatarUrl = (profile as any)?.avatar_url || "";
-  const initials = name ? name.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase() : "?";
+  const avatarUrl = profile?.avatar_url || "";
+  const initials = name ? name.split(" ").map((n: string) => n[0]).filter(Boolean).slice(0, 2).join("").toUpperCase() : "?";
 
   const handleLogout = async () => {
     await signOut();

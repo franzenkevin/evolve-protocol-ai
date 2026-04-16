@@ -28,6 +28,7 @@ export interface Profile {
   supplements: string[] | null;
   free_meals: string | null;
   meal_count: number | null;
+  avatar_url: string | null;
   onboarding_complete: boolean;
 }
 
