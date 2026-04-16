@@ -64,6 +64,26 @@ export const usePreviousWorkoutLogs = (dayIndex: number, currentDate: string) =>
   });
 };
 
+export const useAllWorkoutLogs = () => {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ["all_workout_logs", user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from("workout_logs")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("session_date", { ascending: false })
+        .limit(1000);
+      if (error) throw error;
+      return (data || []) as unknown as WorkoutLog[];
+    },
+    enabled: !!user,
+  });
+};
+
 export const useSaveWorkoutLog = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
