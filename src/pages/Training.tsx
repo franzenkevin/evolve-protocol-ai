@@ -23,7 +23,11 @@ import {
   Info,
   Brain,
   Loader2,
+  Replace,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import {
@@ -118,6 +122,9 @@ const Training = () => {
   const [feedbackNotes, setFeedbackNotes] = useState("");
   const [showSplitExplanation, setShowSplitExplanation] = useState(false);
   const [showExerciseInfo, setShowExerciseInfo] = useState<string | null>(null);
+  const [swapResults, setSwapResults] = useState<Record<string, { available: boolean; newExercise?: string; reason?: string; message?: string }>>({});
+  const [swapping, setSwapping] = useState<string | null>(null);
+  const [swappedNames, setSwappedNames] = useState<Record<string, string>>({});
   const ai = useAIExplanation();
 
   const training = (protocol?.training as any[]) || [];
@@ -200,13 +207,50 @@ const Training = () => {
         protocol_id: protocol?.id,
         day_index: selectedDay,
         exercise_id: ex.id,
-        exercise_name: ex.name,
+        exercise_name: swappedNames[ex.id] || ex.name,
         session_date: sessionDate,
         sets,
       });
       toast.success("Exercício salvo!");
     } catch {
       toast.error("Erro ao salvar");
+    }
+  };
+
+  const handleSwapExercise = async (ex: any) => {
+    setSwapping(ex.id);
+    try {
+      const { data, error } = await supabase.functions.invoke("swap-exercise", {
+        body: {
+          exerciseName: swappedNames[ex.id] || ex.name,
+          muscleGroup: day?.muscleGroup,
+          gymType: undefined,
+          reason: "Aluno não tem o equipamento ou não consegue executar este exercício",
+        },
+      });
+      if (error) throw error;
+      setSwapResults((prev) => ({ ...prev, [ex.id]: data }));
+    } catch (e: any) {
+      toast.error(e?.message || "Erro ao buscar substituição");
+      setSwapResults((prev) => ({
+        ...prev,
+        [ex.id]: { available: false, message: "Erro ao buscar substituição. Tente novamente." },
+      }));
+    } finally {
+      setSwapping(null);
+    }
+  };
+
+  const acceptSwap = (exId: string) => {
+    const result = swapResults[exId];
+    if (result?.available && result.newExercise) {
+      setSwappedNames((prev) => ({ ...prev, [exId]: result.newExercise! }));
+      setSwapResults((prev) => {
+        const next = { ...prev };
+        delete next[exId];
+        return next;
+      });
+      toast.success("Exercício substituído nesta sessão!");
     }
   };
 
@@ -379,13 +423,19 @@ const Training = () => {
             <Card className="p-3 border-border bg-muted/30">
               <div className="flex items-start gap-2">
                 <Flame size={16} className="text-primary mt-0.5 shrink-0" />
-                <div className="text-xs text-muted-foreground">
-                  <p className="font-semibold text-foreground mb-1">Instruções de aquecimento</p>
-                  <p>
-                    1ª série: ~50% da carga máxima (12 reps). 2ª série: ~75% da carga máxima (10
-                    reps). Depois, séries válidas próximas da falha. Última série: até a falha
-                    total.
-                  </p>
+                <div className="text-xs text-muted-foreground space-y-2">
+                  <div>
+                    <p className="font-semibold text-foreground mb-1">Dinâmica do treino</p>
+                    {day.dynamicNotes ? (
+                      <p>{day.dynamicNotes}</p>
+                    ) : (
+                      <p>
+                        1ª série: ~50% da carga máxima (12 reps). 2ª série: ~75% da carga máxima (10
+                        reps). Depois, séries válidas próximas da falha. Última série: até a falha
+                        total (alvo 8-12 reps).
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </Card>
@@ -418,12 +468,17 @@ const Training = () => {
                       onClick={() => setExpandedExercise(isExpanded ? null : ex.id)}
                     >
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <p
                             className={`font-medium text-sm ${allValidDone ? "text-primary" : "text-foreground"}`}
                           >
-                            {ex.name}
+                            {swappedNames[ex.id] || ex.name}
                           </p>
+                          {swappedNames[ex.id] && (
+                            <Badge variant="outline" className="text-[9px] px-1 py-0 border-warning/40 text-warning bg-warning/10">
+                              substituído
+                            </Badge>
+                          )}
                           {progression === "up" && (
                             <TrendingUp size={14} className="text-primary" />
                           )}
@@ -484,7 +539,76 @@ const Training = () => {
                           </div>
                         )}
 
-                        {/* Previous best */}
+                        {/* Swap exercise button */}
+                        <button
+                          className="flex items-center gap-1.5 text-xs text-warning hover:text-warning/80 transition-colors disabled:opacity-50"
+                          disabled={swapping === ex.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSwapExercise(ex);
+                          }}
+                        >
+                          {swapping === ex.id ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <Replace size={12} />
+                          )}
+                          Não tenho esse equipamento — sugerir substituição
+                        </button>
+
+                        {swapResults[ex.id] && (
+                          <div className={`rounded-lg border p-3 ${swapResults[ex.id].available ? "bg-warning/10 border-warning/30" : "bg-muted/30 border-border"}`}>
+                            {swapResults[ex.id].available ? (
+                              <div className="space-y-2">
+                                <div className="flex items-start gap-2">
+                                  <CheckCircle2 size={14} className="text-warning mt-0.5 shrink-0" />
+                                  <div className="flex-1">
+                                    <p className="text-xs font-semibold text-foreground">
+                                      Substituir por: <span className="text-warning">{swapResults[ex.id].newExercise}</span>
+                                    </p>
+                                    <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                                      {swapResults[ex.id].reason}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-7 text-[11px] flex-1"
+                                    onClick={() => acceptSwap(ex.id)}
+                                  >
+                                    Aceitar substituição
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-7 text-[11px]"
+                                    onClick={() => setSwapResults((prev) => { const n = { ...prev }; delete n[ex.id]; return n; })}
+                                  >
+                                    Cancelar
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex items-start gap-2">
+                                <XCircle size={14} className="text-muted-foreground mt-0.5 shrink-0" />
+                                <div className="flex-1">
+                                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                    {swapResults[ex.id].message}
+                                  </p>
+                                  <button
+                                    onClick={() => setSwapResults((prev) => { const n = { ...prev }; delete n[ex.id]; return n; })}
+                                    className="text-[10px] text-primary hover:underline mt-1"
+                                  >
+                                    Fechar
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         {prev && (
                           <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-md p-2">
                             <History size={12} />
