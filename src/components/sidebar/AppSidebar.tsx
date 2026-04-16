@@ -41,8 +41,7 @@ const AppSidebar = ({ open, onOpenChange }: AppSidebarProps) => {
     { icon: Mail, label: "SAC / Suporte", desc: "Envie um e-mail para nosso time", onClick: handleSAC },
     { icon: MessageSquare, label: "Feedback", desc: "Avalie na loja de apps", onClick: handleFeedback },
     { icon: Star, label: "Avaliar o app", desc: "Dê sua nota na loja", onClick: handleFeedback },
-    { icon: FileText, label: "Termos de uso", desc: "Termos e Política de Privacidade", onClick: handleTerms },
-    { icon: Shield, label: "Política de privacidade", desc: "Seus dados protegidos (LGPD)", onClick: handleTerms },
+    { icon: FileText, label: "Termos e Política de Privacidade", desc: "Termos de uso + LGPD em uma página", onClick: handleTerms },
   ];
 
   return (
