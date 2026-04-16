@@ -10,7 +10,19 @@ export type AuditAction =
   | "demote_admin"
   | "delete_article"
   | "delete_exercise"
-  | "delete_food";
+  | "delete_food"
+  | "create_meeting"
+  | "update_meeting"
+  | "delete_meeting"
+  | "create_plan"
+  | "update_plan"
+  | "delete_plan"
+  | "create_coupon"
+  | "update_coupon"
+  | "delete_coupon"
+  | "approve_refund"
+  | "deny_refund"
+  | "mark_refunded";
 
 export const useLogAudit = () => {
   const { user } = useAuth();
