@@ -360,6 +360,8 @@ export type Database = {
           stress_level: string | null
           supplements: string[] | null
           sweet_preference: string | null
+          terms_accepted_at: string | null
+          terms_version: string | null
           training_days: number | null
           training_time: string | null
           training_weekdays: string[] | null
@@ -398,6 +400,8 @@ export type Database = {
           stress_level?: string | null
           supplements?: string[] | null
           sweet_preference?: string | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           training_days?: number | null
           training_time?: string | null
           training_weekdays?: string[] | null
@@ -436,6 +440,8 @@ export type Database = {
           stress_level?: string | null
           supplements?: string[] | null
           sweet_preference?: string | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           training_days?: number | null
           training_time?: string | null
           training_weekdays?: string[] | null
