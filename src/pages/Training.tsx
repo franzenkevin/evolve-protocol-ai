@@ -122,6 +122,9 @@ const Training = () => {
   const [feedbackNotes, setFeedbackNotes] = useState("");
   const [showSplitExplanation, setShowSplitExplanation] = useState(false);
   const [showExerciseInfo, setShowExerciseInfo] = useState<string | null>(null);
+  const [swapResults, setSwapResults] = useState<Record<string, { available: boolean; newExercise?: string; reason?: string; message?: string }>>({});
+  const [swapping, setSwapping] = useState<string | null>(null);
+  const [swappedNames, setSwappedNames] = useState<Record<string, string>>({});
   const ai = useAIExplanation();
 
   const training = (protocol?.training as any[]) || [];
