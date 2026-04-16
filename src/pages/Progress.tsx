@@ -607,36 +607,86 @@ const Progress = () => {
           </TabsContent>
 
           <TabsContent value="checkin" className="space-y-4 mt-4">
-            <Card className="p-4 card-gradient border-border">
-              <h3 className="font-heading font-semibold text-foreground mb-3">Check-in semanal</h3>
-              <div className="space-y-3">
-                <div>
-                  <Label>Como está sua aderência geral?</Label>
-                  <div className="flex gap-2 mt-1">
-                    {[
-                      { emoji: "😴", value: 25 },
-                      { emoji: "😐", value: 50 },
-                      { emoji: "💪", value: 75 },
-                      { emoji: "🔥", value: 100 },
-                    ].map(({ emoji, value }) => (
-                      <Button
-                        key={value}
-                        variant={checkinAdherence === value ? "default" : "outline"}
-                        size="sm"
-                        className="flex-1 text-lg"
-                        onClick={() => setCheckinAdherence(value)}
-                      >
-                        {emoji}
-                      </Button>
-                    ))}
+            {/* Status: locked or unlocked */}
+            {!checkinUnlocked ? (
+              <Card className="p-6 card-gradient border-border text-center">
+                <Lock size={28} className="mx-auto text-muted-foreground mb-2" />
+                <h3 className="font-heading font-semibold text-foreground text-sm mb-1">
+                  Check-in semanal bloqueado
+                </h3>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Faltam <span className="text-primary font-semibold">{daysUntilCheckin} dia(s)</span> para liberar o próximo check-in.
+                </p>
+                {lastCheckin && (
+                  <div className="bg-secondary/40 rounded-md p-3 text-left">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Clock size={12} className="text-muted-foreground" />
+                      <p className="text-[11px] text-muted-foreground">
+                        Último check-in: {new Date(lastCheckin.created_at).toLocaleDateString("pt-BR")}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 mb-1">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star
+                          key={s}
+                          size={14}
+                          className={s <= Math.round((lastCheckin.adherence || 0) / 20) ? "fill-primary text-primary" : "text-muted-foreground"}
+                        />
+                      ))}
+                      <span className="text-[10px] text-muted-foreground ml-1">
+                        {Math.round((lastCheckin.adherence || 0) / 20)}/5
+                      </span>
+                    </div>
+                    {lastCheckin.notes && (
+                      <p className="text-[11px] text-foreground italic">"{lastCheckin.notes}"</p>
+                    )}
                   </div>
+                )}
+              </Card>
+            ) : (
+              <Card className="p-4 card-gradient border-border">
+                <h3 className="font-heading font-semibold text-foreground mb-1">Check-in semanal</h3>
+                <p className="text-[11px] text-muted-foreground mb-3">
+                  Avalie como foi sua semana de 0 a 5 estrelas. Descrição opcional.
+                  {lastCheckin && (
+                    <> Último: {new Date(lastCheckin.created_at).toLocaleDateString("pt-BR")} ({Math.round((lastCheckin.adherence || 0) / 20)}/5)</>
+                  )}
+                </p>
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs">Sua nota da semana</Label>
+                    <div className="flex items-center gap-1 mt-1">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <button key={s} type="button" onClick={() => setCheckinRating(s)} className="p-0.5">
+                          <Star
+                            size={28}
+                            className={s <= checkinRating ? "fill-primary text-primary" : "text-muted-foreground"}
+                          />
+                        </button>
+                      ))}
+                      <span className="text-xs text-muted-foreground ml-2">{checkinRating}/5</span>
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs">Observações (opcional)</Label>
+                    <Textarea
+                      value={checkinNotes}
+                      onChange={(e) => setCheckinNotes(e.target.value)}
+                      placeholder="Como foi a semana? Aderência ao treino e dieta, dificuldades..."
+                      className="h-20 text-xs resize-none mt-1"
+                    />
+                  </div>
+                  <Button
+                    className="w-full mt-2 glow"
+                    onClick={handleCheckin}
+                    disabled={savingCheckin || checkinRating === 0}
+                  >
+                    {savingCheckin ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
+                    Enviar check-in
+                  </Button>
                 </div>
-                <Button className="w-full mt-2 glow" onClick={handleCheckin} disabled={savingCheckin || checkinAdherence === null}>
-                  {savingCheckin ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
-                  Enviar check-in
-                </Button>
-              </div>
-            </Card>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </div>
