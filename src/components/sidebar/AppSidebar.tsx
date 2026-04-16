@@ -10,8 +10,9 @@ import SectionMeetings from "./SectionMeetings";
 import SectionJournal from "./SectionJournal";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Card } from "@/components/ui/card";
-import { Headphones, FileText, Shield, Star, MessageSquare, Mail } from "lucide-react";
+import { Headphones, FileText, Shield, Star, MessageSquare, Mail, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 interface AppSidebarProps {
   open: boolean;
@@ -22,6 +23,7 @@ const SAC_EMAIL = "suporte@hypertrophy.app";
 
 const AppSidebar = ({ open, onOpenChange }: AppSidebarProps) => {
   const navigate = useNavigate();
+  const { data: isAdmin } = useIsAdmin();
 
   const handleSAC = () => {
     window.location.href = `mailto:${SAC_EMAIL}?subject=Suporte%20Hypertrophy`;
@@ -61,6 +63,19 @@ const AppSidebar = ({ open, onOpenChange }: AppSidebarProps) => {
             <SectionPlan />
             <SectionMeetings />
             <SectionJournal />
+
+            {isAdmin && (
+              <Card
+                className="p-3 flex items-center gap-3 cursor-pointer bg-primary/10 border-primary/30 hover:bg-primary/15 transition-colors"
+                onClick={() => { onOpenChange(false); navigate("/admin"); }}
+              >
+                <ShieldCheck size={16} className="text-primary shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-foreground font-semibold">Painel do Criador</p>
+                  <p className="text-[10px] text-muted-foreground">Vendas, leads, conteúdo e métricas</p>
+                </div>
+              </Card>
+            )}
 
             {/* Standard app options */}
             <div className="space-y-1">

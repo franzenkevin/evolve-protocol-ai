@@ -19,6 +19,7 @@ import Exams from "./pages/Exams";
 import Journal from "./pages/Journal";
 import Chat from "./pages/Chat";
 import Admin from "./pages/Admin";
+import AdminGate from "./components/AdminGate";
 import Terms from "./pages/Terms";
 import AcceptTerms from "./pages/AcceptTerms";
 import Profile from "./pages/Profile";
@@ -63,7 +64,7 @@ const App = () => (
             <Route path="/exams" element={<ProtectedRoute><OnboardingGate><Exams /></OnboardingGate></ProtectedRoute>} />
             <Route path="/journal" element={<ProtectedRoute><OnboardingGate><Journal /></OnboardingGate></ProtectedRoute>} />
             <Route path="/chat" element={<ProtectedRoute><OnboardingGate><Chat /></OnboardingGate></ProtectedRoute>} />
-            <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute><AdminGate><Admin /></AdminGate></ProtectedRoute>} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/accept-terms" element={<ProtectedRoute><AcceptTerms /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><OnboardingGate><Profile /></OnboardingGate></ProtectedRoute>} />
