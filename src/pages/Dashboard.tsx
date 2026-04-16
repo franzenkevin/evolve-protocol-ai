@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import { useCheckins } from "@/hooks/useCheckins";
 import { useBodyAssessments } from "@/hooks/useBodyAssessments";
 import { useDailyRatings, useTodayRating, useSaveDailyRating } from "@/hooks/useDailyRatings";
-import { useWorkoutLogs } from "@/hooks/useWorkoutLogs";
+import { useWorkoutLogs, useAllWorkoutLogs } from "@/hooks/useWorkoutLogs";
 import AppLayout from "@/components/AppLayout";
+import ProtocolProgressWidget from "@/components/ProtocolProgressWidget";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -38,6 +39,7 @@ const Dashboard = () => {
   const { data: assessments = [] } = useBodyAssessments();
   const { data: ratings = [] } = useDailyRatings(14);
   const { data: todayRating } = useTodayRating();
+  const { data: allLogs = [] } = useAllWorkoutLogs();
   const saveRating = useSaveDailyRating();
 
   const [starRating, setStarRating] = useState(0);
@@ -64,6 +66,25 @@ const Dashboard = () => {
   const isRestDay = training?.length > 0 && todayTrainingIndex < 0;
   const latestAssessment = assessments[0];
   const weightHistory = checkins.filter((c) => c.weight).slice(0, 10).reverse();
+
+  // Tonnage + completed workouts (for 60-day widget)
+  const { totalTonnage, totalWorkouts, avgAdherenceProtocol } = useMemo(() => {
+    const protoLogs = protocol ? allLogs.filter((l) => l.protocol_id === protocol.id) : allLogs;
+    let tonnage = 0;
+    const sessionKeys = new Set<string>();
+    protoLogs.forEach((log) => {
+      sessionKeys.add(`${log.session_date}-${log.day_index}`);
+      const sets = (log.sets as any[]) || [];
+      sets.forEach((s: any) => {
+        if (s.completed && s.type === "valid") tonnage += (Number(s.weight) || 0) * (Number(s.reps) || 0);
+      });
+    });
+    const adherenceList = checkins.filter((c) => c.adherence);
+    const adh = adherenceList.length
+      ? Math.round(adherenceList.reduce((a, c) => a + (c.adherence || 0), 0) / adherenceList.length)
+      : 0;
+    return { totalTonnage: tonnage, totalWorkouts: sessionKeys.size, avgAdherenceProtocol: adh };
+  }, [allLogs, protocol, checkins]);
 
   // Check if today's workout is completed via logs
   const { data: todayLogs } = useWorkoutLogs(todayTrainingIndex >= 0 ? todayTrainingIndex : 0, today);
@@ -118,6 +139,17 @@ const Dashboard = () => {
             <p className="text-muted-foreground mb-3 text-sm">Nenhum protocolo ativo</p>
             <Link to="/onboarding"><Button className="glow">Criar protocolo</Button></Link>
           </Card>
+        )}
+
+        {/* 60-day journey widget */}
+        {protocol && (
+          <ProtocolProgressWidget
+            startDate={protocol.start_date}
+            endDate={protocol.end_date}
+            totalWorkouts={totalWorkouts}
+            totalTonnage={totalTonnage}
+            avgAdherence={avgAdherenceProtocol}
+          />
         )}
 
         {/* Today's training or rest day */}

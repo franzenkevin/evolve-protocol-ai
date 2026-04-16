@@ -1,38 +1,70 @@
+import { useRef, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useProfile } from "@/hooks/useProfile";
+import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import { useCheckins } from "@/hooks/useCheckins";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { supabase } from "@/integrations/supabase/client";
 import AppLayout from "@/components/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, Shield, FileText, HelpCircle, Bell, BellOff, Loader2 } from "lucide-react";
-import logo from "@/assets/logo.png";
+import { LogOut, Settings, Shield, FileText, HelpCircle, Bell, BellOff, Loader2, Camera } from "lucide-react";
 import { toast } from "sonner";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
+  const updateProfile = useUpdateProfile();
   const { data: protocol } = useActiveProtocol();
   const { data: checkins = [] } = useCheckins();
   const navigate = useNavigate();
   const push = usePushNotifications();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   const name = profile?.full_name || user?.user_metadata?.full_name || "Atleta";
   const email = user?.email || "";
+  const avatarUrl = (profile as any)?.avatar_url || "";
+  const initials = name ? name.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase() : "?";
 
   const daysActive = protocol
     ? Math.ceil((Date.now() - new Date(protocol.start_date).getTime()) / 86400000)
     : 0;
 
-  const avgAdherence = checkins.filter((c) => c.adherence).length
-    ? Math.round(checkins.filter((c) => c.adherence).reduce((a, c) => a + (c.adherence || 0), 0) / checkins.filter((c) => c.adherence).length)
+  const validCheckins = checkins.filter((c) => c.adherence);
+  const avgAdherence = validCheckins.length
+    ? Math.round(validCheckins.reduce((a, c) => a + (c.adherence || 0), 0) / validCheckins.length)
     : 0;
 
   const handleLogout = async () => {
     await signOut();
     navigate("/login");
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Imagem muito grande (máx 5MB)");
+      return;
+    }
+    setUploadingAvatar(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+      await updateProfile.mutateAsync({ avatar_url: pub.publicUrl } as any);
+      toast.success("Foto atualizada!");
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao enviar foto");
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   const MENU_ITEMS = [
@@ -48,9 +80,27 @@ const Profile = () => {
         <h1 className="text-2xl font-heading font-bold text-foreground pt-2">Perfil</h1>
 
         <Card className="p-5 card-gradient border-border flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center">
-            <img src={logo} alt="Avatar" className="w-10 h-10" />
-          </div>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingAvatar}
+            className="relative group shrink-0"
+            aria-label="Trocar foto"
+          >
+            <Avatar className="w-16 h-16 border-2 border-border">
+              {avatarUrl && <AvatarImage src={avatarUrl} alt={name} />}
+              <AvatarFallback className="bg-primary/15 text-primary font-bold">{initials}</AvatarFallback>
+            </Avatar>
+            <div className="absolute inset-0 rounded-full bg-background/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              {uploadingAvatar ? <Loader2 size={16} className="animate-spin text-primary" /> : <Camera size={16} className="text-primary" />}
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarUpload}
+            />
+          </button>
           <div className="flex-1">
             <h3 className="font-heading font-semibold text-foreground">{name}</h3>
             <p className="text-sm text-muted-foreground">{email}</p>
