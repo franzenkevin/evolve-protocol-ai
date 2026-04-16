@@ -15,7 +15,7 @@
     --popover: 220 10% 11%;
     --popover-foreground: 30 20% 90%;
 
-    --primary: 30 100% 50%;
+    --primary: 25 100% 50%;
     --primary-foreground: 220 10% 8%;
 
     --secondary: 220 10% 15%;
@@ -24,7 +24,7 @@
     --muted: 220 8% 14%;
     --muted-foreground: 220 8% 50%;
 
-    --accent: 30 100% 50%;
+    --accent: 25 100% 50%;
     --accent-foreground: 220 10% 8%;
 
     --destructive: 0 72% 51%;
@@ -32,28 +32,28 @@
 
     --border: 220 8% 18%;
     --input: 220 8% 18%;
-    --ring: 30 100% 50%;
+    --ring: 25 100% 50%;
 
     --radius: 0.75rem;
 
     --sidebar-background: 220 10% 9%;
     --sidebar-foreground: 30 15% 80%;
-    --sidebar-primary: 30 100% 50%;
+    --sidebar-primary: 25 100% 50%;
     --sidebar-primary-foreground: 220 10% 8%;
     --sidebar-accent: 220 8% 14%;
     --sidebar-accent-foreground: 30 15% 80%;
     --sidebar-border: 220 8% 18%;
-    --sidebar-ring: 30 100% 50%;
+    --sidebar-ring: 25 100% 50%;
 
     --success: 142 72% 45%;
     --warning: 38 92% 50%;
     --info: 217 91% 60%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(30 100% 50%), hsl(25 100% 42%));
+    --gradient-primary: linear-gradient(135deg, hsl(25 100% 50%), hsl(20 100% 42%));
     --gradient-card: linear-gradient(145deg, hsl(220 10% 12%), hsl(220 10% 9%));
-    --gradient-glow: radial-gradient(circle at 50% 50%, hsl(30 100% 50% / 0.12), transparent 70%);
+    --gradient-glow: radial-gradient(circle at 50% 50%, hsl(25 100% 50% / 0.12), transparent 70%);
 
-    --shadow-glow: 0 0 20px hsl(30 100% 50% / 0.2);
+    --shadow-glow: 0 0 20px hsl(25 100% 50% / 0.2);
     --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.3);
 
     --font-heading: 'Space Grotesk', sans-serif;
@@ -106,6 +106,6 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px hsl(30 100% 50% / 0.2); }
-  50% { box-shadow: 0 0 40px hsl(30 100% 50% / 0.4); }
+  0%, 100% { box-shadow: 0 0 20px hsl(25 100% 50% / 0.2); }
+  50% { box-shadow: 0 0 40px hsl(25 100% 50% / 0.4); }
 }

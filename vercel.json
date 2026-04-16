@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/register",
+      "destination": "/signup",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

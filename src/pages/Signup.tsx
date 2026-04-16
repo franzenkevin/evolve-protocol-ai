@@ -104,7 +104,7 @@ const Signup = () => {
             </Label>
           </div>
 
-          <Button type="submit" className="w-full glow" disabled={loading || !acceptedTerms}>
+          <Button type="submit" className="w-full glow" disabled={loading}>
             {loading ? "Criando..." : "Criar conta"}
           </Button>
         </form>
