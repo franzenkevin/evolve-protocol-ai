@@ -217,6 +217,43 @@ const Training = () => {
     }
   };
 
+  const handleSwapExercise = async (ex: any) => {
+    setSwapping(ex.id);
+    try {
+      const { data, error } = await supabase.functions.invoke("swap-exercise", {
+        body: {
+          exerciseName: swappedNames[ex.id] || ex.name,
+          muscleGroup: day?.muscleGroup,
+          gymType: undefined,
+          reason: "Aluno não tem o equipamento ou não consegue executar este exercício",
+        },
+      });
+      if (error) throw error;
+      setSwapResults((prev) => ({ ...prev, [ex.id]: data }));
+    } catch (e: any) {
+      toast.error(e?.message || "Erro ao buscar substituição");
+      setSwapResults((prev) => ({
+        ...prev,
+        [ex.id]: { available: false, message: "Erro ao buscar substituição. Tente novamente." },
+      }));
+    } finally {
+      setSwapping(null);
+    }
+  };
+
+  const acceptSwap = (exId: string) => {
+    const result = swapResults[exId];
+    if (result?.available && result.newExercise) {
+      setSwappedNames((prev) => ({ ...prev, [exId]: result.newExercise! }));
+      setSwapResults((prev) => {
+        const next = { ...prev };
+        delete next[exId];
+        return next;
+      });
+      toast.success("Exercício substituído nesta sessão!");
+    }
+  };
+
   const getProgression = (exId: string): "up" | "down" | "same" | null => {
     const prev = prevBestMap[exId];
     const current = exerciseSets[exId];
