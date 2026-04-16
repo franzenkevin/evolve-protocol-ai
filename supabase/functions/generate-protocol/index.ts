@@ -340,6 +340,11 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
 - Refeições livres: ${profile.free_meals}
 - Horas de sono: ${profile.sleep_hours}h
 - Nível de estresse: ${profile.stress_level}
+- Cardio autorizado: ${profile.cardio_enabled ? "SIM" : "NÃO"}${profile.cardio_enabled ? `
+- Frequência de cardio: ${profile.cardio_frequency || "N/A"}
+- Duração por sessão: ${profile.cardio_duration || "N/A"}
+- Quando fazer cardio: ${profile.cardio_timing || "N/A"}
+- Tipo preferido: ${profile.cardio_type_preference || "N/A"}` : ""}
 ${assessmentContext}
 
 Gere o JSON completo seguindo TODAS as regras da metodologia.`;
