@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import { useCheckins } from "@/hooks/useCheckins";
 import { useBodyAssessments } from "@/hooks/useBodyAssessments";
 import { useDailyRatings, useTodayRating, useSaveDailyRating } from "@/hooks/useDailyRatings";
-import { useWorkoutLogs } from "@/hooks/useWorkoutLogs";
+import { useWorkoutLogs, useAllWorkoutLogs } from "@/hooks/useWorkoutLogs";
 import AppLayout from "@/components/AppLayout";
+import ProtocolProgressWidget from "@/components/ProtocolProgressWidget";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
