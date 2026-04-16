@@ -293,8 +293,8 @@ const Onboarding = () => {
       return;
     }
 
-    // On step 6 (assessment), trigger analysis if photos exist and no assessment yet
-    if (step === 6 && Object.keys(assessmentPhotos).length > 0 && !assessment && !analyzing) {
+    // On step 7 (assessment), trigger analysis if photos exist and no assessment yet
+    if (step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment && !analyzing) {
       await runAssessment();
       return;
     }
@@ -322,6 +322,13 @@ const Onboarding = () => {
         experience: data.experience,
         gym_type: data.gymType,
         injuries: data.injuries,
+        cardio_enabled: data.cardioEnabled === "yes",
+        cardio_frequency: data.cardioEnabled === "yes" ? data.cardioFrequency : null,
+        cardio_duration: data.cardioEnabled === "yes" ? data.cardioDuration : null,
+        cardio_timing: data.cardioEnabled === "yes" ? data.cardioTiming : null,
+        cardio_type_preference: data.cardioEnabled === "yes" ? data.cardioTypePreference : null,
+        ai_data_consent: data.aiDataConsent,
+        ai_data_consent_at: data.aiDataConsent ? new Date().toISOString() : null,
         preferred_foods: data.foodsLike,
         disliked_foods: data.foodsDislike,
         allergies: data.allergies.filter(a => a !== "Não tenho alergias").join(", "),
