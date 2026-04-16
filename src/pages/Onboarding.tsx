@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -106,6 +106,8 @@ interface FormData {
 const Onboarding = () => {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [genProgress, setGenProgress] = useState(0);
+  const [genStage, setGenStage] = useState("");
   const [assessmentPhotos, setAssessmentPhotos] = useState<Record<string, string>>({});
   const [assessment, setAssessment] = useState<any>(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -121,6 +123,31 @@ const Onboarding = () => {
   const { toast } = useToast();
   const updateProfile = useUpdateProfile();
   const createProtocol = useCreateProtocol();
+
+  // Simulate progress while AI generates protocol (caps at 95% until done)
+  useEffect(() => {
+    if (!saving) return;
+    setGenProgress(5);
+    setGenStage("Analisando seu perfil...");
+    const stages = [
+      { at: 15, label: "Calculando macros e calorias..." },
+      { at: 35, label: "Montando divisão de treino..." },
+      { at: 55, label: "Selecionando exercícios ideais..." },
+      { at: 75, label: "Personalizando refeições..." },
+      { at: 88, label: "Ajustando detalhes finais..." },
+    ];
+    const interval = setInterval(() => {
+      setGenProgress((p) => {
+        if (p >= 95) return 95;
+        const next = p + Math.random() * 3 + 1;
+        const stage = stages.reverse().find((s) => next >= s.at);
+        if (stage) setGenStage(stage.label);
+        stages.reverse();
+        return Math.min(95, next);
+      });
+    }, 600);
+    return () => clearInterval(interval);
+  }, [saving]);
 
   const update = (field: keyof FormData, value: any) => {
     setData((prev) => ({ ...prev, [field]: value }));
@@ -317,6 +344,9 @@ const Onboarding = () => {
       }
 
       await createProtocol.mutateAsync(protocol);
+      setGenProgress(100);
+      setGenStage("Pronto!");
+      await new Promise((r) => setTimeout(r, 400));
       navigate("/dashboard");
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
@@ -585,6 +615,25 @@ const Onboarding = () => {
           </div>
         </div>
       </div>
+
+      {saving && (
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
+          <div className="max-w-sm w-full text-center space-y-5">
+            <div className="text-5xl animate-pulse">🤖</div>
+            <div>
+              <h3 className="text-xl font-heading font-bold text-foreground mb-1">Gerando seu protocolo</h3>
+              <p className="text-sm text-muted-foreground">{genStage}</p>
+            </div>
+            <div className="space-y-2">
+              <Progress value={genProgress} className="h-3" />
+              <p className="text-2xl font-bold text-primary">{Math.round(genProgress)}%</p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              A IA está montando seu treino e dieta personalizados. Não feche esta tela.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
