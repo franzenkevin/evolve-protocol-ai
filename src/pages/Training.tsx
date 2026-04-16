@@ -38,6 +38,7 @@ import {
   useSaveWorkoutLog,
   type WorkoutSet,
 } from "@/hooks/useWorkoutLogs";
+import { useWorkoutFeedback, useSaveWorkoutFeedback } from "@/hooks/useWorkoutFeedback";
 import { toast } from "sonner";
 
 // AI explanation hook — streams from the chat edge function
@@ -144,7 +145,9 @@ const Training = () => {
 
   const { data: currentLogs } = useWorkoutLogs(selectedDay, sessionDate);
   const { data: previousLogs } = usePreviousWorkoutLogs(selectedDay, sessionDate);
+  const { data: existingFeedback } = useWorkoutFeedback(selectedDay >= 0 ? selectedDay : 0, sessionDate);
   const saveLog = useSaveWorkoutLog();
+  const saveFeedback = useSaveWorkoutFeedback();
 
   // Build a map of previous best per exercise
   const prevBestMap: Record<string, { weight: number; reps: number }> = {};
