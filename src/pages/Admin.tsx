@@ -22,7 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useExercises, useCreateExercise, useDeleteExercise } from "@/hooks/useExercises";
 import { useFoods, useCreateFood, useDeleteFood } from "@/hooks/useFoods";
 import { useJournalArticles, useCreateJournalArticle, useDeleteJournalArticle } from "@/hooks/useJournal";
-import { LogOut, ArrowLeft, Plus, Trash2, Newspaper, Dumbbell, UtensilsCrossed, Settings, BarChart3, CreditCard, Calendar, UserCog, Megaphone, ScrollText } from "lucide-react";
+import { LogOut, ArrowLeft, Plus, Trash2, Newspaper, Dumbbell, UtensilsCrossed, Settings, BarChart3, CreditCard, Calendar, UserCog, Megaphone, ScrollText, Video, Tag, DollarSign, Receipt } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLogAudit } from "@/hooks/useAuditLog";
 import VideoUploader from "@/components/admin/VideoUploader";
@@ -32,6 +32,10 @@ import AdminRenewals from "@/components/admin/AdminRenewals";
 import AdminLeads from "@/components/admin/AdminLeads";
 import AdminUsers from "@/components/admin/AdminUsers";
 import AdminAuditLog from "@/components/admin/AdminAuditLog";
+import AdminMeetings from "@/components/admin/AdminMeetings";
+import AdminPlans from "@/components/admin/AdminPlans";
+import AdminCoupons from "@/components/admin/AdminCoupons";
+import AdminRefunds from "@/components/admin/AdminRefunds";
 
 const Admin = () => {
   const { signOut } = useAuth();
@@ -159,7 +163,11 @@ const Admin = () => {
             <TabsTrigger value="overview" className="gap-1"><BarChart3 size={14} />Visão geral</TabsTrigger>
             <TabsTrigger value="sales" className="gap-1"><CreditCard size={14} />Vendas</TabsTrigger>
             <TabsTrigger value="renewals" className="gap-1"><Calendar size={14} />Renovações</TabsTrigger>
+            <TabsTrigger value="refunds" className="gap-1"><Receipt size={14} />Reembolsos</TabsTrigger>
             <TabsTrigger value="leads" className="gap-1"><Megaphone size={14} />Leads</TabsTrigger>
+            <TabsTrigger value="meetings" className="gap-1"><Video size={14} />Reuniões</TabsTrigger>
+            <TabsTrigger value="plans" className="gap-1"><DollarSign size={14} />Planos</TabsTrigger>
+            <TabsTrigger value="coupons" className="gap-1"><Tag size={14} />Cupons</TabsTrigger>
             <TabsTrigger value="exercises" className="gap-1"><Dumbbell size={14} />Exercícios</TabsTrigger>
             <TabsTrigger value="foods" className="gap-1"><UtensilsCrossed size={14} />Alimentos</TabsTrigger>
             <TabsTrigger value="journal" className="gap-1"><Newspaper size={14} />Journal</TabsTrigger>
@@ -171,7 +179,11 @@ const Admin = () => {
           <TabsContent value="overview" className="mt-4"><AdminMetrics /></TabsContent>
           <TabsContent value="sales" className="mt-4"><AdminSales /></TabsContent>
           <TabsContent value="renewals" className="mt-4"><AdminRenewals /></TabsContent>
+          <TabsContent value="refunds" className="mt-4"><AdminRefunds /></TabsContent>
           <TabsContent value="leads" className="mt-4"><AdminLeads /></TabsContent>
+          <TabsContent value="meetings" className="mt-4"><AdminMeetings /></TabsContent>
+          <TabsContent value="plans" className="mt-4"><AdminPlans /></TabsContent>
+          <TabsContent value="coupons" className="mt-4"><AdminCoupons /></TabsContent>
           <TabsContent value="users" className="mt-4"><AdminUsers /></TabsContent>
           <TabsContent value="audit" className="mt-4"><AdminAuditLog /></TabsContent>
 
