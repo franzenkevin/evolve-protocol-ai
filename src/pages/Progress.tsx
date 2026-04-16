@@ -105,13 +105,33 @@ const Progress = () => {
     );
   };
 
-  const photoDay0 = photoCheckinsAsc[0] || null;
+  // Day 0: prefer assessment photos (from onboarding), fallback to first checkin photos
+  const assessmentDay0 = assessmentPhotoUrls && (assessmentPhotoUrls.front || assessmentPhotoUrls.side || assessmentPhotoUrls.back)
+    ? {
+        photo_front: assessmentPhotoUrls.front || null,
+        photo_side: assessmentPhotoUrls.side || null,
+        photo_back: assessmentPhotoUrls.back || null,
+        created_at: latestAssessment?.created_at || protocol?.start_date || new Date().toISOString(),
+        source: "assessment" as const,
+      }
+    : null;
+  const photoDay0: any = assessmentDay0 || photoCheckinsAsc[0] || null;
   const photoDay30 = daysSinceStart >= 30 ? findPhotoInWindow(day30Date) : null;
   const photoDay60 = daysSinceStart >= 60 ? findPhotoInWindow(day60Date) : null;
   const day30Unlocked = daysSinceStart >= 30;
   const day60Unlocked = daysSinceStart >= 60;
   const daysUntilDay30 = Math.max(0, 30 - daysSinceStart);
   const daysUntilDay60 = Math.max(0, 60 - daysSinceStart);
+
+  // Last weekly check-in (only entries with rating in notes/adherence — we mark check-ins by adherence presence and absence of weight/photos)
+  const lastCheckin = useMemo(() => {
+    return checkins.find((c) => c.adherence != null && !c.weight && !c.photo_front && !c.photo_side && !c.photo_back) || null;
+  }, [checkins]);
+  const daysSinceLastCheckin = lastCheckin
+    ? Math.floor((Date.now() - new Date(lastCheckin.created_at).getTime()) / 86400000)
+    : null;
+  const checkinUnlocked = daysSinceLastCheckin === null || daysSinceLastCheckin >= 7;
+  const daysUntilCheckin = checkinUnlocked ? 0 : Math.max(0, 7 - (daysSinceLastCheckin || 0));
 
   // Stats: tonnage, sessions, streak, PRs
   const stats = useMemo(() => {
@@ -249,12 +269,23 @@ const Progress = () => {
   };
 
   const handleCheckin = async () => {
-    if (checkinAdherence === null) return;
+    if (!checkinUnlocked) return;
+    if (checkinRating === 0) {
+      toast({ title: "Escolha de 1 a 5 estrelas", variant: "destructive" });
+      return;
+    }
     setSavingCheckin(true);
     try {
-      await createCheckin.mutateAsync({ adherence: checkinAdherence, protocol_id: protocol?.id });
+      // Map 1-5 stars to 20-100 adherence score for stats compatibility
+      const adherenceScore = checkinRating * 20;
+      await createCheckin.mutateAsync({
+        adherence: adherenceScore,
+        notes: checkinNotes || null,
+        protocol_id: protocol?.id,
+      });
       toast({ title: "Check-in enviado!" });
-      setCheckinAdherence(null);
+      setCheckinRating(0);
+      setCheckinNotes("");
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
     } finally {
