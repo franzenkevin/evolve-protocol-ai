@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAdminProfiles } from "@/hooks/useAdminData";
+import { useLogAudit } from "@/hooks/useAuditLog";
 import { Download, Search } from "lucide-react";
 
 const toCSV = (rows: Record<string, any>[]) => {
@@ -28,6 +29,7 @@ const downloadCSV = (filename: string, rows: Record<string, any>[]) => {
 
 const AdminLeads = () => {
   const { data: profiles = [], isLoading } = useAdminProfiles();
+  const logAudit = useLogAudit();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "onboarded" | "incomplete">("all");
 
@@ -53,6 +55,7 @@ const AdminLeads = () => {
       criado_em: p.created_at,
     }));
     downloadCSV(`leads-${new Date().toISOString().slice(0, 10)}.csv`, rows);
+    logAudit("export_leads", null, { count: rows.length, filter });
   };
 
   return (

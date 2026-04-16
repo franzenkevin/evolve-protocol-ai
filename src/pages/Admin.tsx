@@ -6,20 +6,32 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useExercises, useCreateExercise, useDeleteExercise } from "@/hooks/useExercises";
 import { useFoods, useCreateFood, useDeleteFood } from "@/hooks/useFoods";
 import { useJournalArticles, useCreateJournalArticle, useDeleteJournalArticle } from "@/hooks/useJournal";
-import { LogOut, ArrowLeft, Plus, Trash2, Newspaper, Dumbbell, UtensilsCrossed, Settings, BarChart3, CreditCard, Calendar, UserCog, Megaphone } from "lucide-react";
+import { LogOut, ArrowLeft, Plus, Trash2, Newspaper, Dumbbell, UtensilsCrossed, Settings, BarChart3, CreditCard, Calendar, UserCog, Megaphone, ScrollText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLogAudit } from "@/hooks/useAuditLog";
 import VideoUploader from "@/components/admin/VideoUploader";
 import AdminMetrics from "@/components/admin/AdminMetrics";
 import AdminSales from "@/components/admin/AdminSales";
 import AdminRenewals from "@/components/admin/AdminRenewals";
 import AdminLeads from "@/components/admin/AdminLeads";
 import AdminUsers from "@/components/admin/AdminUsers";
+import AdminAuditLog from "@/components/admin/AdminAuditLog";
 
 const Admin = () => {
   const { signOut } = useAuth();
@@ -35,6 +47,8 @@ const Admin = () => {
   const deleteFood = useDeleteFood();
   const createArticle = useCreateJournalArticle();
   const deleteArticle = useDeleteJournalArticle();
+  const logAudit = useLogAudit();
+  const [deletingArticle, setDeletingArticle] = useState<{ id: string; title: string } | null>(null);
 
   // Exercise form
   const [exName, setExName] = useState("");
@@ -150,6 +164,7 @@ const Admin = () => {
             <TabsTrigger value="foods" className="gap-1"><UtensilsCrossed size={14} />Alimentos</TabsTrigger>
             <TabsTrigger value="journal" className="gap-1"><Newspaper size={14} />Journal</TabsTrigger>
             <TabsTrigger value="users" className="gap-1"><UserCog size={14} />Usuários</TabsTrigger>
+            <TabsTrigger value="audit" className="gap-1"><ScrollText size={14} />Auditoria</TabsTrigger>
             <TabsTrigger value="settings" className="gap-1"><Settings size={14} />Config</TabsTrigger>
           </TabsList>
 
@@ -158,6 +173,7 @@ const Admin = () => {
           <TabsContent value="renewals" className="mt-4"><AdminRenewals /></TabsContent>
           <TabsContent value="leads" className="mt-4"><AdminLeads /></TabsContent>
           <TabsContent value="users" className="mt-4"><AdminUsers /></TabsContent>
+          <TabsContent value="audit" className="mt-4"><AdminAuditLog /></TabsContent>
 
           <TabsContent value="exercises" className="mt-4 space-y-3">
             <div className="flex justify-between items-center">
@@ -287,7 +303,7 @@ const Admin = () => {
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 text-destructive shrink-0"
-                  onClick={() => { if (confirm(`Apagar artigo "${art.title}"?`)) deleteArticle.mutate(art.id); }}
+                  onClick={() => setDeletingArticle({ id: art.id, title: art.title })}
                 >
                   <Trash2 size={14} />
                 </Button>
@@ -315,6 +331,35 @@ const Admin = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <AlertDialog open={!!deletingArticle} onOpenChange={(o) => !o && setDeletingArticle(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apagar artigo?</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{deletingArticle?.title}" será removido permanentemente. Esta ação será registrada no log de auditoria.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (!deletingArticle) return;
+                const target = deletingArticle;
+                setDeletingArticle(null);
+                try {
+                  await deleteArticle.mutateAsync(target.id);
+                  await logAudit("delete_article", null, { article_id: target.id, title: target.title });
+                } catch (e: any) {
+                  toast({ title: "Erro", description: e.message, variant: "destructive" });
+                }
+              }}
+            >
+              Apagar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAdminSubscriptions, useAdminProfiles } from "@/hooks/useAdminData";
+import { useLogAudit } from "@/hooks/useAuditLog";
 import { Download, Search } from "lucide-react";
 
 const toCSV = (rows: Record<string, any>[]) => {
@@ -29,6 +30,7 @@ const downloadCSV = (filename: string, rows: Record<string, any>[]) => {
 const AdminSales = () => {
   const { data: subs = [], isLoading } = useAdminSubscriptions();
   const { data: profiles = [] } = useAdminProfiles();
+  const logAudit = useLogAudit();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "active" | "canceled" | "past_due">("all");
 
@@ -62,6 +64,7 @@ const AdminSales = () => {
       };
     });
     downloadCSV(`vendas-${new Date().toISOString().slice(0, 10)}.csv`, rows);
+    logAudit("export_sales", null, { count: rows.length, filter });
   };
 
   return (

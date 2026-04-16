@@ -3,16 +3,29 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAdminProfiles, useAdminUserRoles, usePromoteAdmin } from "@/hooks/useAdminData";
 import { ShieldCheck, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLogAudit } from "@/hooks/useAuditLog";
 
 const AdminUsers = () => {
   const { data: profiles = [], isLoading } = useAdminProfiles();
   const { data: roles = [] } = useAdminUserRoles();
   const promote = usePromoteAdmin();
   const { toast } = useToast();
+  const logAudit = useLogAudit();
   const [search, setSearch] = useState("");
+  const [confirming, setConfirming] = useState<{ userId: string; name: string } | null>(null);
 
   const adminIds = new Set(roles.filter((r) => r.role === "admin").map((r) => r.user_id));
 
@@ -22,10 +35,13 @@ const AdminUsers = () => {
     return p.full_name?.toLowerCase().includes(q) || p.user_id.toLowerCase().includes(q);
   });
 
-  const handlePromote = async (userId: string, name: string) => {
-    if (!confirm(`Promover ${name} a administrador?`)) return;
+  const confirmPromote = async () => {
+    if (!confirming) return;
+    const target = confirming;
+    setConfirming(null);
     try {
-      await promote.mutateAsync(userId);
+      await promote.mutateAsync(target.userId);
+      await logAudit("promote_admin", target.userId, { name: target.name });
       toast({ title: "Promovido a admin!" });
     } catch (e: any) {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
@@ -60,7 +76,7 @@ const AdminUsers = () => {
                   size="sm"
                   variant="outline"
                   className="shrink-0"
-                  onClick={() => handlePromote(p.user_id, p.full_name || "usuário")}
+                  onClick={() => setConfirming({ userId: p.user_id, name: p.full_name || "usuário" })}
                   disabled={promote.isPending}
                 >
                   Promover
@@ -70,6 +86,22 @@ const AdminUsers = () => {
           );
         })}
       </div>
+
+      <AlertDialog open={!!confirming} onOpenChange={(o) => !o && setConfirming(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Promover {confirming?.name} a administrador?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Este usuário ganhará acesso total ao painel admin (vendas, leads, usuários, configurações).
+              A ação será registrada no log de auditoria.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmPromote}>Confirmar promoção</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
