@@ -21,6 +21,7 @@ const Progress = () => {
   const { data: checkins = [] } = useCheckins();
   const { data: protocol } = useActiveProtocol();
   const { data: allLogs = [] } = useAllWorkoutLogs();
+  const { data: assessments = [] } = useBodyAssessments();
   const createCheckin = useCreateCheckin();
   const { toast } = useToast();
 
@@ -28,8 +29,10 @@ const Progress = () => {
   const [savingWeight, setSavingWeight] = useState(false);
   const [photos, setPhotos] = useState<{ front?: File; side?: File; back?: File }>({});
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
-  const [checkinAdherence, setCheckinAdherence] = useState<number | null>(null);
+  const [checkinRating, setCheckinRating] = useState(0);
+  const [checkinNotes, setCheckinNotes] = useState("");
   const [savingCheckin, setSavingCheckin] = useState(false);
+  const [assessmentPhotoUrls, setAssessmentPhotoUrls] = useState<{ front?: string; side?: string; back?: string } | null>(null);
 
   const weightHistory = checkins.filter((c) => c.weight).slice(0, 10).reverse();
   const photoCheckins = checkins.filter((c) => c.photo_front || c.photo_side || c.photo_back);
@@ -37,6 +40,43 @@ const Progress = () => {
   const photoCheckinsAsc = [...photoCheckins].sort(
     (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
   );
+
+  // Latest assessment (used as fallback for Day 0 photos)
+  const latestAssessment = assessments[0] as any | undefined;
+
+  // Resolve assessment photos to public-ish URLs (signed)
+  useEffect(() => {
+    let cancelled = false;
+    const resolve = async () => {
+      if (!latestAssessment?.photo_paths?.length) {
+        setAssessmentPhotoUrls(null);
+        return;
+      }
+      const paths: string[] = latestAssessment.photo_paths;
+      // photo_paths from onboarding follow pattern <user>/assessment/{front|back|left|right}.<ext>
+      const pickByAngle = (angle: string) =>
+        paths.find((p) => p.toLowerCase().includes(`/${angle}.`)) ||
+        paths.find((p) => p.toLowerCase().includes(angle));
+      const targets = {
+        front: pickByAngle("front"),
+        side: pickByAngle("right") || pickByAngle("left") || pickByAngle("side"),
+        back: pickByAngle("back"),
+      };
+      const out: { front?: string; side?: string; back?: string } = {};
+      for (const [k, p] of Object.entries(targets)) {
+        if (!p) continue;
+        const { data } = await supabase.storage
+          .from("photos")
+          .createSignedUrl(p, 60 * 60 * 24 * 7);
+        if (data?.signedUrl) (out as any)[k] = data.signedUrl;
+      }
+      if (!cancelled) setAssessmentPhotoUrls(out);
+    };
+    resolve();
+    return () => {
+      cancelled = true;
+    };
+  }, [latestAssessment?.id]);
 
   // Photo windows based on protocol start date (day 0, 30, 60)
   const protocolStart = protocol?.start_date ? new Date(protocol.start_date) : null;
