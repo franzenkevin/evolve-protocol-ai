@@ -29,6 +29,13 @@ export interface Profile {
   free_meals: string | null;
   meal_count: number | null;
   avatar_url: string | null;
+  cardio_enabled: boolean | null;
+  cardio_frequency: string | null;
+  cardio_duration: string | null;
+  cardio_timing: string | null;
+  cardio_type_preference: string | null;
+  ai_data_consent: boolean | null;
+  ai_data_consent_at: string | null;
   onboarding_complete: boolean;
 }
 

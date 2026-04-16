@@ -22,11 +22,17 @@ const STEPS = [
   "Dados Pessoais",
   "Objetivo & Nível",
   "Treino",
+  "Cardio",
   "Alimentação",
   "Doces & Suplementos",
   "Estilo de Vida",
   "Avaliação Física",
 ];
+
+const CARDIO_FREQUENCY = ["1x por semana", "2x por semana", "3x por semana", "4x por semana", "5x por semana", "Todos os dias"];
+const CARDIO_DURATION = ["10-15 min", "15-20 min", "20-30 min", "30-45 min", "45-60 min"];
+const CARDIO_TIMING = ["Logo após o treino de musculação", "Em horário separado (manhã/noite)", "Em dias de descanso da musculação", "Tanto faz — IA decide"];
+const CARDIO_TYPE = ["LISS (caminhada/bike leve, baixa intensidade)", "HIIT (alta intensidade intervalado)", "Moderado contínuo (corrida/bike)", "Tanto faz — IA escolhe melhor para meu objetivo"];
 
 const GOALS = ["Hipertrofia", "Emagrecimento", "Recomposição Corporal", "Saúde Geral"];
 const ACTIVITY_LEVELS = ["Sedentário", "Levemente ativo", "Moderadamente ativo", "Muito ativo", "Extremamente ativo"];
@@ -92,6 +98,11 @@ interface FormData {
   experience: string;
   gymType: string;
   injuries: string;
+  cardioEnabled: string; // "yes" | "no"
+  cardioFrequency: string;
+  cardioDuration: string;
+  cardioTiming: string;
+  cardioTypePreference: string;
   foodsLike: string[];
   foodsDislike: string;
   allergies: string[];
@@ -101,6 +112,7 @@ interface FormData {
   mealCount: string;
   sleepHours: string;
   stressLevel: string;
+  aiDataConsent: boolean;
 }
 
 const Onboarding = () => {
@@ -115,9 +127,12 @@ const Onboarding = () => {
   const [data, setData] = useState<FormData>({
     fullName: "", age: "", sex: "", weight: "", height: "",
     goal: "", activityLevel: "", neat: "", trainingDays: "", trainingWeekdays: [], trainingTime: "",
-    experience: "", gymType: "", injuries: "", foodsLike: [],
+    experience: "", gymType: "", injuries: "",
+    cardioEnabled: "", cardioFrequency: "", cardioDuration: "", cardioTiming: "", cardioTypePreference: "",
+    foodsLike: [],
     foodsDislike: "", allergies: [], sweetPreference: "", supplements: [],
     freeMeals: "", mealCount: "", sleepHours: "", stressLevel: "",
+    aiDataConsent: false,
   });
   const navigate = useNavigate();
   const { toast } = useToast();
