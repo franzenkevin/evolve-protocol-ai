@@ -252,7 +252,7 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
           {
             "label": "Opção 1",
             "foods": [
-              { "name": "Pão de forma", "amount": "2 fatias", "protein": 5, "carbs": 24, "fat": 2, "calories": 140 }
+              { "name": "Pão de forma", "amount": "50g", "protein": 5, "carbs": 24, "fat": 2, "calories": 140 }
             ]
           }
         ],
