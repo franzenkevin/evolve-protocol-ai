@@ -331,6 +331,35 @@ const Admin = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <AlertDialog open={!!deletingArticle} onOpenChange={(o) => !o && setDeletingArticle(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apagar artigo?</AlertDialogTitle>
+            <AlertDialogDescription>
+              "{deletingArticle?.title}" será removido permanentemente. Esta ação será registrada no log de auditoria.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (!deletingArticle) return;
+                const target = deletingArticle;
+                setDeletingArticle(null);
+                try {
+                  await deleteArticle.mutateAsync(target.id);
+                  await logAudit("delete_article", null, { article_id: target.id, title: target.title });
+                } catch (e: any) {
+                  toast({ title: "Erro", description: e.message, variant: "destructive" });
+                }
+              }}
+            >
+              Apagar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
