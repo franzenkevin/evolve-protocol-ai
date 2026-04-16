@@ -1,9 +1,12 @@
 // Push notification service worker
 self.addEventListener('push', (event) => {
-  let data = { title: 'Hypertrophy', body: 'Hora do treino! 🏋️' };
+  let data = { title: 'Hypertrophy', body: 'Nova notificação' };
   try {
     data = event.data?.json() || data;
   } catch { /* use defaults */ }
+
+  const url = data.data?.url || '/';
+  const tag = data.data?.url ? `notif-${data.data.url}` : 'hypertrophy-notif';
 
   event.waitUntil(
     self.registration.showNotification(data.title, {
@@ -11,8 +14,8 @@ self.addEventListener('push', (event) => {
       icon: '/pwa-192.png',
       badge: '/pwa-192.png',
       vibrate: [200, 100, 200],
-      tag: 'training-reminder',
-      data: { url: '/training' },
+      tag,
+      data: { url },
     })
   );
 });

@@ -2,6 +2,7 @@ import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/
 import { ScrollArea } from "@/components/ui/scroll-area";
 import SidebarHeader from "./SidebarHeader";
 import SectionMyData from "./SectionMyData";
+import SectionRanking from "./SectionRanking";
 import SectionReferrals from "./SectionReferrals";
 import SectionPlan from "./SectionPlan";
 import SectionMeetings from "./SectionMeetings";
@@ -54,6 +55,7 @@ const AppSidebar = ({ open, onOpenChange }: AppSidebarProps) => {
         <ScrollArea className="h-[calc(100vh-80px)]">
           <div className="p-4 space-y-5 pb-8">
             <SectionMyData />
+            <SectionRanking />
             <SectionReferrals />
             <SectionPlan />
             <SectionMeetings />

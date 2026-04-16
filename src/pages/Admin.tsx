@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -10,7 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useExercises, useCreateExercise, useDeleteExercise } from "@/hooks/useExercises";
 import { useFoods, useCreateFood, useDeleteFood } from "@/hooks/useFoods";
-import { Users, Dumbbell, UtensilsCrossed, Settings, Search, LogOut, LayoutDashboard, ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { useJournalArticles, useCreateJournalArticle, useDeleteJournalArticle } from "@/hooks/useJournal";
+import { Users, Dumbbell, UtensilsCrossed, Settings, LogOut, LayoutDashboard, ArrowLeft, Plus, Trash2, Newspaper } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Admin = () => {
@@ -21,10 +23,13 @@ const Admin = () => {
 
   const { data: exercises = [], isLoading: loadingEx } = useExercises();
   const { data: foods = [], isLoading: loadingFoods } = useFoods();
+  const { data: articles = [], isLoading: loadingArticles } = useJournalArticles();
   const createExercise = useCreateExercise();
   const deleteExercise = useDeleteExercise();
   const createFood = useCreateFood();
   const deleteFood = useDeleteFood();
+  const createArticle = useCreateJournalArticle();
+  const deleteArticle = useDeleteJournalArticle();
 
   // Exercise form
   const [exName, setExName] = useState("");
@@ -40,7 +45,45 @@ const Admin = () => {
   const [foodCal, setFoodCal] = useState("");
   const [foodDialogOpen, setFoodDialogOpen] = useState(false);
 
+  // Journal form
+  const [artTitle, setArtTitle] = useState("");
+  const [artCategory, setArtCategory] = useState("");
+  const [artExcerpt, setArtExcerpt] = useState("");
+  const [artContent, setArtContent] = useState("");
+  const [artImageUrl, setArtImageUrl] = useState("");
+  const [artSourceUrl, setArtSourceUrl] = useState("");
+  const [artTags, setArtTags] = useState("");
+  const [artReadTime, setArtReadTime] = useState("3");
+  const [artDialogOpen, setArtDialogOpen] = useState(false);
+
   const handleLogout = async () => { await signOut(); navigate("/login"); };
+
+  const handleAddArticle = async () => {
+    if (!artTitle || !artContent) {
+      toast({ title: "Preencha título e conteúdo", variant: "destructive" });
+      return;
+    }
+    try {
+      const tags = artTags.split(",").map((t) => t.trim()).filter(Boolean);
+      await createArticle.mutateAsync({
+        title: artTitle,
+        summary: artExcerpt || artContent.slice(0, 200),
+        excerpt: artExcerpt || undefined,
+        content: artContent,
+        category: artCategory || "fitness",
+        image_url: artImageUrl || undefined,
+        source_url: artSourceUrl || undefined,
+        tags: tags.length ? tags : undefined,
+        read_time_minutes: parseInt(artReadTime) || 3,
+      });
+      toast({ title: "Artigo publicado!", description: "Notificação enviada aos usuários." });
+      setArtTitle(""); setArtCategory(""); setArtExcerpt(""); setArtContent("");
+      setArtImageUrl(""); setArtSourceUrl(""); setArtTags(""); setArtReadTime("3");
+      setArtDialogOpen(false);
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    }
+  };
 
   const handleAddExercise = async () => {
     if (!exName || !exCategory) return;
@@ -89,7 +132,7 @@ const Admin = () => {
             { icon: Users, label: "Clientes", value: "—", color: "text-primary" },
             { icon: Dumbbell, label: "Exercícios", value: String(exercises.length), color: "text-info" },
             { icon: UtensilsCrossed, label: "Alimentos", value: String(foods.length), color: "text-warning" },
-            { icon: LayoutDashboard, label: "Protocolos", value: "—", color: "text-success" },
+            { icon: Newspaper, label: "Artigos", value: String(articles.length), color: "text-success" },
           ].map(({ icon: Icon, label, value, color }) => (
             <Card key={label} className="p-4 card-gradient border-border">
               <Icon size={20} className={color} />
@@ -103,6 +146,7 @@ const Admin = () => {
           <TabsList className="w-full md:w-auto">
             <TabsTrigger value="exercises" className="gap-1"><Dumbbell size={14} />Exercícios</TabsTrigger>
             <TabsTrigger value="foods" className="gap-1"><UtensilsCrossed size={14} />Alimentos</TabsTrigger>
+            <TabsTrigger value="journal" className="gap-1"><Newspaper size={14} />Journal</TabsTrigger>
             <TabsTrigger value="settings" className="gap-1"><Settings size={14} />Config</TabsTrigger>
           </TabsList>
 
@@ -172,6 +216,87 @@ const Admin = () => {
               </Card>
             ))}
             {!loadingFoods && foods.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">Nenhum alimento cadastrado.</p>}
+          </TabsContent>
+
+          <TabsContent value="journal" className="mt-4 space-y-3">
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">{articles.length} artigos publicados</p>
+              <Dialog open={artDialogOpen} onOpenChange={setArtDialogOpen}>
+                <DialogTrigger asChild><Button size="sm" className="gap-1"><Plus size={14} />Novo artigo</Button></DialogTrigger>
+                <DialogContent className="max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Publicar no Journal</DialogTitle>
+                  </DialogHeader>
+                  <p className="text-xs text-muted-foreground -mt-2">📲 Os usuários receberão uma notificação push automaticamente.</p>
+                  <div className="space-y-3 mt-2">
+                    <div>
+                      <Label>Título *</Label>
+                      <Input value={artTitle} onChange={(e) => setArtTitle(e.target.value)} placeholder="Ex: Novo estudo sobre creatina" className="mt-1" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label>Categoria</Label>
+                        <Input value={artCategory} onChange={(e) => setArtCategory(e.target.value)} placeholder="fitness, ciência..." className="mt-1" />
+                      </div>
+                      <div>
+                        <Label>Tempo de leitura (min)</Label>
+                        <Input type="number" value={artReadTime} onChange={(e) => setArtReadTime(e.target.value)} className="mt-1" />
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Resumo / Chamada</Label>
+                      <Textarea value={artExcerpt} onChange={(e) => setArtExcerpt(e.target.value)} placeholder="Breve resumo que aparece na lista" className="mt-1 h-16 resize-none" />
+                    </div>
+                    <div>
+                      <Label>Conteúdo completo *</Label>
+                      <Textarea value={artContent} onChange={(e) => setArtContent(e.target.value)} placeholder="Texto completo do artigo (suporta múltiplos parágrafos)" className="mt-1 h-40 resize-none" />
+                    </div>
+                    <div>
+                      <Label>URL da imagem de capa</Label>
+                      <Input value={artImageUrl} onChange={(e) => setArtImageUrl(e.target.value)} placeholder="https://..." className="mt-1" />
+                    </div>
+                    <div>
+                      <Label>URL da fonte/estudo</Label>
+                      <Input value={artSourceUrl} onChange={(e) => setArtSourceUrl(e.target.value)} placeholder="https://..." className="mt-1" />
+                    </div>
+                    <div>
+                      <Label>Tags (separadas por vírgula)</Label>
+                      <Input value={artTags} onChange={(e) => setArtTags(e.target.value)} placeholder="creatina, força, suplementação" className="mt-1" />
+                    </div>
+                    <Button onClick={handleAddArticle} className="w-full glow" disabled={createArticle.isPending}>
+                      {createArticle.isPending ? "Publicando..." : "📰 Publicar e notificar"}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            {articles.map((art) => (
+              <Card key={art.id} className="p-3 flex items-center gap-3">
+                {art.image_url && (
+                  <img src={art.image_url} alt={art.title} className="w-14 h-14 rounded object-cover shrink-0" />
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm text-foreground line-clamp-1">{art.title}</p>
+                  <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                    {art.category && <Badge variant="outline" className="text-[9px] py-0">{art.category}</Badge>}
+                    <span>{new Date(art.published_at).toLocaleDateString("pt-BR")}</span>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-destructive shrink-0"
+                  onClick={() => {
+                    if (confirm(`Apagar artigo "${art.title}"?`)) deleteArticle.mutate(art.id);
+                  }}
+                >
+                  <Trash2 size={14} />
+                </Button>
+              </Card>
+            ))}
+            {!loadingArticles && articles.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4">Nenhum artigo publicado.</p>
+            )}
           </TabsContent>
 
           <TabsContent value="settings" className="mt-4 space-y-4">
