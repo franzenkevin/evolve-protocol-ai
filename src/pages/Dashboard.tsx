@@ -141,6 +141,17 @@ const Dashboard = () => {
           </Card>
         )}
 
+        {/* 60-day journey widget */}
+        {protocol && (
+          <ProtocolProgressWidget
+            startDate={protocol.start_date}
+            endDate={protocol.end_date}
+            totalWorkouts={totalWorkouts}
+            totalTonnage={totalTonnage}
+            avgAdherence={avgAdherenceProtocol}
+          />
+        )}
+
         {/* Today's training or rest day */}
         {isRestDay ? (
           <Card className="p-4 card-gradient border-border">
