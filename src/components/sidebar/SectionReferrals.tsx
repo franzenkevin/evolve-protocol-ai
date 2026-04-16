@@ -42,6 +42,9 @@ const SectionReferrals = () => {
           <Sparkles size={16} className="text-primary mt-0.5 shrink-0" />
           <p className="text-[11px] text-muted-foreground leading-relaxed">
             Compartilhe seu cupom e ganhe <span className="text-primary font-semibold">10% de cashback</span> sobre a primeira compra de cada amigo indicado.
+            <span className="block mt-1 text-[10px] opacity-80">
+              💡 O valor fica <span className="text-warning font-medium">pendente por 7 dias</span> após o pagamento (proteção contra chargeback) e depois é liberado automaticamente.
+            </span>
           </p>
         </div>
 

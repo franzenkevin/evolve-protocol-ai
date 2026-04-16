@@ -106,10 +106,20 @@ const Chat = () => {
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-3 pb-4">
             {messages.length === 0 && (
-              <div className="text-center pt-12">
-                <Bot size={40} className="mx-auto text-primary/50 mb-3" />
-                <p className="text-sm text-muted-foreground">Olá! Sou sua IA de fitness.</p>
-                <p className="text-xs text-muted-foreground mt-1">Pergunte sobre treino, dieta, suplementos, peptídeos...</p>
+              <div className="text-center pt-12 px-4">
+                <div className="w-14 h-14 rounded-full bg-primary/15 flex items-center justify-center mx-auto mb-3">
+                  <Bot size={28} className="text-primary" />
+                </div>
+                <p className="text-base font-heading font-semibold text-foreground">Olá! Sou a IA do Hypertrophy.</p>
+                <p className="text-xs text-muted-foreground mt-2 leading-relaxed max-w-xs mx-auto">
+                  Pergunte sobre <span className="text-foreground font-medium">treino</span>,{" "}
+                  <span className="text-foreground font-medium">dieta</span>,{" "}
+                  <span className="text-foreground font-medium">suplementos</span> e{" "}
+                  <span className="text-foreground font-medium">desafios</span> durante sua jornada.
+                </p>
+                <p className="text-[11px] text-muted-foreground/80 mt-2 max-w-xs mx-auto">
+                  Sou instruída e municiada com muita informação para te guiar. 💪
+                </p>
               </div>
             )}
             {messages.map((msg, i) => (

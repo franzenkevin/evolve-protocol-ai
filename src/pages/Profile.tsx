@@ -26,8 +26,8 @@ const Profile = () => {
 
   const name = profile?.full_name || user?.user_metadata?.full_name || "Atleta";
   const email = user?.email || "";
-  const avatarUrl = (profile as any)?.avatar_url || "";
-  const initials = name ? name.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase() : "?";
+  const avatarUrl = profile?.avatar_url || "";
+  const initials = name ? name.split(" ").map((n: string) => n[0]).filter(Boolean).slice(0, 2).join("").toUpperCase() : "?";
 
   const daysActive = protocol
     ? Math.ceil((Date.now() - new Date(protocol.start_date).getTime()) / 86400000)
@@ -52,12 +52,18 @@ const Profile = () => {
     }
     setUploadingAvatar(true);
     try {
-      const ext = file.name.split(".").pop() || "jpg";
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+      const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, {
+        upsert: true,
+        contentType: file.type || `image/${ext}`,
+        cacheControl: "3600",
+      });
       if (upErr) throw upErr;
       const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
-      await updateProfile.mutateAsync({ avatar_url: pub.publicUrl } as any);
+      // Cache-bust to force reload across the app
+      const finalUrl = `${pub.publicUrl}?v=${Date.now()}`;
+      await updateProfile.mutateAsync({ avatar_url: finalUrl });
       toast.success("Foto atualizada!");
     } catch (err: any) {
       toast.error(err.message || "Erro ao enviar foto");

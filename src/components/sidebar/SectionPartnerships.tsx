@@ -27,7 +27,7 @@ const PARTNERS: Partner[] = [
     name: "Armavitta",
     coupon: "Kevin15",
     url: "https://armavitta.com.br",
-    desc: "Vitaminas e suplementos",
+    desc: "Loja de roupas fitness",
   },
 ];
 
