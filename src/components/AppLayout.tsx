@@ -1,16 +1,17 @@
 import { ReactNode, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Dumbbell, UtensilsCrossed, MessageCircle, Newspaper, FlaskConical, Menu } from "lucide-react";
+import { Home, Dumbbell, UtensilsCrossed, MessageCircle, TrendingUp, FlaskConical, Menu } from "lucide-react";
 import AppSidebar from "@/components/sidebar/AppSidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const NAV_ITEMS = [
   { to: "/dashboard", icon: Home, label: "Início" },
   { to: "/training", icon: Dumbbell, label: "Treino" },
   { to: "/diet", icon: UtensilsCrossed, label: "Dieta" },
   { to: "/chat", icon: MessageCircle, label: "Chat IA" },
-  { to: "/journal", icon: Newspaper, label: "Journal" },
+  { to: "/progress", icon: TrendingUp, label: "Progresso" },
   { to: "/exams", icon: FlaskConical, label: "Exames" },
 ];
 
