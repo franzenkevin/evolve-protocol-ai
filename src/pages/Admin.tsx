@@ -47,6 +47,8 @@ const Admin = () => {
   const deleteFood = useDeleteFood();
   const createArticle = useCreateJournalArticle();
   const deleteArticle = useDeleteJournalArticle();
+  const logAudit = useLogAudit();
+  const [deletingArticle, setDeletingArticle] = useState<{ id: string; title: string } | null>(null);
 
   // Exercise form
   const [exName, setExName] = useState("");
@@ -162,6 +164,7 @@ const Admin = () => {
             <TabsTrigger value="foods" className="gap-1"><UtensilsCrossed size={14} />Alimentos</TabsTrigger>
             <TabsTrigger value="journal" className="gap-1"><Newspaper size={14} />Journal</TabsTrigger>
             <TabsTrigger value="users" className="gap-1"><UserCog size={14} />Usuários</TabsTrigger>
+            <TabsTrigger value="audit" className="gap-1"><ScrollText size={14} />Auditoria</TabsTrigger>
             <TabsTrigger value="settings" className="gap-1"><Settings size={14} />Config</TabsTrigger>
           </TabsList>
 
@@ -170,6 +173,7 @@ const Admin = () => {
           <TabsContent value="renewals" className="mt-4"><AdminRenewals /></TabsContent>
           <TabsContent value="leads" className="mt-4"><AdminLeads /></TabsContent>
           <TabsContent value="users" className="mt-4"><AdminUsers /></TabsContent>
+          <TabsContent value="audit" className="mt-4"><AdminAuditLog /></TabsContent>
 
           <TabsContent value="exercises" className="mt-4 space-y-3">
             <div className="flex justify-between items-center">
@@ -299,7 +303,7 @@ const Admin = () => {
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 text-destructive shrink-0"
-                  onClick={() => { if (confirm(`Apagar artigo "${art.title}"?`)) deleteArticle.mutate(art.id); }}
+                  onClick={() => setDeletingArticle({ id: art.id, title: art.title })}
                 >
                   <Trash2 size={14} />
                 </Button>
