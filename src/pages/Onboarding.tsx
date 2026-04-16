@@ -612,6 +612,25 @@ const Onboarding = () => {
           </div>
         </div>
       </div>
+
+      {saving && (
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
+          <div className="max-w-sm w-full text-center space-y-5">
+            <div className="text-5xl animate-pulse">🤖</div>
+            <div>
+              <h3 className="text-xl font-heading font-bold text-foreground mb-1">Gerando seu protocolo</h3>
+              <p className="text-sm text-muted-foreground">{genStage}</p>
+            </div>
+            <div className="space-y-2">
+              <Progress value={genProgress} className="h-3" />
+              <p className="text-2xl font-bold text-primary">{Math.round(genProgress)}%</p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              A IA está montando seu treino e dieta personalizados. Não feche esta tela.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
