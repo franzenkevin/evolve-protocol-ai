@@ -23,10 +23,13 @@ const Admin = () => {
 
   const { data: exercises = [], isLoading: loadingEx } = useExercises();
   const { data: foods = [], isLoading: loadingFoods } = useFoods();
+  const { data: articles = [], isLoading: loadingArticles } = useJournalArticles();
   const createExercise = useCreateExercise();
   const deleteExercise = useDeleteExercise();
   const createFood = useCreateFood();
   const deleteFood = useDeleteFood();
+  const createArticle = useCreateJournalArticle();
+  const deleteArticle = useDeleteJournalArticle();
 
   // Exercise form
   const [exName, setExName] = useState("");
