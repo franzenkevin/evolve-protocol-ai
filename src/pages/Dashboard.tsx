@@ -34,6 +34,7 @@ const Dashboard = () => {
   const { data: ratings = [] } = useDailyRatings(14);
   const { data: todayRating } = useTodayRating();
   const { data: allLogs = [] } = useAllWorkoutLogs();
+  const { data: articles = [] } = useJournalArticles();
   const saveRating = useSaveDailyRating();
 
   const [starRating, setStarRating] = useState(0);
@@ -288,33 +289,34 @@ const Dashboard = () => {
           </Card>
         )}
 
-        {/* Quick actions */}
-        <div>
-          <h3 className="font-heading font-semibold text-foreground mb-2 text-sm">Ações rápidas</h3>
-          <div className="grid grid-cols-4 gap-2">
-            {QUICK_ACTIONS.map(({ to, icon: Icon, label, color }) => (
-              <Link key={label} to={to}>
-                <Card className="p-2 flex flex-col items-center gap-1 hover:border-primary/30 transition-colors cursor-pointer">
-                  <Icon size={18} className={color} />
-                  <span className="text-[10px] text-muted-foreground">{label}</span>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Macros */}
-        {diet && (
+        {/* Journal preview */}
+        {articles.length > 0 && (
           <Card className="p-4 card-gradient border-border">
-            <h3 className="font-heading font-semibold text-foreground mb-2 text-sm">Macros do Dia</h3>
-            <div className="grid grid-cols-4 gap-2 text-center">
-              {[
-                { label: "Kcal", value: diet.totalCalories, color: "text-primary" },
-                { label: "Prot", value: `${diet.protein}g`, color: "text-info" },
-                { label: "Carb", value: `${diet.carbs}g`, color: "text-warning" },
-                { label: "Gord", value: `${diet.fat}g`, color: "text-destructive" },
-              ].map(({ label, value, color }) => (
-                <div key={label}><p className={`text-lg font-bold ${color}`}>{value}</p><p className="text-[10px] text-muted-foreground">{label}</p></div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <BookOpen size={16} className="text-primary" />
+                <h3 className="font-heading font-semibold text-foreground text-sm">Journal — novidades</h3>
+              </div>
+              <Link to="/journal" className="text-xs text-primary hover:underline flex items-center gap-1">
+                Ver tudo <ArrowRight size={12} />
+              </Link>
+            </div>
+            <div className="space-y-2">
+              {articles.slice(0, 3).map((a) => (
+                <Link
+                  key={a.id}
+                  to="/journal"
+                  className="block p-2 rounded-md bg-secondary/40 hover:bg-secondary/60 transition-colors"
+                >
+                  <p className="text-xs font-medium text-foreground line-clamp-1">{a.title}</p>
+                  <p className="text-[10px] text-muted-foreground line-clamp-2 mt-0.5">
+                    {a.excerpt || a.summary}
+                  </p>
+                  <p className="text-[9px] text-muted-foreground mt-1">
+                    {new Date(a.published_at).toLocaleDateString("pt-BR")}
+                    {a.read_time_minutes ? ` • ${a.read_time_minutes} min de leitura` : ""}
+                  </p>
+                </Link>
               ))}
             </div>
           </Card>
