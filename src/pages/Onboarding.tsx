@@ -518,8 +518,59 @@ const Onboarding = () => {
             </>
           )}
 
-          {/* STEP 3 — Alimentação */}
+          {/* STEP 3 — Cardio */}
           {step === 3 && (
+            <>
+              <h2 className="text-2xl font-heading font-bold text-foreground">Cardio</h2>
+              <p className="text-sm text-muted-foreground">Conte para a IA suas preferências de cardio. Ela vai prescrever o tipo e a intensidade certos para o seu objetivo.</p>
+
+              <div>
+                <Label>Você quer incluir cardio no protocolo? *</Label>
+                <RadioGroup value={data.cardioEnabled} onValueChange={(v) => update("cardioEnabled", v)} className="mt-2 space-y-2">
+                  {radioOption("yes", "cardio-yes", "Sim, quero cardio prescrito pela IA")}
+                  {radioOption("no", "cardio-no", "Não, só musculação por enquanto")}
+                </RadioGroup>
+              </div>
+
+              {data.cardioEnabled === "yes" && (
+                <>
+                  <div>
+                    <Label>Frequência semanal de cardio *</Label>
+                    <RadioGroup value={data.cardioFrequency} onValueChange={(v) => update("cardioFrequency", v)} className="mt-2 space-y-2">
+                      {CARDIO_FREQUENCY.map((f) => radioOption(f, `cf-${f}`, f))}
+                    </RadioGroup>
+                  </div>
+
+                  <div>
+                    <Label>Tempo disponível por sessão *</Label>
+                    <RadioGroup value={data.cardioDuration} onValueChange={(v) => update("cardioDuration", v)} className="mt-2 space-y-2">
+                      {CARDIO_DURATION.map((d) => radioOption(d, `cd-${d}`, d))}
+                    </RadioGroup>
+                  </div>
+
+                  <div>
+                    <Label>Quando você prefere fazer o cardio? *</Label>
+                    <RadioGroup value={data.cardioTiming} onValueChange={(v) => update("cardioTiming", v)} className="mt-2 space-y-2">
+                      {CARDIO_TIMING.map((t) => radioOption(t, `ct-${t}`, t))}
+                    </RadioGroup>
+                  </div>
+
+                  <div>
+                    <Label>Tipo de cardio preferido *</Label>
+                    <RadioGroup value={data.cardioTypePreference} onValueChange={(v) => update("cardioTypePreference", v)} className="mt-2 space-y-2">
+                      {CARDIO_TYPE.map((t) => radioOption(t, `ctp-${t}`, t))}
+                    </RadioGroup>
+                    <p className="text-xs text-muted-foreground mt-2 italic">
+                      💡 LISS = baixa intensidade contínua (ótimo para queima de gordura sem prejudicar a recuperação). HIIT = alta intensidade curta (eficiente em pouco tempo, demanda mais recuperação).
+                    </p>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          {/* STEP 4 — Alimentação */}
+          {step === 4 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Alimentação</h2>
 
@@ -575,8 +626,8 @@ const Onboarding = () => {
             </>
           )}
 
-          {/* STEP 4 — Doces & Suplementos */}
-          {step === 4 && (
+          {/* STEP 5 — Doces & Suplementos */}
+          {step === 5 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Doces & Suplementos</h2>
 
@@ -604,8 +655,8 @@ const Onboarding = () => {
             </>
           )}
 
-          {/* STEP 5 — Estilo de Vida */}
-          {step === 5 && (
+          {/* STEP 6 — Estilo de Vida */}
+          {step === 6 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Estilo de Vida</h2>
               <div>
@@ -626,11 +677,40 @@ const Onboarding = () => {
             </>
           )}
 
-          {/* STEP 6 — Avaliação Física */}
-          {step === 6 && (
+          {/* STEP 7 — Avaliação Física + Consentimento LGPD */}
+          {step === 7 && (
             <>
               <BodyPhotoUpload photos={assessmentPhotos} onPhotosChange={setAssessmentPhotos} />
               <AssessmentResults assessment={assessment} loading={analyzing} />
+
+              {/* LGPD CONSENT */}
+              <div className="mt-6 p-4 rounded-lg border border-primary/40 bg-primary/5 space-y-3">
+                <h3 className="text-base font-heading font-semibold text-foreground flex items-center gap-2">
+                  🔒 Autorização para uso dos seus dados pela IA
+                </h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Para gerar seu protocolo personalizado de treino, dieta, cardio e acompanhamento, a inteligência artificial do Hypertrophy precisa
+                  processar os dados que você forneceu (idade, peso, altura, objetivo, fotos da avaliação corporal, preferências alimentares,
+                  rotina e respostas dos check-ins). <strong className="text-foreground">Em conformidade com a LGPD (Lei nº 13.709/2018)</strong>,
+                  seus dados são tratados de forma confidencial, usados exclusivamente dentro do app para personalizar seu acompanhamento, e
+                  você pode solicitar exclusão a qualquer momento.
+                </p>
+                <div
+                  className="flex items-start gap-3 p-3 rounded-lg border border-border bg-background/50 cursor-pointer hover:border-primary/50 transition-colors"
+                  onClick={() => setData((prev) => ({ ...prev, aiDataConsent: !prev.aiDataConsent }))}
+                >
+                  <Checkbox
+                    checked={data.aiDataConsent}
+                    onCheckedChange={(c) => setData((prev) => ({ ...prev, aiDataConsent: !!c }))}
+                    id="ai-consent"
+                    className="mt-0.5"
+                  />
+                  <Label htmlFor="ai-consent" className="cursor-pointer text-sm text-foreground leading-snug">
+                    <strong>Autorizo</strong> que a IA do Hypertrophy utilize meus dados pessoais e de treino para gerar e ajustar meu protocolo,
+                    respeitando a LGPD. *
+                  </Label>
+                </div>
+              </div>
             </>
           )}
         </div>
