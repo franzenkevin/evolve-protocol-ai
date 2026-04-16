@@ -207,7 +207,7 @@ const Training = () => {
         protocol_id: protocol?.id,
         day_index: selectedDay,
         exercise_id: ex.id,
-        exercise_name: ex.name,
+        exercise_name: swappedNames[ex.id] || ex.name,
         session_date: sessionDate,
         sets,
       });
@@ -423,13 +423,19 @@ const Training = () => {
             <Card className="p-3 border-border bg-muted/30">
               <div className="flex items-start gap-2">
                 <Flame size={16} className="text-primary mt-0.5 shrink-0" />
-                <div className="text-xs text-muted-foreground">
-                  <p className="font-semibold text-foreground mb-1">Instruções de aquecimento</p>
-                  <p>
-                    1ª série: ~50% da carga máxima (12 reps). 2ª série: ~75% da carga máxima (10
-                    reps). Depois, séries válidas próximas da falha. Última série: até a falha
-                    total.
-                  </p>
+                <div className="text-xs text-muted-foreground space-y-2">
+                  <div>
+                    <p className="font-semibold text-foreground mb-1">Dinâmica do treino</p>
+                    {day.dynamicNotes ? (
+                      <p>{day.dynamicNotes}</p>
+                    ) : (
+                      <p>
+                        1ª série: ~50% da carga máxima (12 reps). 2ª série: ~75% da carga máxima (10
+                        reps). Depois, séries válidas próximas da falha. Última série: até a falha
+                        total (alvo 8-12 reps).
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </Card>
