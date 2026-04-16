@@ -106,6 +106,8 @@ interface FormData {
 const Onboarding = () => {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [genProgress, setGenProgress] = useState(0);
+  const [genStage, setGenStage] = useState("");
   const [assessmentPhotos, setAssessmentPhotos] = useState<Record<string, string>>({});
   const [assessment, setAssessment] = useState<any>(null);
   const [analyzing, setAnalyzing] = useState(false);
