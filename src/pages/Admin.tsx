@@ -6,20 +6,32 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useExercises, useCreateExercise, useDeleteExercise } from "@/hooks/useExercises";
 import { useFoods, useCreateFood, useDeleteFood } from "@/hooks/useFoods";
 import { useJournalArticles, useCreateJournalArticle, useDeleteJournalArticle } from "@/hooks/useJournal";
-import { LogOut, ArrowLeft, Plus, Trash2, Newspaper, Dumbbell, UtensilsCrossed, Settings, BarChart3, CreditCard, Calendar, UserCog, Megaphone } from "lucide-react";
+import { LogOut, ArrowLeft, Plus, Trash2, Newspaper, Dumbbell, UtensilsCrossed, Settings, BarChart3, CreditCard, Calendar, UserCog, Megaphone, ScrollText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLogAudit } from "@/hooks/useAuditLog";
 import VideoUploader from "@/components/admin/VideoUploader";
 import AdminMetrics from "@/components/admin/AdminMetrics";
 import AdminSales from "@/components/admin/AdminSales";
 import AdminRenewals from "@/components/admin/AdminRenewals";
 import AdminLeads from "@/components/admin/AdminLeads";
 import AdminUsers from "@/components/admin/AdminUsers";
+import AdminAuditLog from "@/components/admin/AdminAuditLog";
 
 const Admin = () => {
   const { signOut } = useAuth();
