@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -10,7 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useExercises, useCreateExercise, useDeleteExercise } from "@/hooks/useExercises";
 import { useFoods, useCreateFood, useDeleteFood } from "@/hooks/useFoods";
-import { Users, Dumbbell, UtensilsCrossed, Settings, Search, LogOut, LayoutDashboard, ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { useJournalArticles, useCreateJournalArticle, useDeleteJournalArticle } from "@/hooks/useJournal";
+import { Users, Dumbbell, UtensilsCrossed, Settings, LogOut, LayoutDashboard, ArrowLeft, Plus, Trash2, Newspaper } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Admin = () => {
