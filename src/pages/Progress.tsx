@@ -1,20 +1,23 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import AppLayout from "@/components/AppLayout";
+import ProtocolProgressWidget from "@/components/ProtocolProgressWidget";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Camera, TrendingUp, Scale, Upload, Loader2 } from "lucide-react";
+import { Camera, TrendingUp, Scale, Upload, Loader2, BarChart3, Flame, Trophy, Dumbbell as DumbbellIcon } from "lucide-react";
 import { useCheckins, useCreateCheckin, uploadPhoto } from "@/hooks/useCheckins";
 import { useActiveProtocol } from "@/hooks/useProtocol";
+import { useAllWorkoutLogs } from "@/hooks/useWorkoutLogs";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 const Progress = () => {
   const { user } = useAuth();
-  const { data: checkins = [], isLoading } = useCheckins();
+  const { data: checkins = [] } = useCheckins();
   const { data: protocol } = useActiveProtocol();
+  const { data: allLogs = [] } = useAllWorkoutLogs();
   const createCheckin = useCreateCheckin();
   const { toast } = useToast();
 
@@ -25,10 +28,104 @@ const Progress = () => {
   const [checkinAdherence, setCheckinAdherence] = useState<number | null>(null);
   const [savingCheckin, setSavingCheckin] = useState(false);
 
-  const weightHistory = checkins
-    .filter((c) => c.weight)
-    .slice(0, 10)
-    .reverse();
+  const weightHistory = checkins.filter((c) => c.weight).slice(0, 10).reverse();
+  const photoCheckins = checkins.filter((c) => c.photo_front || c.photo_side || c.photo_back);
+  const firstPhotos = photoCheckins[photoCheckins.length - 1];
+  const latestPhotos = photoCheckins[0];
+
+  // Stats: tonnage, sessions, streak, PRs
+  const stats = useMemo(() => {
+    const protoLogs = protocol ? allLogs.filter((l) => l.protocol_id === protocol.id) : allLogs;
+    let tonnage = 0;
+    let totalReps = 0;
+    let totalSets = 0;
+    const sessionDates = new Set<string>();
+    const exerciseBest: Record<string, { name: string; weight: number; reps: number; date: string }> = {};
+    const exerciseHistory: Record<string, { name: string; entries: { date: string; topWeight: number }[] }> = {};
+
+    protoLogs.forEach((log) => {
+      sessionDates.add(log.session_date);
+      const sets = (log.sets as any[]) || [];
+      let topWeight = 0;
+      sets.forEach((s: any) => {
+        if (s.completed && s.type === "valid") {
+          const w = Number(s.weight) || 0;
+          const r = Number(s.reps) || 0;
+          tonnage += w * r;
+          totalReps += r;
+          totalSets += 1;
+          if (w > topWeight) topWeight = w;
+          // PR tracking (best 1RM-ish: heaviest top set)
+          const cur = exerciseBest[log.exercise_id];
+          if (!cur || w > cur.weight) {
+            exerciseBest[log.exercise_id] = { name: log.exercise_name, weight: w, reps: r, date: log.session_date };
+          }
+        }
+      });
+      if (topWeight > 0) {
+        if (!exerciseHistory[log.exercise_id]) {
+          exerciseHistory[log.exercise_id] = { name: log.exercise_name, entries: [] };
+        }
+        exerciseHistory[log.exercise_id].entries.push({ date: log.session_date, topWeight });
+      }
+    });
+
+    // Compute streak (consecutive days with any session, ending today or yesterday)
+    const sortedDates = Array.from(sessionDates).sort().reverse();
+    let streak = 0;
+    if (sortedDates.length > 0) {
+      const today = new Date();
+      const ymd = (d: Date) => d.toISOString().split("T")[0];
+      let cursor = new Date(today);
+      // tolerate today not done yet (start from yesterday)
+      if (sortedDates[0] !== ymd(cursor)) cursor.setDate(cursor.getDate() - 1);
+      const dateSet = sessionDates;
+      while (dateSet.has(ymd(cursor))) {
+        streak++;
+        cursor.setDate(cursor.getDate() - 1);
+      }
+    }
+
+    // Sessions in last 7 days (adherence vs planned trainingDays)
+    const sevenDaysAgo = Date.now() - 7 * 86400000;
+    const sessionsLast7 = Array.from(sessionDates).filter((d) => new Date(d).getTime() >= sevenDaysAgo).length;
+
+    // Load progression: top 5 exercises with most data
+    const evolution = Object.entries(exerciseHistory)
+      .map(([id, h]) => {
+        const sorted = h.entries.sort((a, b) => a.date.localeCompare(b.date));
+        const first = sorted[0];
+        const last = sorted[sorted.length - 1];
+        const delta = last.topWeight - first.topWeight;
+        const pct = first.topWeight > 0 ? Math.round((delta / first.topWeight) * 100) : 0;
+        return { id, name: h.name, sessions: sorted.length, first: first.topWeight, last: last.topWeight, delta, pct, points: sorted };
+      })
+      .filter((e) => e.sessions >= 2)
+      .sort((a, b) => b.sessions - a.sessions)
+      .slice(0, 8);
+
+    const prs = Object.entries(exerciseBest)
+      .map(([id, b]) => ({ id, ...b }))
+      .sort((a, b) => b.weight - a.weight)
+      .slice(0, 6);
+
+    const adherenceList = checkins.filter((c) => c.adherence);
+    const avgAdherence = adherenceList.length
+      ? Math.round(adherenceList.reduce((a, c) => a + (c.adherence || 0), 0) / adherenceList.length)
+      : 0;
+
+    return {
+      tonnage,
+      totalReps,
+      totalSets,
+      totalWorkouts: sessionDates.size,
+      streak,
+      sessionsLast7,
+      evolution,
+      prs,
+      avgAdherence,
+    };
+  }, [allLogs, protocol, checkins]);
 
   const handleSaveWeight = async () => {
     if (!weight) return;
@@ -85,17 +182,143 @@ const Progress = () => {
     }
   };
 
+  const fmtTonnage = (kg: number) => kg >= 1000 ? `${(kg / 1000).toFixed(1)}t` : `${Math.round(kg)}kg`;
+
   return (
     <AppLayout>
-      <div className="p-4 max-w-lg mx-auto space-y-4 animate-fade-in">
+      <div className="p-4 max-w-lg mx-auto space-y-4 animate-fade-in pb-24">
         <h1 className="text-2xl font-heading font-bold text-foreground pt-2">Progresso</h1>
 
-        <Tabs defaultValue="weight">
-          <TabsList className="w-full">
-            <TabsTrigger value="weight" className="flex-1 gap-1"><Scale size={14} />Peso</TabsTrigger>
-            <TabsTrigger value="photos" className="flex-1 gap-1"><Camera size={14} />Fotos</TabsTrigger>
-            <TabsTrigger value="checkin" className="flex-1 gap-1"><TrendingUp size={14} />Check-in</TabsTrigger>
+        {protocol && (
+          <ProtocolProgressWidget
+            startDate={protocol.start_date}
+            endDate={protocol.end_date}
+            totalWorkouts={stats.totalWorkouts}
+            totalTonnage={stats.tonnage}
+            avgAdherence={stats.avgAdherence}
+          />
+        )}
+
+        <Tabs defaultValue="stats">
+          <TabsList className="w-full grid grid-cols-4">
+            <TabsTrigger value="stats" className="gap-1 text-xs"><BarChart3 size={12} />Stats</TabsTrigger>
+            <TabsTrigger value="weight" className="gap-1 text-xs"><Scale size={12} />Peso</TabsTrigger>
+            <TabsTrigger value="photos" className="gap-1 text-xs"><Camera size={12} />Fotos</TabsTrigger>
+            <TabsTrigger value="checkin" className="gap-1 text-xs"><TrendingUp size={12} />Check-in</TabsTrigger>
           </TabsList>
+
+          {/* STATS TAB */}
+          <TabsContent value="stats" className="space-y-3 mt-4">
+            {/* Volume highlights */}
+            <div className="grid grid-cols-2 gap-2">
+              <Card className="p-3 card-gradient border-border">
+                <div className="flex items-center gap-2 mb-1">
+                  <DumbbellIcon size={14} className="text-primary" />
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Treinos</span>
+                </div>
+                <p className="text-xl font-bold text-foreground tabular-nums">{stats.totalWorkouts}</p>
+                <p className="text-[10px] text-muted-foreground">{stats.sessionsLast7} nos últimos 7 dias</p>
+              </Card>
+              <Card className="p-3 card-gradient border-border">
+                <div className="flex items-center gap-2 mb-1">
+                  <BarChart3 size={14} className="text-info" />
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Volume total</span>
+                </div>
+                <p className="text-xl font-bold text-foreground tabular-nums">{fmtTonnage(stats.tonnage)}</p>
+                <p className="text-[10px] text-muted-foreground">{stats.totalSets} séries • {stats.totalReps} reps</p>
+              </Card>
+              <Card className="p-3 card-gradient border-border">
+                <div className="flex items-center gap-2 mb-1">
+                  <Flame size={14} className="text-warning" />
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Streak</span>
+                </div>
+                <p className="text-xl font-bold text-foreground tabular-nums">{stats.streak} {stats.streak === 1 ? "dia" : "dias"}</p>
+                <p className="text-[10px] text-muted-foreground">Sequência atual</p>
+              </Card>
+              <Card className="p-3 card-gradient border-border">
+                <div className="flex items-center gap-2 mb-1">
+                  <TrendingUp size={14} className="text-success" />
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wide">Aderência</span>
+                </div>
+                <p className="text-xl font-bold text-foreground tabular-nums">{stats.avgAdherence}%</p>
+                <p className="text-[10px] text-muted-foreground">Média check-ins</p>
+              </Card>
+            </div>
+
+            {/* PRs */}
+            <Card className="p-4 card-gradient border-border">
+              <div className="flex items-center gap-2 mb-3">
+                <Trophy size={16} className="text-primary" />
+                <h3 className="font-heading font-semibold text-foreground text-sm">Recordes (PRs)</h3>
+              </div>
+              {stats.prs.length === 0 ? (
+                <p className="text-xs text-muted-foreground">Registre treinos para ver seus recordes pessoais.</p>
+              ) : (
+                <div className="space-y-2">
+                  {stats.prs.map((pr) => (
+                    <div key={pr.id} className="flex items-center justify-between p-2 bg-secondary/40 rounded-md">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium text-foreground truncate">{pr.name}</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          {new Date(pr.date).toLocaleDateString("pt-BR")}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0 ml-2">
+                        <p className="text-sm font-bold text-primary tabular-nums">{pr.weight}kg</p>
+                        <p className="text-[10px] text-muted-foreground">×{pr.reps}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+
+            {/* Evolution per exercise */}
+            <Card className="p-4 card-gradient border-border">
+              <div className="flex items-center gap-2 mb-3">
+                <TrendingUp size={16} className="text-info" />
+                <h3 className="font-heading font-semibold text-foreground text-sm">Evolução de cargas</h3>
+              </div>
+              {stats.evolution.length === 0 ? (
+                <p className="text-xs text-muted-foreground">Registre pelo menos 2 sessões do mesmo exercício para ver a evolução.</p>
+              ) : (
+                <div className="space-y-3">
+                  {stats.evolution.map((e) => (
+                    <div key={e.id}>
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-xs font-medium text-foreground truncate flex-1 min-w-0">{e.name}</p>
+                        <div className="flex items-center gap-2 shrink-0 ml-2">
+                          <span className="text-[10px] text-muted-foreground tabular-nums">
+                            {e.first}→{e.last}kg
+                          </span>
+                          <span className={`text-[10px] font-bold tabular-nums ${e.delta > 0 ? "text-success" : e.delta < 0 ? "text-destructive" : "text-muted-foreground"}`}>
+                            {e.delta > 0 ? "+" : ""}{e.delta}kg ({e.pct > 0 ? "+" : ""}{e.pct}%)
+                          </span>
+                        </div>
+                      </div>
+                      {/* mini sparkline */}
+                      <div className="flex items-end gap-0.5 h-8 bg-secondary/30 rounded p-1">
+                        {e.points.map((pt, i) => {
+                          const max = Math.max(...e.points.map((p) => p.topWeight));
+                          const min = Math.min(...e.points.map((p) => p.topWeight));
+                          const range = max - min || 1;
+                          const pct = ((pt.topWeight - min) / range) * 80 + 20;
+                          return (
+                            <div
+                              key={i}
+                              className="flex-1 bg-primary/60 rounded-sm min-w-[2px]"
+                              style={{ height: `${pct}%` }}
+                              title={`${pt.date}: ${pt.topWeight}kg`}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+          </TabsContent>
 
           <TabsContent value="weight" className="space-y-4 mt-4">
             <Card className="p-4 card-gradient border-border">
@@ -167,11 +390,51 @@ const Progress = () => {
               )}
             </Card>
 
+            {/* Antes vs Depois */}
+            {firstPhotos && latestPhotos && firstPhotos.id !== latestPhotos.id && (
+              <Card className="p-4 card-gradient border-border">
+                <h3 className="font-heading font-semibold text-foreground mb-3 text-sm">Antes vs Depois</h3>
+                {(["front", "side", "back"] as const).map((angle) => {
+                  const key = `photo_${angle}` as const;
+                  const before = (firstPhotos as any)[key];
+                  const after = (latestPhotos as any)[key];
+                  if (!before && !after) return null;
+                  return (
+                    <div key={angle} className="mb-3 last:mb-0">
+                      <p className="text-xs text-muted-foreground mb-1 capitalize">{angle === "front" ? "Frente" : angle === "side" ? "Lado" : "Costas"}</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          {before ? (
+                            <img src={before} alt="Antes" className="w-full aspect-[3/4] object-cover rounded-md border border-border" />
+                          ) : (
+                            <div className="w-full aspect-[3/4] rounded-md bg-secondary/40 flex items-center justify-center text-[10px] text-muted-foreground">—</div>
+                          )}
+                          <p className="text-[10px] text-muted-foreground mt-1 text-center">
+                            {new Date(firstPhotos.created_at).toLocaleDateString("pt-BR")}
+                          </p>
+                        </div>
+                        <div>
+                          {after ? (
+                            <img src={after} alt="Depois" className="w-full aspect-[3/4] object-cover rounded-md border border-primary/40" />
+                          ) : (
+                            <div className="w-full aspect-[3/4] rounded-md bg-secondary/40 flex items-center justify-center text-[10px] text-muted-foreground">—</div>
+                          )}
+                          <p className="text-[10px] text-primary mt-1 text-center font-medium">
+                            {new Date(latestPhotos.created_at).toLocaleDateString("pt-BR")}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </Card>
+            )}
+
             <Card className="p-4 card-gradient border-border">
               <h3 className="font-heading font-semibold text-foreground mb-2">Histórico de fotos</h3>
-              {checkins.filter((c) => c.photo_front || c.photo_side || c.photo_back).length > 0 ? (
+              {photoCheckins.length > 0 ? (
                 <div className="space-y-2">
-                  {checkins.filter((c) => c.photo_front || c.photo_side || c.photo_back).map((c) => (
+                  {photoCheckins.map((c) => (
                     <div key={c.id} className="text-sm text-muted-foreground">
                       📸 {new Date(c.created_at).toLocaleDateString("pt-BR")}
                     </div>
