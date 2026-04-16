@@ -669,6 +669,13 @@ const Training = () => {
                           </div>
                         )}
 
+                        {/* Execution video */}
+                        <ExerciseVideo
+                          exerciseName={swappedNames[ex.id] || ex.name}
+                          videoUrl={ex.videoUrl}
+                          videoQuery={ex.videoQuery || `${swappedNames[ex.id] || ex.name} execução correta`}
+                        />
+
                         {prev && (
                           <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-md p-2">
                             <History size={12} />
