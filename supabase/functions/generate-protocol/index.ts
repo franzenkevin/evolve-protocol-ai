@@ -214,13 +214,13 @@ Para CADA dia de treino, gerar um campo "dynamicNotes" curto (2-3 frases) explic
 ### Refeições livres:
 - Respeitar a frequência escolhida pelo aluno, mencionar nas notas
 
-## BANCO DE ALIMENTOS COM MACROS (usar para cálculos):
+## BANCO DE ALIMENTOS COM MACROS (porções já em GRAMAS — usar EXATAMENTE essa unidade no campo "amount"):
 Arroz 150g: P4 C42 G0 195kcal | Batata inglesa 200g: P4 C34 G0 154kcal | Batata doce 200g: P3 C40 G0 172kcal
-Macarrão 150g: P5 C44 G1 200kcal | Pão de forma 2fatias: P5 C24 G2 140kcal | Pão francês 1un: P4 C28 G1 135kcal
-Tapioca 2un: P1 C36 G0 150kcal | Cuscuz 150g: P4 C38 G1 170kcal | Mandioca 150g: P2 C39 G0 160kcal
+Macarrão 150g: P5 C44 G1 200kcal | Pão de forma 50g: P5 C24 G2 140kcal | Pão francês 50g: P4 C28 G1 135kcal
+Tapioca 80g: P1 C36 G0 150kcal | Cuscuz 150g: P4 C38 G1 170kcal | Mandioca 150g: P2 C39 G0 160kcal
 Peito frango 150g: P45 C0 G3 210kcal | Patinho 150g: P42 C0 G5 215kcal | Tilápia 150g: P35 C0 G3 170kcal
-Salmão 150g: P34 C0 G14 270kcal | Ovo 3un: P18 C2 G15 210kcal | Atum lata: P30 C0 G1 130kcal
-Whey 1scoop: P25 C3 G1 120kcal | Banana 1un: P1 C27 G0 105kcal | Aveia 40g: P5 C28 G3 150kcal
+Salmão 150g: P34 C0 G14 270kcal | Ovo 150g: P18 C2 G15 210kcal | Atum 120g: P30 C0 G1 130kcal
+Whey 30g: P25 C3 G1 120kcal | Banana 100g: P1 C27 G0 105kcal | Aveia 40g: P5 C28 G3 150kcal
 Feijão 100g: P7 C18 G1 110kcal | Iogurte desnatado 170g: P8 C12 G0 80kcal
 
 # FORMATO DE SAÍDA OBRIGATÓRIO
