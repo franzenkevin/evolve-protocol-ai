@@ -23,6 +23,7 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
 
   const name = profile?.full_name || user?.user_metadata?.full_name || "";
   const initials = name ? name.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase() : "?";
+  const avatarUrl = (profile as any)?.avatar_url || "";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -34,9 +35,10 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
             className="flex items-center gap-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
           >
             <Menu size={18} />
-            <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center">
-              <span className="text-[10px] font-bold text-primary">{initials}</span>
-            </div>
+            <Avatar className="w-7 h-7">
+              {avatarUrl && <AvatarImage src={avatarUrl} alt={name} />}
+              <AvatarFallback className="bg-primary/20 text-[10px] font-bold text-primary">{initials}</AvatarFallback>
+            </Avatar>
           </button>
           <span className="text-sm font-heading font-semibold text-foreground">Hypertrophy</span>
           <div className="w-12" />
