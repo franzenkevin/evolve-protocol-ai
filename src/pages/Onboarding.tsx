@@ -22,11 +22,17 @@ const STEPS = [
   "Dados Pessoais",
   "Objetivo & Nível",
   "Treino",
+  "Cardio",
   "Alimentação",
   "Doces & Suplementos",
   "Estilo de Vida",
   "Avaliação Física",
 ];
+
+const CARDIO_FREQUENCY = ["1x por semana", "2x por semana", "3x por semana", "4x por semana", "5x por semana", "Todos os dias"];
+const CARDIO_DURATION = ["10-15 min", "15-20 min", "20-30 min", "30-45 min", "45-60 min"];
+const CARDIO_TIMING = ["Logo após o treino de musculação", "Em horário separado (manhã/noite)", "Em dias de descanso da musculação", "Tanto faz — IA decide"];
+const CARDIO_TYPE = ["LISS (caminhada/bike leve, baixa intensidade)", "HIIT (alta intensidade intervalado)", "Moderado contínuo (corrida/bike)", "Tanto faz — IA escolhe melhor para meu objetivo"];
 
 const GOALS = ["Hipertrofia", "Emagrecimento", "Recomposição Corporal", "Saúde Geral"];
 const ACTIVITY_LEVELS = ["Sedentário", "Levemente ativo", "Moderadamente ativo", "Muito ativo", "Extremamente ativo"];
@@ -92,6 +98,11 @@ interface FormData {
   experience: string;
   gymType: string;
   injuries: string;
+  cardioEnabled: string; // "yes" | "no"
+  cardioFrequency: string;
+  cardioDuration: string;
+  cardioTiming: string;
+  cardioTypePreference: string;
   foodsLike: string[];
   foodsDislike: string;
   allergies: string[];
@@ -101,6 +112,7 @@ interface FormData {
   mealCount: string;
   sleepHours: string;
   stressLevel: string;
+  aiDataConsent: boolean;
 }
 
 const Onboarding = () => {
@@ -115,9 +127,12 @@ const Onboarding = () => {
   const [data, setData] = useState<FormData>({
     fullName: "", age: "", sex: "", weight: "", height: "",
     goal: "", activityLevel: "", neat: "", trainingDays: "", trainingWeekdays: [], trainingTime: "",
-    experience: "", gymType: "", injuries: "", foodsLike: [],
+    experience: "", gymType: "", injuries: "",
+    cardioEnabled: "", cardioFrequency: "", cardioDuration: "", cardioTiming: "", cardioTypePreference: "",
+    foodsLike: [],
     foodsDislike: "", allergies: [], sweetPreference: "", supplements: [],
     freeMeals: "", mealCount: "", sleepHours: "", stressLevel: "",
+    aiDataConsent: false,
   });
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -199,20 +214,32 @@ const Onboarding = () => {
         if (!data.gymType) return "Selecione o tipo de academia.";
         return null;
       case 3:
+        if (!data.cardioEnabled) return "Indique se deseja incluir cardio.";
+        if (data.cardioEnabled === "yes") {
+          if (!data.cardioFrequency) return "Selecione a frequência do cardio.";
+          if (!data.cardioDuration) return "Selecione a duração do cardio.";
+          if (!data.cardioTiming) return "Selecione quando você vai fazer cardio.";
+          if (!data.cardioTypePreference) return "Selecione o tipo de cardio preferido.";
+        }
+        return null;
+      case 4:
         if (!data.mealCount) return "Selecione quantas refeições por dia.";
         if (data.foodsLike.length === 0) return "Selecione ao menos 5 alimentos que gosta.";
         if (data.foodsLike.length < 5) return "Selecione ao menos 5 alimentos que gosta.";
         if (data.allergies.length === 0) return "Selecione suas alergias ou marque 'Não tenho alergias'.";
         if (!data.freeMeals) return "Selecione a frequência de refeições livres.";
         return null;
-      case 4:
+      case 5:
         if (!data.sweetPreference) return "Selecione uma opção de doce ou 'Nenhum'.";
         if (data.supplements.length === 0) return "Selecione suplementos ou marque 'Nenhum'.";
         return null;
-      case 5:
+      case 6:
         if (!data.neat) return "Selecione sua rotina diária (NEAT).";
         if (!data.sleepHours) return "Informe suas horas de sono.";
         if (!data.stressLevel) return "Selecione seu nível de estresse.";
+        return null;
+      case 7:
+        if (!data.aiDataConsent) return "Você precisa autorizar o uso dos seus dados pela IA para gerar o protocolo personalizado.";
         return null;
       default:
         return null;
@@ -266,8 +293,8 @@ const Onboarding = () => {
       return;
     }
 
-    // On step 6 (assessment), trigger analysis if photos exist and no assessment yet
-    if (step === 6 && Object.keys(assessmentPhotos).length > 0 && !assessment && !analyzing) {
+    // On step 7 (assessment), trigger analysis if photos exist and no assessment yet
+    if (step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment && !analyzing) {
       await runAssessment();
       return;
     }
@@ -295,6 +322,13 @@ const Onboarding = () => {
         experience: data.experience,
         gym_type: data.gymType,
         injuries: data.injuries,
+        cardio_enabled: data.cardioEnabled === "yes",
+        cardio_frequency: data.cardioEnabled === "yes" ? data.cardioFrequency : null,
+        cardio_duration: data.cardioEnabled === "yes" ? data.cardioDuration : null,
+        cardio_timing: data.cardioEnabled === "yes" ? data.cardioTiming : null,
+        cardio_type_preference: data.cardioEnabled === "yes" ? data.cardioTypePreference : null,
+        ai_data_consent: data.aiDataConsent,
+        ai_data_consent_at: data.aiDataConsent ? new Date().toISOString() : null,
         preferred_foods: data.foodsLike,
         disliked_foods: data.foodsDislike,
         allergies: data.allergies.filter(a => a !== "Não tenho alergias").join(", "),
@@ -484,8 +518,59 @@ const Onboarding = () => {
             </>
           )}
 
-          {/* STEP 3 — Alimentação */}
+          {/* STEP 3 — Cardio */}
           {step === 3 && (
+            <>
+              <h2 className="text-2xl font-heading font-bold text-foreground">Cardio</h2>
+              <p className="text-sm text-muted-foreground">Conte para a IA suas preferências de cardio. Ela vai prescrever o tipo e a intensidade certos para o seu objetivo.</p>
+
+              <div>
+                <Label>Você quer incluir cardio no protocolo? *</Label>
+                <RadioGroup value={data.cardioEnabled} onValueChange={(v) => update("cardioEnabled", v)} className="mt-2 space-y-2">
+                  {radioOption("yes", "cardio-yes", "Sim, quero cardio prescrito pela IA")}
+                  {radioOption("no", "cardio-no", "Não, só musculação por enquanto")}
+                </RadioGroup>
+              </div>
+
+              {data.cardioEnabled === "yes" && (
+                <>
+                  <div>
+                    <Label>Frequência semanal de cardio *</Label>
+                    <RadioGroup value={data.cardioFrequency} onValueChange={(v) => update("cardioFrequency", v)} className="mt-2 space-y-2">
+                      {CARDIO_FREQUENCY.map((f) => radioOption(f, `cf-${f}`, f))}
+                    </RadioGroup>
+                  </div>
+
+                  <div>
+                    <Label>Tempo disponível por sessão *</Label>
+                    <RadioGroup value={data.cardioDuration} onValueChange={(v) => update("cardioDuration", v)} className="mt-2 space-y-2">
+                      {CARDIO_DURATION.map((d) => radioOption(d, `cd-${d}`, d))}
+                    </RadioGroup>
+                  </div>
+
+                  <div>
+                    <Label>Quando você prefere fazer o cardio? *</Label>
+                    <RadioGroup value={data.cardioTiming} onValueChange={(v) => update("cardioTiming", v)} className="mt-2 space-y-2">
+                      {CARDIO_TIMING.map((t) => radioOption(t, `ct-${t}`, t))}
+                    </RadioGroup>
+                  </div>
+
+                  <div>
+                    <Label>Tipo de cardio preferido *</Label>
+                    <RadioGroup value={data.cardioTypePreference} onValueChange={(v) => update("cardioTypePreference", v)} className="mt-2 space-y-2">
+                      {CARDIO_TYPE.map((t) => radioOption(t, `ctp-${t}`, t))}
+                    </RadioGroup>
+                    <p className="text-xs text-muted-foreground mt-2 italic">
+                      💡 LISS = baixa intensidade contínua (ótimo para queima de gordura sem prejudicar a recuperação). HIIT = alta intensidade curta (eficiente em pouco tempo, demanda mais recuperação).
+                    </p>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          {/* STEP 4 — Alimentação */}
+          {step === 4 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Alimentação</h2>
 
@@ -541,8 +626,8 @@ const Onboarding = () => {
             </>
           )}
 
-          {/* STEP 4 — Doces & Suplementos */}
-          {step === 4 && (
+          {/* STEP 5 — Doces & Suplementos */}
+          {step === 5 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Doces & Suplementos</h2>
 
@@ -570,8 +655,8 @@ const Onboarding = () => {
             </>
           )}
 
-          {/* STEP 5 — Estilo de Vida */}
-          {step === 5 && (
+          {/* STEP 6 — Estilo de Vida */}
+          {step === 6 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Estilo de Vida</h2>
               <div>
@@ -592,11 +677,40 @@ const Onboarding = () => {
             </>
           )}
 
-          {/* STEP 6 — Avaliação Física */}
-          {step === 6 && (
+          {/* STEP 7 — Avaliação Física + Consentimento LGPD */}
+          {step === 7 && (
             <>
               <BodyPhotoUpload photos={assessmentPhotos} onPhotosChange={setAssessmentPhotos} />
               <AssessmentResults assessment={assessment} loading={analyzing} />
+
+              {/* LGPD CONSENT */}
+              <div className="mt-6 p-4 rounded-lg border border-primary/40 bg-primary/5 space-y-3">
+                <h3 className="text-base font-heading font-semibold text-foreground flex items-center gap-2">
+                  🔒 Autorização para uso dos seus dados pela IA
+                </h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Para gerar seu protocolo personalizado de treino, dieta, cardio e acompanhamento, a inteligência artificial do Hypertrophy precisa
+                  processar os dados que você forneceu (idade, peso, altura, objetivo, fotos da avaliação corporal, preferências alimentares,
+                  rotina e respostas dos check-ins). <strong className="text-foreground">Em conformidade com a LGPD (Lei nº 13.709/2018)</strong>,
+                  seus dados são tratados de forma confidencial, usados exclusivamente dentro do app para personalizar seu acompanhamento, e
+                  você pode solicitar exclusão a qualquer momento.
+                </p>
+                <div
+                  className="flex items-start gap-3 p-3 rounded-lg border border-border bg-background/50 cursor-pointer hover:border-primary/50 transition-colors"
+                  onClick={() => setData((prev) => ({ ...prev, aiDataConsent: !prev.aiDataConsent }))}
+                >
+                  <Checkbox
+                    checked={data.aiDataConsent}
+                    onCheckedChange={(c) => setData((prev) => ({ ...prev, aiDataConsent: !!c }))}
+                    id="ai-consent"
+                    className="mt-0.5"
+                  />
+                  <Label htmlFor="ai-consent" className="cursor-pointer text-sm text-foreground leading-snug">
+                    <strong>Autorizo</strong> que a IA do Hypertrophy utilize meus dados pessoais e de treino para gerar e ajustar meu protocolo,
+                    respeitando a LGPD. *
+                  </Label>
+                </div>
+              </div>
             </>
           )}
         </div>
@@ -610,7 +724,7 @@ const Onboarding = () => {
           <div className="flex gap-3">
             {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving || analyzing}>Voltar</Button>}
             <Button onClick={next} className="flex-1 glow" disabled={saving || analyzing}>
-              {saving ? "🤖 Gerando protocolo com IA..." : analyzing ? "Analisando..." : step === 6 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar Fotos" : step === STEPS.length - 1 ? "Finalizar" : "Próximo"}
+              {saving ? "🤖 Gerando protocolo com IA..." : analyzing ? "Analisando..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar Fotos" : step === STEPS.length - 1 ? "Finalizar" : "Próximo"}
             </Button>
           </div>
         </div>

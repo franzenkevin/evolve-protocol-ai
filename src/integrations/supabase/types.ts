@@ -332,8 +332,15 @@ export type Database = {
         Row: {
           activity_level: string | null
           age: number | null
+          ai_data_consent: boolean | null
+          ai_data_consent_at: string | null
           allergies: string | null
           avatar_url: string | null
+          cardio_duration: string | null
+          cardio_enabled: boolean | null
+          cardio_frequency: string | null
+          cardio_timing: string | null
+          cardio_type_preference: string | null
           created_at: string
           disliked_foods: string | null
           experience: string | null
@@ -363,8 +370,15 @@ export type Database = {
         Insert: {
           activity_level?: string | null
           age?: number | null
+          ai_data_consent?: boolean | null
+          ai_data_consent_at?: string | null
           allergies?: string | null
           avatar_url?: string | null
+          cardio_duration?: string | null
+          cardio_enabled?: boolean | null
+          cardio_frequency?: string | null
+          cardio_timing?: string | null
+          cardio_type_preference?: string | null
           created_at?: string
           disliked_foods?: string | null
           experience?: string | null
@@ -394,8 +408,15 @@ export type Database = {
         Update: {
           activity_level?: string | null
           age?: number | null
+          ai_data_consent?: boolean | null
+          ai_data_consent_at?: string | null
           allergies?: string | null
           avatar_url?: string | null
+          cardio_duration?: string | null
+          cardio_enabled?: boolean | null
+          cardio_frequency?: string | null
+          cardio_timing?: string | null
+          cardio_type_preference?: string | null
           created_at?: string
           disliked_foods?: string | null
           experience?: string | null

@@ -162,8 +162,32 @@ Mapeamento desvio → exercícios corretivos:
 
 Posicionar a mobilidade ANTES das séries válidas (após o aquecimento articular).
 
+### CARDIO (PRESCREVER quando o aluno autorizar):
+Se o aluno marcou que quer cardio (cardio_enabled = true), gerar um campo "cardio" em CADA dia de treino aplicável + um campo geral "cardioPlan" no nível do training. Caso contrário, NÃO gerar cardio.
+
+Tipos de cardio e quando prescrever:
+- **LISS** (Low Intensity Steady State — caminhada inclinada, bike leve, elíptico em ritmo confortável, FC 60-70% máx): MELHOR para emagrecimento e recomposição, NÃO atrapalha recuperação muscular. Duração ideal: 30-60 min. Prescrever em maior frequência.
+- **HIIT** (High Intensity Interval Training — sprints, bike sprint, burpees, intervalados curtos a 85-95% FC): MAIS eficiente em pouco tempo, ALTA demanda de recuperação. Limitar a 1-2x/semana, NUNCA em dia de perna pesada nem antes/no mesmo dia que treinos de membros inferiores. Duração: 10-20 min.
+- **Moderado contínuo** (corrida em ritmo estável, bike moderada, FC 70-80%): meio-termo. 20-40 min. 1-3x/semana.
+
+Regras de prescrição:
+1. Respeitar a PREFERÊNCIA do aluno (cardio_type_preference). Se ele escolheu LISS, priorizar LISS. Se "tanto faz", a IA escolhe o melhor para o objetivo:
+   - Emagrecimento: LISS dominante (3-5x) + 1 HIIT opcional
+   - Hipertrofia: LISS leve para saúde cardiovascular (1-2x, 20-30 min, baixíssima intensidade) — evitar HIIT
+   - Recomposição: misto LISS + 1 HIIT
+   - Saúde geral: LISS ou moderado, 2-3x
+2. Respeitar FREQUÊNCIA (cardio_frequency) e DURAÇÃO (cardio_duration) escolhidas
+3. Respeitar TIMING (cardio_timing):
+   - "Logo após o treino de musculação": adicionar campo "cardio" dentro do dia de musculação (NUNCA em dia de perna pesada se for HIIT)
+   - "Em horário separado": colocar no campo "cardioPlan" geral, sugerindo manhã em jejum (se objetivo for emagrecimento) ou noite
+   - "Em dias de descanso": gerar "restDayCardio" listando dias da semana sem musculação
+   - "Tanto faz": IA decide o ideal por objetivo
+4. NUNCA prescrever HIIT antes de treino de membros inferiores nem no mesmo dia
+5. Para cada sessão de cardio, especificar: type ("LISS"|"HIIT"|"Moderado"), modality (caminhada inclinada, bike, esteira, etc.), duration (em min), intensity (descrever em zona de FC ou RPE), notes (orientação prática), videoQuery
+6. Se cardio_enabled for false, OMITIR completamente os campos cardio/cardioPlan.
+
 ### VIDEO DE EXECUÇÃO (OBRIGATÓRIO em CADA exercício):
-Para CADA exercício prescrito (treino e mobilidade), incluir o campo "videoQuery" — uma string curta otimizada para busca no YouTube em português que retorne um bom tutorial de execução. Formato: "[nome do exercício] execução correta" ou "[nome do exercício] como fazer". Exemplos: "Supino reto barra execução correta", "Hip thrust como fazer", "Face pull execução correta".
+Para CADA exercício prescrito (treino, mobilidade e cardio), incluir o campo "videoQuery" — uma string curta otimizada para busca no YouTube em português que retorne um bom tutorial de execução. Formato: "[nome do exercício] execução correta" ou "[nome do exercício] como fazer".
 
 ### NOTA DE DINÂMICA OBRIGATÓRIA:
 Para CADA dia de treino, gerar um campo "dynamicNotes" curto (2-3 frases) explicando:
@@ -316,6 +340,11 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
 - Refeições livres: ${profile.free_meals}
 - Horas de sono: ${profile.sleep_hours}h
 - Nível de estresse: ${profile.stress_level}
+- Cardio autorizado: ${profile.cardio_enabled ? "SIM" : "NÃO"}${profile.cardio_enabled ? `
+- Frequência de cardio: ${profile.cardio_frequency || "N/A"}
+- Duração por sessão: ${profile.cardio_duration || "N/A"}
+- Quando fazer cardio: ${profile.cardio_timing || "N/A"}
+- Tipo preferido: ${profile.cardio_type_preference || "N/A"}` : ""}
 ${assessmentContext}
 
 Gere o JSON completo seguindo TODAS as regras da metodologia.`;
