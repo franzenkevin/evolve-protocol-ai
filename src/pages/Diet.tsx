@@ -15,6 +15,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useActiveProtocol } from "@/hooks/useProtocol";
+import DietFeedbackCard from "@/components/DietFeedbackCard";
 
 const Diet = () => {
   const { data: protocol, isLoading } = useActiveProtocol();
@@ -204,6 +205,9 @@ const Diet = () => {
             </Card>
           );
         })}
+
+        {/* Daily diet feedback */}
+        <DietFeedbackCard />
 
         {/* Supplement notes */}
         {diet.notes && diet.notes.length > 0 && (

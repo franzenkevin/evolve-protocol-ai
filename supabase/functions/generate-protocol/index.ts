@@ -153,32 +153,50 @@ Para CADA dia de treino, gerar um campo "dynamicNotes" curto (2-3 frases) explic
 
 ## DIETA
 
-### Cálculo calórico:
-- BMR = peso(kg) × 24 (homem) ou peso(kg) × 22 (mulher)
-- TDEE = BMR × fator de atividade:
-  - Sedentário: 1.2
-  - Levemente ativo: 1.375
-  - Moderadamente ativo: 1.55
-  - Muito ativo: 1.725
-  - Extremamente ativo: 1.9
-- Emagrecimento: TDEE - 400kcal
-- Hipertrofia: TDEE + 300kcal
-- Recomposição: TDEE (manutenção)
-- Saúde Geral: TDEE
+### Cálculo calórico (CALORIAS CONSERVADORAS — NÃO superestimar):
+- BMR = peso(kg) × 22 (homem) ou peso(kg) × 20 (mulher)  ← valores reduzidos para ser conservador
+- TDEE = BMR × fator de atividade (CAP MÁXIMO em 1.5 mesmo para muito ativo):
+  - Sedentário: 1.15
+  - Levemente ativo: 1.25
+  - Moderadamente ativo: 1.35
+  - Muito ativo: 1.45
+  - Extremamente ativo: 1.5
+- Emagrecimento: TDEE - 500kcal (déficit mais agressivo)
+- Hipertrofia: TDEE + 200kcal (superávit conservador, evitar ganho de gordura)
+- Recomposição: TDEE - 150kcal (leve déficit)
+- Saúde Geral: TDEE - 100kcal
+- REGRA DE OURO: prefira ERRAR PARA BAIXO. É melhor o aluno ter fome leve do que estagnar por excesso calórico.
+- Limites de segurança: NUNCA prescrever mais que 35kcal/kg para mulheres ou 38kcal/kg para homens em hipertrofia.
 
 ### Macronutrientes:
 - Proteína: 2g/kg de peso corporal
-- Gordura: 0.9g/kg de peso corporal
-- Carboidratos: restante das calorias (TDEE - proteína×4 - gordura×9) / 4
+- Gordura: 0.8g/kg de peso corporal (reduzido de 0.9)
+- Carboidratos: restante das calorias (kcal_total - proteína×4 - gordura×9) / 4
 
 ### Carb Front Loading:
 - Concentrar a MAIORIA dos carboidratos nas 2 refeições ANTES do treino e na refeição PÓS-treino
 - Refeições distantes do treino: menos carboidratos, mais proteína e vegetais
 
+### REGRAS CRÍTICAS DE ALIMENTOS (RESPEITAR 100%):
+
+**1. UNIDADES — APENAS GRAMAS (g) ou ml para líquidos:**
+- PROIBIDO usar "1 unidade", "1 colher", "1 copo", "1 fatia", "1 scoop", "1 xícara", "2 fatias", "3 ovos"
+- SEMPRE converter para gramas: ovo = "150g" (3 ovos), pão = "50g", whey = "30g", banana = "100g", arroz = "150g"
+- Campo "amount" deve ser SEMPRE no formato "Xg" ou "Xml" (ex: "150g", "200ml", "30g")
+
+**2. ALIMENTOS PROIBIDOS (NUNCA INCLUIR):**
+- Qualquer item da lista de "alimentos que não gosta" do aluno
+- Qualquer item da lista de "alergias" do aluno
+- Verifique CADA alimento antes de adicionar — se aparecer na lista de detestados/alergias, USE OUTRO
+- Nas substituições da refeição, também NUNCA listar alimentos detestados/alérgicos
+
+**3. PRIORIZAÇÃO DE PREFERIDOS:**
+- Use PREFERENCIALMENTE os alimentos da lista "preferred_foods" do aluno
+- Se um alimento preferido se encaixa na refeição, ele deve ser a Opção 1
+
 ### Estrutura das refeições:
 - Cada refeição deve ter 3 OPÇÕES intercambiáveis (para variar)
-- Cada refeição deve ter uma lista de SUBSTITUIÇÕES por categoria (carboidrato, proteína, fruta, leguminosa)
-- RESPEITAR alimentos preferidos (priorizar), detestados (excluir), alergias (excluir)
+- Cada refeição deve ter uma lista de SUBSTITUIÇÕES por categoria (carboidrato, proteína, fruta, leguminosa) — TUDO em gramas
 - Café da manhã: carboidrato leve + proteína + fruta
 - Almoço/Jantar: carboidrato + proteína + leguminosa/vegetais
 - Lanches: proteína + fruta ± carboidrato leve
@@ -196,13 +214,13 @@ Para CADA dia de treino, gerar um campo "dynamicNotes" curto (2-3 frases) explic
 ### Refeições livres:
 - Respeitar a frequência escolhida pelo aluno, mencionar nas notas
 
-## BANCO DE ALIMENTOS COM MACROS (usar para cálculos):
+## BANCO DE ALIMENTOS COM MACROS (porções já em GRAMAS — usar EXATAMENTE essa unidade no campo "amount"):
 Arroz 150g: P4 C42 G0 195kcal | Batata inglesa 200g: P4 C34 G0 154kcal | Batata doce 200g: P3 C40 G0 172kcal
-Macarrão 150g: P5 C44 G1 200kcal | Pão de forma 2fatias: P5 C24 G2 140kcal | Pão francês 1un: P4 C28 G1 135kcal
-Tapioca 2un: P1 C36 G0 150kcal | Cuscuz 150g: P4 C38 G1 170kcal | Mandioca 150g: P2 C39 G0 160kcal
+Macarrão 150g: P5 C44 G1 200kcal | Pão de forma 50g: P5 C24 G2 140kcal | Pão francês 50g: P4 C28 G1 135kcal
+Tapioca 80g: P1 C36 G0 150kcal | Cuscuz 150g: P4 C38 G1 170kcal | Mandioca 150g: P2 C39 G0 160kcal
 Peito frango 150g: P45 C0 G3 210kcal | Patinho 150g: P42 C0 G5 215kcal | Tilápia 150g: P35 C0 G3 170kcal
-Salmão 150g: P34 C0 G14 270kcal | Ovo 3un: P18 C2 G15 210kcal | Atum lata: P30 C0 G1 130kcal
-Whey 1scoop: P25 C3 G1 120kcal | Banana 1un: P1 C27 G0 105kcal | Aveia 40g: P5 C28 G3 150kcal
+Salmão 150g: P34 C0 G14 270kcal | Ovo 150g: P18 C2 G15 210kcal | Atum 120g: P30 C0 G1 130kcal
+Whey 30g: P25 C3 G1 120kcal | Banana 100g: P1 C27 G0 105kcal | Aveia 40g: P5 C28 G3 150kcal
 Feijão 100g: P7 C18 G1 110kcal | Iogurte desnatado 170g: P8 C12 G0 80kcal
 
 # FORMATO DE SAÍDA OBRIGATÓRIO
@@ -234,7 +252,7 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
           {
             "label": "Opção 1",
             "foods": [
-              { "name": "Pão de forma", "amount": "2 fatias", "protein": 5, "carbs": 24, "fat": 2, "calories": 140 }
+              { "name": "Pão de forma", "amount": "50g", "protein": 5, "carbs": 24, "fat": 2, "calories": 140 }
             ]
           }
         ],

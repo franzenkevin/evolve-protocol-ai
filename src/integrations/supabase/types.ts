@@ -136,6 +136,45 @@ export type Database = {
         }
         Relationships: []
       }
+      diet_feedback: {
+        Row: {
+          adherence: number
+          created_at: string
+          digestion: number | null
+          energy_level: number | null
+          hunger_level: number | null
+          id: string
+          notes: string | null
+          rated_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          adherence?: number
+          created_at?: string
+          digestion?: number | null
+          energy_level?: number | null
+          hunger_level?: number | null
+          id?: string
+          notes?: string | null
+          rated_date?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          adherence?: number
+          created_at?: string
+          digestion?: number | null
+          energy_level?: number | null
+          hunger_level?: number | null
+          id?: string
+          notes?: string | null
+          rated_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       exercises: {
         Row: {
           category: string
