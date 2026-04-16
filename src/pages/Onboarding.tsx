@@ -214,20 +214,32 @@ const Onboarding = () => {
         if (!data.gymType) return "Selecione o tipo de academia.";
         return null;
       case 3:
+        if (!data.cardioEnabled) return "Indique se deseja incluir cardio.";
+        if (data.cardioEnabled === "yes") {
+          if (!data.cardioFrequency) return "Selecione a frequência do cardio.";
+          if (!data.cardioDuration) return "Selecione a duração do cardio.";
+          if (!data.cardioTiming) return "Selecione quando você vai fazer cardio.";
+          if (!data.cardioTypePreference) return "Selecione o tipo de cardio preferido.";
+        }
+        return null;
+      case 4:
         if (!data.mealCount) return "Selecione quantas refeições por dia.";
         if (data.foodsLike.length === 0) return "Selecione ao menos 5 alimentos que gosta.";
         if (data.foodsLike.length < 5) return "Selecione ao menos 5 alimentos que gosta.";
         if (data.allergies.length === 0) return "Selecione suas alergias ou marque 'Não tenho alergias'.";
         if (!data.freeMeals) return "Selecione a frequência de refeições livres.";
         return null;
-      case 4:
+      case 5:
         if (!data.sweetPreference) return "Selecione uma opção de doce ou 'Nenhum'.";
         if (data.supplements.length === 0) return "Selecione suplementos ou marque 'Nenhum'.";
         return null;
-      case 5:
+      case 6:
         if (!data.neat) return "Selecione sua rotina diária (NEAT).";
         if (!data.sleepHours) return "Informe suas horas de sono.";
         if (!data.stressLevel) return "Selecione seu nível de estresse.";
+        return null;
+      case 7:
+        if (!data.aiDataConsent) return "Você precisa autorizar o uso dos seus dados pela IA para gerar o protocolo personalizado.";
         return null;
       default:
         return null;
