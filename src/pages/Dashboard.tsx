@@ -238,59 +238,11 @@ const Dashboard = () => {
           </Button>
         </Card>
 
-        {/* Rating History Mini Chart */}
-        {ratings.length > 0 && (
-          <Card className="p-4 card-gradient border-border">
-            <h3 className="font-heading font-semibold text-foreground mb-2 text-sm">Evolução dos últimos dias</h3>
-            <div className="flex items-end gap-1 h-20">
-              {[...ratings].reverse().map((r, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
-                  <div
-                    className="w-full rounded-t bg-primary/60 hover:bg-primary transition-colors"
-                    style={{ height: `${(r.rating / 5) * 100}%` }}
-                  />
-                  <span className="text-[8px] text-muted-foreground">
-                    {new Date(r.rated_date).toLocaleDateString("pt-BR", { day: "2-digit" })}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
-
-        {/* Weight Evolution */}
-        {weightHistory.length > 0 && (
-          <Card className="p-4 card-gradient border-border">
-            <h3 className="font-heading font-semibold text-foreground mb-2 text-sm">Evolução do Peso</h3>
-            <div className="flex items-end gap-1 h-24">
-              {weightHistory.map((w, i) => {
-                const min = Math.min(...weightHistory.map((h) => h.weight!));
-                const max = Math.max(...weightHistory.map((h) => h.weight!));
-                const range = max - min || 1;
-                const pct = ((w.weight! - min) / range) * 80 + 20;
-                return (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
-                    <span className="text-[8px] text-muted-foreground">{w.weight}</span>
-                    <div className="w-full rounded-t bg-primary/60 hover:bg-primary transition-all" style={{ height: `${pct}%` }} />
-                    <span className="text-[8px] text-muted-foreground">
-                      {new Date(w.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="mt-1 flex justify-between text-xs text-muted-foreground">
-              <span>Início: {weightHistory[0]?.weight}kg</span>
-              <span className="text-primary font-medium">Atual: {weightHistory[weightHistory.length - 1]?.weight}kg</span>
-            </div>
-          </Card>
-        )}
-
         {/* Body Assessment */}
         {latestAssessment && (
           <Card className="p-4 card-gradient border-border">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-heading font-semibold text-foreground text-sm">Avaliação Corporal</h3>
+              <h3 className="font-heading font-semibold text-foreground text-sm">Última Avaliação Corporal</h3>
               <Button variant="ghost" size="sm" className="text-xs gap-1 text-primary" onClick={() => setShowAssessment(!showAssessment)}>
                 <Eye size={12} />{showAssessment ? "Ocultar" : "Ver detalhes"}
               </Button>

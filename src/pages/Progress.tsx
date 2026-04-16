@@ -30,8 +30,45 @@ const Progress = () => {
 
   const weightHistory = checkins.filter((c) => c.weight).slice(0, 10).reverse();
   const photoCheckins = checkins.filter((c) => c.photo_front || c.photo_side || c.photo_back);
-  const firstPhotos = photoCheckins[photoCheckins.length - 1];
-  const latestPhotos = photoCheckins[0];
+  // Oldest -> newest
+  const photoCheckinsAsc = [...photoCheckins].sort(
+    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+  );
+
+  // Photo windows based on protocol start date (day 0, 30, 60)
+  const protocolStart = protocol?.start_date ? new Date(protocol.start_date) : null;
+  const daysSinceStart = protocolStart
+    ? Math.floor((Date.now() - protocolStart.getTime()) / 86400000)
+    : 0;
+
+  const offsetDate = (offset: number) => {
+    if (!protocolStart) return null;
+    const d = new Date(protocolStart);
+    d.setDate(d.getDate() + offset);
+    return d;
+  };
+  const day30Date = offsetDate(30);
+  const day60Date = offsetDate(60);
+
+  const findPhotoInWindow = (centerDate: Date | null, tolDays = 7) => {
+    if (!centerDate) return null;
+    const center = centerDate.getTime();
+    const tol = tolDays * 86400000;
+    return (
+      photoCheckinsAsc.find((c) => {
+        const t = new Date(c.created_at).getTime();
+        return Math.abs(t - center) <= tol;
+      }) || null
+    );
+  };
+
+  const photoDay0 = photoCheckinsAsc[0] || null;
+  const photoDay30 = daysSinceStart >= 30 ? findPhotoInWindow(day30Date) : null;
+  const photoDay60 = daysSinceStart >= 60 ? findPhotoInWindow(day60Date) : null;
+  const day30Unlocked = daysSinceStart >= 30;
+  const day60Unlocked = daysSinceStart >= 60;
+  const daysUntilDay30 = Math.max(0, 30 - daysSinceStart);
+  const daysUntilDay60 = Math.max(0, 60 - daysSinceStart);
 
   // Stats: tonnage, sessions, streak, PRs
   const stats = useMemo(() => {
@@ -365,85 +402,134 @@ const Progress = () => {
           </TabsContent>
 
           <TabsContent value="photos" className="space-y-4 mt-4">
-            <Card className="p-6 card-gradient border-border text-center">
-              <Camera size={40} className="mx-auto text-muted-foreground mb-3" />
-              <h3 className="font-heading font-semibold text-foreground mb-1">Enviar fotos</h3>
-              <p className="text-sm text-muted-foreground mb-4">Frente, lado e costas</p>
-              <div className="grid grid-cols-3 gap-3">
-                {(["front", "side", "back"] as const).map((angle) => (
-                  <label key={angle} className="cursor-pointer">
-                    <div className={`aspect-[3/4] rounded-lg border-2 border-dashed ${photos[angle] ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"} flex flex-col items-center justify-center gap-2 transition-colors`}>
-                      <Upload size={20} className={photos[angle] ? "text-primary" : "text-muted-foreground"} />
-                      <span className="text-xs text-muted-foreground">
-                        {angle === "front" ? "Frente" : angle === "side" ? "Lado" : "Costas"}
-                      </span>
-                    </div>
-                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePhotoChange(angle, e.target.files?.[0])} />
-                  </label>
-                ))}
+            {/* Explanation card */}
+            <Card className="p-4 card-gradient border-primary/20">
+              <div className="flex items-start gap-2">
+                <Camera size={16} className="text-primary mt-0.5 shrink-0" />
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p className="font-semibold text-foreground">Como funcionam as fotos do protocolo</p>
+                  <p>📸 <span className="text-foreground font-medium">Início (dia 0)</span>: tire suas primeiras fotos nos 3 ângulos (frente, lado, costas) ao começar o protocolo.</p>
+                  <p>🔓 <span className="text-foreground font-medium">Dia 30</span>: nova janela libera para refazer as fotos nos mesmos ângulos e comparar a evolução de meio de ciclo.</p>
+                  <p>🏁 <span className="text-foreground font-medium">Dia 60</span>: última janela libera ao fim do protocolo — fotos finais usadas na troca para o próximo treino.</p>
+                </div>
               </div>
-              {Object.keys(photos).length > 0 && (
-                <Button className="mt-4 glow w-full" onClick={handleUploadPhotos} disabled={uploadingPhotos}>
-                  {uploadingPhotos ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
-                  Enviar fotos
-                </Button>
-              )}
             </Card>
 
-            {/* Antes vs Depois */}
-            {firstPhotos && latestPhotos && firstPhotos.id !== latestPhotos.id && (
+            {/* Active upload window */}
+            {(() => {
+              const needsDay0 = !photoDay0;
+              const needsDay30 = day30Unlocked && !photoDay30;
+              const needsDay60 = day60Unlocked && !photoDay60;
+              const activeLabel = needsDay0
+                ? "Fotos iniciais (Dia 0)"
+                : needsDay60
+                ? "Fotos finais (Dia 60)"
+                : needsDay30
+                ? "Fotos de meio de ciclo (Dia 30)"
+                : null;
+
+              if (!activeLabel) {
+                return (
+                  <Card className="p-4 card-gradient border-border text-center">
+                    <p className="text-xs text-muted-foreground">
+                      ✅ Fotos da janela atual já enviadas. A próxima janela abre em{" "}
+                      <span className="text-primary font-semibold">
+                        {!day30Unlocked
+                          ? `${daysUntilDay30} dia(s) (Dia 30)`
+                          : !day60Unlocked
+                          ? `${daysUntilDay60} dia(s) (Dia 60)`
+                          : "—"}
+                      </span>.
+                    </p>
+                  </Card>
+                );
+              }
+
+              return (
+                <Card className="p-6 card-gradient border-border text-center">
+                  <Camera size={32} className="mx-auto text-primary mb-2" />
+                  <h3 className="font-heading font-semibold text-foreground mb-1 text-sm">{activeLabel}</h3>
+                  <p className="text-xs text-muted-foreground mb-4">Frente, lado e costas</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {(["front", "side", "back"] as const).map((angle) => (
+                      <label key={angle} className="cursor-pointer">
+                        <div className={`aspect-[3/4] rounded-lg border-2 border-dashed ${photos[angle] ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"} flex flex-col items-center justify-center gap-2 transition-colors`}>
+                          <Upload size={20} className={photos[angle] ? "text-primary" : "text-muted-foreground"} />
+                          <span className="text-xs text-muted-foreground">
+                            {angle === "front" ? "Frente" : angle === "side" ? "Lado" : "Costas"}
+                          </span>
+                        </div>
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handlePhotoChange(angle, e.target.files?.[0])} />
+                      </label>
+                    ))}
+                  </div>
+                  {Object.keys(photos).length > 0 && (
+                    <Button className="mt-4 glow w-full" onClick={handleUploadPhotos} disabled={uploadingPhotos}>
+                      {uploadingPhotos ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
+                      Enviar fotos
+                    </Button>
+                  )}
+                </Card>
+              );
+            })()}
+
+            {/* Locked windows */}
+            {protocol && (!day30Unlocked || !day60Unlocked) && (
+              <div className="grid grid-cols-2 gap-2">
+                {!day30Unlocked && (
+                  <Card className="p-3 border-border bg-muted/20 text-center">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">🔒 Dia 30</p>
+                    <p className="text-sm font-bold text-foreground mt-0.5">{daysUntilDay30}d</p>
+                    <p className="text-[10px] text-muted-foreground">para abrir</p>
+                  </Card>
+                )}
+                {!day60Unlocked && (
+                  <Card className="p-3 border-border bg-muted/20 text-center">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">🔒 Dia 60</p>
+                    <p className="text-sm font-bold text-foreground mt-0.5">{daysUntilDay60}d</p>
+                    <p className="text-[10px] text-muted-foreground">para abrir</p>
+                  </Card>
+                )}
+              </div>
+            )}
+
+            {/* 3-window comparison */}
+            {photoDay0 && (
               <Card className="p-4 card-gradient border-border">
-                <h3 className="font-heading font-semibold text-foreground mb-3 text-sm">Antes vs Depois</h3>
+                <h3 className="font-heading font-semibold text-foreground mb-3 text-sm">Comparativo do protocolo</h3>
                 {(["front", "side", "back"] as const).map((angle) => {
                   const key = `photo_${angle}` as const;
-                  const before = (firstPhotos as any)[key];
-                  const after = (latestPhotos as any)[key];
-                  if (!before && !after) return null;
+                  const p0 = (photoDay0 as any)?.[key];
+                  const p30 = (photoDay30 as any)?.[key];
+                  const p60 = (photoDay60 as any)?.[key];
+                  if (!p0 && !p30 && !p60) return null;
+                  const angleLabel = angle === "front" ? "Frente" : angle === "side" ? "Lado" : "Costas";
+                  const Slot = ({ src, label, locked, date }: { src?: string; label: string; locked?: boolean; date?: string }) => (
+                    <div>
+                      {src ? (
+                        <img src={src} alt={label} className="w-full aspect-[3/4] object-cover rounded-md border border-border" />
+                      ) : (
+                        <div className="w-full aspect-[3/4] rounded-md bg-secondary/40 border border-dashed border-border flex items-center justify-center text-[10px] text-muted-foreground">
+                          {locked ? "🔒" : "—"}
+                        </div>
+                      )}
+                      <p className="text-[10px] text-muted-foreground mt-1 text-center">{label}</p>
+                      {date && <p className="text-[9px] text-muted-foreground text-center">{date}</p>}
+                    </div>
+                  );
                   return (
                     <div key={angle} className="mb-3 last:mb-0">
-                      <p className="text-xs text-muted-foreground mb-1 capitalize">{angle === "front" ? "Frente" : angle === "side" ? "Lado" : "Costas"}</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          {before ? (
-                            <img src={before} alt="Antes" className="w-full aspect-[3/4] object-cover rounded-md border border-border" />
-                          ) : (
-                            <div className="w-full aspect-[3/4] rounded-md bg-secondary/40 flex items-center justify-center text-[10px] text-muted-foreground">—</div>
-                          )}
-                          <p className="text-[10px] text-muted-foreground mt-1 text-center">
-                            {new Date(firstPhotos.created_at).toLocaleDateString("pt-BR")}
-                          </p>
-                        </div>
-                        <div>
-                          {after ? (
-                            <img src={after} alt="Depois" className="w-full aspect-[3/4] object-cover rounded-md border border-primary/40" />
-                          ) : (
-                            <div className="w-full aspect-[3/4] rounded-md bg-secondary/40 flex items-center justify-center text-[10px] text-muted-foreground">—</div>
-                          )}
-                          <p className="text-[10px] text-primary mt-1 text-center font-medium">
-                            {new Date(latestPhotos.created_at).toLocaleDateString("pt-BR")}
-                          </p>
-                        </div>
+                      <p className="text-xs text-muted-foreground mb-1">{angleLabel}</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        <Slot src={p0} label="Dia 0" date={photoDay0 ? new Date(photoDay0.created_at).toLocaleDateString("pt-BR") : undefined} />
+                        <Slot src={p30} label="Dia 30" locked={!day30Unlocked} date={photoDay30 ? new Date(photoDay30.created_at).toLocaleDateString("pt-BR") : undefined} />
+                        <Slot src={p60} label="Dia 60" locked={!day60Unlocked} date={photoDay60 ? new Date(photoDay60.created_at).toLocaleDateString("pt-BR") : undefined} />
                       </div>
                     </div>
                   );
                 })}
               </Card>
             )}
-
-            <Card className="p-4 card-gradient border-border">
-              <h3 className="font-heading font-semibold text-foreground mb-2">Histórico de fotos</h3>
-              {photoCheckins.length > 0 ? (
-                <div className="space-y-2">
-                  {photoCheckins.map((c) => (
-                    <div key={c.id} className="text-sm text-muted-foreground">
-                      📸 {new Date(c.created_at).toLocaleDateString("pt-BR")}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">Nenhuma foto enviada ainda.</p>
-              )}
-            </Card>
           </TabsContent>
 
           <TabsContent value="checkin" className="space-y-4 mt-4">
