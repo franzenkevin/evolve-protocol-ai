@@ -5,6 +5,7 @@ import SectionMyData from "./SectionMyData";
 import SectionReferrals from "./SectionReferrals";
 import SectionPlan from "./SectionPlan";
 import SectionMeetings from "./SectionMeetings";
+import SectionJournal from "./SectionJournal";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Card } from "@/components/ui/card";
 import { Headphones, FileText, Shield, Star, MessageSquare, Mail } from "lucide-react";
@@ -56,6 +57,7 @@ const AppSidebar = ({ open, onOpenChange }: AppSidebarProps) => {
             <SectionReferrals />
             <SectionPlan />
             <SectionMeetings />
+            <SectionJournal />
 
             {/* Standard app options */}
             <div className="space-y-1">
