@@ -462,12 +462,17 @@ const Training = () => {
                       onClick={() => setExpandedExercise(isExpanded ? null : ex.id)}
                     >
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <p
                             className={`font-medium text-sm ${allValidDone ? "text-primary" : "text-foreground"}`}
                           >
-                            {ex.name}
+                            {swappedNames[ex.id] || ex.name}
                           </p>
+                          {swappedNames[ex.id] && (
+                            <Badge variant="outline" className="text-[9px] px-1 py-0 border-warning/40 text-warning bg-warning/10">
+                              substituído
+                            </Badge>
+                          )}
                           {progression === "up" && (
                             <TrendingUp size={14} className="text-primary" />
                           )}
