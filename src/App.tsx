@@ -20,7 +20,9 @@ import Journal from "./pages/Journal";
 import Chat from "./pages/Chat";
 import Admin from "./pages/Admin";
 import Terms from "./pages/Terms";
+import AcceptTerms from "./pages/AcceptTerms";
 import NotFound from "./pages/NotFound";
+import { CURRENT_TERMS_VERSION } from "@/lib/terms";
 
 const queryClient = new QueryClient();
 
