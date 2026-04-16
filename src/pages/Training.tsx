@@ -23,7 +23,11 @@ import {
   Info,
   Brain,
   Loader2,
+  Replace,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import {
