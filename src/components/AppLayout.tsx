@@ -45,20 +45,28 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
       <main className="flex-1 overflow-auto pb-20">{children}</main>
 
       {/* Bottom nav */}
-      <nav className="fixed bottom-0 left-0 right-0 glass border-t border-border z-50">
-        <div className="flex justify-around items-center h-14 max-w-lg mx-auto">
+      <nav className="fixed bottom-0 left-0 right-0 glass border-t border-border z-50 safe-area-bottom">
+        <div className="grid grid-cols-6 items-center h-16 max-w-lg mx-auto px-1">
           {NAV_ITEMS.map(({ to, icon: Icon, label }) => {
             const active = location.pathname === to;
             return (
               <Link
                 key={to}
                 to={to}
-                className={`flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg transition-colors ${
-                  active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                className={`flex flex-col items-center justify-center gap-1 py-2 rounded-xl transition-all ${
+                  active
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Icon size={18} strokeWidth={active ? 2.5 : 1.5} />
-                <span className="text-[9px] font-medium">{label}</span>
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full transition-all ${
+                  active ? "bg-primary/15 scale-110" : ""
+                }`}>
+                  <Icon size={active ? 20 : 18} strokeWidth={active ? 2.5 : 1.5} />
+                </div>
+                <span className={`text-[10px] leading-tight font-medium truncate max-w-full ${
+                  active ? "opacity-100" : "opacity-70"
+                }`}>{label}</span>
               </Link>
             );
           })}
