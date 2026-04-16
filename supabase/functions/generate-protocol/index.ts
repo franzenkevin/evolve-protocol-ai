@@ -145,6 +145,26 @@ Bíceps: Rosca direta barra, Rosca martelo, Rosca concentrada, Rosca scott, Rosc
 Core: Prancha, Abdominal infra, Crunch, Abdominal oblíquo, Roda abdominal
 Panturrilha: Panturrilha em pé, Panturrilha sentado
 
+### MOBILIDADE & ALONGAMENTO ESPECÍFICO POR DESVIO POSTURAL (OBRIGATÓRIO):
+Se a avaliação corporal listar desvios posturais, gerar UMA lista "mobility" por dia com 2-4 exercícios de mobilidade/alongamento específicos para corrigir os desvios encontrados. Cada item: { name, type ('alongamento'|'mobilidade'|'fortalecimento corretivo'), duration (ex: "2x 30s" ou "3x 10 reps"), target (desvio que corrige), videoQuery (string para buscar tutorial no YouTube) }.
+
+Mapeamento desvio → exercícios corretivos:
+- Hipercifose torácica / ombros protraídos: Alongamento peitoral na parede, Mobilidade torácica (cat-cow, thoracic extension no foam roller), Fortalecimento Face pull, YTW na prancha
+- Hiperlordose lombar / anteversão pélvica: Alongamento flexor de quadril (lunge stretch), Alongamento reto femoral, Ativação glúteo (glute bridge), Prancha com retroversão
+- Retificação lombar / posteversão pélvica: Mobilidade lombar (cat-cow), Alongamento posterior de coxa, Fortalecimento eretores (good morning leve)
+- Joelho valgo: Fortalecimento glúteo médio (clamshell, abdução com mini band), Mobilidade tornozelo (dorsiflexão na parede), Alongamento adutores
+- Joelho varo: Fortalecimento adutores, Mobilidade quadril externa
+- Pescoço anteriorizado / forward head: Chin tucks, Alongamento ECOM, Mobilidade cervical (rotações leves), Fortalecimento profundos do pescoço
+- Escápula alada: YTW prono, Serrátil punch (push-up plus), Wall slides
+- Assimetria de ombro: Mobilidade glenoumeral (sleeper stretch), Alongamento unilateral do trapézio
+- Pé pronado/chato: Fortalecimento intrínsecos do pé, Toe spreads, Calf raises com bola entre os calcanhares
+- Sem desvios identificados: incluir mobilidade GERAL básica (1-2 itens: mobilidade de quadril e mobilidade torácica) APENAS no primeiro dia da semana — nos demais dias, retornar mobility: [].
+
+Posicionar a mobilidade ANTES das séries válidas (após o aquecimento articular).
+
+### VIDEO DE EXECUÇÃO (OBRIGATÓRIO em CADA exercício):
+Para CADA exercício prescrito (treino e mobilidade), incluir o campo "videoQuery" — uma string curta otimizada para busca no YouTube em português que retorne um bom tutorial de execução. Formato: "[nome do exercício] execução correta" ou "[nome do exercício] como fazer". Exemplos: "Supino reto barra execução correta", "Hip thrust como fazer", "Face pull execução correta".
+
 ### NOTA DE DINÂMICA OBRIGATÓRIA:
 Para CADA dia de treino, gerar um campo "dynamicNotes" curto (2-3 frases) explicando:
 - A LÓGICA da ordem dos exercícios (por que esse antes daquele)
@@ -234,8 +254,12 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
       "muscleGroup": "Peito & Tríceps",
       "weekday": "Segunda",
       "dynamicNotes": "Comece pelo composto pesado (supino reto) para máxima carga, depois isole. Faça 1 aquecimento a 50% e progrida até a falha nas válidas. Última série: vai até a falha total.",
+      "mobility": [
+        { "name": "Alongamento peitoral na parede", "type": "alongamento", "duration": "2x 30s cada lado", "target": "Ombros protraídos / hipercifose", "videoQuery": "Alongamento peitoral na parede execução" },
+        { "name": "Face pull com banda", "type": "fortalecimento corretivo", "duration": "2x 15 reps", "target": "Hipercifose torácica", "videoQuery": "Face pull com banda execução correta" }
+      ],
       "exercises": [
-        { "id": "0-0", "name": "Supino reto barra", "sets": 3, "reps": "8-12", "rest": "90s", "technique": "standard", "done": false }
+        { "id": "0-0", "name": "Supino reto barra", "sets": 3, "reps": "8-12", "rest": "90s", "technique": "standard", "videoQuery": "Supino reto barra execução correta", "done": false }
       ]
     }
   ],
@@ -361,12 +385,19 @@ Gere o JSON completo seguindo TODAS as regras da metodologia.`;
       });
     }
 
-    // Ensure exercises have id and done fields
+    // Ensure exercises have id, done, and videoQuery fields
     protocol.training = protocol.training.map((day: any, di: number) => ({
       ...day,
+      mobility: Array.isArray(day.mobility)
+        ? day.mobility.map((m: any) => ({
+            ...m,
+            videoQuery: m.videoQuery || `${m.name} execução correta`,
+          }))
+        : [],
       exercises: (day.exercises || []).map((ex: any, ei: number) => ({
         ...ex,
         id: ex.id || `${di}-${ei}`,
+        videoQuery: ex.videoQuery || `${ex.name} execução correta`,
         done: false,
       })),
     }));
