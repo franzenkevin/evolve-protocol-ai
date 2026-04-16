@@ -63,6 +63,7 @@ const App = () => (
             <Route path="/chat" element={<ProtectedRoute><OnboardingGate><Chat /></OnboardingGate></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/accept-terms" element={<ProtectedRoute><AcceptTerms /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
