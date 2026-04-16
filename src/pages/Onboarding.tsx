@@ -124,6 +124,31 @@ const Onboarding = () => {
   const updateProfile = useUpdateProfile();
   const createProtocol = useCreateProtocol();
 
+  // Simulate progress while AI generates protocol (caps at 95% until done)
+  useEffect(() => {
+    if (!saving) return;
+    setGenProgress(5);
+    setGenStage("Analisando seu perfil...");
+    const stages = [
+      { at: 15, label: "Calculando macros e calorias..." },
+      { at: 35, label: "Montando divisão de treino..." },
+      { at: 55, label: "Selecionando exercícios ideais..." },
+      { at: 75, label: "Personalizando refeições..." },
+      { at: 88, label: "Ajustando detalhes finais..." },
+    ];
+    const interval = setInterval(() => {
+      setGenProgress((p) => {
+        if (p >= 95) return 95;
+        const next = p + Math.random() * 3 + 1;
+        const stage = stages.reverse().find((s) => next >= s.at);
+        if (stage) setGenStage(stage.label);
+        stages.reverse();
+        return Math.min(95, next);
+      });
+    }, 600);
+    return () => clearInterval(interval);
+  }, [saving]);
+
   const update = (field: keyof FormData, value: any) => {
     setData((prev) => ({ ...prev, [field]: value }));
     setValidationError("");
