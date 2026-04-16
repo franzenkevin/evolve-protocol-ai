@@ -36,6 +36,8 @@ export interface Profile {
   cardio_type_preference: string | null;
   ai_data_consent: boolean | null;
   ai_data_consent_at: string | null;
+  terms_version: string | null;
+  terms_accepted_at: string | null;
   onboarding_complete: boolean;
 }
 
