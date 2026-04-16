@@ -4,6 +4,7 @@ import SidebarHeader from "./SidebarHeader";
 import SectionMyData from "./SectionMyData";
 import SectionRanking from "./SectionRanking";
 import SectionReferrals from "./SectionReferrals";
+import SectionPartnerships from "./SectionPartnerships";
 import SectionPlan from "./SectionPlan";
 import SectionMeetings from "./SectionMeetings";
 import SectionJournal from "./SectionJournal";
@@ -57,6 +58,7 @@ const AppSidebar = ({ open, onOpenChange }: AppSidebarProps) => {
             <SectionMyData />
             <SectionRanking />
             <SectionReferrals />
+            <SectionPartnerships />
             <SectionPlan />
             <SectionMeetings />
             <SectionJournal />

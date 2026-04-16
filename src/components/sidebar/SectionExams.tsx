@@ -1,27 +1,57 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, FlaskConical, Syringe, ShieldCheck } from "lucide-react";
+import { FileText, FlaskConical, Syringe, ShieldCheck, Info } from "lucide-react";
 import { useState } from "react";
 
 const EXAM_CHECKLIST = [
+  // Bioquímica básica
+  "Glicose em jejum",
   "Hemograma completo",
-  "Glicemia de jejum",
-  "Insulina de jejum",
-  "HbA1c",
-  "Colesterol total + frações",
-  "Triglicerídeos",
-  "TSH e T4 livre",
-  "Testosterona total e livre",
-  "Estradiol",
-  "SHBG",
-  "Cortisol",
-  "Vitamina D (25-OH)",
-  "Vitamina B12",
-  "Ferritina",
-  "TGO / TGP",
-  "Creatinina",
   "Ureia",
-  "PCR ultra-sensível",
+  "Creatinina",
+  "CPK (Creatinoquinase)",
+  "Albumina",
+  // Ferro
+  "Ferritina",
+  "Ferro sérico",
+  // Eletrólitos
+  "Sódio",
+  "Potássio",
+  // Função hepática
+  "TGO (AST)",
+  "TGP (ALT)",
+  "Gama GT",
+  "Bilirrubinas (total e frações)",
+  // Hormônios sexuais
+  "Testosterona total",
+  "Testosterona livre",
+  "DHT (Di-hidrotestosterona)",
+  "SHBG",
+  "Prolactina",
+  "Estradiol",
+  "LH",
+  "FSH",
+  // Tireoide
+  "TSH",
+  "T4 livre",
+  "T3",
+  "T3 reverso",
+  // Lipídios
+  "Triglicerídeos",
+  "Colesterol total",
+  "HDL",
+  "LDL",
+  // Vitaminas
+  "25-Hidroxivitamina D",
+  "Vitamina B12",
+  // Próstata / cardio
+  "PSA livre",
+  "Troponina",
+  // Resistência à insulina
+  "Insulina de jejum",
+  "HOMA-IR",
+  "HOMA-Beta",
+  "Hemoglobina glicada (HbA1c)",
 ];
 
 const SERVICES = [
@@ -56,17 +86,36 @@ const SectionExams = () => {
     });
   };
 
+  const copyList = () => {
+    const text = EXAM_CHECKLIST.map((e) => `• ${e}`).join("\n");
+    navigator.clipboard.writeText(`Lista de exames Hypertrophy:\n\n${text}`);
+  };
+
   return (
     <div className="space-y-3">
       <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">Exames & Protocolo</h3>
 
+      {/* Explanation card */}
+      <Card className="p-3 bg-primary/5 border-primary/20">
+        <div className="flex gap-2">
+          <Info size={16} className="text-primary shrink-0 mt-0.5" />
+          <div className="space-y-1.5">
+            <p className="text-xs font-medium text-foreground">Como funciona</p>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              Você pode solicitar a lista de exames abaixo por conta própria, pedir orçamento em laboratórios da sua região
+              e, com os resultados em mãos, contratar um dos planos de acompanhamento abaixo para análise e protocolo personalizado.
+            </p>
+          </div>
+        </div>
+      </Card>
+
       <Card className="p-3 card-gradient border-border">
         <div className="flex items-center gap-2 mb-2">
           <FileText size={14} className="text-primary" />
-          <span className="text-sm font-medium text-foreground">Lista de exames</span>
+          <span className="text-sm font-medium text-foreground">Lista completa de exames</span>
           <span className="ml-auto text-[10px] text-muted-foreground">{checked.size}/{EXAM_CHECKLIST.length}</span>
         </div>
-        <div className="max-h-40 overflow-y-auto space-y-1 pr-1">
+        <div className="max-h-56 overflow-y-auto space-y-1 pr-1">
           {EXAM_CHECKLIST.map((exam) => (
             <label key={exam} className="flex items-center gap-2 cursor-pointer text-xs py-0.5 hover:bg-secondary/50 rounded px-1">
               <input
@@ -75,13 +124,17 @@ const SectionExams = () => {
                 onChange={() => toggle(exam)}
                 className="rounded border-border accent-primary w-3 h-3"
               />
-              <span className={checked.has(exam) ? "text-foreground" : "text-muted-foreground"}>{exam}</span>
+              <span className={checked.has(exam) ? "text-foreground line-through opacity-60" : "text-muted-foreground"}>{exam}</span>
             </label>
           ))}
         </div>
+        <Button onClick={copyList} variant="outline" size="sm" className="w-full mt-2 h-7 text-[11px]">
+          Copiar lista para o laboratório
+        </Button>
       </Card>
 
       <div className="space-y-2">
+        <p className="text-[10px] text-muted-foreground px-1 uppercase tracking-wider font-semibold">Planos de acompanhamento</p>
         {SERVICES.map(({ icon: Icon, title, desc, price }) => (
           <Card key={title} className="p-3 card-gradient border-border">
             <div className="flex items-start gap-2">
