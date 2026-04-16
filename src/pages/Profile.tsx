@@ -12,6 +12,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { LogOut, Settings, Shield, FileText, HelpCircle, Bell, BellOff, Loader2, Camera } from "lucide-react";
 import { toast } from "sonner";
+import RefundRequestDialog from "@/components/RefundRequestDialog";
 
 const Profile = () => {
   const { user, signOut } = useAuth();
@@ -168,6 +169,7 @@ const Profile = () => {
               <span className="text-sm text-foreground flex-1">{label}</span>
             </Card>
           ))}
+          <RefundRequestDialog />
         </div>
 
         <Button variant="destructive" className="w-full" onClick={handleLogout}>
