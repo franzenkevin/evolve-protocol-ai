@@ -344,6 +344,9 @@ const Onboarding = () => {
       }
 
       await createProtocol.mutateAsync(protocol);
+      setGenProgress(100);
+      setGenStage("Pronto!");
+      await new Promise((r) => setTimeout(r, 400));
       navigate("/dashboard");
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
