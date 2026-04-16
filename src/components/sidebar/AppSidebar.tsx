@@ -55,6 +55,7 @@ const AppSidebar = ({ open, onOpenChange }: AppSidebarProps) => {
         <ScrollArea className="h-[calc(100vh-80px)]">
           <div className="p-4 space-y-5 pb-8">
             <SectionMyData />
+            <SectionRanking />
             <SectionReferrals />
             <SectionPlan />
             <SectionMeetings />
