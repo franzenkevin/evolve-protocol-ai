@@ -67,6 +67,25 @@ const Dashboard = () => {
   const latestAssessment = assessments[0];
   const weightHistory = checkins.filter((c) => c.weight).slice(0, 10).reverse();
 
+  // Tonnage + completed workouts (for 60-day widget)
+  const { totalTonnage, totalWorkouts, avgAdherenceProtocol } = useMemo(() => {
+    const protoLogs = protocol ? allLogs.filter((l) => l.protocol_id === protocol.id) : allLogs;
+    let tonnage = 0;
+    const sessionKeys = new Set<string>();
+    protoLogs.forEach((log) => {
+      sessionKeys.add(`${log.session_date}-${log.day_index}`);
+      const sets = (log.sets as any[]) || [];
+      sets.forEach((s: any) => {
+        if (s.completed && s.type === "valid") tonnage += (Number(s.weight) || 0) * (Number(s.reps) || 0);
+      });
+    });
+    const adherenceList = checkins.filter((c) => c.adherence);
+    const adh = adherenceList.length
+      ? Math.round(adherenceList.reduce((a, c) => a + (c.adherence || 0), 0) / adherenceList.length)
+      : 0;
+    return { totalTonnage: tonnage, totalWorkouts: sessionKeys.size, avgAdherenceProtocol: adh };
+  }, [allLogs, protocol, checkins]);
+
   // Check if today's workout is completed via logs
   const { data: todayLogs } = useWorkoutLogs(todayTrainingIndex >= 0 ? todayTrainingIndex : 0, today);
   const isTodayWorkoutDone = todayTraining?.exercises?.length > 0 && todayLogs && todayLogs.length > 0 &&
