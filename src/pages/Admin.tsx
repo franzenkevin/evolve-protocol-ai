@@ -132,7 +132,7 @@ const Admin = () => {
             { icon: Users, label: "Clientes", value: "—", color: "text-primary" },
             { icon: Dumbbell, label: "Exercícios", value: String(exercises.length), color: "text-info" },
             { icon: UtensilsCrossed, label: "Alimentos", value: String(foods.length), color: "text-warning" },
-            { icon: LayoutDashboard, label: "Protocolos", value: "—", color: "text-success" },
+            { icon: Newspaper, label: "Artigos", value: String(articles.length), color: "text-success" },
           ].map(({ icon: Icon, label, value, color }) => (
             <Card key={label} className="p-4 card-gradient border-border">
               <Icon size={20} className={color} />
@@ -146,6 +146,7 @@ const Admin = () => {
           <TabsList className="w-full md:w-auto">
             <TabsTrigger value="exercises" className="gap-1"><Dumbbell size={14} />Exercícios</TabsTrigger>
             <TabsTrigger value="foods" className="gap-1"><UtensilsCrossed size={14} />Alimentos</TabsTrigger>
+            <TabsTrigger value="journal" className="gap-1"><Newspaper size={14} />Journal</TabsTrigger>
             <TabsTrigger value="settings" className="gap-1"><Settings size={14} />Config</TabsTrigger>
           </TabsList>
 
