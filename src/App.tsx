@@ -20,6 +20,8 @@ import Journal from "./pages/Journal";
 import Chat from "./pages/Chat";
 import Admin from "./pages/Admin";
 import AdminGate from "./components/AdminGate";
+import StudentGate from "./components/StudentGate";
+import Welcome from "./pages/Welcome";
 import Terms from "./pages/Terms";
 import AcceptTerms from "./pages/AcceptTerms";
 import Profile from "./pages/Profile";
@@ -39,7 +41,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const OnboardingGate = ({ children }: { children: React.ReactNode }) => {
   const { data: profile, isLoading } = useProfile();
   if (isLoading) return <div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
-  if (!profile || !profile.onboarding_complete) return <Navigate to="/onboarding" replace />;
+  // Send new students to /welcome instead of forcing /onboarding directly
+  if (!profile || !profile.onboarding_complete) return <Navigate to="/welcome" replace />;
   return <>{children}</>;
 };
 
