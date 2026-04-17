@@ -13,19 +13,25 @@ export interface JournalArticle {
   category: string | null;
   image_url: string | null;
   source_url: string | null;
+  status: string;
+  ai_generated: boolean;
+  ai_sources: any[] | null;
+  ai_prompt: string | null;
   published_at: string;
   created_at: string;
 }
 
-export const useJournalArticles = () => {
+export const useJournalArticles = (includeDrafts = false) => {
   return useQuery({
-    queryKey: ["journal-articles"],
+    queryKey: ["journal-articles", includeDrafts],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let q = supabase
         .from("journal_articles")
         .select("*")
         .order("published_at", { ascending: false })
-        .limit(50);
+        .limit(100);
+      if (!includeDrafts) q = q.eq("status", "published");
+      const { data, error } = await q;
       if (error) throw error;
       return (data || []) as unknown as JournalArticle[];
     },
@@ -33,20 +39,9 @@ export const useJournalArticles = () => {
 };
 
 export const useCreateJournalArticle = () => {
-  const queryClient = useQueryClient();
+  const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (article: {
-      title: string;
-      summary: string;
-      content?: string;
-      excerpt?: string;
-      category?: string;
-      tags?: string[];
-      author?: string;
-      image_url?: string;
-      source_url?: string;
-      read_time_minutes?: number;
-    }) => {
+    mutationFn: async (article: Partial<JournalArticle> & { title: string; summary: string }) => {
       const { data, error } = await supabase
         .from("journal_articles")
         .insert(article as any)
@@ -55,21 +50,62 @@ export const useCreateJournalArticle = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["journal-articles"] });
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["journal-articles"] }),
+  });
+};
+
+export const useUpdateJournalArticle = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<JournalArticle> & { id: string }) => {
+      const { data, error } = await supabase
+        .from("journal_articles")
+        .update(updates as any)
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
     },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["journal-articles"] }),
   });
 };
 
 export const useDeleteJournalArticle = () => {
-  const queryClient = useQueryClient();
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("journal_articles").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["journal-articles"] });
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["journal-articles"] }),
+  });
+};
+
+export interface JournalAIDraft {
+  title: string;
+  summary: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  tags: string[];
+  read_time_minutes: number;
+  sources: { title?: string; uri: string }[];
+  ai_prompt: string;
+}
+
+export const useResearchJournalTopic = () => {
+  return useMutation({
+    mutationFn: async (topic: string): Promise<JournalAIDraft> => {
+      const { data, error } = await supabase.functions.invoke("journal-research", {
+        body: { topic },
+      });
+      if (error) {
+        const msg = (error as any)?.context?.error || error.message;
+        throw new Error(msg);
+      }
+      if (data?.error) throw new Error(data.error);
+      return data as JournalAIDraft;
     },
   });
 };
