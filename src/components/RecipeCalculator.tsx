@@ -148,10 +148,6 @@ const RecipeCalculator = ({ trigger }: RecipeCalculatorProps) => {
                         key={f.id}
                         value={f.name}
                         onSelect={() => addFood(f)}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          addFood(f);
-                        }}
                       >
                         <span className="flex-1">{f.name}</span>
                         <span className="text-xs text-muted-foreground">
