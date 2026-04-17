@@ -26,6 +26,7 @@ import Terms from "./pages/Terms";
 import AcceptTerms from "./pages/AcceptTerms";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
+import Plans from "./pages/Plans";
 import NotFound from "./pages/NotFound";
 import { CURRENT_TERMS_VERSION } from "@/lib/terms";
 
