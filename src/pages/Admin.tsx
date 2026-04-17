@@ -110,6 +110,9 @@ const Admin = () => {
         fat: parseFloat(foodFat) || 0,
         calories: parseFloat(foodCal) || 0,
         category: null,
+        fiber: 0,
+        portion_grams: 100,
+        source: "manual",
       });
       toast({ title: "Alimento adicionado!" });
       setFoodName(""); setFoodProtein(""); setFoodCarbs(""); setFoodFat(""); setFoodCal(""); setFoodDialogOpen(false);
