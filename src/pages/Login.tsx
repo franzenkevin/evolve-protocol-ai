@@ -101,10 +101,38 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm animate-fade-in">
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center mb-6">
           <img src={logo} alt="Hypertrophy" className="w-20 h-20 mb-4" />
           <h1 className="text-3xl font-heading font-bold text-foreground">Hypertrophy</h1>
-          <p className="text-muted-foreground mt-1">Entre na sua conta</p>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {mode === "admin" ? "Acesso do Criador" : "Entre na sua conta"}
+          </p>
+        </div>
+
+        {/* Mode toggle */}
+        <div className="grid grid-cols-2 gap-1 p-1 mb-5 rounded-lg bg-secondary/50 border border-border">
+          <button
+            type="button"
+            onClick={() => { setMode("client"); setErrorMsg(""); }}
+            className={`flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${
+              mode === "client"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <User size={14} /> Cliente
+          </button>
+          <button
+            type="button"
+            onClick={() => { setMode("admin"); setErrorMsg(""); }}
+            className={`flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${
+              mode === "admin"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <ShieldCheck size={14} /> Admin
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
