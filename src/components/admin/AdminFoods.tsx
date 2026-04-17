@@ -184,6 +184,7 @@ const AdminFoods = () => {
             <SelectItem value="manual">Manual</SelectItem>
           </SelectContent>
         </Select>
+        <RecipeCalculator />
         <Button size="sm" className="gap-1" onClick={openCreate}>
           <Plus size={14} /> Adicionar
         </Button>
