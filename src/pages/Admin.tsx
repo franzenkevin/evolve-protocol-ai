@@ -36,6 +36,7 @@ import AdminMeetings from "@/components/admin/AdminMeetings";
 import AdminPlans from "@/components/admin/AdminPlans";
 import AdminCoupons from "@/components/admin/AdminCoupons";
 import AdminRefunds from "@/components/admin/AdminRefunds";
+import RecipeCalculator from "@/components/RecipeCalculator";
 
 const Admin = () => {
   const { signOut } = useAuth();
@@ -228,10 +229,12 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="foods" className="mt-4 space-y-3">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center gap-2 flex-wrap">
               <p className="text-sm text-muted-foreground">{foods.length} alimentos cadastrados</p>
-              <Dialog open={foodDialogOpen} onOpenChange={setFoodDialogOpen}>
-                <DialogTrigger asChild><Button size="sm" className="gap-1"><Plus size={14} />Adicionar</Button></DialogTrigger>
+              <div className="flex items-center gap-2">
+                <RecipeCalculator />
+                <Dialog open={foodDialogOpen} onOpenChange={setFoodDialogOpen}>
+                  <DialogTrigger asChild><Button size="sm" className="gap-1"><Plus size={14} />Adicionar</Button></DialogTrigger>
                 <DialogContent>
                   <DialogHeader><DialogTitle>Novo Alimento</DialogTitle></DialogHeader>
                   <div className="space-y-3">
@@ -248,6 +251,7 @@ const Admin = () => {
                   </div>
                 </DialogContent>
               </Dialog>
+              </div>
             </div>
             {foods.map((food) => (
               <Card key={food.id} className="p-3 flex items-center justify-between">
