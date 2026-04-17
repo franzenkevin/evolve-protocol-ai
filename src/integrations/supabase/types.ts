@@ -316,9 +316,12 @@ export type Database = {
           category: string | null
           created_at: string
           fat: number
+          fiber: number
           id: string
           name: string
+          portion_grams: number
           protein: number
+          source: string | null
           updated_at: string
         }
         Insert: {
@@ -327,9 +330,12 @@ export type Database = {
           category?: string | null
           created_at?: string
           fat?: number
+          fiber?: number
           id?: string
           name: string
+          portion_grams?: number
           protein?: number
+          source?: string | null
           updated_at?: string
         }
         Update: {
@@ -338,15 +344,21 @@ export type Database = {
           category?: string | null
           created_at?: string
           fat?: number
+          fiber?: number
           id?: string
           name?: string
+          portion_grams?: number
           protein?: number
+          source?: string | null
           updated_at?: string
         }
         Relationships: []
       }
       journal_articles: {
         Row: {
+          ai_generated: boolean
+          ai_prompt: string | null
+          ai_sources: Json | null
           author: string | null
           category: string | null
           content: string | null
@@ -357,12 +369,16 @@ export type Database = {
           published_at: string
           read_time_minutes: number | null
           source_url: string | null
+          status: string
           summary: string
           tags: string[] | null
           title: string
           updated_at: string
         }
         Insert: {
+          ai_generated?: boolean
+          ai_prompt?: string | null
+          ai_sources?: Json | null
           author?: string | null
           category?: string | null
           content?: string | null
@@ -373,12 +389,16 @@ export type Database = {
           published_at?: string
           read_time_minutes?: number | null
           source_url?: string | null
+          status?: string
           summary: string
           tags?: string[] | null
           title: string
           updated_at?: string
         }
         Update: {
+          ai_generated?: boolean
+          ai_prompt?: string | null
+          ai_sources?: Json | null
           author?: string | null
           category?: string | null
           content?: string | null
@@ -389,9 +409,52 @@ export type Database = {
           published_at?: string
           read_time_minutes?: number | null
           source_url?: string | null
+          status?: string
           summary?: string
           tags?: string[] | null
           title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          converted_user_id: string | null
+          created_at: string
+          email: string
+          goal: string | null
+          id: string
+          name: string | null
+          notes: string | null
+          phone: string | null
+          source: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          converted_user_id?: string | null
+          created_at?: string
+          email: string
+          goal?: string | null
+          id?: string
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          converted_user_id?: string | null
+          created_at?: string
+          email?: string
+          goal?: string | null
+          id?: string
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          source?: string | null
+          status?: string
           updated_at?: string
         }
         Relationships: []
