@@ -1,25 +1,30 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { User, ShieldCheck } from "lucide-react";
 import logo from "@/assets/logo.png";
+
+type LoginMode = "client" | "admin";
 
 const isEmailNotConfirmed = (msg: string) =>
   msg.toLowerCase().includes("email not confirmed") ||
   msg.toLowerCase().includes("email_not_confirmed");
 
 const Login = () => {
+  const [mode, setMode] = useState<LoginMode>("client");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [emailNotConfirmed, setEmailNotConfirmed] = useState(false);
-  const { signIn, resendConfirmationEmail } = useAuth();
+  const { signIn, signOut, resendConfirmationEmail } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -57,7 +62,24 @@ const Login = () => {
         toast({ title: "Erro ao entrar", description: msg, variant: "destructive" });
       }
     } else {
-      navigate("/dashboard");
+      const { data: { user: authedUser } } = await supabase.auth.getUser();
+      if (authedUser) {
+        const { data: roleRow } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", authedUser.id)
+          .eq("role", "admin")
+          .maybeSingle();
+        const isAdmin = !!roleRow;
+
+        if (mode === "admin" && !isAdmin) {
+          await signOut();
+          setErrorMsg("Esta conta não tem permissão de administrador. Use a aba 'Cliente' para entrar.");
+          toast({ title: "Acesso negado", description: "Sua conta não é admin.", variant: "destructive" });
+          return;
+        }
+        navigate(isAdmin ? "/admin" : "/dashboard");
+      }
     }
   };
 
@@ -79,10 +101,38 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm animate-fade-in">
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center mb-6">
           <img src={logo} alt="Hypertrophy" className="w-20 h-20 mb-4" />
           <h1 className="text-3xl font-heading font-bold text-foreground">Hypertrophy</h1>
-          <p className="text-muted-foreground mt-1">Entre na sua conta</p>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {mode === "admin" ? "Acesso do Criador" : "Entre na sua conta"}
+          </p>
+        </div>
+
+        {/* Mode toggle */}
+        <div className="grid grid-cols-2 gap-1 p-1 mb-5 rounded-lg bg-secondary/50 border border-border">
+          <button
+            type="button"
+            onClick={() => { setMode("client"); setErrorMsg(""); }}
+            className={`flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${
+              mode === "client"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <User size={14} /> Cliente
+          </button>
+          <button
+            type="button"
+            onClick={() => { setMode("admin"); setErrorMsg(""); }}
+            className={`flex items-center justify-center gap-2 py-2 rounded-md text-sm font-medium transition-all ${
+              mode === "admin"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <ShieldCheck size={14} /> Admin
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
