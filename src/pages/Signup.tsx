@@ -16,7 +16,7 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { signUp } = useAuth();
+  const { signUp, signIn } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -34,16 +34,29 @@ const Signup = () => {
       });
       return;
     }
+
     setLoading(true);
-    const { error } = await signUp(email, password, name);
-    if (error) {
+
+    const { error: signUpError } = await signUp(email, password, name);
+    if (signUpError) {
       setLoading(false);
-      toast({ title: "Erro ao cadastrar", description: error.message, variant: "destructive" });
+      toast({ title: "Erro ao cadastrar", description: signUpError.message, variant: "destructive" });
       return;
     }
 
-    // Persist terms acceptance on the profile (created automatically via trigger).
-    // Best-effort: if user must confirm email first, we still try; failure is silent.
+    // Auto login após criação da conta
+    const { error: signInError } = await signIn(email, password);
+    if (signInError) {
+      setLoading(false);
+      toast({
+        title: "Conta criada!",
+        description: "Faça login para continuar.",
+      });
+      navigate("/login");
+      return;
+    }
+
+    // Persiste aceite dos termos no perfil
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const uid = sessionData.session?.user?.id;
@@ -57,12 +70,12 @@ const Signup = () => {
           .eq("user_id", uid);
       }
     } catch {
-      // ignore — will be re-prompted on first authenticated access if missing
+      // silencioso — será solicitado novamente se necessário
     }
 
     setLoading(false);
-    toast({ title: "Conta criada!", description: "Verifique seu e-mail para confirmar." });
-    navigate("/login");
+    toast({ title: "Bem-vindo!", description: "Conta criada com sucesso." });
+    navigate("/onboarding");
   };
 
   return (
@@ -86,6 +99,9 @@ const Signup = () => {
           <div>
             <Label htmlFor="password">Senha</Label>
             <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" required className="mt-1" />
+            <p className="text-xs text-muted-foreground mt-1">
+              Use letras maiúsculas, minúsculas e números. Evite senhas comuns.
+            </p>
           </div>
 
           <div className="flex items-start gap-2 pt-1">
