@@ -7,8 +7,11 @@ export interface Food {
   protein: number;
   carbs: number;
   fat: number;
+  fiber: number;
   calories: number;
   category: string | null;
+  portion_grams: number;
+  source: string | null;
 }
 
 export const useFoods = () => {
@@ -20,7 +23,7 @@ export const useFoods = () => {
         .select("*")
         .order("name", { ascending: true });
       if (error) throw error;
-      return data as Food[];
+      return (data || []) as unknown as Food[];
     },
   });
 };
@@ -29,7 +32,7 @@ export const useCreateFood = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (food: Omit<Food, "id">) => {
-      const { data, error } = await supabase.from("foods").insert(food).select().single();
+      const { data, error } = await supabase.from("foods").insert(food as any).select().single();
       if (error) throw error;
       return data;
     },
@@ -41,7 +44,12 @@ export const useUpdateFood = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Food> & { id: string }) => {
-      const { data, error } = await supabase.from("foods").update(updates).eq("id", id).select().single();
+      const { data, error } = await supabase
+        .from("foods")
+        .update(updates as any)
+        .eq("id", id)
+        .select()
+        .single();
       if (error) throw error;
       return data;
     },
