@@ -251,6 +251,7 @@ const Admin = () => {
                   </div>
                 </DialogContent>
               </Dialog>
+              </div>
             </div>
             {foods.map((food) => (
               <Card key={food.id} className="p-3 flex items-center justify-between">
