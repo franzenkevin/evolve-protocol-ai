@@ -36,6 +36,7 @@ import AdminMeetings from "@/components/admin/AdminMeetings";
 import AdminPlans from "@/components/admin/AdminPlans";
 import AdminCoupons from "@/components/admin/AdminCoupons";
 import AdminRefunds from "@/components/admin/AdminRefunds";
+import RecipeCalculator from "@/components/RecipeCalculator";
 
 const Admin = () => {
   const { signOut } = useAuth();
