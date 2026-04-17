@@ -1,4 +1,1 @@
 project_id = "wrxddctlyyiqgetiwdpu"
-
-[functions.admin-reset-helper]
-verify_jwt = false
