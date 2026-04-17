@@ -808,39 +808,63 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          cancel_at_period_end: boolean | null
           created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          environment: string | null
           id: string
           next_billing_date: string | null
+          paddle_customer_id: string | null
+          paddle_subscription_id: string | null
           payment_brand: string | null
           payment_last4: string | null
           payment_method: string | null
           plan_type: string
+          price_id: string | null
+          product_id: string | null
           start_date: string
           status: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          cancel_at_period_end?: boolean | null
           created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string | null
           id?: string
           next_billing_date?: string | null
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
           payment_brand?: string | null
           payment_last4?: string | null
           payment_method?: string | null
           plan_type?: string
+          price_id?: string | null
+          product_id?: string | null
           start_date?: string
           status?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          cancel_at_period_end?: boolean | null
           created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          environment?: string | null
           id?: string
           next_billing_date?: string | null
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
           payment_brand?: string | null
           payment_last4?: string | null
           payment_method?: string | null
           plan_type?: string
+          price_id?: string | null
+          product_id?: string | null
           start_date?: string
           status?: string
           updated_at?: string
@@ -978,6 +1002,10 @@ export type Database = {
           user_id: string
           workouts_count: number
         }[]
+      }
+      has_active_subscription: {
+        Args: { check_env?: string; user_uuid: string }
+        Returns: boolean
       }
       has_role: {
         Args: {
