@@ -28,11 +28,20 @@ const Login = () => {
     setErrorMsg("");
     setEmailNotConfirmed(false);
     setLoading(true);
-    const { error } = await signIn(email, password);
-    setLoading(false);
+
+    let error: any = null;
+    try {
+      const result = await signIn(email, password);
+      error = result.error;
+    } catch (err: any) {
+      error = err;
+    } finally {
+      setLoading(false);
+    }
 
     if (error) {
-      if (isEmailNotConfirmed(error.message)) {
+      const msg: string = error?.message ?? "Ocorreu um erro ao entrar. Tente novamente.";
+      if (isEmailNotConfirmed(msg)) {
         setEmailNotConfirmed(true);
         setErrorMsg("Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada (e a pasta de spam).");
         toast({
@@ -40,11 +49,10 @@ const Login = () => {
           description: "Confirme seu e-mail antes de entrar.",
           variant: "destructive",
         });
-      } else if (error.message.toLowerCase().includes("invalid login credentials") || error.message.toLowerCase().includes("invalid_credentials")) {
+      } else if (msg.toLowerCase().includes("invalid login credentials") || msg.toLowerCase().includes("invalid_credentials")) {
         setErrorMsg("E-mail ou senha incorretos. Verifique seus dados e tente novamente.");
         toast({ title: "Credenciais inválidas", description: "E-mail ou senha incorretos.", variant: "destructive" });
       } else {
-        const msg = error.message || "Ocorreu um erro ao entrar. Tente novamente.";
         setErrorMsg(msg);
         toast({ title: "Erro ao entrar", description: msg, variant: "destructive" });
       }
