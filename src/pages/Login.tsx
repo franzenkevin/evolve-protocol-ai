@@ -17,13 +17,14 @@ const isEmailNotConfirmed = (msg: string) =>
   msg.toLowerCase().includes("email_not_confirmed");
 
 const Login = () => {
+  const [mode, setMode] = useState<LoginMode>("client");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [emailNotConfirmed, setEmailNotConfirmed] = useState(false);
-  const { signIn, resendConfirmationEmail } = useAuth();
+  const { signIn, signOut, resendConfirmationEmail } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -61,7 +62,24 @@ const Login = () => {
         toast({ title: "Erro ao entrar", description: msg, variant: "destructive" });
       }
     } else {
-      navigate("/dashboard");
+      const { data: { user: authedUser } } = await supabase.auth.getUser();
+      if (authedUser) {
+        const { data: roleRow } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", authedUser.id)
+          .eq("role", "admin")
+          .maybeSingle();
+        const isAdmin = !!roleRow;
+
+        if (mode === "admin" && !isAdmin) {
+          await signOut();
+          setErrorMsg("Esta conta não tem permissão de administrador. Use a aba 'Cliente' para entrar.");
+          toast({ title: "Acesso negado", description: "Sua conta não é admin.", variant: "destructive" });
+          return;
+        }
+        navigate(isAdmin ? "/admin" : "/dashboard");
+      }
     }
   };
 
