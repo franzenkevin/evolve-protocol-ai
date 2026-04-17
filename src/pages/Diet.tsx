@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import DietFeedbackCard from "@/components/DietFeedbackCard";
+import RecipeCalculator from "@/components/RecipeCalculator";
+import { Calculator } from "lucide-react";
 
 const Diet = () => {
   const { data: protocol, isLoading } = useActiveProtocol();
@@ -227,6 +229,20 @@ const Diet = () => {
             </div>
           </Card>
         )}
+
+        {/* Recipe calculator */}
+        <Card className="p-4 border-border">
+          <div className="flex items-center gap-2 mb-2">
+            <Calculator size={14} className="text-primary" />
+            <h3 className="font-heading font-semibold text-sm text-foreground">
+              Calculadora de receita
+            </h3>
+          </div>
+          <p className="text-xs text-muted-foreground mb-3">
+            Some macros e kcal de vários alimentos para montar uma receita fit ou testar uma da internet.
+          </p>
+          <RecipeCalculator />
+        </Card>
       </div>
     </AppLayout>
   );

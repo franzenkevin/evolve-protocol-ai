@@ -32,6 +32,7 @@ import { useFoods, useCreateFood, useUpdateFood, useDeleteFood, type Food } from
 import { useToast } from "@/hooks/use-toast";
 import { useLogAudit } from "@/hooks/useAuditLog";
 import { Plus, Trash2, Pencil, Search, Database } from "lucide-react";
+import RecipeCalculator from "@/components/RecipeCalculator";
 
 const emptyDraft: Partial<Food> = {
   name: "",
@@ -183,6 +184,7 @@ const AdminFoods = () => {
             <SelectItem value="manual">Manual</SelectItem>
           </SelectContent>
         </Select>
+        <RecipeCalculator />
         <Button size="sm" className="gap-1" onClick={openCreate}>
           <Plus size={14} /> Adicionar
         </Button>
