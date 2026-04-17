@@ -26,6 +26,7 @@ import Terms from "./pages/Terms";
 import AcceptTerms from "./pages/AcceptTerms";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
+import Plans from "./pages/Plans";
 import NotFound from "./pages/NotFound";
 import { CURRENT_TERMS_VERSION } from "@/lib/terms";
 
@@ -74,6 +75,7 @@ const App = () => (
             <Route path="/accept-terms" element={<ProtectedRoute><AcceptTerms /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><StudentGate><OnboardingGate><Profile /></OnboardingGate></StudentGate></ProtectedRoute>} />
             <Route path="/profile/edit" element={<ProtectedRoute><StudentGate><OnboardingGate><EditProfile /></OnboardingGate></StudentGate></ProtectedRoute>} />
+            <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
