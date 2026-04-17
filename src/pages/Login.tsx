@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { User, ShieldCheck } from "lucide-react";
 import logo from "@/assets/logo.png";
+
+type LoginMode = "client" | "admin";
 
 const isEmailNotConfirmed = (msg: string) =>
   msg.toLowerCase().includes("email not confirmed") ||
