@@ -11,6 +11,13 @@ const PRICE_TO_PLAN_CODE: Record<string, string> = {
   hypertrophy_annual: 'annual',
 };
 
+const ONE_TIME_PRICES = new Set([
+  'hypertrophy_new_protocol_once',
+  'hypertrophy_exam_analysis_once',
+  'hypertrophy_hormone_60d_once',
+  'hypertrophy_hormone_annual_once',
+]);
+
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 
@@ -33,6 +40,7 @@ Deno.serve(async (req) => {
         break;
       case EventName.TransactionCompleted:
         console.log('Transaction completed:', event.data.id);
+        await handleTransactionCompleted(event.data, env);
         break;
       case EventName.TransactionPaymentFailed:
         console.log('Payment failed:', event.data.id);
