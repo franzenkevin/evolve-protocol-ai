@@ -750,7 +750,7 @@ const Onboarding = () => {
                 {String(Math.floor(genElapsed / 60)).padStart(2, "0")}:{String(genElapsed % 60).padStart(2, "0")}
               </p>
               <p className="text-[11px] text-muted-foreground">
-                Tempo estimado: até 3 minutos
+                Tempo estimado: até 4 minutos (análise detalhada da sua avaliação)
               </p>
             </div>
             <p className="text-xs text-muted-foreground">
