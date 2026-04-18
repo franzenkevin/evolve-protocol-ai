@@ -247,6 +247,11 @@ const Onboarding = () => {
         return null;
       case 7:
         if (!data.aiDataConsent) return "Você precisa autorizar o uso dos seus dados pela IA para gerar o protocolo personalizado.";
+        if (Object.keys(assessmentPhotos).length === 0) return "Envie pelo menos uma foto para análise corporal.";
+        if (!assessment) return "Aguarde a análise das suas fotos antes de continuar.";
+        return null;
+      case 8:
+        if (!isConfirmationComplete(confirmations)) return "Responda todas as perguntas de confirmação (e justifique quando responder 'Não').";
         return null;
       default:
         return null;
