@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, FlaskConical, Syringe, ShieldCheck, Info } from "lucide-react";
+import { FileText, FlaskConical, Syringe, ShieldCheck, Info, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
 
 const EXAM_CHECKLIST = [
   // Bioquímica básica
@@ -54,29 +55,47 @@ const EXAM_CHECKLIST = [
   "Hemoglobina glicada (HbA1c)",
 ];
 
-const SERVICES = [
+const SERVICES: {
+  icon: typeof FlaskConical;
+  title: string;
+  desc: string;
+  price: string;
+  priceId: string;
+}[] = [
   {
     icon: FlaskConical,
     title: "Análise de Exames",
     desc: "Interpretação detalhada dos seus exames com recomendações personalizadas.",
-    price: "A definir",
+    price: "R$ 99,90",
+    priceId: "hypertrophy_exam_analysis_once",
   },
   {
     icon: Syringe,
-    title: "Análise + Protocolo Hormonal",
-    desc: "Análise completa dos exames + protocolo hormonal personalizado.",
-    price: "A definir",
+    title: "Análise + Protocolo Hormonal (60 dias)",
+    desc: "Análise completa dos exames + protocolo hormonal personalizado com acompanhamento de 60 dias.",
+    price: "R$ 297,00",
+    priceId: "hypertrophy_hormone_60d_once",
   },
   {
     icon: ShieldCheck,
-    title: "Acompanhamento Anual",
-    desc: "Análise de exames + protocolo hormonal + acompanhamento anual completo.",
-    price: "A definir",
+    title: "Acompanhamento Hormonal Anual",
+    desc: "Análise + protocolo hormonal + acompanhamento contínuo por 12 meses.",
+    price: "R$ 899,00",
+    priceId: "hypertrophy_hormone_annual_once",
   },
 ];
 
 const SectionExams = () => {
   const [checked, setChecked] = useState<Set<string>>(new Set());
+  const { openCheckout, loading } = usePaddleCheckout();
+
+  const buy = (priceId: string) => {
+    openCheckout({
+      priceId,
+      successUrl: `${window.location.origin}/checkout/success?type=exam`,
+      customData: { purchaseType: "exam" },
+    });
+  };
 
   const toggle = (exam: string) => {
     setChecked((prev) => {
@@ -135,16 +154,23 @@ const SectionExams = () => {
 
       <div className="space-y-2">
         <p className="text-[10px] text-muted-foreground px-1 uppercase tracking-wider font-semibold">Planos de acompanhamento</p>
-        {SERVICES.map(({ icon: Icon, title, desc, price }) => (
+        {SERVICES.map(({ icon: Icon, title, desc, price, priceId }) => (
           <Card key={title} className="p-3 card-gradient border-border">
             <div className="flex items-start gap-2">
               <Icon size={16} className="text-primary mt-0.5 shrink-0" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">{title}</p>
                 <p className="text-[11px] text-muted-foreground mt-0.5">{desc}</p>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-xs font-semibold text-primary">{price}</span>
-                  <Button size="sm" variant="outline" className="h-6 text-[10px] px-2">Contratar</Button>
+                <div className="flex items-center justify-between mt-2 gap-2">
+                  <span className="text-sm font-bold text-primary">{price}</span>
+                  <Button
+                    size="sm"
+                    className="h-7 text-[11px] px-3"
+                    disabled={loading}
+                    onClick={() => buy(priceId)}
+                  >
+                    {loading ? <Loader2 size={12} className="animate-spin" /> : "Contratar"}
+                  </Button>
                 </div>
               </div>
             </div>
