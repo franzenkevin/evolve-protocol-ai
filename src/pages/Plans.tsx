@@ -42,8 +42,9 @@ const FEATURES = [
 
 export default function Plans() {
   const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
-  const { data: subscription } = useSubscription();
+  const { data: subscription, refetch: refetchSub } = useSubscription();
   const [portalLoading, setPortalLoading] = useState(false);
+  const [reconcileLoading, setReconcileLoading] = useState(false);
 
   const isActive =
     subscription &&
@@ -62,6 +63,36 @@ export default function Plans() {
       toast.error("Erro ao abrir portal de gerenciamento");
     } finally {
       setPortalLoading(false);
+    }
+  };
+
+  const reconcile = async () => {
+    setReconcileLoading(true);
+    try {
+      const env =
+        (import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN as string | undefined)?.startsWith(
+          "test_"
+        )
+          ? "sandbox"
+          : "live";
+      const { data, error } = await supabase.functions.invoke(
+        "reconcile-subscription",
+        { body: { environment: env } }
+      );
+      if (error) throw error;
+      if (data?.synced) {
+        toast.success("Assinatura sincronizada! Acesso liberado.");
+        await refetchSub();
+      } else {
+        toast.info(
+          data?.message || "Nenhuma assinatura ativa encontrada no provedor."
+        );
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Não foi possível sincronizar agora. Tente novamente.");
+    } finally {
+      setReconcileLoading(false);
     }
   };
 
@@ -164,6 +195,27 @@ export default function Plans() {
             );
           })}
         </div>
+
+        {!isActive && (
+          <div className="pt-2 text-center">
+            <p className="text-xs text-muted-foreground mb-2">
+              Já pagou e o acesso não liberou?
+            </p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={reconcile}
+              disabled={reconcileLoading}
+              className="text-xs"
+            >
+              {reconcileLoading ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                "Sincronizar minha assinatura"
+              )}
+            </Button>
+          </div>
+        )}
 
         <p className="text-[10px] text-muted-foreground text-center pt-2">
           Pagamento processado com segurança. Aceita cartão de crédito e PIX (quando disponível na sua região).
