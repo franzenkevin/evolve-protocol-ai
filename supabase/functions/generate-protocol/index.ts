@@ -52,20 +52,35 @@ serve(async (req) => {
     }
 
     // Build assessment context
+    const hasAssessment = !!bodyAssessment;
+    const hasInjuries = !!(profile.injuries && profile.injuries.trim() && profile.injuries.toLowerCase() !== "nenhuma" && profile.injuries.toLowerCase() !== "não");
+    const hasPostureIssues = hasAssessment && Array.isArray(bodyAssessment.posture_deviations) && bodyAssessment.posture_deviations.length > 0;
+    const hasWeakPoints = hasAssessment && Array.isArray(bodyAssessment.weak_points) && bodyAssessment.weak_points.length > 0;
+
     let assessmentContext = "";
-    if (bodyAssessment) {
+    if (hasAssessment) {
       assessmentContext = `
-## AVALIAÇÃO CORPORAL (fotos analisadas por IA)
+## AVALIAÇÃO CORPORAL (fotos analisadas por IA — USAR COMO BASE OBRIGATÓRIA DA PRESCRIÇÃO)
 - Gordura estimada: ${bodyAssessment.body_fat_estimate || "N/A"}
 - Categoria: ${bodyAssessment.body_fat_category || "N/A"}
 - Pontos fortes: ${(bodyAssessment.strong_points || []).join(", ") || "N/A"}
-- Pontos fracos: ${(bodyAssessment.weak_points || []).join(", ") || "N/A"}
-- Desvios posturais: ${(bodyAssessment.posture_deviations || []).join(", ") || "N/A"}
+- Pontos fracos (PRIORIZAR no treino): ${(bodyAssessment.weak_points || []).join(", ") || "N/A"}
+- Desvios posturais (CONTRAINDICAÇÕES + mobilidade obrigatória): ${(bodyAssessment.posture_deviations || []).join(", ") || "N/A"}
 - Desenvolvimento muscular: ${JSON.stringify(bodyAssessment.muscle_development || {})}
 - Recomendações da avaliação: ${(bodyAssessment.recommendations || []).join("; ") || "N/A"}
-- Resumo: ${bodyAssessment.overall_summary || "N/A"}
+- Resumo: ${bodyAssessment.overall_summary || "N/A"}`;
+    } else {
+      assessmentContext = `
+## AVALIAÇÃO CORPORAL
+Não há avaliação corporal disponível. Use prescrição padrão conservadora baseada apenas em sexo/nível/objetivo, SEM exercícios de alto risco articular (ex: agachamento livre profundo com carga, desenvolvimento militar atrás da nuca, remada curvada pesada) — prefira variações em máquina ou guiadas.`;
+    }
 
-IMPORTANTE: Use esses dados para PRIORIZAR grupos musculares fracos no treino e ajustar macros baseado na composição corporal real.`;
+    if (hasInjuries) {
+      assessmentContext += `
+
+## LESÕES INFORMADAS PELO ALUNO (CONTRAINDICAÇÕES ABSOLUTAS)
+"${profile.injuries}"
+Você DEVE excluir do treino qualquer exercício que solicite ou agrave a estrutura lesionada (ver tabela "ADAPTAÇÕES POR LESÃO" abaixo).`;
     }
 
     const systemPrompt = `Você é um preparador físico profissional especializado em hipertrofia e recomposição corporal. Você segue uma metodologia ESPECÍFICA que deve ser respeitada em TODOS os protocolos gerados. Responda APENAS com o JSON solicitado.
