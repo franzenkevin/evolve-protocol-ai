@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { BodyPhotoUpload } from "@/components/onboarding/BodyPhotoUpload";
 import { AssessmentResults } from "@/components/onboarding/AssessmentResults";
+import { ProtocolConfirmation, type ProtocolConfirmations, isConfirmationComplete } from "@/components/onboarding/ProtocolConfirmation";
 import type { Profile } from "@/hooks/useProfile";
 
 const STEPS = [
@@ -27,6 +28,7 @@ const STEPS = [
   "Doces & Suplementos",
   "Estilo de Vida",
   "Avaliação Física",
+  "Confirmação",
 ];
 
 const CARDIO_FREQUENCY = ["1x por semana", "2x por semana", "3x por semana", "4x por semana", "5x por semana", "Todos os dias"];
