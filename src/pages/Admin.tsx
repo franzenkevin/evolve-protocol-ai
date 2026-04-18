@@ -19,13 +19,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useExercises, useCreateExercise, useDeleteExercise } from "@/hooks/useExercises";
-import { useFoods, useCreateFood, useDeleteFood } from "@/hooks/useFoods";
-import { useJournalArticles, useCreateJournalArticle, useDeleteJournalArticle } from "@/hooks/useJournal";
-import { LogOut, ArrowLeft, Plus, Trash2, Newspaper, Dumbbell, UtensilsCrossed, Settings, BarChart3, CreditCard, Calendar, UserCog, Megaphone, ScrollText, Video, Tag, DollarSign, Receipt } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useLogAudit } from "@/hooks/useAuditLog";
-import VideoUploader from "@/components/admin/VideoUploader";
+import { LogOut, ArrowLeft, Newspaper, Dumbbell, UtensilsCrossed, Settings, BarChart3, CreditCard, Calendar, UserCog, Megaphone, ScrollText, Video, Tag, DollarSign, Receipt } from "lucide-react";
 import AdminMetrics from "@/components/admin/AdminMetrics";
 import AdminSales from "@/components/admin/AdminSales";
 import AdminRenewals from "@/components/admin/AdminRenewals";
@@ -36,7 +30,9 @@ import AdminMeetings from "@/components/admin/AdminMeetings";
 import AdminPlans from "@/components/admin/AdminPlans";
 import AdminCoupons from "@/components/admin/AdminCoupons";
 import AdminRefunds from "@/components/admin/AdminRefunds";
-import RecipeCalculator from "@/components/RecipeCalculator";
+import AdminFoods from "@/components/admin/AdminFoods";
+import AdminExercises from "@/components/admin/AdminExercises";
+import AdminJournal from "@/components/admin/AdminJournal";
 
 const Admin = () => {
   const { signOut } = useAuth();
