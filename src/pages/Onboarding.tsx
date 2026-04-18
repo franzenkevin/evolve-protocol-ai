@@ -139,18 +139,19 @@ const Onboarding = () => {
   const updateProfile = useUpdateProfile();
   const createProtocol = useCreateProtocol();
 
-  // Real elapsed timer (counts up to 3 min) while generating
-  const TARGET_SECONDS = 180;
+  // Real elapsed timer (up to 4 min) — IA analisa avaliação + lesões antes de prescrever
+  const TARGET_SECONDS = 240;
   useEffect(() => {
     if (!saving) return;
     setGenElapsed(0);
-    setGenStage("Analisando seu perfil...");
+    setGenStage("Analisando seu perfil e avaliação corporal...");
     const stages: { at: number; label: string }[] = [
-      { at: 15, label: "Calculando macros e calorias..." },
-      { at: 45, label: "Montando divisão de treino..." },
-      { at: 80, label: "Selecionando exercícios ideais..." },
-      { at: 120, label: "Personalizando refeições..." },
-      { at: 160, label: "Ajustando detalhes finais..." },
+      { at: 20, label: "Identificando lesões e desvios posturais..." },
+      { at: 50, label: "Selecionando exercícios seguros e adequados..." },
+      { at: 90, label: "Priorizando seus pontos fracos..." },
+      { at: 130, label: "Calculando macros e montando refeições..." },
+      { at: 180, label: "Refinando combinações e substituições..." },
+      { at: 220, label: "Finalizando seu protocolo personalizado..." },
     ];
     const t0 = Date.now();
     const id = setInterval(() => {
