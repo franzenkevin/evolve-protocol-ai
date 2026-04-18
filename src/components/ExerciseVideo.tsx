@@ -42,15 +42,15 @@ const ExerciseVideo = ({ exerciseName, videoUrl, videoQuery }: ExerciseVideoProp
   const youtubeEmbedUrl = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(query)}`;
 
   // If a direct media URL is provided, render it
-  if (videoUrl) {
-    const isGif = /\.gif(\?|$)/i.test(videoUrl);
-    const isYoutube = /youtube\.com|youtu\.be/i.test(videoUrl);
+  if (resolvedUrl) {
+    const isGif = /\.gif(\?|$)/i.test(resolvedUrl);
+    const isYoutube = /youtube\.com|youtu\.be/i.test(resolvedUrl);
 
     if (isGif) {
       return (
         <div className="rounded-lg overflow-hidden border border-border bg-black/40">
           <img
-            src={videoUrl}
+            src={resolvedUrl}
             alt={`Execução de ${exerciseName}`}
             className="w-full h-auto max-h-64 object-contain"
             loading="lazy"
@@ -61,8 +61,8 @@ const ExerciseVideo = ({ exerciseName, videoUrl, videoQuery }: ExerciseVideoProp
 
     if (isYoutube) {
       // Convert watch URL to embed URL
-      let embedUrl = videoUrl;
-      const watchMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
+      let embedUrl = resolvedUrl;
+      const watchMatch = resolvedUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
       if (watchMatch) embedUrl = `https://www.youtube.com/embed/${watchMatch[1]}`;
       return (
         <div className="rounded-lg overflow-hidden border border-border bg-black aspect-video">
