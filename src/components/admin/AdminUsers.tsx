@@ -3,6 +3,22 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,21 +29,48 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useAdminProfiles, useAdminUserRoles, usePromoteAdmin } from "@/hooks/useAdminData";
-import { ShieldCheck, Search } from "lucide-react";
+import {
+  useAdminProfiles,
+  useAdminUserRoles,
+  useAdminSubscriptions,
+} from "@/hooks/useAdminData";
+import { useAdminUserAction } from "@/hooks/useAdminUserAction";
+import {
+  ShieldCheck,
+  Search,
+  Pencil,
+  CreditCard,
+  User as UserIcon,
+  Trash2,
+  Ban,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useLogAudit } from "@/hooks/useAuditLog";
+
+type Profile = {
+  id: string;
+  user_id: string;
+  full_name: string | null;
+  age: number | null;
+  sex: string | null;
+  weight: number | null;
+  height: number | null;
+  goal: string | null;
+  onboarding_complete: boolean;
+};
 
 const AdminUsers = () => {
   const { data: profiles = [], isLoading } = useAdminProfiles();
   const { data: roles = [] } = useAdminUserRoles();
-  const promote = usePromoteAdmin();
+  const { data: subs = [] } = useAdminSubscriptions();
+  const action = useAdminUserAction();
   const { toast } = useToast();
-  const logAudit = useLogAudit();
+
   const [search, setSearch] = useState("");
-  const [confirming, setConfirming] = useState<{ userId: string; name: string } | null>(null);
+  const [editing, setEditing] = useState<Profile | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<Profile | null>(null);
 
   const adminIds = new Set(roles.filter((r) => r.role === "admin").map((r) => r.user_id));
+  const subByUser = new Map(subs.map((s) => [s.user_id, s] as const));
 
   const filtered = profiles.filter((p) => {
     if (!search) return true;
@@ -35,14 +78,118 @@ const AdminUsers = () => {
     return p.full_name?.toLowerCase().includes(q) || p.user_id.toLowerCase().includes(q);
   });
 
-  const confirmPromote = async () => {
-    if (!confirming) return;
-    const target = confirming;
-    setConfirming(null);
+  // Profile form state
+  const [pName, setPName] = useState("");
+  const [pAge, setPAge] = useState("");
+  const [pWeight, setPWeight] = useState("");
+  const [pHeight, setPHeight] = useState("");
+  const [pGoal, setPGoal] = useState("");
+  const [pOnboarded, setPOnboarded] = useState(false);
+
+  // Subscription form state
+  const [sPlan, setSPlan] = useState("monthly");
+  const [sStatus, setSStatus] = useState("active");
+  const [sUntil, setSUntil] = useState("");
+
+  const openEditor = (p: Profile) => {
+    setEditing(p);
+    setPName(p.full_name ?? "");
+    setPAge(p.age?.toString() ?? "");
+    setPWeight(p.weight?.toString() ?? "");
+    setPHeight(p.height?.toString() ?? "");
+    setPGoal(p.goal ?? "");
+    setPOnboarded(p.onboarding_complete);
+
+    const sub = subByUser.get(p.user_id);
+    setSPlan(sub?.plan_type ?? "monthly");
+    setSStatus(sub?.status ?? "active");
+    setSUntil(
+      sub?.current_period_end
+        ? new Date(sub.current_period_end).toISOString().slice(0, 10)
+        : ""
+    );
+  };
+
+  const saveProfile = async () => {
+    if (!editing) return;
     try {
-      await promote.mutateAsync(target.userId);
-      await logAudit("promote_admin", target.userId, { name: target.name });
-      toast({ title: "Promovido a admin!" });
+      await action.mutateAsync({
+        action: "update_profile",
+        target_user_id: editing.user_id,
+        payload: {
+          full_name: pName || null,
+          age: pAge ? Number(pAge) : null,
+          weight: pWeight ? Number(pWeight) : null,
+          height: pHeight ? Number(pHeight) : null,
+          goal: pGoal || null,
+          onboarding_complete: pOnboarded,
+        },
+      });
+      toast({ title: "Perfil atualizado!" });
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const saveSubscription = async () => {
+    if (!editing) return;
+    try {
+      await action.mutateAsync({
+        action: "upsert_subscription",
+        target_user_id: editing.user_id,
+        payload: {
+          plan_type: sPlan,
+          status: sStatus,
+          current_period_end: sUntil ? new Date(sUntil).toISOString() : null,
+          next_billing_date: sUntil || null,
+          environment: "live",
+        },
+      });
+      toast({ title: "Assinatura atualizada!" });
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const cancelSub = async () => {
+    if (!editing) return;
+    try {
+      await action.mutateAsync({
+        action: "cancel_subscription",
+        target_user_id: editing.user_id,
+      });
+      setSStatus("canceled");
+      toast({ title: "Assinatura cancelada" });
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const setRole = async (role: "admin" | "user") => {
+    if (!editing) return;
+    try {
+      await action.mutateAsync({
+        action: "set_role",
+        target_user_id: editing.user_id,
+        payload: { role },
+      });
+      toast({ title: role === "admin" ? "Promovido a admin" : "Rebaixado a usuário" });
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const deleteUser = async () => {
+    if (!confirmDelete) return;
+    const target = confirmDelete;
+    setConfirmDelete(null);
+    try {
+      await action.mutateAsync({
+        action: "delete_user",
+        target_user_id: target.user_id,
+      });
+      setEditing(null);
+      toast({ title: "Usuário deletado" });
     } catch (e: any) {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
     }
@@ -52,7 +199,12 @@ const AdminUsers = () => {
     <div className="space-y-3">
       <div className="relative">
         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar usuário..." className="pl-9" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Buscar por nome ou ID..."
+          className="pl-9"
+        />
       </div>
 
       <p className="text-xs text-muted-foreground">{filtered.length} usuário(s)</p>
@@ -62,43 +214,173 @@ const AdminUsers = () => {
       <div className="space-y-2">
         {filtered.map((p) => {
           const isAdmin = adminIds.has(p.user_id);
+          const sub = subByUser.get(p.user_id);
+          const subActive =
+            sub &&
+            ["active", "trialing"].includes(sub.status) &&
+            (!sub.current_period_end || new Date(sub.current_period_end) > new Date());
           return (
             <Card key={p.id} className="p-3 flex items-center justify-between gap-2">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="font-medium text-sm text-foreground truncate">{p.full_name || "—"}</p>
-                  {isAdmin && <Badge variant="default" className="text-[9px] gap-1"><ShieldCheck size={10} />admin</Badge>}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="font-medium text-sm text-foreground truncate">
+                    {p.full_name || "—"}
+                  </p>
+                  {isAdmin && (
+                    <Badge variant="default" className="text-[9px] gap-1">
+                      <ShieldCheck size={10} />admin
+                    </Badge>
+                  )}
+                  {subActive ? (
+                    <Badge variant="outline" className="text-[9px] gap-1 border-primary/40 text-primary">
+                      <CreditCard size={10} />{sub?.plan_type}
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-[9px] text-muted-foreground">
+                      sem plano
+                    </Badge>
+                  )}
                 </div>
                 <p className="text-[10px] text-muted-foreground truncate">{p.user_id}</p>
               </div>
-              {!isAdmin && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="shrink-0"
-                  onClick={() => setConfirming({ userId: p.user_id, name: p.full_name || "usuário" })}
-                  disabled={promote.isPending}
-                >
-                  Promover
-                </Button>
-              )}
+              <Button size="sm" variant="outline" className="shrink-0 gap-1" onClick={() => openEditor(p as Profile)}>
+                <Pencil size={12} />Editar
+              </Button>
             </Card>
           );
         })}
       </div>
 
-      <AlertDialog open={!!confirming} onOpenChange={(o) => !o && setConfirming(null)}>
+      {/* Editor */}
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Editar usuário</DialogTitle>
+            <DialogDescription className="text-xs">
+              {editing?.full_name || "—"} · {editing?.user_id}
+            </DialogDescription>
+          </DialogHeader>
+
+          <Tabs defaultValue="profile">
+            <TabsList className="w-full">
+              <TabsTrigger value="profile" className="flex-1 gap-1"><UserIcon size={12} />Perfil</TabsTrigger>
+              <TabsTrigger value="subscription" className="flex-1 gap-1"><CreditCard size={12} />Plano</TabsTrigger>
+              <TabsTrigger value="role" className="flex-1 gap-1"><ShieldCheck size={12} />Role</TabsTrigger>
+              <TabsTrigger value="danger" className="flex-1 gap-1 text-destructive"><Ban size={12} />Risco</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="profile" className="space-y-3 mt-3">
+              <div><Label>Nome completo</Label><Input value={pName} onChange={(e) => setPName(e.target.value)} className="mt-1" /></div>
+              <div className="grid grid-cols-3 gap-2">
+                <div><Label>Idade</Label><Input type="number" value={pAge} onChange={(e) => setPAge(e.target.value)} className="mt-1" /></div>
+                <div><Label>Peso (kg)</Label><Input type="number" value={pWeight} onChange={(e) => setPWeight(e.target.value)} className="mt-1" /></div>
+                <div><Label>Altura (cm)</Label><Input type="number" value={pHeight} onChange={(e) => setPHeight(e.target.value)} className="mt-1" /></div>
+              </div>
+              <div><Label>Objetivo</Label><Input value={pGoal} onChange={(e) => setPGoal(e.target.value)} placeholder="hipertrofia, emagrecimento..." className="mt-1" /></div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="onb"
+                  checked={pOnboarded}
+                  onChange={(e) => setPOnboarded(e.target.checked)}
+                />
+                <Label htmlFor="onb" className="cursor-pointer">Onboarding concluído</Label>
+              </div>
+              <Button onClick={saveProfile} disabled={action.isPending} className="w-full">
+                {action.isPending ? "Salvando..." : "Salvar perfil"}
+              </Button>
+            </TabsContent>
+
+            <TabsContent value="subscription" className="space-y-3 mt-3">
+              <div>
+                <Label>Plano</Label>
+                <Select value={sPlan} onValueChange={setSPlan}>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="monthly">Mensal</SelectItem>
+                    <SelectItem value="annual">Anual</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Status</Label>
+                <Select value={sStatus} onValueChange={setSStatus}>
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Ativa</SelectItem>
+                    <SelectItem value="trialing">Trial</SelectItem>
+                    <SelectItem value="past_due">Inadimplente</SelectItem>
+                    <SelectItem value="canceled">Cancelada</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Acesso até</Label>
+                <Input type="date" value={sUntil} onChange={(e) => setSUntil(e.target.value)} className="mt-1" />
+                <p className="text-[10px] text-muted-foreground mt-1">Defina uma data futura para conceder acesso manual.</p>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={saveSubscription} disabled={action.isPending} className="flex-1">
+                  {action.isPending ? "Salvando..." : "Salvar plano"}
+                </Button>
+                <Button onClick={cancelSub} disabled={action.isPending} variant="outline" className="flex-1">
+                  Cancelar plano
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="role" className="space-y-3 mt-3">
+              <p className="text-xs text-muted-foreground">
+                Admins têm acesso total ao painel e contornam paywall. Use com cautela.
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setRole("admin")}
+                  disabled={action.isPending || (editing && adminIds.has(editing.user_id))}
+                  className="flex-1 gap-1"
+                >
+                  <ShieldCheck size={14} />Tornar admin
+                </Button>
+                <Button
+                  onClick={() => setRole("user")}
+                  disabled={action.isPending || (editing && !adminIds.has(editing.user_id))}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Rebaixar a usuário
+                </Button>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="danger" className="space-y-3 mt-3">
+              <p className="text-xs text-destructive">
+                Excluir o usuário é <strong>irreversível</strong>. Remove conta de auth, perfil, treinos, dieta, etc.
+              </p>
+              <Button
+                variant="destructive"
+                className="w-full gap-2"
+                onClick={() => editing && setConfirmDelete(editing)}
+              >
+                <Trash2 size={14} />Excluir usuário permanentemente
+              </Button>
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Promover {confirming?.name} a administrador?</AlertDialogTitle>
+            <AlertDialogTitle>Excluir {confirmDelete?.full_name || "usuário"}?</AlertDialogTitle>
             <AlertDialogDescription>
-              Este usuário ganhará acesso total ao painel admin (vendas, leads, usuários, configurações).
-              A ação será registrada no log de auditoria.
+              Essa ação NÃO pode ser desfeita. Todos os dados do usuário serão removidos.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmPromote}>Confirmar promoção</AlertDialogAction>
+            <AlertDialogAction onClick={deleteUser} className="bg-destructive text-destructive-foreground">
+              Excluir definitivamente
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
