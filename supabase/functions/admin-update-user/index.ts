@@ -165,6 +165,33 @@ Deno.serve(async (req) => {
         return json({ ok: true });
       }
 
+      case "update_email": {
+        const newEmail: string | undefined = payload?.email?.trim().toLowerCase();
+        if (!newEmail || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(newEmail)) {
+          return json({ error: "Email inválido" }, 400);
+        }
+        // email_confirm:false -> envia email de confirmação ao novo endereço
+        const { error } = await admin.auth.admin.updateUserById(target_user_id, {
+          email: newEmail,
+          email_confirm: false,
+        });
+        if (error) throw error;
+        await audit("admin_update_email", { new_email: newEmail });
+        return json({ ok: true });
+      }
+
+      case "grant_protocol_regen": {
+        // Concede crédito de regeneração antecipada (admin manual, sem cobrança)
+        const { error } = await admin.from("protocol_regenerations").insert({
+          user_id: target_user_id,
+          status: "granted",
+          amount_brl: 0,
+        });
+        if (error) throw error;
+        await audit("admin_grant_protocol_regen");
+        return json({ ok: true });
+      }
+
       default:
         return json({ error: "Unknown action" }, 400);
     }
