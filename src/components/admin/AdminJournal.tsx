@@ -259,6 +259,25 @@ const AdminJournal = () => {
         </div>
       </Card>
 
+      {/* Gerar lote automático */}
+      <Card className="p-4 card-gradient border-primary/20">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <h3 className="font-heading font-semibold text-foreground text-sm flex items-center gap-2">
+              <Sparkles size={14} className="text-primary" />
+              Gerar lote automático
+            </h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              5 rascunhos: treino, nutrição, peptídeos, mente e suplementação.
+            </p>
+          </div>
+          <Button onClick={handleBatchGenerate} disabled={batchLoading} size="sm" className="gap-1 glow shrink-0">
+            {batchLoading ? <Loader2 className="animate-spin" size={14} /> : <Wand2 size={14} />}
+            {batchLoading ? "Gerando..." : "Gerar 5 artigos"}
+          </Button>
+        </div>
+      </Card>
+
       <div className="flex justify-between items-center">
         <div className="flex gap-2 text-xs text-muted-foreground">
           <span>📰 {published.length} publicados</span>

@@ -43,6 +43,8 @@ import {
   User as UserIcon,
   Trash2,
   Ban,
+  Mail,
+  Gift,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -85,6 +87,7 @@ const AdminUsers = () => {
   const [pHeight, setPHeight] = useState("");
   const [pGoal, setPGoal] = useState("");
   const [pOnboarded, setPOnboarded] = useState(false);
+  const [pEmail, setPEmail] = useState("");
 
   // Subscription form state
   const [sPlan, setSPlan] = useState("monthly");
@@ -99,6 +102,7 @@ const AdminUsers = () => {
     setPHeight(p.height?.toString() ?? "");
     setPGoal(p.goal ?? "");
     setPOnboarded(p.onboarding_complete);
+    setPEmail("");
 
     const sub = subByUser.get(p.user_id);
     setSPlan(sub?.plan_type ?? "monthly");
@@ -174,6 +178,44 @@ const AdminUsers = () => {
         payload: { role },
       });
       toast({ title: role === "admin" ? "Promovido a admin" : "Rebaixado a usuário" });
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const updateEmail = async () => {
+    if (!editing) return;
+    if (!pEmail.trim()) {
+      toast({ title: "Digite o novo email", variant: "destructive" });
+      return;
+    }
+    try {
+      await action.mutateAsync({
+        action: "update_email",
+        target_user_id: editing.user_id,
+        payload: { email: pEmail.trim() },
+      });
+      toast({
+        title: "Email enviado para confirmação",
+        description: "O usuário precisa clicar no link no novo endereço.",
+      });
+      setPEmail("");
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const grantRegen = async () => {
+    if (!editing) return;
+    try {
+      await action.mutateAsync({
+        action: "grant_protocol_regen",
+        target_user_id: editing.user_id,
+      });
+      toast({
+        title: "Regeneração liberada",
+        description: "Usuário pode gerar novo protocolo agora (sem cobrança).",
+      });
     } catch (e: any) {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
     }
