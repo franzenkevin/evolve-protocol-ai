@@ -28,6 +28,7 @@ import AcceptTerms from "./pages/AcceptTerms";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import Plans from "./pages/Plans";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 import NotFound from "./pages/NotFound";
 import { CURRENT_TERMS_VERSION } from "@/lib/terms";
 
@@ -77,6 +78,7 @@ const App = () => (
             <Route path="/profile" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><Profile /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
             <Route path="/profile/edit" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><EditProfile /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
             <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
+            <Route path="/checkout/success" element={<ProtectedRoute><CheckoutSuccess /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
