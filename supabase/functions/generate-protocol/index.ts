@@ -403,19 +403,22 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
 {
   "training": [
     {
-      "label": "Segunda — Peito & Tríceps",
-      "muscleGroup": "Peito & Tríceps",
+      "label": "Segunda — A: Push",
+      "muscleGroup": "Push (Peito + Ombros + Tríceps)",
       "weekday": "Segunda",
-      "dynamicNotes": "Comece pelo composto pesado (supino reto) para máxima carga, depois isole. Faça 1 aquecimento a 50% e progrida até a falha nas válidas. Última série: vai até a falha total.",
+      "splitCode": "A",
+      "dynamicNotes": "Comece pelo composto pesado para máxima carga, depois isole. Aquecimento 50% sem chegar perto da falha, válida 1 alvo 10 reps, válida 2 alvo 8 reps mesma carga, válida 3 falha total mesma carga.",
       "mobility": [
-        { "name": "Alongamento peitoral na parede", "type": "alongamento", "duration": "2x 30s cada lado", "target": "Ombros protraídos / hipercifose", "videoQuery": "Alongamento peitoral na parede execução" },
-        { "name": "Face pull com banda", "type": "fortalecimento corretivo", "duration": "2x 15 reps", "target": "Hipercifose torácica", "videoQuery": "Face pull com banda execução correta" }
+        { "name": "Alongamento peitoral na parede", "type": "alongamento", "duration": "2x 30s cada lado", "target": "Ombros protraídos / hipercifose", "videoQuery": "Alongamento peitoral na parede execução" }
       ],
       "exercises": [
-        { "id": "0-0", "name": "Supino reto barra", "sets": 3, "reps": "8-12", "rest": "90s", "technique": "standard", "videoQuery": "Supino reto barra execução correta", "done": false }
-      ]
+        { "id": "0-0", "name": "Supino reto barra", "sets": 3, "reps": "10/8/falha", "rest": "90s", "technique": "standard", "primaryMuscle": "peito", "accessoryMuscle": "deltoide_frontal", "videoQuery": "Supino reto barra execução correta", "done": false }
+      ],
+      "cardio": null
     }
   ],
+  "cardioPlan": null,
+  "weeklyVolumeCheck": { "peito": "ex 12", "costas": "ex 14", "biceps": "ex 9", "triceps": "ex 9" },
   "diet": {
     "totalCalories": 2500,
     "protein": 160,
