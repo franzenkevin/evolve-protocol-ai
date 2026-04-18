@@ -31,8 +31,8 @@ const STEPS = [
 
 const CARDIO_FREQUENCY = ["1x por semana", "2x por semana", "3x por semana", "4x por semana", "5x por semana", "Todos os dias"];
 const CARDIO_DURATION = ["10-15 min", "15-20 min", "20-30 min", "30-45 min", "45-60 min"];
-const CARDIO_TIMING = ["Logo após o treino de musculação", "Em horário separado (manhã/noite)", "Em dias de descanso da musculação", "Tanto faz — IA decide"];
-const CARDIO_TYPE = ["LISS (caminhada/bike leve, baixa intensidade)", "HIIT (alta intensidade intervalado)", "Moderado contínuo (corrida/bike)", "Tanto faz — IA escolhe melhor para meu objetivo"];
+const CARDIO_TIMING = ["Logo após o treino de musculação", "Em horário separado (manhã/noite)", "Em dias de descanso da musculação", "Tanto faz"];
+const CARDIO_TYPE = ["LISS (caminhada/bike leve, baixa intensidade)", "HIIT (alta intensidade intervalado)", "Moderado contínuo (corrida/bike)", "Tanto faz — escolha o melhor para meu objetivo"];
 
 const GOALS = ["Hipertrofia", "Emagrecimento", "Recomposição Corporal", "Saúde Geral"];
 const ACTIVITY_LEVELS = ["Sedentário", "Levemente ativo", "Moderadamente ativo", "Muito ativo", "Extremamente ativo"];
@@ -522,12 +522,12 @@ const Onboarding = () => {
           {step === 3 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Cardio</h2>
-              <p className="text-sm text-muted-foreground">Conte para a IA suas preferências de cardio. Ela vai prescrever o tipo e a intensidade certos para o seu objetivo.</p>
+              <p className="text-sm text-muted-foreground">Conte suas preferências de cardio. O cardio será incluído junto com seus dias de treino.</p>
 
               <div>
                 <Label>Você quer incluir cardio no protocolo? *</Label>
                 <RadioGroup value={data.cardioEnabled} onValueChange={(v) => update("cardioEnabled", v)} className="mt-2 space-y-2">
-                  {radioOption("yes", "cardio-yes", "Sim, quero cardio prescrito pela IA")}
+                  {radioOption("yes", "cardio-yes", "Sim, quero incluir cardio")}
                   {radioOption("no", "cardio-no", "Não, só musculação por enquanto")}
                 </RadioGroup>
               </div>
