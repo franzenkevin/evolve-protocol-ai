@@ -350,6 +350,9 @@ const Onboarding = () => {
         meal_count: data.mealCount ? parseInt(data.mealCount) : null,
         sleep_hours: data.sleepHours ? parseFloat(data.sleepHours) : null,
         stress_level: data.stressLevel,
+        body_emphasis: confirmations.bodyEmphasis.wants === "yes"
+          ? confirmations.bodyEmphasis.description.trim() || null
+          : null,
         onboarding_complete: true,
       };
 
@@ -374,7 +377,12 @@ const Onboarding = () => {
         toast({ title: "🤖 Gerando protocolo com IA...", description: "Isso pode levar alguns segundos." });
 
         const { data: aiResult, error: aiError } = await supabase.functions.invoke("generate-protocol", {
-          body: { profile: profileData, bodyAssessment },
+          body: {
+            profile: profileData,
+            bodyAssessment,
+            bodyEmphasis: profileData.body_emphasis,
+            confirmations,
+          },
         });
 
         if (aiError) throw aiError;
