@@ -134,6 +134,44 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // Optional direct-send mode: { userId, title, body, url }
+    let directBody: { userId?: string; title?: string; body?: string; url?: string } | null = null;
+    if (req.method === "POST") {
+      try { directBody = await req.json(); } catch { /* no body */ }
+    }
+    if (directBody?.userId && directBody.title && directBody.body) {
+      const { data: userSubs, error: subErr } = await supabase
+        .from("push_subscriptions")
+        .select("*")
+        .eq("user_id", directBody.userId);
+      if (subErr) throw subErr;
+
+      let sentDirect = 0;
+      for (const sub of userSubs || []) {
+        try {
+          const payload = JSON.stringify({
+            title: directBody.title,
+            body: directBody.body,
+            data: { url: directBody.url || "/dashboard" },
+          });
+          await sendPushNotification(
+            { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
+            payload,
+            VAPID_PRIVATE_KEY
+          );
+          sentDirect++;
+        } catch (e) {
+          console.error("Direct push failed:", e);
+          if (e instanceof Error && e.message.includes("410")) {
+            await supabase.from("push_subscriptions").delete().eq("id", sub.id);
+          }
+        }
+      }
+      return new Response(JSON.stringify({ sent: sentDirect, mode: "direct" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Get current hour in BRT (UTC-3)
     const now = new Date();
     const brtHour = (now.getUTCHours() - 3 + 24) % 24;
