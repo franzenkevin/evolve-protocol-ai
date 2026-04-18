@@ -52,23 +52,69 @@ serve(async (req) => {
     }
 
     // Build assessment context
+    const hasAssessment = !!bodyAssessment;
+    const hasInjuries = !!(profile.injuries && profile.injuries.trim() && profile.injuries.toLowerCase() !== "nenhuma" && profile.injuries.toLowerCase() !== "não");
+    const hasPostureIssues = hasAssessment && Array.isArray(bodyAssessment.posture_deviations) && bodyAssessment.posture_deviations.length > 0;
+    const hasWeakPoints = hasAssessment && Array.isArray(bodyAssessment.weak_points) && bodyAssessment.weak_points.length > 0;
+
     let assessmentContext = "";
-    if (bodyAssessment) {
+    if (hasAssessment) {
       assessmentContext = `
-## AVALIAÇÃO CORPORAL (fotos analisadas por IA)
+## AVALIAÇÃO CORPORAL (fotos analisadas por IA — USAR COMO BASE OBRIGATÓRIA DA PRESCRIÇÃO)
 - Gordura estimada: ${bodyAssessment.body_fat_estimate || "N/A"}
 - Categoria: ${bodyAssessment.body_fat_category || "N/A"}
 - Pontos fortes: ${(bodyAssessment.strong_points || []).join(", ") || "N/A"}
-- Pontos fracos: ${(bodyAssessment.weak_points || []).join(", ") || "N/A"}
-- Desvios posturais: ${(bodyAssessment.posture_deviations || []).join(", ") || "N/A"}
+- Pontos fracos (PRIORIZAR no treino): ${(bodyAssessment.weak_points || []).join(", ") || "N/A"}
+- Desvios posturais (CONTRAINDICAÇÕES + mobilidade obrigatória): ${(bodyAssessment.posture_deviations || []).join(", ") || "N/A"}
 - Desenvolvimento muscular: ${JSON.stringify(bodyAssessment.muscle_development || {})}
 - Recomendações da avaliação: ${(bodyAssessment.recommendations || []).join("; ") || "N/A"}
-- Resumo: ${bodyAssessment.overall_summary || "N/A"}
-
-IMPORTANTE: Use esses dados para PRIORIZAR grupos musculares fracos no treino e ajustar macros baseado na composição corporal real.`;
+- Resumo: ${bodyAssessment.overall_summary || "N/A"}`;
+    } else {
+      assessmentContext = `
+## AVALIAÇÃO CORPORAL
+Não há avaliação corporal disponível. Use prescrição padrão conservadora baseada apenas em sexo/nível/objetivo, SEM exercícios de alto risco articular (ex: agachamento livre profundo com carga, desenvolvimento militar atrás da nuca, remada curvada pesada) — prefira variações em máquina ou guiadas.`;
     }
 
-    const systemPrompt = `Você é um preparador físico profissional especializado em hipertrofia e recomposição corporal. Você segue uma metodologia ESPECÍFICA que deve ser respeitada em TODOS os protocolos gerados. Responda APENAS com o JSON solicitado.
+    if (hasInjuries) {
+      assessmentContext += `
+
+## LESÕES INFORMADAS PELO ALUNO (CONTRAINDICAÇÕES ABSOLUTAS)
+"${profile.injuries}"
+Você DEVE excluir do treino qualquer exercício que solicite ou agrave a estrutura lesionada (ver tabela "ADAPTAÇÕES POR LESÃO" abaixo).`;
+    }
+
+    const systemPrompt = `Você é um preparador físico profissional especializado em hipertrofia e recomposição corporal. Você segue uma metodologia ESPECÍFICA que deve ser respeitada em TODOS os protocolos gerados. PRIORIZE ASSERTIVIDADE SOBRE VELOCIDADE — analise CADA dado do aluno antes de prescrever cada exercício. Responda APENAS com o JSON solicitado.
+
+# PROCESSO OBRIGATÓRIO DE PRESCRIÇÃO (siga nesta ORDEM, internamente, antes de gerar o JSON)
+
+1. **LER a avaliação corporal**: identifique pontos fracos, desvios posturais, categoria de gordura. Esses dados ditam PRIORIDADES e CONTRAINDICAÇÕES.
+2. **LER as lesões**: cada lesão remove um conjunto específico de exercícios do banco (ver "ADAPTAÇÕES POR LESÃO"). Substitua por variações seguras.
+3. **PRIORIZAR pontos fracos**: para cada ponto fraco da avaliação, adicione 1 exercício extra OU 1 série extra ao grupo correspondente.
+4. **CORRIGIR desvios posturais**: gere mobilidade ESPECÍFICA + escolha exercícios da lista que reforcem antagonistas dos desvios (ex: hipercifose → mais costas/face pull, menos peito barra).
+5. **MONTAR o split** respeitando dias da semana e descanso entre sinérgicos.
+6. **VALIDAR cada exercício** antes de incluir: "esse exercício é seguro para esta pessoa específica?" Se houver dúvida (lesão lombar + agachamento livre, ombro impacto + desenvolvimento militar, etc.), TROQUE por uma variação mais segura.
+
+A maioria dos alunos receberá exercícios semelhantes (a base hipertrofia é universal), mas as ADAPTAÇÕES individuais (lesão, postura, ponto fraco) tornam o protocolo único. NUNCA prescreva um exercício "no piloto automático" sem verificar contraindicações.
+
+# ADAPTAÇÕES POR LESÃO (regras de substituição obrigatórias)
+
+- **Lombar (hérnia, dor, ciática)**: REMOVER agachamento livre, stiff barra, remada curvada, levantamento terra, desenvolvimento em pé com barra. SUBSTITUIR por: hack squat, leg press, agachamento na máquina smith com pés à frente, stiff com halteres leves, mesa flexora, remada cavaleiro com peito apoiado, desenvolvimento sentado com apoio.
+- **Joelho (condromalácia, menisco, ligamento)**: REMOVER agachamento livre profundo, passada com carga, sissy squat, agachamento búlgaro pesado. SUBSTITUIR por: leg press com amplitude controlada (sem passar dos 90°), cadeira extensora unilateral leve, mesa flexora, elevação pélvica, abdução máquina.
+- **Ombro (impacto, manguito, bursite)**: REMOVER desenvolvimento militar atrás da nuca, supino reto com barra pesada, elevação frontal pesada, mergulho no banco. SUBSTITUIR por: desenvolvimento com halteres neutro (martelo/Arnold), supino com halteres em ângulo neutro, crucifixo com pegada neutra, face pull (obrigatório), elevação lateral leve com inclinação.
+- **Cotovelo (epicondilite/tendinite)**: REMOVER rosca direta com barra reta, tríceps testa com barra. SUBSTITUIR por: rosca martelo, rosca com pegada neutra, tríceps na corda, tríceps francês unilateral.
+- **Punho**: REMOVER barra fixa pegada pronada pesada, supino com barra. SUBSTITUIR por: máquinas com pegada neutra, halteres.
+- **Cervical**: REMOVER encolhimento de trapézio pesado, desenvolvimento com barra atrás da nuca, abdominal com mãos na nuca. SUBSTITUIR por: encolhimento leve com halteres, desenvolvimento neutro sentado, abdominal com mãos cruzadas no peito.
+- **Quadril**: REMOVER agachamento sumô profundo, levantamento terra. SUBSTITUIR por: leg press, hip thrust com amplitude reduzida, abdução.
+
+# ADAPTAÇÕES POR DESVIO POSTURAL (selecionar exercícios que ajudem, evitar os que pioram)
+
+- **Hipercifose torácica / ombros protraídos**: PRIORIZAR puxada frontal pegada aberta, remada cavaleiro, face pull, crucifixo invertido, YTW. EVITAR volume excessivo de supino reto e crucifixo (já estão encurtados). Limitar peito a 2 exercícios mesmo para homens.
+- **Hiperlordose lombar / anteversão pélvica**: PRIORIZAR posterior de coxa (mesa flexora, stiff leve, hip thrust), core anterior (prancha, crunch), glúteo. EVITAR hiperextensão lombar pesada, agachamento muito profundo com carga (acentua a lordose se descontrolado).
+- **Joelho valgo**: PRIORIZAR glúteo médio (abdução, clamshell). EVITAR leg press com pés muito juntos, agachamento sem mini-band.
+- **Pescoço anteriorizado**: PRIORIZAR puxada para trás, face pull, encolhimento posterior leve, fortalecimento de profundos do pescoço. EVITAR encolhimentos pesados frontais.
+- **Escápula alada**: PRIORIZAR serrátil (push-up plus, landmine press), wall slides. EVITAR cargas pesadas em supino reto e desenvolvimento até estabilizar.
+
+
 
 # SUA METODOLOGIA (REGRAS OBRIGATÓRIAS)
 
@@ -384,12 +430,17 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
 - Tipo preferido: ${profile.cardio_type_preference || "N/A"}` : ""}
 ${assessmentContext}
 
-Gere o JSON completo seguindo TODAS as regras da metodologia.`;
+INSTRUÇÃO FINAL: Antes de prescrever, faça internamente o checklist:
+1. Quais lesões/desvios este aluno tem? Quais exercícios devo REMOVER ou SUBSTITUIR?
+2. Quais são os pontos fracos da avaliação? Onde devo adicionar volume extra?
+3. Para CADA exercício do split, ele é seguro e adequado para ESTE aluno especificamente?
+Só depois gere o JSON completo seguindo TODAS as regras da metodologia.`;
 
-    console.log("Calling AI for protocol generation...");
+    console.log("Calling AI for protocol generation (assertive mode)...");
 
-    // Use Gemini Flash: ~5-8x faster than gpt-5-mini for this prompt size,
-    // keeping us safely under the 150s edge function idle timeout.
+    // Use GPT-5: raciocínio mais profundo para analisar avaliação + lesões + desvios
+    // antes de prescrever cada exercício. Trade-off: ~60-120s vs Flash (~30s),
+    // mas o usuário prioriza ASSERTIVIDADE sobre velocidade.
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -397,14 +448,14 @@ Gere o JSON completo seguindo TODAS as regras da metodologia.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "openai/gpt-5",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
         response_format: { type: "json_object" },
       }),
-      signal: AbortSignal.timeout(130000),
+      signal: AbortSignal.timeout(180000),
     });
 
     if (!aiResponse.ok) {
