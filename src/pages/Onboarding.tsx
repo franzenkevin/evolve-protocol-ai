@@ -376,7 +376,6 @@ const Onboarding = () => {
       }
 
       await createProtocol.mutateAsync(protocol);
-      setGenProgress(100);
       setGenStage("Pronto!");
       await new Promise((r) => setTimeout(r, 400));
       navigate("/dashboard");
@@ -745,11 +744,16 @@ const Onboarding = () => {
               <p className="text-sm text-muted-foreground">{genStage}</p>
             </div>
             <div className="space-y-2">
-              <Progress value={genProgress} className="h-3" />
-              <p className="text-2xl font-bold text-primary">{Math.round(genProgress)}%</p>
+              <Progress value={Math.min(100, (genElapsed / TARGET_SECONDS) * 100)} className="h-3" />
+              <p className="text-3xl font-bold text-primary font-heading tabular-nums">
+                {String(Math.floor(genElapsed / 60)).padStart(2, "0")}:{String(genElapsed % 60).padStart(2, "0")}
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                Tempo estimado: até 3 minutos
+              </p>
             </div>
             <p className="text-xs text-muted-foreground">
-              A IA está montando seu treino e dieta personalizados. Não feche esta tela.
+              Mantenha esta tela aberta enquanto montamos seu treino e dieta personalizados.
             </p>
           </div>
         </div>
