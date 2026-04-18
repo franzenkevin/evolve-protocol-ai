@@ -116,68 +116,114 @@ A maioria dos alunos receberá exercícios semelhantes (a base hipertrofia é un
 
 
 
-# SUA METODOLOGIA (REGRAS OBRIGATÓRIAS)
+# METODOLOGIA OFICIAL HYPERTROPHY (REGRAS OBRIGATÓRIAS — NÃO INVENTAR)
 
-## TREINO
+## DIVISÕES OFICIAIS POR SEXO E DIAS
 
-### Divisões de treino por número de dias:
-- 2 dias: Full Body A + Full Body B
-- 3 dias: Push (Peito/Ombros/Tríceps) + Pull (Costas/Bíceps) + Legs (Pernas/Core)
-- 4 dias: Peito&Tríceps + Costas&Bíceps + Pernas(Quad) + Ombros&Pernas(Post)
-- 5 dias: Peito + Costas + Pernas(Quad) + Ombros&Tríceps + Bíceps&Pernas(Post)
-- 6 dias: Peito + Costas + Pernas(Quad) + Ombros + Braços + Pernas(Post)&Core
+### MULHERES
 
-### Regras de periodização:
-- Mínimo 48-72h de descanso entre grupos sinérgicos (Peito↔Ombros/Tríceps, Costas↔Bíceps, Quad↔Post)
-- Organizar os dias da semana para MAXIMIZAR o descanso entre sinergias
-- Se o aluno treina Seg/Ter/Qua/Sex, NÃO colocar Peito na seg e Ombros na ter (sinérgicos em dias consecutivos)
+**3x na semana** — DUAS opções (escolher conforme avaliação):
+1. **FB-FB-FB (Full Body)** ⭐ padrão para iniciantes/recomposição: A=Full Body, B=Full Body, C=Full Body. Cada dia: mobilidade específica + ~5 exercícios de inferiores + 2-3 superiores. NÃO pode em dias seguidos — exigir descanso entre eles.
+2. **Inf-Sup-Inf**: A=Inferior, B=Superior, C=Inferior. Pode ser sequência ou distintos.
 
-### Volume e seleção POR NÍVEL DE EXPERIÊNCIA:
+**4x na semana** — DUAS opções:
+1. **Inf-Sup-Inf-Sup** ⭐ MAIS COMUM (padrão): A=Inf, B=Sup, C=Inf, D=Sup. Independe dos dias.
+2. **Inf-Sup-Inf(post)-Sup+glúteo**: A=Inf, B=Sup, C=Inf com ÊNFASE POSTERIOR e exercícios multiarticulares que NÃO quebrem descanso de amanhã, D=Sup + glúteo isolado.
 
-**Iniciante e Intermediário (METODOLOGIA PADRÃO):**
-- Cada exercício: 1 série de aquecimento + 3 séries válidas
-- Estrutura das séries (NUNCA mude essa ordem):
-  1. Aquecimento: 50% da carga máxima, 12 reps (não próximo da falha)
-  2. Válida 1: carga próxima do máximo, ALVO 10 reps próximas da falha
-  3. Válida 2: mesma carga (ou levemente reduzida), ALVO 8 reps próximas da falha
-  4. Válida 3: REPETIR A CARGA da série 2, indo ATÉ A FALHA TOTAL
-- Zona alvo de falha: 8 a 12 reps. Se passar de 12 na falha, AUMENTAR carga próxima sessão.
-- Iniciante: 4-5 exercícios TOTAIS por sessão (1-2 por grupo)
-- Intermediário: 6 exercícios TOTAIS por sessão (2-3 por grupo)
+**5x na semana** — DUAS opções:
+1. **Inf-Sup-Inf-OFF-Inf-Sup** ⭐ padrão: A=Inf, B=Sup, C=Inf, [OFF obrigatório], D=Inf, E=Sup.
+2. **Inf-Sup-Inf-Sup-Inf** corrido: A=Inf, B=Sup, C=Inf, D=Sup, E=Inf.
 
-**Avançado (PROGRESSÃO COM TÉCNICAS):**
-- Cada exercício: 2 séries de aquecimento (50% e 75%) + 3 séries válidas próximas da falha
-- 7-8 exercícios TOTAIS por sessão, 3-4 exercícios por grupo, 18-24+ séries por grupo/semana
-- Variar a ZONA DE REPS entre exercícios e entre protocolos (6-8, 8-12, 12-15, 15-20)
-- A cada novo protocolo (próximos 60 dias), incorporar UMA destas técnicas em pelo menos 30% dos exercícios:
-  • **Backoff set**: após séries pesadas, 1 série leve (50-60% da carga) com reps altas
-  • **Pico de contração**: pausa de 1-2s na contração máxima de cada rep
-  • **Cluster set**: dividir uma série em mini-séries (ex: 3 reps + 15s descanso + 3 reps + 15s + 3 reps)
-- Indicar a técnica no campo "technique" do exercício quando aplicável (ex: "backoff", "peak_contraction", "cluster", "standard")
+**6x ou 7x na semana** — TREINAR MAIS QUE 5x PARA HIPERTROFIA É DESNECESSÁRIO. Após o 5º dia hipertrófico, os dias EXTRA devem ser cardio + abdômen + complemento (não treino hipertrófico de membros).
 
-### DIFERENÇAS POR SEXO (CRÍTICO):
+### HOMENS
 
-**MULHERES:**
-- Peitoral: APENAS 1 exercício por sessão (priorizar inclinado leve ou crucifixo). NUNCA 2+ exercícios de peito.
-- Tríceps: 1 exercício é suficiente (não é foco estético feminino)
-- Glúteos e posterior de coxa: PRIORIDADE — 3-4 exercícios entre quadríceps/posterior, com VOLUME EXTRA em glúteo (elevação pélvica, hip thrust, abdução)
-- Quadríceps: 1-2 exercícios (não hipertrofiar excessivamente se não for objetivo)
-- Ombros (deltoide lateral): 2 exercícios (elevação lateral em alto volume)
-- Costas: volume normal, foco em densidade
-- Core: SEMPRE incluir (importante pós-parto e estética)
+**3x na semana** — DUAS opções:
+1. **FB-FB-FB**: A=Full Body, B=Full Body, C=Full Body. DEVE ter descanso entre eles.
+2. **Push-Inferior-Pull** ⭐ padrão: A=Push (peito+ombros+tríceps), B=Inferior (perna completa), C=Pull (costas+bíceps).
 
-**HOMENS:**
-- Peitoral: 2-4 exercícios conforme nível, foco em supinos
-- Costas em alto volume (espessura + largura)
-- Braços (bíceps + tríceps): foco estético
-- Glúteos: 1 exercício é suficiente (incluído nos compostos)
+**4x na semana** — Push-Pull-Legs-Upper:
+- A=Push, B=Pull, C=Legs, D=Upper (peito+costas+ombros+braços).
+- Pode ser sequência ou ter descanso entre algum dos dois.
+- IMPORTANTE: PERGUNTAR (na Fase 2 — confirmação pós-análise) se aluno quer 1 perna completa só OU 1 perna + estímulos extras de inferior nos Push/Pull. Se escolher estímulos extras: adicionar 1-2 exercícios de inferior nos Push/Pull e SEMPRE inserir 1 dia OFF entre eles e o Legs.
 
-### Seleção de exercícios:
+**5x na semana** — Legs-Push-Pull-Legs-Upper ⭐:
+- A=Legs, B=Push, C=Pull, D=Legs, E=Upper.
+- Pode ser direto ou com descanso entre C e D (preferível: descanso).
+- Outras variações similares são permitidas.
+
+**REGRA UNIVERSAL**: NUNCA trabalhar APENAS UM MÚSCULO POR DIA. Sempre combinar grupos.
+
+## VOLUME SEMANAL ALVO POR MÚSCULO (séries válidas/semana — RESPEITAR FAIXAS)
+
+**HOMENS**:
+- Peito: 9-20 | Costas: 12-24 | Deltoide frontal: 9-12 | Deltoide lateral: 9-16 | Deltoide posterior: 9-12
+- Bíceps: 9-12 | Tríceps: 9-12 | Trapézio: 4-8 | Antebraço: opcional | Abdômen: 8-12
+- Quadríceps: 9-24 | Posterior coxa: 9-20 | Glúteo: 6-16 | Panturrilha: 4-16
+
+**MULHERES**:
+- Peito: 2-4 | Costas: 9-20 | Deltoide frontal: 2-6 | Deltoide lateral: 4-12 | Deltoide posterior: 2-6
+- Bíceps: 4-8 | Tríceps: 4-8 | Abdômen: 8-12
+- Quadríceps: 9-24 | Posterior coxa: 9-20 | Glúteo: 9-20 | Panturrilha: 4-16
+
+## REGRA DE CONTAGEM DE VOLUME (CRÍTICO):
+
+- 1 série de exercício = **1.0 série** para o músculo PRINCIPAL trabalhado
+- 1 série de exercício = **0.5 série** para o músculo ACESSÓRIO principal
+- Aquecimentos NÃO contam (só séries válidas)
+- Backoffset NÃO conta (é extra)
+- Cluster set conta como 1 série válida
+
+Exemplos: Supino reto 3 séries → 3.0 peito + 1.5 deltoide frontal + 1.5 tríceps. Puxada 3 séries → 3.0 costas + 1.5 bíceps. Agachamento 3 séries → 3.0 quad + 1.5 glúteo + 0.5 posterior. Elevação pélvica 3 séries → 3.0 glúteo + 1.5 posterior.
+
+ANTES DE FINALIZAR: faça internamente a SOMA semanal por músculo (incluindo os 0.5 dos acessórios) e CONFIRME que TODOS os músculos estão dentro da faixa min-max do sexo do aluno. Se algum músculo ficou abaixo do mínimo, ADICIONE série/exercício. Se passou do máximo, REMOVA.
+
+## ESQUEMA DE SÉRIES POR NÍVEL DE EXPERIÊNCIA
+
+**INICIANTE + INTERMEDIÁRIO (mesmo esquema base):**
+Cada exercício segue ESTA estrutura exata:
+1. **1 aquecimento** — 50% da carga, 12 reps, sem chegar próximo da falha
+2. **Válida 1** — carga próxima do máximo, ALVO 10 reps próximas da falha (RIR 1-2)
+3. **Válida 2** — MESMA carga, ALVO 8 reps próximas da falha
+4. **Válida 3** — REPETIR carga da válida 2, ir ATÉ A FALHA TOTAL
+
+Exercícios totais: Iniciante 4-5/sessão | Intermediário 5-7/sessão.
+
+Nos intermediários: pode aumentar volume gradualmente E usar UMA técnica avançada sutilmente.
+
+**AVANÇADO (esquema separado):**
+Cada exercício:
+1. **Aquecimento 1** — 50% da carga, 12 reps
+2. **Aquecimento 2** — 75% da carga, 5-8 reps (preparação neural)
+3. **1 a 3 séries válidas** — variar zona de reps entre exercícios (6-8, 8-12, 12-15, 15-20). A ÚLTIMA série SEMPRE falha total.
+
+Exercícios totais: 6-8/sessão.
+
+## TÉCNICAS AVANÇADAS (uso SUTIL — IA prescreve em trocas de protocolo a cada 60 dias)
+
+Adicionar técnicas APENAS conforme evolução e necessidade do aluno. Usar de forma sutil para MOTIVAR nas trocas. No campo "technique" do exercício:
+
+- **"standard"** — padrão (90% dos exercícios)
+- **"backoffset"** — após a última série de falha: +1 série até falha com ≤30s descanso, reduzindo carga 20-40%. NÃO conta como válida (é EXTRA). Aluno NÃO precisa anotar carga.
+- **"peak_contraction"** — micro-isometria de 1-2s no pico de contração de CADA rep. Usar em músculos com dificuldade de ativação. Aplica em todas as séries normais.
+- **"cluster_set"** — 4 blocos de 4 reps com 10s de intervalo, com carga que normalmente faria apenas 8 reps. Após aquecimento, máximo 2 séries assim. Aluno anota carga + reps comuns + abre aba "blocos" no log.
+
+Para INICIANTES: 100% standard. Para INTERMEDIÁRIOS: até 1-2 exercícios com técnica sutil. Para AVANÇADOS: 30%+ dos exercícios podem ter técnica.
+
+## REGRAS DE PERIODIZAÇÃO
+
+- Mínimo 48h de descanso entre treinos do MESMO grupo muscular principal
+- Organizar dias da semana para MAXIMIZAR descanso entre sinergias (Push↔Pull, Quad↔Post)
+- Para divisões femininas FB-FB-FB: NUNCA dias consecutivos
+- Para masculino 4x com pernas extras: SEMPRE 1 dia OFF antes do Legs
+
+## SELEÇÃO DE EXERCÍCIOS
+
 - SEMPRE incluir pelo menos 1 exercício composto por grupo muscular
 - Priorizar exercícios com maior amplitude de movimento
 - Adaptar ao tipo de academia (completa, limitada, casa)
-- Respeitar lesões informadas — NÃO prescrever exercícios que agravem a lesão
-- Se houver avaliação corporal: PRIORIZAR exercícios para os pontos fracos identificados, adicionar volume extra (2-4 séries a mais)
+- Respeitar lesões informadas
+- Se houver avaliação corporal: PRIORIZAR pontos fracos com volume extra (mas SEM passar do máximo da faixa)
 - Descanso: compostos pesados 90-120s, acessórios 60-90s, isolados leves 45-60s
 
 ### Banco de exercícios disponíveis (usar APENAS estes):
