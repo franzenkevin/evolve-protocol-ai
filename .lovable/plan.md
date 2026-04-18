@@ -1,40 +1,46 @@
 
-The user is asking why the shareable link after publishing is different. Let me check the publish settings and project URLs to understand.
+## Mudanças no Admin → Journal
 
-Project URLs from context:
-- Preview: `https://id-preview--d5acd8e1-618e-400a-b85d-e21966eecfc6.lovable.app`
-- Published: `https://evolve-protocol-ai.lovable.app`
-- Custom domain: none
+### 1. Remover botão "Gerar 5 artigos" (lote)
+- Em `src/components/admin/AdminJournal.tsx`: remover o Card "Gerar lote automático" (linhas 263-279), o estado `batchLoading`, a função `handleBatchGenerate` e o import não usado `supabase` da invocação.
+- Deletar a edge function `supabase/functions/journal-batch-generate/` (não será mais chamada).
 
-The published URL `evolve-protocol-ai.lovable.app` doesn't match the project name "Hypertrophy". This is likely because the project was renamed after the first publish, but the published subdomain stays as the original slug from when it was first published. Lovable doesn't automatically rename the published subdomain when the project is renamed.
+### 2. Mudar fluxo de "Pesquisar com IA" para retornar 3 opções do Google Acadêmico
+Hoje: digita tema → IA gera **1 rascunho** direto.
+Novo: digita tema → IA pesquisa no **Google Scholar** → retorna **3 sugestões** com título do estudo + resumo curto + link/DOI da referência → admin escolhe uma → IA expande em artigo completo já com a fonte preenchida.
 
-## Why the link looks different
+### 3. Alterações técnicas
 
-Your published URL is `https://evolve-protocol-ai.lovable.app`, which doesn't match the current project name "Hypertrophy". This happens because:
+**Edge function `journal-research`** (refatorar):
+- Aceita 2 modos via body:
+  - `{ topic }` → modo "buscar 3 opções": usa `tools: [{ type: "google_search" }]` com instrução explícita "pesquise no Google Scholar / scholar.google.com / PubMed" e retorna array de 3 objetos `{ angle, study_title, study_authors, study_year, study_url, short_pitch }` via tool-call `suggest_studies`.
+  - `{ topic, selected: { study_title, study_url, short_pitch, ... } }` → modo "expandir": gera artigo completo (mesma estrutura atual: title/summary/excerpt/content/category/tags/read_time_minutes) **forçando `source_url = study_url`** e citando o estudo no corpo.
+- Mantém validação de admin e tratamento de 429/402.
 
-1. **The published subdomain is locked to the slug used when you first published.** When the project was created/first published, it was named "evolve-protocol-ai". Renaming the project later (to "Hypertrophy") does NOT automatically rename the `.lovable.app` subdomain.
+**Hook `useJournal.ts`**:
+- Renomear/duplicar `useResearchJournalTopic` em duas mutations:
+  - `useSearchJournalStudies(topic)` → retorna `JournalStudySuggestion[]`.
+  - `useExpandJournalStudy({ topic, selected })` → retorna `JournalAIDraft` (igual ao atual).
+- Novo tipo `JournalStudySuggestion`.
 
-2. **The preview URL is also different by design.** Preview uses the project ID format (`id-preview--<uuid>.lovable.app`), while published uses a friendly slug. These two URLs are always different — preview is for in-editor testing (login-gated), published is the public live site.
+**`AdminJournal.tsx`** (UI):
+- Substituir o input + botão "Gerar rascunho" por:
+  1. Input do tema + botão "Buscar estudos" (chama `useSearchJournalStudies`).
+  2. Quando volta, renderiza 3 Cards (cada um com título do estudo, autores/ano, pitch, link clicável da fonte) + botão "Gerar artigo deste estudo" em cada.
+  3. Ao clicar, chama `useExpandJournalStudy` e abre o Dialog de edição preenchido (já com `source_url` da referência, `ai_sources` populadas, badge "Gerado por IA").
+- Mantém todo o fluxo de edição/publicação/auditoria existente.
 
-## Options to fix
+### 4. Garantias
+- Fonte sempre obrigatória: o modo "buscar 3 opções" só aceita sugestões que tenham `study_url` válido (filtra no servidor).
+- Se Google Search não devolver nada acadêmico, a edge retorna erro claro "Nenhum estudo encontrado, refine o tema" em vez de inventar.
+- O `source_url` do artigo final = link do estudo escolhido (não pode ser editado em branco no submit).
 
-**Option A — Connect a custom domain (recommended for branding)**
-Buy or connect `hypertrophy.app` (or similar) via Project Settings → Domains. This gives you a clean branded URL like `https://hypertrophy.app` regardless of the internal slug.
+### Arquivos afetados
+```text
+src/components/admin/AdminJournal.tsx        (refatorar UI)
+src/hooks/useJournal.ts                       (novo hook + tipos)
+supabase/functions/journal-research/index.ts  (2 modos)
+supabase/functions/journal-batch-generate/    (DELETAR)
+```
 
-**Option B — Request a subdomain change**
-Lovable does not expose a self-serve "rename published subdomain" option in the UI. To change `evolve-protocol-ai.lovable.app` to `hypertrophy.lovable.app`, you'd need to contact Lovable support, OR remix the project under the desired name and republish (but this creates a new project).
-
-**Option C — Workspace branded URLs (Business/Enterprise plan)**
-If you're on Business or Enterprise, you can configure branded app URLs like `*.yourcompany.lovable.app` in workspace settings.
-
-## Recommendation
-
-Since the app has paid features (Paddle checkout, push notifications, manifest pointing to Hypertrophy branding), I recommend **Option A**: connect a custom domain like `hypertrophy.app` or `app.hypertrophy.com.br`. This:
-- Fixes the inconsistency permanently
-- Improves trust in checkout flows (Paddle)
-- Allows you to send auth emails from `@hypertrophy.app` (fixing the iCloud/Gmail confirmation issue you reported earlier)
-- Auto-provisions SSL
-
-No code changes are needed for this — it's done in **Project Settings → Domains → Connect Domain**.
-
-Want me to also update the manifest, OG tags, and Paddle return URLs to use the new custom domain once you've connected it? Or if you'd prefer, I can guide you through buying a domain directly inside Lovable (Project Settings → Domains → "Buy new domain").
+Sem mudanças em banco, RLS ou secrets — toda a infra já existe.
