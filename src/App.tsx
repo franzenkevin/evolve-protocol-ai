@@ -21,6 +21,7 @@ import Chat from "./pages/Chat";
 import Admin from "./pages/Admin";
 import AdminGate from "./components/AdminGate";
 import StudentGate from "./components/StudentGate";
+import SubscriptionGate from "./components/SubscriptionGate";
 import Welcome from "./pages/Welcome";
 import Terms from "./pages/Terms";
 import AcceptTerms from "./pages/AcceptTerms";
