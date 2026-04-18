@@ -351,6 +351,8 @@ Gere o JSON completo seguindo TODAS as regras da metodologia.`;
 
     console.log("Calling AI for protocol generation...");
 
+    // Use Gemini Flash: ~5-8x faster than gpt-5-mini for this prompt size,
+    // keeping us safely under the 150s edge function idle timeout.
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -358,12 +360,14 @@ Gere o JSON completo seguindo TODAS as regras da metodologia.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openai/gpt-5-mini",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
+        response_format: { type: "json_object" },
       }),
+      signal: AbortSignal.timeout(130000),
     });
 
     if (!aiResponse.ok) {
