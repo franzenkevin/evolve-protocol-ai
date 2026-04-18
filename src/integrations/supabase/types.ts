@@ -533,6 +533,7 @@ export type Database = {
           ai_data_consent_at: string | null
           allergies: string | null
           avatar_url: string | null
+          body_emphasis: string | null
           cardio_duration: string | null
           cardio_enabled: boolean | null
           cardio_frequency: string | null
@@ -573,6 +574,7 @@ export type Database = {
           ai_data_consent_at?: string | null
           allergies?: string | null
           avatar_url?: string | null
+          body_emphasis?: string | null
           cardio_duration?: string | null
           cardio_enabled?: boolean | null
           cardio_frequency?: string | null
@@ -613,6 +615,7 @@ export type Database = {
           ai_data_consent_at?: string | null
           allergies?: string | null
           avatar_url?: string | null
+          body_emphasis?: string | null
           cardio_duration?: string | null
           cardio_enabled?: boolean | null
           cardio_frequency?: string | null
