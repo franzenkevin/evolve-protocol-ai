@@ -574,10 +574,15 @@ Só depois gere o JSON completo seguindo TODAS as regras da metodologia.`;
 
     console.log("Protocol generated successfully");
 
-    return new Response(JSON.stringify({ training: protocol.training, diet: protocol.diet }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        training: protocol.training,
+        diet: protocol.diet,
+        cardioPlan: protocol.cardioPlan ?? null,
+        weeklyVolumeCheck: protocol.weeklyVolumeCheck ?? null,
+      }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   } catch (e) {
     console.error("Error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
