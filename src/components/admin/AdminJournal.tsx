@@ -27,14 +27,14 @@ import {
   useCreateJournalArticle,
   useUpdateJournalArticle,
   useDeleteJournalArticle,
-  useResearchJournalTopic,
+  useSearchJournalStudies,
+  useExpandJournalStudy,
   type JournalArticle,
   type JournalAIDraft,
+  type JournalStudySuggestion,
 } from "@/hooks/useJournal";
 import { useToast } from "@/hooks/use-toast";
 import { useLogAudit } from "@/hooks/useAuditLog";
-import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   Sparkles,
   Plus,
@@ -45,6 +45,8 @@ import {
   ExternalLink,
   Loader2,
   Wand2,
+  Search,
+  BookOpen,
 } from "lucide-react";
 
 const emptyDraft: Partial<JournalArticle> = {
@@ -66,10 +68,10 @@ const AdminJournal = () => {
   const createArticle = useCreateJournalArticle();
   const updateArticle = useUpdateJournalArticle();
   const deleteArticle = useDeleteJournalArticle();
-  const research = useResearchJournalTopic();
+  const searchStudies = useSearchJournalStudies();
+  const expandStudy = useExpandJournalStudy();
   const { toast } = useToast();
   const logAudit = useLogAudit();
-  const qc = useQueryClient();
 
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<JournalArticle | null>(null);
@@ -78,29 +80,10 @@ const AdminJournal = () => {
   const [aiSources, setAiSources] = useState<{ title?: string; uri: string }[]>([]);
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiTopic, setAiTopic] = useState("");
+  const [studies, setStudies] = useState<JournalStudySuggestion[]>([]);
+  const [searchedTopic, setSearchedTopic] = useState("");
+  const [expandingIdx, setExpandingIdx] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [batchLoading, setBatchLoading] = useState(false);
-
-  const handleBatchGenerate = async () => {
-    if (!confirm("Gerar 5 artigos rascunho automaticamente? Pode levar 1-2 minutos.")) return;
-    setBatchLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("journal-batch-generate");
-      if (error) throw error;
-      qc.invalidateQueries({ queryKey: ["journal-articles"] });
-      toast({
-        title: `${data?.total || 0} rascunhos criados`,
-        description: data?.errors?.length
-          ? `${data.errors.length} falha(s). Veja console.`
-          : "Revise e publique quando estiver pronto.",
-      });
-      if (data?.errors?.length) console.warn("[batch errors]", data.errors);
-    } catch (e: any) {
-      toast({ title: "Erro no lote", description: e.message, variant: "destructive" });
-    } finally {
-      setBatchLoading(false);
-    }
-  };
 
   const dialogOpen = creating || !!editing;
   const closeDialog = () => {
@@ -135,6 +118,7 @@ const AdminJournal = () => {
       category: d.category,
       read_time_minutes: d.read_time_minutes,
       tags: d.tags,
+      source_url: d.source_url || "",
       ai_generated: true,
       status: "draft",
     } as Partial<JournalArticle>);
@@ -143,29 +127,62 @@ const AdminJournal = () => {
     setAiPrompt(d.ai_prompt);
   };
 
-  const handleResearch = async () => {
+  const handleSearchStudies = async () => {
     const topic = aiTopic.trim();
     if (topic.length < 3) {
       toast({ title: "Digite o tema (mín. 3 caracteres)", variant: "destructive" });
       return;
     }
     try {
-      const result = await research.mutateAsync(topic);
-      setCreating(true);
-      applyAIDraft(result);
-      setAiTopic("");
+      const result = await searchStudies.mutateAsync(topic);
+      setStudies(result.studies);
+      setSearchedTopic(result.topic);
       toast({
-        title: "Rascunho gerado pela IA",
-        description: `${result.sources.length} fonte(s) consultadas.`,
+        title: `${result.studies.length} estudo(s) encontrado(s)`,
+        description: "Escolha um para gerar o artigo.",
       });
     } catch (e: any) {
-      toast({ title: "Erro ao pesquisar", description: e.message, variant: "destructive" });
+      setStudies([]);
+      toast({ title: "Erro ao buscar estudos", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const handleExpandStudy = async (study: JournalStudySuggestion, idx: number) => {
+    setExpandingIdx(idx);
+    try {
+      const draftResult = await expandStudy.mutateAsync({
+        topic: searchedTopic,
+        selected: study,
+      });
+      setCreating(true);
+      applyAIDraft(draftResult);
+      // limpa lista após escolher
+      setStudies([]);
+      setSearchedTopic("");
+      setAiTopic("");
+      toast({
+        title: "Artigo gerado a partir do estudo",
+        description: study.study_title.slice(0, 80),
+      });
+    } catch (e: any) {
+      toast({ title: "Erro ao gerar artigo", description: e.message, variant: "destructive" });
+    } finally {
+      setExpandingIdx(null);
     }
   };
 
   const handleSave = async (publish: boolean) => {
     if (!draft.title || !draft.content) {
       toast({ title: "Preencha título e conteúdo", variant: "destructive" });
+      return;
+    }
+    // Para artigos gerados por IA, source_url é obrigatório (referência do estudo)
+    if (draft.ai_generated && !draft.source_url) {
+      toast({
+        title: "Fonte obrigatória",
+        description: "Artigos gerados por IA precisam manter o link do estudo.",
+        variant: "destructive",
+      });
       return;
     }
     const tags = tagsInput
@@ -234,48 +251,90 @@ const AdminJournal = () => {
 
   return (
     <div className="space-y-4">
-      {/* IA: pesquisa de tema */}
+      {/* IA: pesquisa de estudos */}
       <Card className="p-4 card-gradient border-primary/30">
         <div className="flex items-center gap-2 mb-2">
           <Sparkles size={16} className="text-primary" />
-          <h3 className="font-heading font-semibold text-foreground">Pesquisar com IA</h3>
+          <h3 className="font-heading font-semibold text-foreground">Pesquisar estudos científicos</h3>
         </div>
         <p className="text-xs text-muted-foreground mb-3">
-          Digite um tema. A IA pesquisa na web (Google Search), gera o rascunho com fontes,
-          e você revisa antes de publicar.
+          Digite um tema. A IA busca no Google Scholar / PubMed e devolve <strong>3 estudos reais</strong>
+          {" "}com link da referência. Você escolhe um e a IA gera o artigo já com a fonte.
         </p>
         <div className="flex gap-2">
           <Input
             value={aiTopic}
             onChange={(e) => setAiTopic(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && !research.isPending && handleResearch()}
+            onKeyDown={(e) => e.key === "Enter" && !searchStudies.isPending && handleSearchStudies()}
             placeholder="Ex: creatina monohidratada e ganho de força"
-            disabled={research.isPending}
+            disabled={searchStudies.isPending}
           />
-          <Button onClick={handleResearch} disabled={research.isPending} className="gap-1 shrink-0">
-            {research.isPending ? <Loader2 className="animate-spin" size={14} /> : <Wand2 size={14} />}
-            {research.isPending ? "Pesquisando..." : "Gerar rascunho"}
+          <Button
+            onClick={handleSearchStudies}
+            disabled={searchStudies.isPending}
+            className="gap-1 shrink-0"
+          >
+            {searchStudies.isPending ? (
+              <Loader2 className="animate-spin" size={14} />
+            ) : (
+              <Search size={14} />
+            )}
+            {searchStudies.isPending ? "Buscando..." : "Buscar estudos"}
           </Button>
         </div>
-      </Card>
 
-      {/* Gerar lote automático */}
-      <Card className="p-4 card-gradient border-primary/20">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div>
-            <h3 className="font-heading font-semibold text-foreground text-sm flex items-center gap-2">
-              <Sparkles size={14} className="text-primary" />
-              Gerar lote automático
-            </h3>
-            <p className="text-xs text-muted-foreground mt-1">
-              5 rascunhos: treino, nutrição, peptídeos, mente e suplementação.
+        {studies.length > 0 && (
+          <div className="mt-4 space-y-2">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
+              {studies.length} sugestões para: <span className="text-foreground">{searchedTopic}</span>
             </p>
+            {studies.map((s, idx) => (
+              <Card key={idx} className="p-3 border-border/50 bg-background/40">
+                <div className="flex items-start gap-2 mb-2 flex-wrap">
+                  <Badge variant="outline" className="text-[10px]">
+                    {s.angle}
+                  </Badge>
+                  {s.study_year && (
+                    <Badge variant="secondary" className="text-[10px]">
+                      {s.study_year}
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-sm font-medium text-foreground leading-snug mb-1">
+                  {s.study_title}
+                </p>
+                {s.study_authors && (
+                  <p className="text-xs text-muted-foreground mb-1">{s.study_authors}</p>
+                )}
+                <p className="text-xs text-muted-foreground mb-2">{s.short_pitch}</p>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <a
+                    href={s.study_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-primary hover:underline flex items-center gap-1 truncate max-w-[60%]"
+                  >
+                    <ExternalLink size={11} className="shrink-0" />
+                    <span className="truncate">{s.study_url}</span>
+                  </a>
+                  <Button
+                    size="sm"
+                    onClick={() => handleExpandStudy(s, idx)}
+                    disabled={expandStudy.isPending}
+                    className="gap-1 h-7 text-xs"
+                  >
+                    {expandingIdx === idx ? (
+                      <Loader2 className="animate-spin" size={12} />
+                    ) : (
+                      <Wand2 size={12} />
+                    )}
+                    Gerar artigo
+                  </Button>
+                </div>
+              </Card>
+            ))}
           </div>
-          <Button onClick={handleBatchGenerate} disabled={batchLoading} size="sm" className="gap-1 glow shrink-0">
-            {batchLoading ? <Loader2 className="animate-spin" size={14} /> : <Wand2 size={14} />}
-            {batchLoading ? "Gerando..." : "Gerar 5 artigos"}
-          </Button>
-        </div>
+        )}
       </Card>
 
       <div className="flex justify-between items-center">
@@ -291,7 +350,6 @@ const AdminJournal = () => {
 
       {isLoading && <p className="text-sm text-muted-foreground">Carregando...</p>}
 
-      {/* Rascunhos no topo */}
       {drafts.length > 0 && (
         <div className="space-y-2">
           <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
@@ -308,7 +366,6 @@ const AdminJournal = () => {
         </div>
       )}
 
-      {/* Publicados */}
       {published.length > 0 && (
         <div className="space-y-2">
           <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
@@ -350,6 +407,23 @@ const AdminJournal = () => {
               <div className="text-xs bg-muted/50 p-2 rounded border border-border">
                 <span className="text-muted-foreground">Prompt original:</span>{" "}
                 <span className="text-foreground">{aiPrompt}</span>
+              </div>
+            )}
+
+            {draft.ai_generated && draft.source_url && (
+              <div className="text-xs bg-primary/10 p-2 rounded border border-primary/30 flex items-start gap-2">
+                <BookOpen size={14} className="text-primary shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <p className="text-muted-foreground">Estudo de referência (obrigatório):</p>
+                  <a
+                    href={draft.source_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary hover:underline truncate block"
+                  >
+                    {draft.source_url}
+                  </a>
+                </div>
               </div>
             )}
 
@@ -409,7 +483,9 @@ const AdminJournal = () => {
                 />
               </div>
               <div>
-                <Label>Fonte/estudo (URL)</Label>
+                <Label>
+                  Fonte/estudo (URL) {draft.ai_generated && <span className="text-destructive">*</span>}
+                </Label>
                 <Input
                   value={draft.source_url || ""}
                   onChange={(e) => setDraft({ ...draft, source_url: e.target.value })}
