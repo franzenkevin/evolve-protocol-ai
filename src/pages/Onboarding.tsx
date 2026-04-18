@@ -126,6 +126,12 @@ const Onboarding = () => {
   const [assessment, setAssessment] = useState<any>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [validationError, setValidationError] = useState("");
+  const [confirmations, setConfirmations] = useState<ProtocolConfirmations>({
+    bodyEmphasis: { wants: "", description: "" },
+    split: { agree: "", justification: "" },
+    cardio: { agree: "", justification: "" },
+    mealTimes: { agree: "", justification: "" },
+  });
   const [data, setData] = useState<FormData>({
     fullName: "", age: "", sex: "", weight: "", height: "",
     goal: "", activityLevel: "", neat: "", trainingDays: "", trainingWeekdays: [], trainingTime: "",
