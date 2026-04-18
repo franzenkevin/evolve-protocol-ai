@@ -42,8 +42,9 @@ const FEATURES = [
 
 export default function Plans() {
   const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
-  const { data: subscription } = useSubscription();
+  const { data: subscription, refetch: refetchSub } = useSubscription();
   const [portalLoading, setPortalLoading] = useState(false);
+  const [reconcileLoading, setReconcileLoading] = useState(false);
 
   const isActive =
     subscription &&
@@ -62,6 +63,36 @@ export default function Plans() {
       toast.error("Erro ao abrir portal de gerenciamento");
     } finally {
       setPortalLoading(false);
+    }
+  };
+
+  const reconcile = async () => {
+    setReconcileLoading(true);
+    try {
+      const env =
+        (import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN as string | undefined)?.startsWith(
+          "test_"
+        )
+          ? "sandbox"
+          : "live";
+      const { data, error } = await supabase.functions.invoke(
+        "reconcile-subscription",
+        { body: { environment: env } }
+      );
+      if (error) throw error;
+      if (data?.synced) {
+        toast.success("Assinatura sincronizada! Acesso liberado.");
+        await refetchSub();
+      } else {
+        toast.info(
+          data?.message || "Nenhuma assinatura ativa encontrada no provedor."
+        );
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Não foi possível sincronizar agora. Tente novamente.");
+    } finally {
+      setReconcileLoading(false);
     }
   };
 
