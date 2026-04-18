@@ -35,13 +35,24 @@ serve(async (req) => {
       });
     }
 
-    const { profile, bodyAssessment } = await req.json();
+    const body = await req.json();
+    const {
+      profile,
+      bodyAssessment,
+      bodyEmphasis: bodyEmphasisInput,
+      confirmations,
+      reanalysisFeedback,
+    } = body || {};
+
     if (!profile) {
       return new Response(JSON.stringify({ error: "Profile is required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Body emphasis: prioriza valor recém-enviado, senão usa o gravado em profile
+    const bodyEmphasis = (bodyEmphasisInput || profile.body_emphasis || "").trim();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
