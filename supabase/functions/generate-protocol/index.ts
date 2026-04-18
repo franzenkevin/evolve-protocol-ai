@@ -430,7 +430,11 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
 - Tipo preferido: ${profile.cardio_type_preference || "N/A"}` : ""}
 ${assessmentContext}
 
-Gere o JSON completo seguindo TODAS as regras da metodologia.`;
+INSTRUÇÃO FINAL: Antes de prescrever, faça internamente o checklist:
+1. Quais lesões/desvios este aluno tem? Quais exercícios devo REMOVER ou SUBSTITUIR?
+2. Quais são os pontos fracos da avaliação? Onde devo adicionar volume extra?
+3. Para CADA exercício do split, ele é seguro e adequado para ESTE aluno especificamente?
+Só depois gere o JSON completo seguindo TODAS as regras da metodologia.`;
 
     console.log("Calling AI for protocol generation (assertive mode)...");
 
