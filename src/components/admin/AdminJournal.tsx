@@ -33,6 +33,8 @@ import {
 } from "@/hooks/useJournal";
 import { useToast } from "@/hooks/use-toast";
 import { useLogAudit } from "@/hooks/useAuditLog";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Sparkles,
   Plus,
@@ -67,6 +69,7 @@ const AdminJournal = () => {
   const research = useResearchJournalTopic();
   const { toast } = useToast();
   const logAudit = useLogAudit();
+  const qc = useQueryClient();
 
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<JournalArticle | null>(null);
@@ -76,6 +79,28 @@ const AdminJournal = () => {
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiTopic, setAiTopic] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [batchLoading, setBatchLoading] = useState(false);
+
+  const handleBatchGenerate = async () => {
+    if (!confirm("Gerar 5 artigos rascunho automaticamente? Pode levar 1-2 minutos.")) return;
+    setBatchLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("journal-batch-generate");
+      if (error) throw error;
+      qc.invalidateQueries({ queryKey: ["journal-articles"] });
+      toast({
+        title: `${data?.total || 0} rascunhos criados`,
+        description: data?.errors?.length
+          ? `${data.errors.length} falha(s). Veja console.`
+          : "Revise e publique quando estiver pronto.",
+      });
+      if (data?.errors?.length) console.warn("[batch errors]", data.errors);
+    } catch (e: any) {
+      toast({ title: "Erro no lote", description: e.message, variant: "destructive" });
+    } finally {
+      setBatchLoading(false);
+    }
+  };
 
   const dialogOpen = creating || !!editing;
   const closeDialog = () => {
