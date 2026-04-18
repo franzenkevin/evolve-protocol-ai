@@ -648,6 +648,39 @@ export type Database = {
         }
         Relationships: []
       }
+      protocol_regenerations: {
+        Row: {
+          amount_brl: number
+          created_at: string
+          id: string
+          paddle_transaction_id: string | null
+          status: string
+          updated_at: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_brl?: number
+          created_at?: string
+          id?: string
+          paddle_transaction_id?: string | null
+          status?: string
+          updated_at?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_brl?: number
+          created_at?: string
+          id?: string
+          paddle_transaction_id?: string | null
+          status?: string
+          updated_at?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       protocols: {
         Row: {
           created_at: string
