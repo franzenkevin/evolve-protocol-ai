@@ -7,10 +7,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 
-const POLL_INTERVAL_MS = 2000;
-const POLL_MAX_MS = 30000;
+const POLL_INTERVAL_MS = 2500;
+const POLL_MAX_MS = 45000;
+const RECONCILE_AFTER_MS = 8000; // Se webhook não chegou em 8s, força sync via API Paddle
 
 const CheckoutSuccess = () => {
   const navigate = useNavigate();
@@ -27,21 +29,46 @@ const CheckoutSuccess = () => {
     ["active", "trialing"].includes(subscription.status) &&
     (!subscription.current_period_end || new Date(subscription.current_period_end) > new Date());
 
-  // Poll until webhook confirms subscription (max 30s)
+  // Poll for webhook; if it doesn't arrive in time, call reconcile fallback
   useEffect(() => {
     if (isActive) {
       setWaiting(false);
       return;
     }
     const start = Date.now();
-    const id = setInterval(async () => {
+    let reconcileFired = false;
+
+    const tick = async () => {
       qc.invalidateQueries({ queryKey: ["subscription"] });
       await refetch();
+
+      // After RECONCILE_AFTER_MS, try the reconcile function in parallel (once)
+      if (!reconcileFired && Date.now() - start > RECONCILE_AFTER_MS) {
+        reconcileFired = true;
+        const env =
+          (import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN as string | undefined)?.startsWith(
+            "test_"
+          )
+            ? "sandbox"
+            : "live";
+        supabase.functions
+          .invoke("reconcile-subscription", { body: { environment: env } })
+          .then(({ data, error }) => {
+            if (error) console.warn("reconcile failed:", error);
+            else console.log("reconcile result:", data);
+            qc.invalidateQueries({ queryKey: ["subscription"] });
+            refetch();
+          })
+          .catch((e) => console.warn("reconcile invoke error:", e));
+      }
+
       if (Date.now() - start > POLL_MAX_MS) {
         clearInterval(id);
         setWaiting(false);
       }
-    }, POLL_INTERVAL_MS);
+    };
+
+    const id = setInterval(tick, POLL_INTERVAL_MS);
     return () => clearInterval(id);
   }, [isActive, qc, refetch]);
 
