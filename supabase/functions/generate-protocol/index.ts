@@ -35,13 +35,24 @@ serve(async (req) => {
       });
     }
 
-    const { profile, bodyAssessment } = await req.json();
+    const body = await req.json();
+    const {
+      profile,
+      bodyAssessment,
+      bodyEmphasis: bodyEmphasisInput,
+      confirmations,
+      reanalysisFeedback,
+    } = body || {};
+
     if (!profile) {
       return new Response(JSON.stringify({ error: "Profile is required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Body emphasis: prioriza valor recém-enviado, senão usa o gravado em profile
+    const bodyEmphasis = (bodyEmphasisInput || profile.body_emphasis || "").trim();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -82,6 +93,50 @@ Não há avaliação corporal disponível. Use prescrição padrão conservadora
 "${profile.injuries}"
 Você DEVE excluir do treino qualquer exercício que solicite ou agrave a estrutura lesionada (ver tabela "ADAPTAÇÕES POR LESÃO" abaixo).`;
     }
+
+    if (bodyEmphasis) {
+      assessmentContext += `
+
+## ÊNFASE CORPORAL SOLICITADA PELO ALUNO (PRIORIDADE MÁXIMA)
+"${bodyEmphasis}"
+Essa solicitação SOBRESCREVE a priorização automática por pontos fracos. Adicionar volume EXTRA (sem ultrapassar o máximo da faixa do sexo) nos músculos pedidos. Se o pedido conflitar com lesões/desvios posturais, PRIORIZAR a segurança e explicar no campo dynamicNotes do dia mais relevante.`;
+    }
+
+    if (confirmations) {
+      const parts: string[] = [];
+      if (confirmations.split?.agree === "no" && confirmations.split?.justification) {
+        parts.push(`- DIVISÃO: o aluno NÃO concordou com a divisão padrão. Justificativa: "${confirmations.split.justification}". AJUSTAR a divisão respeitando essa preferência (mas mantendo as regras da metodologia oficial — combinar grupos, descanso entre sinérgicos, etc.).`);
+      }
+      if (confirmations.cardio?.agree === "no" && confirmations.cardio?.justification) {
+        parts.push(`- CARDIO: o aluno NÃO concordou com o cardio proposto. Justificativa: "${confirmations.cardio.justification}". AJUSTAR a prescrição de cardio (tipo/frequência/duração/timing) seguindo a justificativa.`);
+      }
+      if (confirmations.mealTimes?.agree === "no" && confirmations.mealTimes?.justification) {
+        parts.push(`- HORÁRIOS DE REFEIÇÃO: o aluno NÃO concordou com os horários sugeridos. Justificativa: "${confirmations.mealTimes.justification}". AJUSTAR os horários (campo "time" de cada refeição) e a ordem (pré-treino vs pós-treino, carb front loading) conforme a nova rotina.`);
+      }
+      if (parts.length > 0) {
+        assessmentContext += `
+
+## AJUSTES SOLICITADOS PELO ALUNO NA CONFIRMAÇÃO PÓS-ANÁLISE (OBRIGATÓRIO RESPEITAR)
+${parts.join("\n")}`;
+      }
+    }
+
+    if (reanalysisFeedback) {
+      const r = reanalysisFeedback;
+      const items: string[] = [];
+      if (r.painsOrInjuries) items.push(`- DORES/LESÕES NOVAS surgidas no ciclo anterior: "${r.painsOrInjuries}". REMOVER ou SUBSTITUIR exercícios que possam agravar.`);
+      if (r.uncomfortableExercises) items.push(`- EXERCÍCIOS DESCONFORTÁVEIS no ciclo anterior: "${r.uncomfortableExercises}". TROCAR por variações.`);
+      if (r.progressNotes) items.push(`- NOTAS DE PROGRESSO: "${r.progressNotes}".`);
+      if (r.deloadRequested) items.push(`- DELOAD SOLICITADO: reduzir o volume semanal por músculo em ~30% por este ciclo (manter dentro das faixas mínimas).`);
+      if (r.volumeIncreaseRequested) items.push(`- AUMENTO DE VOLUME SOLICITADO: aproximar do MÁXIMO da faixa de cada músculo (sem ultrapassar).`);
+      if (items.length > 0) {
+        assessmentContext += `
+
+## REANÁLISE 60 DIAS — FEEDBACK DO ALUNO (OBRIGATÓRIO USAR PARA AJUSTAR O NOVO PROTOCOLO)
+${items.join("\n")}`;
+      }
+    }
+
 
     const systemPrompt = `Você é um preparador físico profissional especializado em hipertrofia e recomposição corporal. Você segue uma metodologia ESPECÍFICA que deve ser respeitada em TODOS os protocolos gerados. PRIORIZE ASSERTIVIDADE SOBRE VELOCIDADE — analise CADA dado do aluno antes de prescrever cada exercício. Responda APENAS com o JSON solicitado.
 

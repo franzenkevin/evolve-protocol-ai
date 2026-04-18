@@ -38,6 +38,7 @@ export interface Profile {
   ai_data_consent_at: string | null;
   terms_version: string | null;
   terms_accepted_at: string | null;
+  body_emphasis: string | null;
   onboarding_complete: boolean;
 }
 

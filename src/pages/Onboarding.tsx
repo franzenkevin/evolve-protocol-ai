@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { BodyPhotoUpload } from "@/components/onboarding/BodyPhotoUpload";
 import { AssessmentResults } from "@/components/onboarding/AssessmentResults";
+import { ProtocolConfirmation, type ProtocolConfirmations, isConfirmationComplete } from "@/components/onboarding/ProtocolConfirmation";
 import type { Profile } from "@/hooks/useProfile";
 
 const STEPS = [
@@ -27,6 +28,7 @@ const STEPS = [
   "Doces & Suplementos",
   "Estilo de Vida",
   "Avaliação Física",
+  "Confirmação",
 ];
 
 const CARDIO_FREQUENCY = ["1x por semana", "2x por semana", "3x por semana", "4x por semana", "5x por semana", "Todos os dias"];
@@ -124,6 +126,12 @@ const Onboarding = () => {
   const [assessment, setAssessment] = useState<any>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [validationError, setValidationError] = useState("");
+  const [confirmations, setConfirmations] = useState<ProtocolConfirmations>({
+    bodyEmphasis: { wants: "", description: "" },
+    split: { agree: "", justification: "" },
+    cardio: { agree: "", justification: "" },
+    mealTimes: { agree: "", justification: "" },
+  });
   const [data, setData] = useState<FormData>({
     fullName: "", age: "", sex: "", weight: "", height: "",
     goal: "", activityLevel: "", neat: "", trainingDays: "", trainingWeekdays: [], trainingTime: "",
@@ -239,6 +247,11 @@ const Onboarding = () => {
         return null;
       case 7:
         if (!data.aiDataConsent) return "Você precisa autorizar o uso dos seus dados pela IA para gerar o protocolo personalizado.";
+        if (Object.keys(assessmentPhotos).length === 0) return "Envie pelo menos uma foto para análise corporal.";
+        if (!assessment) return "Aguarde a análise das suas fotos antes de continuar.";
+        return null;
+      case 8:
+        if (!isConfirmationComplete(confirmations)) return "Responda todas as perguntas de confirmação (e justifique quando responder 'Não').";
         return null;
       default:
         return null;
@@ -337,6 +350,9 @@ const Onboarding = () => {
         meal_count: data.mealCount ? parseInt(data.mealCount) : null,
         sleep_hours: data.sleepHours ? parseFloat(data.sleepHours) : null,
         stress_level: data.stressLevel,
+        body_emphasis: confirmations.bodyEmphasis.wants === "yes"
+          ? confirmations.bodyEmphasis.description.trim() || null
+          : null,
         onboarding_complete: true,
       };
 
@@ -361,7 +377,12 @@ const Onboarding = () => {
         toast({ title: "🤖 Gerando protocolo com IA...", description: "Isso pode levar alguns segundos." });
 
         const { data: aiResult, error: aiError } = await supabase.functions.invoke("generate-protocol", {
-          body: { profile: profileData, bodyAssessment },
+          body: {
+            profile: profileData,
+            bodyAssessment,
+            bodyEmphasis: profileData.body_emphasis,
+            confirmations,
+          },
         });
 
         if (aiError) throw aiError;
@@ -718,6 +739,23 @@ const Onboarding = () => {
                 </div>
               </div>
             </>
+          )}
+
+          {/* STEP 8 — Confirmação do protocolo */}
+          {step === 8 && (
+            <ProtocolConfirmation
+              sex={data.sex}
+              trainingDays={parseInt(data.trainingDays) || 4}
+              cardioEnabled={data.cardioEnabled === "yes"}
+              cardioFrequency={data.cardioFrequency}
+              cardioType={data.cardioTypePreference}
+              cardioDuration={data.cardioDuration}
+              mealCount={parseInt(data.mealCount) || 4}
+              trainingTime={data.trainingTime}
+              weakPoints={assessment?.weak_points}
+              initial={confirmations}
+              onChange={setConfirmations}
+            />
           )}
         </div>
       </div>

@@ -2,6 +2,9 @@ import AppLayout from "@/components/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,7 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Loader2, Sparkles, RefreshCw, ShieldCheck, ArrowLeft } from "lucide-react";
+import { Loader2, Sparkles, RefreshCw, ShieldCheck, ArrowLeft, Stethoscope } from "lucide-react";
 import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
 import {
   useProtocolRegenStatus,
@@ -35,6 +38,13 @@ const NewProtocol = () => {
   const qc = useQueryClient();
   const [confirming, setConfirming] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [reanalysis, setReanalysis] = useState({
+    painsOrInjuries: "",
+    uncomfortableExercises: "",
+    progressNotes: "",
+    deloadRequested: false,
+    volumeIncreaseRequested: false,
+  });
 
   const handlePay = () => {
     openCheckout({
@@ -49,7 +59,10 @@ const NewProtocol = () => {
     setGenerating(true);
     try {
       const { error } = await supabase.functions.invoke("generate-protocol", {
-        body: { force_regenerate: true },
+        body: {
+          force_regenerate: true,
+          reanalysisFeedback: reanalysis,
+        },
       });
       if (error) throw error;
       await consume.mutateAsync(status.availableCredit.id);
@@ -123,6 +136,79 @@ const NewProtocol = () => {
           </ul>
         </Card>
 
+        {/* REANÁLISE 60d — perguntas de dores/lesões/progresso */}
+        {hasCredit && (
+          <Card className="p-4 border-primary/30 bg-primary/5 space-y-4">
+            <div className="flex items-center gap-2">
+              <Stethoscope size={16} className="text-primary" />
+              <p className="text-sm font-semibold text-foreground">
+                Reanálise — como foi seu ciclo?
+              </p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Suas respostas vão guiar a IA na hora de montar o próximo protocolo.
+            </p>
+
+            <div className="space-y-2">
+              <Label className="text-xs">Surgiu alguma dor ou lesão nesse ciclo?</Label>
+              <Textarea
+                placeholder="Ex: dor lombar ao agachar, desconforto no ombro no supino..."
+                value={reanalysis.painsOrInjuries}
+                onChange={(e) => setReanalysis({ ...reanalysis, painsOrInjuries: e.target.value })}
+                maxLength={500}
+                rows={2}
+                className="resize-none text-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs">Algum exercício te incomodou (sem ser dor)?</Label>
+              <Textarea
+                placeholder="Ex: stiff barra estava pesado nas costas, prefiro com halteres..."
+                value={reanalysis.uncomfortableExercises}
+                onChange={(e) => setReanalysis({ ...reanalysis, uncomfortableExercises: e.target.value })}
+                maxLength={500}
+                rows={2}
+                className="resize-none text-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs">Notas sobre seu progresso</Label>
+              <Textarea
+                placeholder="Ex: ganhei 2kg, glúteo evoluiu mas peito estagnado..."
+                value={reanalysis.progressNotes}
+                onChange={(e) => setReanalysis({ ...reanalysis, progressNotes: e.target.value })}
+                maxLength={500}
+                rows={2}
+                className="resize-none text-sm"
+              />
+            </div>
+
+            <div className="flex items-center justify-between rounded-md border border-border p-3">
+              <div>
+                <p className="text-xs font-medium text-foreground">Pedir deload (-30% volume)</p>
+                <p className="text-[10px] text-muted-foreground">Para ciclo de recuperação se sentiu cansaço/estagnação</p>
+              </div>
+              <Switch
+                checked={reanalysis.deloadRequested}
+                onCheckedChange={(c) => setReanalysis({ ...reanalysis, deloadRequested: c, volumeIncreaseRequested: c ? false : reanalysis.volumeIncreaseRequested })}
+              />
+            </div>
+
+            <div className="flex items-center justify-between rounded-md border border-border p-3">
+              <div>
+                <p className="text-xs font-medium text-foreground">Pedir aumento de volume</p>
+                <p className="text-[10px] text-muted-foreground">Aproximar do máximo da faixa por músculo</p>
+              </div>
+              <Switch
+                checked={reanalysis.volumeIncreaseRequested}
+                onCheckedChange={(c) => setReanalysis({ ...reanalysis, volumeIncreaseRequested: c, deloadRequested: c ? false : reanalysis.deloadRequested })}
+              />
+            </div>
+          </Card>
+        )}
+
         {isLoading ? (
           <Card className="p-6 flex justify-center">
             <Loader2 className="animate-spin text-primary" />
@@ -133,15 +219,15 @@ const NewProtocol = () => {
               <Badge className="bg-primary text-primary-foreground">Crédito disponível</Badge>
             </div>
             <p className="text-sm text-foreground mb-3">
-              Você tem 1 regeneração disponível. Clique abaixo para refazer
-              seu quiz e gerar um novo protocolo.
+              Você tem 1 regeneração disponível. Suas respostas acima serão enviadas
+              à IA para gerar o novo protocolo.
             </p>
             <Button
               className="w-full glow gap-2"
               onClick={() => setConfirming(true)}
               disabled={generating}
             >
-              <RefreshCw size={14} /> Refazer quiz e gerar novo protocolo
+              <RefreshCw size={14} /> Gerar novo protocolo
             </Button>
           </Card>
         ) : blockedThisYear ? (
@@ -178,9 +264,9 @@ const NewProtocol = () => {
             <AlertDialogTitle>Substituir protocolo atual?</AlertDialogTitle>
             <AlertDialogDescription>
               Vamos gerar um novo protocolo de treino e dieta com base nos seus
-              dados atuais ({profile?.full_name || "seu perfil"}). O protocolo
-              anterior será arquivado e você não poderá voltar atrás. Esse
-              crédito será consumido.
+              dados atuais ({profile?.full_name || "seu perfil"}) e nas suas
+              respostas de reanálise. O protocolo anterior será arquivado e você
+              não poderá voltar atrás. Esse crédito será consumido.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
