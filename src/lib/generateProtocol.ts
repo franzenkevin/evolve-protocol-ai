@@ -496,22 +496,25 @@ function generateDiet(p: Profile) {
         ],
       });
     } else if (isDinner) {
+      // Jantar: REPETIR formato de almoço (combinações brasileiras: prato feito).
+      // NUNCA misturar carbo de café (pão/wrap) com proteína de almoço (carne/peixe) + arroz.
       const c1 = pick(carbMain);
       const c2 = carbMain.find(c => c !== c1) || c1;
+      const c3 = carbMain.find(c => c !== c1 && c !== c2) || c1;
       const p1 = protMain.length > 1 ? protMain[1] : pick(protMain);
       const p2 = protMain.length > 2 ? protMain[2] : pick(protMain);
+      const p3 = protMain.length > 0 ? protMain[0] : pick(protMain);
       const fruit = fruits.length > 1 ? fruits[1] : pick(fruits);
-      const carbBr = pick(carbBreakfast);
 
       meals.push({
         ...slot,
         options: [
-          { label: "Opção 1", foods: [getFood(c1), getFood(p1), getFood("Vegetais"), getFood(fruit)] },
-          { label: "Opção 2", foods: [getFood(c2), getFood(p2), getFood("Vegetais"), getFood(fruit)] },
-          { label: "Opção 3", foods: [getFood(carbBr), getFood(pick(protSnack)), getFood("Vegetais"), getFood(fruit)] },
+          { label: "Opção 1", foods: [getFood(c1), getFood("Feijão"), getFood(p1), getFood("Vegetais"), getFood(fruit)] },
+          { label: "Opção 2", foods: [getFood(c2), getFood("Feijão"), getFood(p2), getFood("Vegetais"), getFood(fruit)] },
+          { label: "Opção 3", foods: [getFood(c3), getFood("Lentilha"), getFood(p3), getFood("Vegetais"), getFood(fruit)] },
         ],
         substitutions: [
-          { category: "Carboidrato", options: [...carbMain, ...carbBreakfast] },
+          { category: "Carboidrato", options: carbMain },
           { category: "Proteína", options: protMain },
           { category: "Fruta", options: fruits },
         ],
