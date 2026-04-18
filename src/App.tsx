@@ -21,6 +21,7 @@ import Chat from "./pages/Chat";
 import Admin from "./pages/Admin";
 import AdminGate from "./components/AdminGate";
 import StudentGate from "./components/StudentGate";
+import SubscriptionGate from "./components/SubscriptionGate";
 import Welcome from "./pages/Welcome";
 import Terms from "./pages/Terms";
 import AcceptTerms from "./pages/AcceptTerms";
@@ -61,20 +62,20 @@ const App = () => (
             <Route path="/register" element={<Navigate to="/signup" replace />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/welcome" element={<ProtectedRoute><StudentGate><Welcome /></StudentGate></ProtectedRoute>} />
-            <Route path="/onboarding" element={<ProtectedRoute><StudentGate><Onboarding /></StudentGate></ProtectedRoute>} />
-            <Route path="/dashboard" element={<ProtectedRoute><StudentGate><OnboardingGate><Dashboard /></OnboardingGate></StudentGate></ProtectedRoute>} />
-            <Route path="/training" element={<ProtectedRoute><StudentGate><OnboardingGate><Training /></OnboardingGate></StudentGate></ProtectedRoute>} />
-            <Route path="/diet" element={<ProtectedRoute><StudentGate><OnboardingGate><Diet /></OnboardingGate></StudentGate></ProtectedRoute>} />
-            <Route path="/progress" element={<ProtectedRoute><StudentGate><OnboardingGate><Progress /></OnboardingGate></StudentGate></ProtectedRoute>} />
-            <Route path="/exams" element={<ProtectedRoute><StudentGate><OnboardingGate><Exams /></OnboardingGate></StudentGate></ProtectedRoute>} />
-            <Route path="/journal" element={<ProtectedRoute><StudentGate><OnboardingGate><Journal /></OnboardingGate></StudentGate></ProtectedRoute>} />
-            <Route path="/chat" element={<ProtectedRoute><StudentGate><OnboardingGate><Chat /></OnboardingGate></StudentGate></ProtectedRoute>} />
+            <Route path="/welcome" element={<ProtectedRoute><StudentGate><SubscriptionGate><Welcome /></SubscriptionGate></StudentGate></ProtectedRoute>} />
+            <Route path="/onboarding" element={<ProtectedRoute><StudentGate><SubscriptionGate><Onboarding /></SubscriptionGate></StudentGate></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><Dashboard /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
+            <Route path="/training" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><Training /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
+            <Route path="/diet" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><Diet /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
+            <Route path="/progress" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><Progress /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
+            <Route path="/exams" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><Exams /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
+            <Route path="/journal" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><Journal /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
+            <Route path="/chat" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><Chat /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminGate><Admin /></AdminGate></ProtectedRoute>} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/accept-terms" element={<ProtectedRoute><AcceptTerms /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><StudentGate><OnboardingGate><Profile /></OnboardingGate></StudentGate></ProtectedRoute>} />
-            <Route path="/profile/edit" element={<ProtectedRoute><StudentGate><OnboardingGate><EditProfile /></OnboardingGate></StudentGate></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><Profile /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
+            <Route path="/profile/edit" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><EditProfile /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
             <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
