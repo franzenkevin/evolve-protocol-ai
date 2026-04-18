@@ -4,13 +4,15 @@ import { LogOut, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
-import { useSidebar } from "@/components/ui/sidebar";
 
-const SidebarHeader = () => {
+interface SidebarHeaderProps {
+  onClose?: () => void;
+}
+
+const SidebarHeader = ({ onClose }: SidebarHeaderProps = {}) => {
   const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
   const navigate = useNavigate();
-  const { setOpenMobile, isMobile } = useSidebar();
 
   const name = profile?.full_name || user?.user_metadata?.full_name || "Atleta";
   const email = user?.email || "";
