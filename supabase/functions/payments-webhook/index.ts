@@ -11,6 +11,13 @@ const PRICE_TO_PLAN_CODE: Record<string, string> = {
   hypertrophy_annual: 'annual',
 };
 
+const ONE_TIME_PRICES = new Set([
+  'hypertrophy_new_protocol_once',
+  'hypertrophy_exam_analysis_once',
+  'hypertrophy_hormone_60d_once',
+  'hypertrophy_hormone_annual_once',
+]);
+
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 
@@ -33,6 +40,7 @@ Deno.serve(async (req) => {
         break;
       case EventName.TransactionCompleted:
         console.log('Transaction completed:', event.data.id);
+        await handleTransactionCompleted(event.data, env);
         break;
       case EventName.TransactionPaymentFailed:
         console.log('Payment failed:', event.data.id);
@@ -169,4 +177,52 @@ async function handleSubscriptionCanceled(data: any, env: PaddleEnv) {
     })
     .eq('paddle_subscription_id', data.id)
     .eq('environment', env);
+}
+
+async function handleTransactionCompleted(data: any, env: PaddleEnv) {
+  // Trata compras one-time (não-assinaturas): regen de protocolo, exames, etc.
+  // Subscriptions são tratadas em SubscriptionCreated/Updated.
+  if (data.subscriptionId) return; // já é uma assinatura
+
+  const userId = data.customData?.userId;
+  if (!userId) {
+    console.log('No userId in transaction customData — ignorando');
+    return;
+  }
+  const items = data.items || [];
+  for (const item of items) {
+    const priceExternalId =
+      item.price?.importMeta?.externalId || item.price?.customData?.externalId;
+    if (!priceExternalId || !ONE_TIME_PRICES.has(priceExternalId)) continue;
+
+    if (priceExternalId === 'hypertrophy_new_protocol_once') {
+      await supabase.from('protocol_regenerations').insert({
+        user_id: userId,
+        paddle_transaction_id: data.id,
+        amount_brl: 19.9,
+        status: 'paid',
+      });
+      console.log(`✅ regen credit ${data.id} → user ${userId}`);
+    }
+
+    // exames/hormonal: só registra log + push (sem regra de uso ainda)
+    if (priceExternalId.startsWith('hypertrophy_exam') || priceExternalId.startsWith('hypertrophy_hormone')) {
+      try {
+        const fnUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/push-send`;
+        fetch(fnUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+          },
+          body: JSON.stringify({
+            userId,
+            title: '✅ Pagamento confirmado',
+            body: 'Em até 48h enviaremos a análise dos seus exames por e-mail.',
+            url: '/exams',
+          }),
+        }).catch(() => {});
+      } catch {}
+    }
+  }
 }

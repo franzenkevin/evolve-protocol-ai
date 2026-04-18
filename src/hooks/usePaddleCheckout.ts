@@ -8,9 +8,10 @@ export function usePaddleCheckout() {
   const [loading, setLoading] = useState(false);
 
   const openCheckout = async (options: {
-    priceId: "hypertrophy_monthly" | "hypertrophy_annual";
+    priceId: string;
     referralCode?: string;
     successUrl?: string;
+    customData?: Record<string, string>;
   }) => {
     if (!user) {
       toast.error("Faça login para assinar");
@@ -27,6 +28,7 @@ export function usePaddleCheckout() {
         customData: {
           userId: user.id,
           ...(options.referralCode ? { referralCode: options.referralCode } : {}),
+          ...(options.customData || {}),
         },
         settings: {
           displayMode: "overlay",

@@ -10,6 +10,8 @@ export type AuditAction =
   | "demote_admin"
   | "delete_article"
   | "delete_exercise"
+  | "create_exercise"
+  | "update_exercise"
   | "delete_food"
   | "create_food"
   | "update_food"

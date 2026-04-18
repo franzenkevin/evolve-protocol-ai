@@ -29,6 +29,7 @@ import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import Plans from "./pages/Plans";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
+import NewProtocol from "./pages/NewProtocol";
 import NotFound from "./pages/NotFound";
 import { CURRENT_TERMS_VERSION } from "@/lib/terms";
 
@@ -79,6 +80,7 @@ const App = () => (
             <Route path="/profile/edit" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><EditProfile /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
             <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
             <Route path="/checkout/success" element={<ProtectedRoute><CheckoutSuccess /></ProtectedRoute>} />
+            <Route path="/new-protocol" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><NewProtocol /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
