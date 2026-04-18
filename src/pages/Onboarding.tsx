@@ -740,6 +740,23 @@ const Onboarding = () => {
               </div>
             </>
           )}
+
+          {/* STEP 8 — Confirmação do protocolo */}
+          {step === 8 && (
+            <ProtocolConfirmation
+              sex={data.sex}
+              trainingDays={parseInt(data.trainingDays) || 4}
+              cardioEnabled={data.cardioEnabled === "yes"}
+              cardioFrequency={data.cardioFrequency}
+              cardioType={data.cardioTypePreference}
+              cardioDuration={data.cardioDuration}
+              mealCount={parseInt(data.mealCount) || 4}
+              trainingTime={data.trainingTime}
+              weakPoints={assessment?.weak_points}
+              initial={confirmations}
+              onChange={setConfirmations}
+            />
+          )}
         </div>
       </div>
 
