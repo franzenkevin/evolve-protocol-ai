@@ -6,8 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { CURRENT_TERMS_VERSION } from "@/lib/terms";
+import { Mail, CheckCircle2 } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const Signup = () => {
@@ -16,7 +15,9 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { signUp, signIn } = useAuth();
+  const [resending, setResending] = useState(false);
+  const [confirmationSent, setConfirmationSent] = useState(false);
+  const { signUp, resendConfirmationEmail } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -36,47 +37,86 @@ const Signup = () => {
     }
 
     setLoading(true);
-
     const { error: signUpError } = await signUp(email, password, name);
-    if (signUpError) {
-      setLoading(false);
-      toast({ title: "Erro ao cadastrar", description: signUpError.message, variant: "destructive" });
-      return;
-    }
-
-    // Auto login após criação da conta
-    const { error: signInError } = await signIn(email, password);
-    if (signInError) {
-      setLoading(false);
-      toast({
-        title: "Conta criada!",
-        description: "Faça login para continuar.",
-      });
-      navigate("/login");
-      return;
-    }
-
-    // Persiste aceite dos termos no perfil
-    try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const uid = sessionData.session?.user?.id;
-      if (uid) {
-        await supabase
-          .from("profiles")
-          .update({
-            terms_version: CURRENT_TERMS_VERSION,
-            terms_accepted_at: new Date().toISOString(),
-          })
-          .eq("user_id", uid);
-      }
-    } catch {
-      // silencioso — será solicitado novamente se necessário
-    }
-
     setLoading(false);
-    toast({ title: "Bem-vindo!", description: "Conta criada com sucesso." });
-    navigate("/onboarding");
+
+    if (signUpError) {
+      toast({
+        title: "Erro ao cadastrar",
+        description: signUpError.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setConfirmationSent(true);
   };
+
+  const handleResend = async () => {
+    setResending(true);
+    const { error } = await resendConfirmationEmail(email);
+    setResending(false);
+    if (error) {
+      toast({ title: "Erro ao reenviar", description: error.message, variant: "destructive" });
+    } else {
+      toast({
+        title: "E-mail reenviado!",
+        description: "Verifique sua caixa de entrada e a pasta de spam.",
+      });
+    }
+  };
+
+  if (confirmationSent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <div className="w-full max-w-sm text-center animate-fade-in">
+          <div className="w-16 h-16 rounded-full bg-primary/15 flex items-center justify-center mx-auto mb-5">
+            <Mail size={28} className="text-primary" />
+          </div>
+          <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
+            Verifique seu e-mail
+          </h1>
+          <p className="text-sm text-muted-foreground mb-1">
+            Enviamos um link de confirmação para
+          </p>
+          <p className="text-sm font-semibold text-foreground mb-5 break-all">{email}</p>
+
+          <div className="bg-secondary/40 border border-border rounded-lg p-4 text-left space-y-2 mb-5">
+            <div className="flex items-start gap-2">
+              <CheckCircle2 size={14} className="text-primary mt-0.5 shrink-0" />
+              <p className="text-xs text-muted-foreground">
+                Abra o e-mail e clique em <strong className="text-foreground">"Confirmar"</strong> para ativar sua conta.
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <CheckCircle2 size={14} className="text-primary mt-0.5 shrink-0" />
+              <p className="text-xs text-muted-foreground">
+                Não esqueça de checar a <strong className="text-foreground">caixa de spam</strong> ou promoções.
+              </p>
+            </div>
+            <div className="flex items-start gap-2">
+              <CheckCircle2 size={14} className="text-primary mt-0.5 shrink-0" />
+              <p className="text-xs text-muted-foreground">
+                Após confirmar, faça login para iniciar seu protocolo.
+              </p>
+            </div>
+          </div>
+
+          <Button
+            variant="outline"
+            className="w-full mb-2"
+            onClick={handleResend}
+            disabled={resending}
+          >
+            {resending ? "Reenviando..." : "Reenviar e-mail de confirmação"}
+          </Button>
+          <Button className="w-full glow" onClick={() => navigate("/login")}>
+            Ir para o login
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
@@ -98,10 +138,7 @@ const Signup = () => {
           </div>
           <div>
             <Label htmlFor="password">Senha</Label>
-            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="6 caracteres no mínimo" required minLength={6} className="mt-1" />
-            <p className="text-xs text-muted-foreground mt-1">
-              Mínimo de 6 caracteres. Use o que for fácil de lembrar.
-            </p>
+            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} className="mt-1" />
           </div>
 
           <div className="flex items-start gap-2 pt-1">
