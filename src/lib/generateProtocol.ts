@@ -1,28 +1,257 @@
 import type { Profile } from "@/hooks/useProfile";
+import {
+  SPLITS_MEN,
+  SPLITS_WOMEN,
+  getSetScheme,
+  type SplitVariant,
+} from "@/lib/workoutRules";
 
 /**
  * Generates a default training + diet protocol based on user profile.
- * This is a rule-based generator — AI enhancement comes in Phase 2.
+ * Rule-based fallback — usado quando o GPT-5 falha.
+ * Segue METODOLOGIA OFICIAL HYPERTROPHY (ver src/lib/workoutRules.ts).
  */
 export function generateProtocol(profile: Profile) {
   const training = generateTraining(profile);
   const diet = generateDiet(profile);
-  return { training, diet };
+  const cardioPlan = buildCardioPlan(profile);
+  return { training, diet, cardioPlan };
 }
 
-// ==================== TRAINING (unchanged) ====================
+// ==================== TRAINING (refatorado — Fase 1 metodologia) ====================
+
+const WEEKDAY_ORDER: Record<string, number> = {
+  "Segunda": 0, "Terça": 1, "Quarta": 2, "Quinta": 3,
+  "Sexta": 4, "Sábado": 5, "Domingo": 6,
+};
+
+// Banco de exercícios indexado por foco (focus → ordered list)
+// Cada exercício: { name, primary, accessory? } — para cálculo de volume 1.0 + 0.5
+type ExDef = { name: string; primary: string; accessory?: string; rest: string };
+
+const EX_BANK: Record<string, ExDef[]> = {
+  // ===== INFERIOR =====
+  inferior: [
+    { name: "Agachamento livre", primary: "quadriceps", accessory: "gluteo", rest: "120s" },
+    { name: "Leg press 45°", primary: "quadriceps", accessory: "gluteo", rest: "90s" },
+    { name: "Cadeira extensora", primary: "quadriceps", rest: "60s" },
+    { name: "Stiff", primary: "posterior_coxa", accessory: "gluteo", rest: "90s" },
+    { name: "Mesa flexora", primary: "posterior_coxa", rest: "60s" },
+    { name: "Elevação pélvica com barra", primary: "gluteo", accessory: "posterior_coxa", rest: "90s" },
+    { name: "Cadeira abdutora", primary: "gluteo", rest: "45s" },
+    { name: "Panturrilha em pé", primary: "panturrilha", rest: "45s" },
+  ],
+  inferior_posterior: [
+    { name: "Stiff", primary: "posterior_coxa", accessory: "gluteo", rest: "90s" },
+    { name: "Mesa flexora", primary: "posterior_coxa", rest: "60s" },
+    { name: "Elevação pélvica com barra", primary: "gluteo", accessory: "posterior_coxa", rest: "90s" },
+    { name: "Bom dia (good morning)", primary: "posterior_coxa", accessory: "gluteo", rest: "75s" },
+    { name: "Cadeira flexora unilateral", primary: "posterior_coxa", rest: "60s" },
+    { name: "Panturrilha sentado", primary: "panturrilha", rest: "45s" },
+  ],
+  // ===== SUPERIOR (mulheres) =====
+  superior: [
+    { name: "Puxada frontal", primary: "costas", accessory: "biceps", rest: "75s" },
+    { name: "Remada sentada", primary: "costas", accessory: "biceps", rest: "75s" },
+    { name: "Desenvolvimento com halteres", primary: "deltoide_frontal", accessory: "triceps", rest: "75s" },
+    { name: "Elevação lateral", primary: "deltoide_lateral", rest: "45s" },
+    { name: "Crucifixo invertido", primary: "deltoide_posterior", rest: "45s" },
+    { name: "Tríceps pulley corda", primary: "triceps", rest: "60s" },
+    { name: "Rosca direta", primary: "biceps", rest: "60s" },
+  ],
+  superior_gluteo: [
+    { name: "Puxada frontal", primary: "costas", accessory: "biceps", rest: "75s" },
+    { name: "Remada sentada", primary: "costas", accessory: "biceps", rest: "75s" },
+    { name: "Elevação lateral", primary: "deltoide_lateral", rest: "45s" },
+    { name: "Crucifixo invertido", primary: "deltoide_posterior", rest: "45s" },
+    { name: "Tríceps pulley corda", primary: "triceps", rest: "60s" },
+    { name: "Rosca direta", primary: "biceps", rest: "60s" },
+    { name: "Coice na polia (glúteo isolado)", primary: "gluteo", rest: "45s" },
+    { name: "Abdução em pé na polia", primary: "gluteo", rest: "45s" },
+  ],
+  // ===== PUSH (homens) =====
+  push: [
+    { name: "Supino reto com barra", primary: "peito", accessory: "deltoide_frontal", rest: "120s" },
+    { name: "Supino inclinado halteres", primary: "peito", accessory: "deltoide_frontal", rest: "90s" },
+    { name: "Crucifixo máquina", primary: "peito", rest: "60s" },
+    { name: "Desenvolvimento com halteres", primary: "deltoide_frontal", accessory: "triceps", rest: "90s" },
+    { name: "Elevação lateral", primary: "deltoide_lateral", rest: "45s" },
+    { name: "Tríceps testa barra EZ", primary: "triceps", rest: "60s" },
+    { name: "Tríceps pulley corda", primary: "triceps", rest: "60s" },
+  ],
+  // ===== PULL (homens) =====
+  pull: [
+    { name: "Puxada frontal", primary: "costas", accessory: "biceps", rest: "90s" },
+    { name: "Remada curvada", primary: "costas", accessory: "biceps", rest: "90s" },
+    { name: "Remada unilateral halteres", primary: "costas", accessory: "biceps", rest: "75s" },
+    { name: "Pulldown corda", primary: "costas", rest: "60s" },
+    { name: "Crucifixo invertido", primary: "deltoide_posterior", rest: "45s" },
+    { name: "Rosca direta barra", primary: "biceps", rest: "60s" },
+    { name: "Rosca martelo", primary: "biceps", rest: "60s" },
+  ],
+  // ===== LEGS (homens) =====
+  legs: [
+    { name: "Agachamento livre", primary: "quadriceps", accessory: "gluteo", rest: "120s" },
+    { name: "Leg press 45°", primary: "quadriceps", accessory: "gluteo", rest: "90s" },
+    { name: "Cadeira extensora", primary: "quadriceps", rest: "60s" },
+    { name: "Stiff", primary: "posterior_coxa", accessory: "gluteo", rest: "90s" },
+    { name: "Mesa flexora", primary: "posterior_coxa", rest: "60s" },
+    { name: "Panturrilha em pé", primary: "panturrilha", rest: "45s" },
+    { name: "Abdominal infra", primary: "abdomen", rest: "45s" },
+  ],
+  // ===== UPPER (homens) =====
+  upper: [
+    { name: "Supino inclinado halteres", primary: "peito", accessory: "deltoide_frontal", rest: "90s" },
+    { name: "Puxada frontal", primary: "costas", accessory: "biceps", rest: "90s" },
+    { name: "Remada sentada", primary: "costas", accessory: "biceps", rest: "75s" },
+    { name: "Desenvolvimento máquina", primary: "deltoide_frontal", accessory: "triceps", rest: "75s" },
+    { name: "Elevação lateral", primary: "deltoide_lateral", rest: "45s" },
+    { name: "Tríceps pulley corda", primary: "triceps", rest: "60s" },
+    { name: "Rosca direta", primary: "biceps", rest: "60s" },
+  ],
+  // ===== FULL BODY =====
+  fullbody_women: [
+    // Mobilidade + 5 inferiores + 2-3 superiores
+    { name: "Mobilidade de quadril (5min)", primary: "abdomen", rest: "0s" },
+    { name: "Agachamento livre", primary: "quadriceps", accessory: "gluteo", rest: "120s" },
+    { name: "Elevação pélvica com barra", primary: "gluteo", accessory: "posterior_coxa", rest: "90s" },
+    { name: "Stiff", primary: "posterior_coxa", accessory: "gluteo", rest: "90s" },
+    { name: "Cadeira abdutora", primary: "gluteo", rest: "45s" },
+    { name: "Panturrilha em pé", primary: "panturrilha", rest: "45s" },
+    { name: "Puxada frontal", primary: "costas", accessory: "biceps", rest: "75s" },
+    { name: "Desenvolvimento halteres", primary: "deltoide_frontal", accessory: "triceps", rest: "75s" },
+  ],
+  fullbody_men: [
+    { name: "Agachamento livre", primary: "quadriceps", accessory: "gluteo", rest: "120s" },
+    { name: "Supino reto com barra", primary: "peito", accessory: "deltoide_frontal", rest: "120s" },
+    { name: "Remada curvada", primary: "costas", accessory: "biceps", rest: "90s" },
+    { name: "Stiff", primary: "posterior_coxa", accessory: "gluteo", rest: "90s" },
+    { name: "Desenvolvimento com halteres", primary: "deltoide_frontal", accessory: "triceps", rest: "75s" },
+    { name: "Rosca direta", primary: "biceps", rest: "60s" },
+    { name: "Tríceps pulley corda", primary: "triceps", rest: "60s" },
+  ],
+  // ===== COMPLEMENTO (cardio + abs) =====
+  complemento: [
+    { name: "Cardio LISS (30-40min, 60-70% FCmax)", primary: "abdomen", rest: "0s" },
+    { name: "Abdominal infra", primary: "abdomen", rest: "45s" },
+    { name: "Prancha", primary: "abdomen", rest: "30s" },
+    { name: "Abdominal supra na polia", primary: "abdomen", rest: "45s" },
+  ],
+};
+
+// Mapeia o "focus" textual da divisão → chave do banco
+function focusKey(focus: string, sex: "M" | "F"): keyof typeof EX_BANK {
+  const f = focus.toLowerCase();
+  if (f.includes("full body")) return sex === "F" ? "fullbody_women" : "fullbody_men";
+  if (f.includes("ênfase posterior") || f.includes("enfase posterior")) return "inferior_posterior";
+  if (f.includes("superior + glúteo") || f.includes("superior + gluteo")) return "superior_gluteo";
+  if (f.includes("inferior")) return "inferior";
+  if (f.includes("superior")) return "superior";
+  if (f.includes("push")) return "push";
+  if (f.includes("pull")) return "pull";
+  if (f.includes("legs")) return "legs";
+  if (f.includes("upper")) return "upper";
+  if (f.includes("cardio") || f.includes("complemento")) return "complemento";
+  return sex === "F" ? "superior" : "upper";
+}
+
+function pickSplitVariant(sex: "M" | "F", days: number): SplitVariant {
+  const table = sex === "F" ? SPLITS_WOMEN : SPLITS_MEN;
+  const variants = table[days] || table[4] || table[3];
+  return variants.find((v) => v.defaultChoice) || variants[0];
+}
 
 function generateTraining(p: Profile) {
+  const sex: "M" | "F" = p.sex === "F" ? "F" : "M";
+  const days = Math.max(2, Math.min(7, p.training_days || 4));
+  const weekdays = p.training_weekdays || [];
+  const sortedWeekdays = [...weekdays].sort((a, b) => (WEEKDAY_ORDER[a] ?? 0) - (WEEKDAY_ORDER[b] ?? 0));
+
+  const variant = pickSplitVariant(sex, days);
+  const { scheme, level } = getSetScheme(p.experience);
+
+  // Quantos exercícios por dia? (heurística — a IA real é mais granular)
+  const targetEx = level === "advanced" ? 7 : 6;
+
+  // Cardio integrado por dia (se habilitado)
+  const cardioEnabled = p.cardio_enabled !== false;
+  const cardioFreq = (p.cardio_frequency || "").toLowerCase();
+  const cardioType = p.cardio_type_preference || "Esteira (caminhada inclinada)";
+  const cardioDur = p.cardio_duration || "20-30min";
+  const cardioTiming = (p.cardio_timing || "").toLowerCase();
+
+  // Distribuir cardio em ~metade dos dias se freq não específica
+  const numCardioDays = cardioEnabled
+    ? cardioFreq.includes("todo") ? days
+    : cardioFreq.includes("5") ? 5
+    : cardioFreq.includes("4") ? 4
+    : cardioFreq.includes("3") ? 3
+    : cardioFreq.includes("2") ? 2
+    : cardioFreq.includes("1") ? 1
+    : Math.ceil(days / 2)
+    : 0;
+
+  return variant.days.map((dayDef, i) => {
+    const weekday = sortedWeekdays[i] || "";
+    const fk = focusKey(dayDef.focus, sex);
+    const list = EX_BANK[fk] || [];
+    const exercises = list.slice(0, targetEx).map((ex, j) => ({
+      id: `${i}-${j}`,
+      name: ex.name,
+      primary: ex.primary,
+      accessory: ex.accessory || null,
+      sets: scheme.validSets.length, // séries válidas
+      warmups: scheme.warmups,
+      validSetsScheme: scheme.validSets,
+      reps: scheme.validSets.map((s) => s.reps).join(" / "),
+      rest: ex.rest,
+      technique: "standard" as const,
+      done: false,
+    }));
+
+    const includeCardio = cardioEnabled && i < numCardioDays;
+    const cardio = includeCardio
+      ? {
+          modality: cardioType,
+          duration: cardioDur,
+          intensity: cardioTiming.includes("jejum") ? "60-65% FCmax (LISS jejum)" : "65-75% FCmax",
+          when: cardioTiming || "após o treino",
+        }
+      : null;
+
+    const label = weekday
+      ? `${weekday} — ${dayDef.code}: ${dayDef.focus}`
+      : `Dia ${dayDef.code} — ${dayDef.focus}`;
+
+    return {
+      label,
+      code: dayDef.code,
+      focus: dayDef.focus,
+      muscleGroup: dayDef.focus,
+      weekday,
+      exercises,
+      cardio,
+      level,
+      schemeDescription: scheme.description,
+    };
+  });
+}
+
+function buildCardioPlan(p: Profile) {
+  if (p.cardio_enabled === false) return null;
+  return {
+    type: p.cardio_type_preference || "Esteira (caminhada inclinada)",
+    frequency: p.cardio_frequency || "3-4x por semana",
+    duration: p.cardio_duration || "20-30min",
+    timing: p.cardio_timing || "após o treino",
+    note: "Cardio aparece embutido em cada dia de treino — não é treino separado.",
+  };
+}
+
+// ============= LEGACY (mantido para evitar quebrar imports antigos) =============
+function _legacyGenerateTraining(p: Profile) {
   const days = p.training_days || 4;
   const weekdays = p.training_weekdays || [];
-
-  // Map weekday names to numeric index (0=Monday ... 6=Sunday)
-  const WEEKDAY_ORDER: Record<string, number> = {
-    "Segunda": 0, "Terça": 1, "Quarta": 2, "Quinta": 3,
-    "Sexta": 4, "Sábado": 5, "Domingo": 6,
-  };
-
-  // Sort selected weekdays by their position in the week
   const sortedWeekdays = [...weekdays].sort((a, b) => (WEEKDAY_ORDER[a] ?? 0) - (WEEKDAY_ORDER[b] ?? 0));
 
   // Muscle group templates — ordered to maximize rest between synergistic groups
