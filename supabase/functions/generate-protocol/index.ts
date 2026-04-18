@@ -96,12 +96,12 @@ IMPORTANTE: Use esses dados para PRIORIZAR grupos musculares fracos no treino e 
   3. Válida 2: mesma carga (ou levemente reduzida), ALVO 8 reps próximas da falha
   4. Válida 3: REPETIR A CARGA da série 2, indo ATÉ A FALHA TOTAL
 - Zona alvo de falha: 8 a 12 reps. Se passar de 12 na falha, AUMENTAR carga próxima sessão.
-- Iniciante: 1-2 exercícios por grupo muscular
-- Intermediário: 2-3 exercícios por grupo muscular
+- Iniciante: 4-5 exercícios TOTAIS por sessão (1-2 por grupo)
+- Intermediário: 6 exercícios TOTAIS por sessão (2-3 por grupo)
 
 **Avançado (PROGRESSÃO COM TÉCNICAS):**
 - Cada exercício: 2 séries de aquecimento (50% e 75%) + 3 séries válidas próximas da falha
-- 3-4 exercícios por grupo, 18-24+ séries por grupo/semana
+- 7-8 exercícios TOTAIS por sessão, 3-4 exercícios por grupo, 18-24+ séries por grupo/semana
 - Variar a ZONA DE REPS entre exercícios e entre protocolos (6-8, 8-12, 12-15, 15-20)
 - A cada novo protocolo (próximos 60 dias), incorporar UMA destas técnicas em pelo menos 30% dos exercícios:
   • **Backoff set**: após séries pesadas, 1 série leve (50-60% da carga) com reps altas
@@ -223,10 +223,27 @@ Para CADA dia de treino, gerar um campo "dynamicNotes" curto (2-3 frases) explic
 
 ### REGRAS CRÍTICAS DE ALIMENTOS (RESPEITAR 100%):
 
-**1. UNIDADES — APENAS GRAMAS (g) ou ml para líquidos:**
-- PROIBIDO usar "1 unidade", "1 colher", "1 copo", "1 fatia", "1 scoop", "1 xícara", "2 fatias", "3 ovos"
-- SEMPRE converter para gramas: ovo = "150g" (3 ovos), pão = "50g", whey = "30g", banana = "100g", arroz = "150g"
-- Campo "amount" deve ser SEMPRE no formato "Xg" ou "Xml" (ex: "150g", "200ml", "30g")
+**1. UNIDADES — REGRA MISTA (gramas + unidade quando o peso é padronizado):**
+
+Use **UNIDADE** (com gramas entre parênteses) APENAS para alimentos com peso padrão conhecido:
+- Ovos: "3 unidades (150g)" ou "2 unidades (100g)"
+- Pão francês: "1 unidade (50g)" ou "2 unidades (100g)"
+- Pão de forma: "2 fatias (50g)"
+- Pão de hambúrguer: "1 unidade (60g)"
+- Rap10 / Wrap / Tortilla pronta: "1 unidade (45g)"
+- Atum em lata: "1 lata (120g)"
+- Sardinha em lata: "1 lata (125g)"
+
+Use **GRAMAS (g) ou ML** para tudo o mais (peso varia muito por unidade):
+- Frutas (banana, maçã, mamão, manga): "120g", "150g" — NUNCA "1 banana"
+- Tapioca, cuscuz cozido: "60g", "150g"
+- Arroz, batata, macarrão, feijão, lentilha: "150g", "200g"
+- Carnes, peixes, frango: "150g", "180g"
+- Leite, iogurte líquido: "200ml"
+- Queijo, requeijão, pasta de amendoim: "30g"
+- Aveia, granola, whey: "30g", "40g"
+
+PROIBIDO: "1 colher", "1 copo", "1 xícara", "1 scoop", "1 fatia (sem peso)", "à vontade".
 
 **2. ALIMENTOS PROIBIDOS (NUNCA INCLUIR):**
 - Qualquer item da lista de "alimentos que não gosta" do aluno
@@ -240,12 +257,30 @@ Para CADA dia de treino, gerar um campo "dynamicNotes" curto (2-3 frases) explic
 - Nas listas de "substitutions" de cada refeição, liste APENAS alimentos preferidos da mesma categoria (ou indique "Repita as opções acima" se só houver um preferido).
 - Se um alimento preferido se encaixa na refeição, ele deve ser a Opção 1.
 
+**4. COMBINAÇÕES BRASILEIRAS LÓGICAS (CRÍTICO — pense no SABOR):**
+
+Cada refeição precisa fazer SENTIDO como um prato real que um brasileiro comeria. NUNCA combine alimentos aleatórios.
+
+**Templates obrigatórios por refeição:**
+- **Café da manhã**: 1 carbo de café (pão/tapioca/cuscuz/rap10) + 1 proteína leve (ovo/queijo/iogurte/whey) + 1 fruta + opcional laticínio (leite/café com leite). Ex: "Pão francês + ovo mexido + mamão + café com leite". NUNCA arroz ou batata no café.
+- **Almoço**: 1 carbo principal (arroz OU batata OU macarrão OU mandioca — UM SÓ) + 1 leguminosa (feijão/lentilha) + 1 proteína animal (frango/carne/peixe) + vegetais/salada. Ex: "Arroz + feijão + frango grelhado + salada". NUNCA pão ou tapioca no almoço.
+- **Jantar**: MESMO formato do almoço (prato feito brasileiro). Pode incluir fruta de sobremesa. NUNCA misture pão+arroz+peixe.
+- **Lanche da manhã/tarde**: fruta + proteína leve (whey/iogurte/queijo) + opcional carbo leve (aveia/granola/pão/tapioca). Ex: "Banana + whey + aveia" ou "Pão de forma + queijo + maçã".
+- **Pré-treino**: carbo de absorção rápida (pão/banana/tapioca/aveia) + proteína leve (whey/ovo). Sem gordura pesada nem fibras em excesso.
+- **Ceia**: proteína de absorção lenta (queijo/iogurte/ovo) + opcional fruta. Sem carbo pesado.
+
+**Combinações PROIBIDAS (nunca prescreva):**
+- Arroz + pão na mesma refeição
+- Pão + macarrão na mesma refeição
+- Tilápia/peixe + pão na mesma refeição (a não ser sanduíche de atum no lanche)
+- 2 carbos principais juntos (arroz+batata, arroz+macarrão, batata+mandioca)
+- Whey + carne grelhada na mesma refeição (whey é para lanche/pós-treino)
+- Doce em refeição principal (sempre como sobremesa de lanche, máx 1x/dia)
+
 ### Estrutura das refeições:
-- Cada refeição deve ter 3 OPÇÕES intercambiáveis (para variar)
-- Cada refeição deve ter uma lista de SUBSTITUIÇÕES por categoria (carboidrato, proteína, fruta, leguminosa) — TUDO em gramas
-- Café da manhã: carboidrato leve + proteína + fruta
-- Almoço/Jantar: carboidrato + proteína + leguminosa/vegetais
-- Lanches: proteína + fruta ± carboidrato leve
+- Cada refeição deve ter 3 OPÇÕES intercambiáveis (para variar) — TODAS seguindo o template da refeição
+- Cada refeição deve ter uma lista de SUBSTITUIÇÕES por categoria (carboidrato, proteína, fruta, leguminosa)
+- Substituições devem manter a CATEGORIA correta (não substitua arroz por banana)
 
 ### Suplementação (dosagens obrigatórias):
 - Creatina: 5g (mulher) ou 7g (homem) por dia, qualquer horário
