@@ -432,10 +432,11 @@ ${assessmentContext}
 
 Gere o JSON completo seguindo TODAS as regras da metodologia.`;
 
-    console.log("Calling AI for protocol generation...");
+    console.log("Calling AI for protocol generation (assertive mode)...");
 
-    // Use Gemini Flash: ~5-8x faster than gpt-5-mini for this prompt size,
-    // keeping us safely under the 150s edge function idle timeout.
+    // Use GPT-5: raciocínio mais profundo para analisar avaliação + lesões + desvios
+    // antes de prescrever cada exercício. Trade-off: ~60-120s vs Flash (~30s),
+    // mas o usuário prioriza ASSERTIVIDADE sobre velocidade.
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -443,14 +444,14 @@ Gere o JSON completo seguindo TODAS as regras da metodologia.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "openai/gpt-5",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
         response_format: { type: "json_object" },
       }),
-      signal: AbortSignal.timeout(130000),
+      signal: AbortSignal.timeout(180000),
     });
 
     if (!aiResponse.ok) {
