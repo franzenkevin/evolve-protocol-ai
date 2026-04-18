@@ -25,7 +25,7 @@ const SidebarHeader = ({ onClose }: SidebarHeaderProps = {}) => {
   };
 
   const goToProfile = () => {
-    if (isMobile) setOpenMobile(false);
+    onClose?.();
     navigate("/profile");
   };
 
