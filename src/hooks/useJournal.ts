@@ -92,13 +92,46 @@ export interface JournalAIDraft {
   read_time_minutes: number;
   sources: { title?: string; uri: string }[];
   ai_prompt: string;
+  source_url?: string;
 }
 
-export const useResearchJournalTopic = () => {
+export interface JournalStudySuggestion {
+  angle: string;
+  study_title: string;
+  study_authors?: string;
+  study_year?: number;
+  study_url: string;
+  short_pitch: string;
+}
+
+/** Modo 1: pesquisa 3 estudos no Google Scholar/PubMed */
+export const useSearchJournalStudies = () => {
   return useMutation({
-    mutationFn: async (topic: string): Promise<JournalAIDraft> => {
+    mutationFn: async (
+      topic: string,
+    ): Promise<{ studies: JournalStudySuggestion[]; topic: string }> => {
       const { data, error } = await supabase.functions.invoke("journal-research", {
         body: { topic },
+      });
+      if (error) {
+        const msg = (error as any)?.context?.error || error.message;
+        throw new Error(msg);
+      }
+      if (data?.error) throw new Error(data.error);
+      return data;
+    },
+  });
+};
+
+/** Modo 2: expande um estudo selecionado em artigo completo */
+export const useExpandJournalStudy = () => {
+  return useMutation({
+    mutationFn: async (params: {
+      topic: string;
+      selected: JournalStudySuggestion;
+    }): Promise<JournalAIDraft> => {
+      const { data, error } = await supabase.functions.invoke("journal-research", {
+        body: { topic: params.topic, selected: params.selected },
       });
       if (error) {
         const msg = (error as any)?.context?.error || error.message;
