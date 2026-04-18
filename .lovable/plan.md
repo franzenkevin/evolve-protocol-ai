@@ -1,73 +1,40 @@
 
+The user is asking why the shareable link after publishing is different. Let me check the publish settings and project URLs to understand.
 
-User asks if the backend has everything already created. Let me check what's there vs what's needed, and also there are build errors in edge functions that need fixing.
+Project URLs from context:
+- Preview: `https://id-preview--d5acd8e1-618e-400a-b85d-e21966eecfc6.lovable.app`
+- Published: `https://evolve-protocol-ai.lovable.app`
+- Custom domain: none
 
-Backend status check:
-- Tables: admin_audit_log, body_assessments, checkins, coupons, coupon_redemptions, daily_ratings, diet_feedback, exercises, foods, journal_articles, live_meetings, plans, profiles, protocols, push_subscriptions, referrals, refund_requests, subscriptions, user_roles, workout_feedback, workout_logs ✅
-- Functions: get_admin_metrics (com MRR/LTV/churn), has_role, handle_new_user, generate_referral_code, get_monthly_ranking, notify_new_journal_article, prevent_self_admin_promotion ✅
-- Edge functions: analyze-body, chat, fetch-journal, generate-protocol, journal-notify, push-send, push-subscribe, swap-exercise ✅
-- Storage: photos, avatars, exercise-videos ✅
-- Secrets: LOVABLE_API_KEY, VAPID_PRIVATE_KEY ✅
+The published URL `evolve-protocol-ai.lovable.app` doesn't match the project name "Hypertrophy". This is likely because the project was renamed after the first publish, but the published subdomain stays as the original slug from when it was first published. Lovable doesn't automatically rename the published subdomain when the project is renamed.
 
-Build errors: TS errors em push-send/index.ts e journal-notify/index.ts (Uint8Array→ArrayBuffer cast). Precisa fix.
+## Why the link looks different
 
-Faltando para Pacote C estar 100%:
-1. Seed inicial em `plans` (tabela vazia → MRR=0). Sem isso, métricas não calculam nada.
-2. Build errors nos edge functions (bloqueia deploy).
+Your published URL is `https://evolve-protocol-ai.lovable.app`, which doesn't match the current project name "Hypertrophy". This happens because:
 
-Vou apresentar plano enxuto: corrigir build + seed plans.
+1. **The published subdomain is locked to the slug used when you first published.** When the project was created/first published, it was named "evolve-protocol-ai". Renaming the project later (to "Hypertrophy") does NOT automatically rename the `.lovable.app` subdomain.
 
-# Diagnóstico do backend
+2. **The preview URL is also different by design.** Preview uses the project ID format (`id-preview--<uuid>.lovable.app`), while published uses a friendly slug. These two URLs are always different — preview is for in-editor testing (login-gated), published is the public live site.
 
-## O que JÁ está pronto ✅
+## Options to fix
 
-**Tabelas (21):** todas do Pacote C criadas — `plans`, `coupons`, `coupon_redemptions`, `refund_requests`, `live_meetings`, `admin_audit_log`, etc. RLS configurada em todas.
+**Option A — Connect a custom domain (recommended for branding)**
+Buy or connect `hypertrophy.app` (or similar) via Project Settings → Domains. This gives you a clean branded URL like `https://hypertrophy.app` regardless of the internal slug.
 
-**Funções SQL:** `get_admin_metrics()` já calcula MRR, LTV, churn 30d, conversão, retenção 7d/30d, signups diários. `has_role`, `handle_new_user`, `prevent_self_admin_promotion` ativas.
+**Option B — Request a subdomain change**
+Lovable does not expose a self-serve "rename published subdomain" option in the UI. To change `evolve-protocol-ai.lovable.app` to `hypertrophy.lovable.app`, you'd need to contact Lovable support, OR remix the project under the desired name and republish (but this creates a new project).
 
-**Edge functions (8):** chat, generate-protocol, analyze-body, fetch-journal, journal-notify, push-send, push-subscribe, swap-exercise.
+**Option C — Workspace branded URLs (Business/Enterprise plan)**
+If you're on Business or Enterprise, you can configure branded app URLs like `*.yourcompany.lovable.app` in workspace settings.
 
-**Storage:** buckets `photos`, `avatars`, `exercise-videos`.
+## Recommendation
 
-**Secrets:** `LOVABLE_API_KEY`, `VAPID_PRIVATE_KEY` configurados.
+Since the app has paid features (Paddle checkout, push notifications, manifest pointing to Hypertrophy branding), I recommend **Option A**: connect a custom domain like `hypertrophy.app` or `app.hypertrophy.com.br`. This:
+- Fixes the inconsistency permanently
+- Improves trust in checkout flows (Paddle)
+- Allows you to send auth emails from `@hypertrophy.app` (fixing the iCloud/Gmail confirmation issue you reported earlier)
+- Auto-provisions SSL
 
-## O que falta ⚠️
+No code changes are needed for this — it's done in **Project Settings → Domains → Connect Domain**.
 
-**1. Build errors em 2 edge functions** (bloqueia deploy)
-- `push-send/index.ts` e `journal-notify/index.ts` têm 8 erros TS2345 sobre `Uint8Array → ArrayBuffer`. Causa: tipo estrito do Deno mais novo. Fix: castar `.buffer as ArrayBuffer` ou usar `new Uint8Array(arr).buffer.slice(0)`.
-
-**2. Tabela `plans` está vazia**
-- Sem registros, o `get_admin_metrics()` retorna **MRR = 0** e **LTV = 0**. Você precisa inserir os 3 planos padrão (Mensal/Trimestral/Anual) ou criar via aba `AdminPlans` no painel.
-
-**3. (Opcional) Trigger de `updated_at`**
-- As tabelas novas (`plans`, `coupons`, `refund_requests`) têm coluna `updated_at` mas sem trigger automático. Hoje funciona porque o frontend não atualiza esse campo manualmente — mas se quiser auditoria correta, vale adicionar.
-
-## Plano de ação
-
-### Etapa 1 — Corrigir build errors (obrigatório)
-Em `push-send/index.ts` e `journal-notify/index.ts`, ajustar 4 chamadas em cada arquivo:
-```ts
-// antes
-base64UrlEncode(new TextEncoder().encode(JSON.stringify(header)))
-// depois
-base64UrlEncode(new TextEncoder().encode(JSON.stringify(header)).buffer as ArrayBuffer)
-```
-Mesmo padrão para `rawSig.buffer` e `vapidPublicKeyBytes.buffer`.
-
-### Etapa 2 — Seed da tabela `plans`
-Inserir via insert tool:
-| code | name | price_brl | interval_months |
-|---|---|---|---|
-| monthly | Mensal | 97.00 | 1 |
-| quarterly | Trimestral | 249.00 | 3 |
-| yearly | Anual | 897.00 | 12 |
-
-Após isso, `MRR`, `LTV` e gráficos no Overview do `/admin` ficam funcionais.
-
-### Etapa 3 (opcional) — Triggers updated_at
-Migration adicionando trigger `update_updated_at_column` nas 3 tabelas novas. Pode pular se quiser.
-
-## Resposta direta
-
-**Backend está 95% pronto.** Falta só (a) corrigir 8 erros TS nos edge functions de push e (b) popular a tabela `plans` com os 3 valores padrão pra MRR/LTV calcularem corretamente. Sem isso o painel funciona, mas mostra zeros nas métricas financeiras.
-
+Want me to also update the manifest, OG tags, and Paddle return URLs to use the new custom domain once you've connected it? Or if you'd prefer, I can guide you through buying a domain directly inside Lovable (Project Settings → Domains → "Buy new domain").
