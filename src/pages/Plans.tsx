@@ -196,6 +196,27 @@ export default function Plans() {
           })}
         </div>
 
+        {!isActive && (
+          <div className="pt-2 text-center">
+            <p className="text-xs text-muted-foreground mb-2">
+              Já pagou e o acesso não liberou?
+            </p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={reconcile}
+              disabled={reconcileLoading}
+              className="text-xs"
+            >
+              {reconcileLoading ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                "Sincronizar minha assinatura"
+              )}
+            </Button>
+          </div>
+        )}
+
         <p className="text-[10px] text-muted-foreground text-center pt-2">
           Pagamento processado com segurança. Aceita cartão de crédito e PIX (quando disponível na sua região).
         </p>
