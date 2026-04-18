@@ -32,9 +32,13 @@ const VideoUploader = ({ value, onChange }: VideoUploaderProps) => {
         upsert: false,
       });
       if (error) throw error;
-      const { data } = supabase.storage.from("exercise-videos").getPublicUrl(path);
-      onChange(data.publicUrl);
-      setUrlInput(data.publicUrl);
+      // Bucket é privado: gera signed URL de longa duração (1 ano)
+      const { data: signed, error: signErr } = await supabase.storage
+        .from("exercise-videos")
+        .createSignedUrl(path, 60 * 60 * 24 * 365);
+      if (signErr) throw signErr;
+      onChange(signed.signedUrl);
+      setUrlInput(signed.signedUrl);
       toast({ title: "Vídeo enviado!" });
     } catch (err: any) {
       toast({ title: "Erro no upload", description: err.message, variant: "destructive" });
