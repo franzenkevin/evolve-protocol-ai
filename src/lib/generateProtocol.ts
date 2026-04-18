@@ -117,9 +117,13 @@ function generateTraining(p: Profile) {
   const dayIndices = sortedWeekdays.map(d => WEEKDAY_ORDER[d] ?? 0);
   const orderedSplit = orderSplit(rawSplit, dayIndices.length === rawSplit.length ? dayIndices : Array.from({ length: rawSplit.length }, (_, i) => i));
 
-  // Valid sets based on experience
+  // Valid sets + exercises per group based on experience
   const expLevel = p.experience || "Intermediário";
-  const validSetsCount = expLevel.startsWith("Iniciante") ? 1 : expLevel.startsWith("Avançado") ? 3 : 2;
+  const isBeginner = expLevel.startsWith("Iniciante");
+  const isAdvanced = expLevel.startsWith("Avançado");
+  const validSetsCount = isBeginner ? 1 : isAdvanced ? 3 : 2;
+  // Iniciante: 4-5 ex/treino | Intermediário: 6 | Avançado: 7-8
+  const exercisesPerGroupTarget = isBeginner ? 1 : isAdvanced ? 3 : 2;
 
   const exerciseDB: Record<string, { name: string; sets: number; reps: string; rest: string }[]> = {
     "Peito": [
@@ -174,7 +178,8 @@ function generateTraining(p: Profile) {
     const groups = day.muscleGroup.split(/[&,]/).map((g) => g.trim());
     const exercises = groups.flatMap((g) => {
       const key = Object.keys(exerciseDB).find((k) => g.includes(k) || k.includes(g));
-      return key ? exerciseDB[key] : [];
+      const list = key ? exerciseDB[key] : [];
+      return list.slice(0, exercisesPerGroupTarget);
     });
 
     return {
@@ -221,12 +226,14 @@ const FOOD_DB: Record<string, FoodItem> = {
   "Batata doce": { name: "Batata doce", amount: "200g (cozida)", protein: 3, carbs: 40, fat: 0, calories: 172 },
   "Mandioca": { name: "Mandioca", amount: "150g (cozida)", protein: 2, carbs: 39, fat: 0, calories: 160 },
   "Macarrão": { name: "Macarrão", amount: "150g (cozido)", protein: 5, carbs: 44, fat: 1, calories: 200 },
-  "Pão de forma": { name: "Pão de forma", amount: "2 fatias", protein: 5, carbs: 24, fat: 2, calories: 140 },
-  "Pão francês": { name: "Pão francês", amount: "1 unidade", protein: 4, carbs: 28, fat: 1, calories: 135 },
-  "Pão de hambúrguer": { name: "Pão de hambúrguer", amount: "1 unidade", protein: 5, carbs: 30, fat: 3, calories: 160 },
-  "Rap10": { name: "Rap10", amount: "1 unidade", protein: 4, carbs: 22, fat: 2, calories: 120 },
-  "Cuscuz": { name: "Cuscuz", amount: "150g", protein: 4, carbs: 38, fat: 1, calories: 170 },
-  "Tapioca": { name: "Tapioca", amount: "2 unidades", protein: 1, carbs: 36, fat: 0, calories: 150 },
+  // PÃES E WRAPS — em unidade (peso padrão por unidade conhecido)
+  "Pão de forma": { name: "Pão de forma", amount: "2 fatias (50g)", protein: 5, carbs: 24, fat: 2, calories: 140 },
+  "Pão francês": { name: "Pão francês", amount: "1 unidade (50g)", protein: 4, carbs: 28, fat: 1, calories: 135 },
+  "Pão de hambúrguer": { name: "Pão de hambúrguer", amount: "1 unidade (60g)", protein: 5, carbs: 30, fat: 3, calories: 160 },
+  "Rap10": { name: "Rap10", amount: "1 unidade (45g)", protein: 4, carbs: 22, fat: 2, calories: 120 },
+  // CUSCUZ E TAPIOCA — em gramas (peso varia muito)
+  "Cuscuz": { name: "Cuscuz cozido", amount: "150g", protein: 4, carbs: 38, fat: 1, calories: 170 },
+  "Tapioca": { name: "Tapioca (massa pronta)", amount: "60g", protein: 1, carbs: 36, fat: 0, calories: 150 },
 
   // Proteins
   "Peito de frango": { name: "Peito de frango grelhado", amount: "150g", protein: 45, carbs: 0, fat: 3, calories: 210 },
@@ -237,8 +244,9 @@ const FOOD_DB: Record<string, FoodItem> = {
   "Coxão mole": { name: "Coxão mole grelhado", amount: "150g", protein: 41, carbs: 0, fat: 6, calories: 220 },
   "Salmão": { name: "Salmão grelhado", amount: "150g", protein: 34, carbs: 0, fat: 14, calories: 270 },
   "Tilápia": { name: "Tilápia grelhada", amount: "150g", protein: 35, carbs: 0, fat: 3, calories: 170 },
-  "Atum": { name: "Atum em lata (drenado)", amount: "1 lata (120g)", protein: 30, carbs: 0, fat: 1, calories: 130 },
-  "Ovo": { name: "Ovos", amount: "3 unidades", protein: 18, carbs: 2, fat: 15, calories: 210 },
+  "Atum": { name: "Atum em lata (drenado)", amount: "120g (1 lata)", protein: 30, carbs: 0, fat: 1, calories: 130 },
+  // OVO — em unidade
+  "Ovo": { name: "Ovos inteiros", amount: "3 unidades (150g)", protein: 18, carbs: 2, fat: 15, calories: 210 },
 
   // Dairy
   "Queijo": { name: "Queijo branco", amount: "30g", protein: 6, carbs: 1, fat: 5, calories: 70 },
@@ -258,26 +266,26 @@ const FOOD_DB: Record<string, FoodItem> = {
   "Sardinha": { name: "Sardinha em lata", amount: "1 lata (125g)", protein: 25, carbs: 0, fat: 8, calories: 170 },
   "Camarão": { name: "Camarão cozido", amount: "150g", protein: 30, carbs: 1, fat: 2, calories: 140 },
   "Carne de porco magra": { name: "Lombo suíno grelhado", amount: "150g", protein: 38, carbs: 0, fat: 6, calories: 210 },
-  "Goiaba": { name: "Goiaba", amount: "1 unidade", protein: 2, carbs: 14, fat: 1, calories: 68 },
-  "Ameixa": { name: "Ameixa", amount: "3 unidades", protein: 1, carbs: 18, fat: 0, calories: 70 },
-  "Pêssego": { name: "Pêssego", amount: "1 unidade", protein: 1, carbs: 15, fat: 0, calories: 60 },
+  "Goiaba": { name: "Goiaba", amount: "150g", protein: 2, carbs: 14, fat: 1, calories: 68 },
+  "Ameixa": { name: "Ameixa", amount: "100g", protein: 1, carbs: 18, fat: 0, calories: 70 },
+  "Pêssego": { name: "Pêssego", amount: "150g", protein: 1, carbs: 15, fat: 0, calories: 60 },
   "Grão de bico": { name: "Grão de bico", amount: "100g (cozido)", protein: 9, carbs: 22, fat: 3, calories: 140 },
   "Pasta de amendoim": { name: "Pasta de amendoim", amount: "20g", protein: 5, carbs: 3, fat: 10, calories: 120 },
   "Castanhas": { name: "Castanhas mistas", amount: "30g", protein: 5, carbs: 5, fat: 15, calories: 175 },
   "Azeite de oliva": { name: "Azeite de oliva", amount: "1 colher sopa", protein: 0, carbs: 0, fat: 14, calories: 120 },
 
-  // Fruits
-  "Banana": { name: "Banana", amount: "1 unidade", protein: 1, carbs: 27, fat: 0, calories: 105 },
-  "Mamão": { name: "Mamão", amount: "1 fatia", protein: 1, carbs: 15, fat: 0, calories: 60 },
+  // FRUTAS — sempre em GRAMAS (peso varia muito por unidade)
+  "Banana": { name: "Banana", amount: "120g", protein: 1, carbs: 27, fat: 0, calories: 105 },
+  "Mamão": { name: "Mamão papaya", amount: "150g", protein: 1, carbs: 15, fat: 0, calories: 60 },
   "Melão": { name: "Melão", amount: "200g", protein: 1, carbs: 16, fat: 0, calories: 64 },
   "Melancia": { name: "Melancia", amount: "200g", protein: 1, carbs: 16, fat: 0, calories: 60 },
-  "Kiwi": { name: "Kiwi", amount: "2 unidades", protein: 2, carbs: 22, fat: 1, calories: 90 },
+  "Kiwi": { name: "Kiwi", amount: "150g", protein: 2, carbs: 22, fat: 1, calories: 90 },
   "Uva": { name: "Uva", amount: "150g", protein: 1, carbs: 27, fat: 0, calories: 103 },
-  "Manga": { name: "Manga", amount: "1 unidade", protein: 1, carbs: 28, fat: 0, calories: 110 },
+  "Manga": { name: "Manga", amount: "180g", protein: 1, carbs: 28, fat: 0, calories: 110 },
   "Abacate": { name: "Abacate", amount: "100g", protein: 2, carbs: 9, fat: 15, calories: 160 },
-  "Laranja": { name: "Laranja", amount: "1 unidade", protein: 1, carbs: 15, fat: 0, calories: 62 },
+  "Laranja": { name: "Laranja", amount: "150g", protein: 1, carbs: 15, fat: 0, calories: 62 },
   "Morango": { name: "Morango", amount: "150g", protein: 1, carbs: 12, fat: 0, calories: 48 },
-  "Maçã": { name: "Maçã", amount: "1 unidade", protein: 0, carbs: 25, fat: 0, calories: 95 },
+  "Maçã": { name: "Maçã", amount: "150g", protein: 0, carbs: 25, fat: 0, calories: 95 },
   "Abacaxi": { name: "Abacaxi", amount: "150g", protein: 1, carbs: 20, fat: 0, calories: 75 },
 
   // Sweets
@@ -488,22 +496,25 @@ function generateDiet(p: Profile) {
         ],
       });
     } else if (isDinner) {
+      // Jantar: REPETIR formato de almoço (combinações brasileiras: prato feito).
+      // NUNCA misturar carbo de café (pão/wrap) com proteína de almoço (carne/peixe) + arroz.
       const c1 = pick(carbMain);
       const c2 = carbMain.find(c => c !== c1) || c1;
+      const c3 = carbMain.find(c => c !== c1 && c !== c2) || c1;
       const p1 = protMain.length > 1 ? protMain[1] : pick(protMain);
       const p2 = protMain.length > 2 ? protMain[2] : pick(protMain);
+      const p3 = protMain.length > 0 ? protMain[0] : pick(protMain);
       const fruit = fruits.length > 1 ? fruits[1] : pick(fruits);
-      const carbBr = pick(carbBreakfast);
 
       meals.push({
         ...slot,
         options: [
-          { label: "Opção 1", foods: [getFood(c1), getFood(p1), getFood("Vegetais"), getFood(fruit)] },
-          { label: "Opção 2", foods: [getFood(c2), getFood(p2), getFood("Vegetais"), getFood(fruit)] },
-          { label: "Opção 3", foods: [getFood(carbBr), getFood(pick(protSnack)), getFood("Vegetais"), getFood(fruit)] },
+          { label: "Opção 1", foods: [getFood(c1), getFood("Feijão"), getFood(p1), getFood("Vegetais"), getFood(fruit)] },
+          { label: "Opção 2", foods: [getFood(c2), getFood("Feijão"), getFood(p2), getFood("Vegetais"), getFood(fruit)] },
+          { label: "Opção 3", foods: [getFood(c3), getFood("Lentilha"), getFood(p3), getFood("Vegetais"), getFood(fruit)] },
         ],
         substitutions: [
-          { category: "Carboidrato", options: [...carbMain, ...carbBreakfast] },
+          { category: "Carboidrato", options: carbMain },
           { category: "Proteína", options: protMain },
           { category: "Fruta", options: fruits },
         ],
