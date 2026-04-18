@@ -31,8 +31,8 @@ const STEPS = [
 
 const CARDIO_FREQUENCY = ["1x por semana", "2x por semana", "3x por semana", "4x por semana", "5x por semana", "Todos os dias"];
 const CARDIO_DURATION = ["10-15 min", "15-20 min", "20-30 min", "30-45 min", "45-60 min"];
-const CARDIO_TIMING = ["Logo após o treino de musculação", "Em horário separado (manhã/noite)", "Em dias de descanso da musculação", "Tanto faz — IA decide"];
-const CARDIO_TYPE = ["LISS (caminhada/bike leve, baixa intensidade)", "HIIT (alta intensidade intervalado)", "Moderado contínuo (corrida/bike)", "Tanto faz — IA escolhe melhor para meu objetivo"];
+const CARDIO_TIMING = ["Logo após o treino de musculação", "Em horário separado (manhã/noite)", "Em dias de descanso da musculação", "Tanto faz"];
+const CARDIO_TYPE = ["LISS (caminhada/bike leve, baixa intensidade)", "HIIT (alta intensidade intervalado)", "Moderado contínuo (corrida/bike)", "Tanto faz — escolha o melhor para meu objetivo"];
 
 const GOALS = ["Hipertrofia", "Emagrecimento", "Recomposição Corporal", "Saúde Geral"];
 const ACTIVITY_LEVELS = ["Sedentário", "Levemente ativo", "Moderadamente ativo", "Muito ativo", "Extremamente ativo"];
@@ -118,7 +118,7 @@ interface FormData {
 const Onboarding = () => {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
-  const [genProgress, setGenProgress] = useState(0);
+  const [genElapsed, setGenElapsed] = useState(0); // seconds
   const [genStage, setGenStage] = useState("");
   const [assessmentPhotos, setAssessmentPhotos] = useState<Record<string, string>>({});
   const [assessment, setAssessment] = useState<any>(null);
@@ -139,29 +139,27 @@ const Onboarding = () => {
   const updateProfile = useUpdateProfile();
   const createProtocol = useCreateProtocol();
 
-  // Simulate progress while AI generates protocol (caps at 95% until done)
+  // Real elapsed timer (counts up to 3 min) while generating
+  const TARGET_SECONDS = 180;
   useEffect(() => {
     if (!saving) return;
-    setGenProgress(5);
+    setGenElapsed(0);
     setGenStage("Analisando seu perfil...");
-    const stages = [
+    const stages: { at: number; label: string }[] = [
       { at: 15, label: "Calculando macros e calorias..." },
-      { at: 35, label: "Montando divisão de treino..." },
-      { at: 55, label: "Selecionando exercícios ideais..." },
-      { at: 75, label: "Personalizando refeições..." },
-      { at: 88, label: "Ajustando detalhes finais..." },
+      { at: 45, label: "Montando divisão de treino..." },
+      { at: 80, label: "Selecionando exercícios ideais..." },
+      { at: 120, label: "Personalizando refeições..." },
+      { at: 160, label: "Ajustando detalhes finais..." },
     ];
-    const interval = setInterval(() => {
-      setGenProgress((p) => {
-        if (p >= 95) return 95;
-        const next = p + Math.random() * 3 + 1;
-        const stage = stages.reverse().find((s) => next >= s.at);
-        if (stage) setGenStage(stage.label);
-        stages.reverse();
-        return Math.min(95, next);
-      });
-    }, 600);
-    return () => clearInterval(interval);
+    const t0 = Date.now();
+    const id = setInterval(() => {
+      const sec = Math.floor((Date.now() - t0) / 1000);
+      setGenElapsed(sec);
+      const cur = [...stages].reverse().find((s) => sec >= s.at);
+      if (cur) setGenStage(cur.label);
+    }, 1000);
+    return () => clearInterval(id);
   }, [saving]);
 
   const update = (field: keyof FormData, value: any) => {
@@ -378,7 +376,6 @@ const Onboarding = () => {
       }
 
       await createProtocol.mutateAsync(protocol);
-      setGenProgress(100);
       setGenStage("Pronto!");
       await new Promise((r) => setTimeout(r, 400));
       navigate("/dashboard");
@@ -522,12 +519,12 @@ const Onboarding = () => {
           {step === 3 && (
             <>
               <h2 className="text-2xl font-heading font-bold text-foreground">Cardio</h2>
-              <p className="text-sm text-muted-foreground">Conte para a IA suas preferências de cardio. Ela vai prescrever o tipo e a intensidade certos para o seu objetivo.</p>
+              <p className="text-sm text-muted-foreground">Conte suas preferências de cardio. O cardio será incluído junto com seus dias de treino.</p>
 
               <div>
                 <Label>Você quer incluir cardio no protocolo? *</Label>
                 <RadioGroup value={data.cardioEnabled} onValueChange={(v) => update("cardioEnabled", v)} className="mt-2 space-y-2">
-                  {radioOption("yes", "cardio-yes", "Sim, quero cardio prescrito pela IA")}
+                  {radioOption("yes", "cardio-yes", "Sim, quero incluir cardio")}
                   {radioOption("no", "cardio-no", "Não, só musculação por enquanto")}
                 </RadioGroup>
               </div>
@@ -686,15 +683,24 @@ const Onboarding = () => {
               {/* LGPD CONSENT */}
               <div className="mt-6 p-4 rounded-lg border border-primary/40 bg-primary/5 space-y-3">
                 <h3 className="text-base font-heading font-semibold text-foreground flex items-center gap-2">
-                  🔒 Autorização para uso dos seus dados pela IA
+                  🔒 Autorização de uso dos seus dados pela IA
                 </h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Para gerar seu protocolo personalizado de treino, dieta, cardio e acompanhamento, a inteligência artificial do Hypertrophy precisa
-                  processar os dados que você forneceu (idade, peso, altura, objetivo, fotos da avaliação corporal, preferências alimentares,
-                  rotina e respostas dos check-ins). <strong className="text-foreground">Em conformidade com a LGPD (Lei nº 13.709/2018)</strong>,
-                  seus dados são tratados de forma confidencial, usados exclusivamente dentro do app para personalizar seu acompanhamento, e
-                  você pode solicitar exclusão a qualquer momento.
+                  Para gerar seu protocolo personalizado, autorizo o uso dos meus dados pela IA, em conformidade com a LGPD.
                 </p>
+                <details className="group">
+                  <summary className="cursor-pointer text-xs text-primary hover:underline list-none">
+                    <span className="group-open:hidden">Ler termo completo →</span>
+                    <span className="hidden group-open:inline">Ocultar termo ↑</span>
+                  </summary>
+                  <p className="text-xs text-muted-foreground leading-relaxed mt-2">
+                    Para gerar seu protocolo personalizado de treino, dieta, cardio e acompanhamento, a inteligência artificial do Hypertrophy
+                    precisa processar os dados que você forneceu (idade, peso, altura, objetivo, fotos da avaliação corporal, preferências
+                    alimentares, rotina e respostas dos check-ins). <strong className="text-foreground">Em conformidade com a LGPD
+                    (Lei nº 13.709/2018)</strong>, seus dados são tratados de forma confidencial, usados exclusivamente dentro do app para
+                    personalizar seu acompanhamento, e você pode solicitar exclusão a qualquer momento.
+                  </p>
+                </details>
                 <div
                   className="flex items-start gap-3 p-3 rounded-lg border border-border bg-background/50 cursor-pointer hover:border-primary/50 transition-colors"
                   onClick={() => setData((prev) => ({ ...prev, aiDataConsent: !prev.aiDataConsent }))}
@@ -706,8 +712,7 @@ const Onboarding = () => {
                     className="mt-0.5"
                   />
                   <Label htmlFor="ai-consent" className="cursor-pointer text-sm text-foreground leading-snug">
-                    <strong>Autorizo</strong> que a IA do Hypertrophy utilize meus dados pessoais e de treino para gerar e ajustar meu protocolo,
-                    respeitando a LGPD. *
+                    <strong>Autorizo</strong> o uso dos meus dados pela IA do Hypertrophy. *
                   </Label>
                 </div>
               </div>
@@ -739,11 +744,16 @@ const Onboarding = () => {
               <p className="text-sm text-muted-foreground">{genStage}</p>
             </div>
             <div className="space-y-2">
-              <Progress value={genProgress} className="h-3" />
-              <p className="text-2xl font-bold text-primary">{Math.round(genProgress)}%</p>
+              <Progress value={Math.min(100, (genElapsed / TARGET_SECONDS) * 100)} className="h-3" />
+              <p className="text-3xl font-bold text-primary font-heading tabular-nums">
+                {String(Math.floor(genElapsed / 60)).padStart(2, "0")}:{String(genElapsed % 60).padStart(2, "0")}
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                Tempo estimado: até 3 minutos
+              </p>
             </div>
             <p className="text-xs text-muted-foreground">
-              A IA está montando seu treino e dieta personalizados. Não feche esta tela.
+              Mantenha esta tela aberta enquanto montamos seu treino e dieta personalizados.
             </p>
           </div>
         </div>

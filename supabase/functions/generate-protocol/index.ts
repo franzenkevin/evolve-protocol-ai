@@ -234,9 +234,11 @@ Para CADA dia de treino, gerar um campo "dynamicNotes" curto (2-3 frases) explic
 - Verifique CADA alimento antes de adicionar — se aparecer na lista de detestados/alergias, USE OUTRO
 - Nas substituições da refeição, também NUNCA listar alimentos detestados/alérgicos
 
-**3. PRIORIZAÇÃO DE PREFERIDOS:**
-- Use PREFERENCIALMENTE os alimentos da lista "preferred_foods" do aluno
-- Se um alimento preferido se encaixa na refeição, ele deve ser a Opção 1
+**3. RESTRIÇÃO ESTRITA AOS PREFERIDOS:**
+- Use EXCLUSIVAMENTE os alimentos da lista "preferred_foods" do aluno (com a única exceção dos staples obrigatórios: Feijão, Lentilha, Vegetais/salada, Whey/Creatina se forem suplementos selecionados, e o doce escolhido em sweet_preference).
+- NUNCA introduza um alimento que NÃO esteja em preferred_foods. Se a categoria (ex: carbo do café) tiver poucos preferidos, REPITA os preferidos entre as opções em vez de adicionar outros.
+- Nas listas de "substitutions" de cada refeição, liste APENAS alimentos preferidos da mesma categoria (ou indique "Repita as opções acima" se só houver um preferido).
+- Se um alimento preferido se encaixa na refeição, ele deve ser a Opção 1.
 
 ### Estrutura das refeições:
 - Cada refeição deve ter 3 OPÇÕES intercambiáveis (para variar)

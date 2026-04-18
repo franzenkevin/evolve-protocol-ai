@@ -1,14 +1,16 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
-import { LogOut } from "lucide-react";
+import { LogOut, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
+import { useSidebar } from "@/components/ui/sidebar";
 
 const SidebarHeader = () => {
   const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
   const navigate = useNavigate();
+  const { setOpenMobile, isMobile } = useSidebar();
 
   const name = profile?.full_name || user?.user_metadata?.full_name || "Atleta";
   const email = user?.email || "";
@@ -20,17 +22,29 @@ const SidebarHeader = () => {
     navigate("/login");
   };
 
+  const goToProfile = () => {
+    if (isMobile) setOpenMobile(false);
+    navigate("/profile");
+  };
+
   return (
     <div className="p-4 border-b border-border">
       <div className="flex items-center gap-3">
-        <Avatar className="w-12 h-12 shrink-0">
-          {avatarUrl && <AvatarImage src={avatarUrl} alt={name} />}
-          <AvatarFallback className="bg-primary/15 text-primary font-bold text-sm">{initials}</AvatarFallback>
-        </Avatar>
-        <div className="flex-1 min-w-0">
-          <p className="font-heading font-semibold text-foreground text-sm truncate">{name}</p>
-          <p className="text-xs text-muted-foreground truncate">{email}</p>
-        </div>
+        <button
+          onClick={goToProfile}
+          className="flex items-center gap-3 flex-1 min-w-0 text-left rounded-lg p-1 -m-1 hover:bg-secondary/50 transition-colors group"
+          aria-label="Editar perfil"
+        >
+          <Avatar className="w-12 h-12 shrink-0">
+            {avatarUrl && <AvatarImage src={avatarUrl} alt={name} />}
+            <AvatarFallback className="bg-primary/15 text-primary font-bold text-sm">{initials}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <p className="font-heading font-semibold text-foreground text-sm truncate">{name}</p>
+            <p className="text-xs text-muted-foreground truncate">{email}</p>
+          </div>
+          <ChevronRight size={14} className="text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />
+        </button>
         <Button variant="ghost" size="icon" onClick={handleLogout} className="shrink-0 text-muted-foreground hover:text-destructive">
           <LogOut size={18} />
         </Button>

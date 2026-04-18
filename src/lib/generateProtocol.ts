@@ -304,7 +304,6 @@ function pickPreferred(options: string[], preferred: string[], disliked: string,
   const filtered = options.filter(o => {
     const lower = o.toLowerCase();
     if (dislikedLower.includes(lower)) return false;
-    // Check allergy mappings
     if (allergySet.has("celíaco (glúten)") && ["Pão de forma", "Pão francês", "Pão de hambúrguer", "Macarrão", "Aveia", "Granola"].includes(o)) return false;
     if (allergySet.has("intolerância à lactose") && ["Leite desnatado", "Leite semi desnatado", "Queijo", "Iogurte desnatado", "Requeijão light", "Whey Protein"].includes(o)) return false;
     if (allergySet.has("alergia a ovo") && o === "Ovo") return false;
@@ -313,17 +312,21 @@ function pickPreferred(options: string[], preferred: string[], disliked: string,
     return true;
   });
 
-  // Prefer user's preferred foods
-  const preferredMatch = filtered.find(o => preferred.includes(o));
-  if (preferredMatch) return preferredMatch;
+  // STRICT: only use foods the user actually selected
+  const preferredSet = new Set(preferred);
+  const userSelected = filtered.filter(o => preferredSet.has(o));
+  if (userSelected.length > 0) return userSelected[0];
+
+  // Last-resort fallback only if user didn't pick anything in this category
   return filtered[0] || options[0];
 }
 
 function filterList(options: string[], preferred: string[], disliked: string, allergies: string[]): string[] {
   const dislikedLower = (disliked || "").toLowerCase();
   const allergySet = new Set((allergies || []).map(a => a.toLowerCase()));
+  const preferredSet = new Set(preferred);
 
-  return options.filter(o => {
+  const safe = options.filter(o => {
     const lower = o.toLowerCase();
     if (dislikedLower.includes(lower)) return false;
     if (allergySet.has("celíaco (glúten)") && ["Pão de forma", "Pão francês", "Pão de hambúrguer", "Macarrão", "Aveia", "Granola"].includes(o)) return false;
@@ -333,6 +336,10 @@ function filterList(options: string[], preferred: string[], disliked: string, al
     if (allergySet.has("alergia a proteína do soro do leite") && o === "Whey Protein") return false;
     return true;
   });
+
+  // STRICT: restrict to user-selected foods when available
+  const userSelected = safe.filter(o => preferredSet.has(o));
+  return userSelected.length > 0 ? userSelected : safe;
 }
 
 function generateDiet(p: Profile) {

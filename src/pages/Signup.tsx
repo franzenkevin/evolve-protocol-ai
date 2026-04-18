@@ -98,9 +98,9 @@ const Signup = () => {
           </div>
           <div>
             <Label htmlFor="password">Senha</Label>
-            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" required className="mt-1" />
+            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="6 caracteres no mínimo" required minLength={6} className="mt-1" />
             <p className="text-xs text-muted-foreground mt-1">
-              Use letras maiúsculas, minúsculas e números. Evite senhas comuns.
+              Mínimo de 6 caracteres. Use o que for fácil de lembrar.
             </p>
           </div>
 
