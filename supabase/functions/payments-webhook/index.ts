@@ -111,6 +111,26 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
     }
   }
 
+  // 3) Welcome push notification (fire-and-forget)
+  try {
+    const fnUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/push-send`;
+    fetch(fnUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+      },
+      body: JSON.stringify({
+        userId,
+        title: '🎉 Bem-vindo ao Hypertrophy!',
+        body: 'Seu acesso está liberado. Bora montar seu primeiro protocolo!',
+        url: '/welcome',
+      }),
+    }).catch((e) => console.error('welcome push dispatch failed:', e));
+  } catch (e) {
+    console.error('welcome push error:', e);
+  }
+
   console.log(`✅ subscription ${id} ativada para user ${userId} (${planCode})`);
 }
 
