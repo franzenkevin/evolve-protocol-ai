@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ExternalLink, Youtube } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ExerciseVideoProps {
   exerciseName: string;
@@ -15,6 +16,25 @@ interface ExerciseVideoProps {
  */
 const ExerciseVideo = ({ exerciseName, videoUrl, videoQuery }: ExerciseVideoProps) => {
   const [showEmbed, setShowEmbed] = useState(false);
+  const [resolvedUrl, setResolvedUrl] = useState<string | null>(videoUrl || null);
+
+  // Bucket exercise-videos é privado: URLs antigas /object/public/ precisam virar signed URL
+  useEffect(() => {
+    if (!videoUrl) {
+      setResolvedUrl(null);
+      return;
+    }
+    const legacyMatch = videoUrl.match(/\/storage\/v1\/object\/public\/exercise-videos\/(.+?)(\?|$)/);
+    if (legacyMatch) {
+      const path = legacyMatch[1];
+      supabase.storage
+        .from("exercise-videos")
+        .createSignedUrl(path, 60 * 60 * 24 * 7)
+        .then(({ data }) => setResolvedUrl(data?.signedUrl || videoUrl));
+    } else {
+      setResolvedUrl(videoUrl);
+    }
+  }, [videoUrl]);
 
   const query = videoQuery || `${exerciseName} execução correta`;
   const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
