@@ -439,8 +439,27 @@ Cada refeição precisa fazer SENTIDO como um prato real que um brasileiro comer
 ### Doce preferido:
 - Se o aluno indicou preferência de doce, INCLUIR em um dos lanches como opção 3 (máx 1x/dia)
 
-### Refeições livres:
-- Respeitar a frequência escolhida pelo aluno, mencionar nas notas
+### Intolerância à lactose / restrições lácteas:
+- Se o aluno marcou "Intolerância à lactose" em allergies: PRIORIZE alternativas zero-lactose. Use leite desnatado/semi APENAS em último caso (quando não houver substituto viável dentro dos preferidos), e sempre como **versão zero lactose** (ex: "Leite zero lactose 200ml", "Iogurte zero lactose 170g", "Queijo minas zero lactose 30g").
+- Whey Protein: NUNCA recomende whey concentrado. Use **Whey Isolado** (lactose <1%) ou, se o aluno preferir vegetal, **Proteína de Soja Isolada**. Mencione explicitamente no campo "supplementation" qual versão (ex: "Whey Isolado 30g" ou "Proteína de Soja Isolada 30g").
+- Em "Celíaco (glúten)": exclua pão, macarrão, cuscuz comum, aveia comum (use aveia sem glúten) e prefira tapioca, arroz, batata, mandioca.
+
+### Refeições livres (free meals) — calibrar pelo objetivo:
+- O aluno escolheu: **${'${profile.free_meals || "Nenhuma"}'}**. Avalie se essa frequência é compatível com o objetivo:
+  - **Emagrecimento**: máximo recomendado **1 refeição livre por semana**. Se o aluno pediu 2/semana ou mais, mantenha o que ele escolheu MAS reduza calorias da refeição livre.
+  - **Hipertrofia / Ganho de massa**: até **2 refeições livres por semana** são compatíveis (superávit absorve melhor).
+  - **Recomposição corporal**: **1 por semana**, calorias controladas.
+  - **Saúde geral**: **1 a cada 15 dias** ou 1/semana, sem extrapolar muito.
+- SEMPRE inclua um bloco "freeMealsGuide" no JSON da dieta com:
+  - frequencia recomendada vs escolhida
+  - **limite calórico por refeição livre** baseado no objetivo:
+    - Emagrecimento: máx **600-800 kcal** por refeição livre
+    - Recomposição: máx **800-1000 kcal**
+    - Hipertrofia: máx **1000-1400 kcal**
+    - Saúde geral: máx **800 kcal**
+  - 3 exemplos práticos brasileiros respeitando o limite (ex: "1 hambúrguer artesanal simples + batata pequena ≈ 750 kcal", "2 fatias de pizza muçarela média ≈ 700 kcal", "1 prato executivo no rodízio japonês com 8 peças ≈ 700 kcal").
+  - dica de controle: "evite bebida alcoólica + sobremesa na mesma refeição livre".
+
 
 ## BANCO DE ALIMENTOS COM MACROS (porções já em GRAMAS — usar EXATAMENTE essa unidade no campo "amount"):
 Arroz 150g: P4 C42 G0 195kcal | Batata inglesa 200g: P4 C34 G0 154kcal | Batata doce 200g: P3 C40 G0 172kcal
@@ -497,7 +516,20 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
       }
     ],
     "notes": ["Creatina: 7g por dia, pode tomar a qualquer hora com água."],
-    "carbFrontLoading": "Método carb front loading: maioria dos carboidratos nas 2 refeições antes do treino..."
+    "carbFrontLoading": "Método carb front loading: maioria dos carboidratos nas 2 refeições antes do treino...",
+    "supplementation": ["Whey Isolado 30g pós-treino (lactose <1%)", "Creatina 5g/dia"],
+    "freeMealsGuide": {
+      "frequenciaEscolhida": "Uma por semana",
+      "frequenciaRecomendada": "Uma por semana",
+      "compativelComObjetivo": true,
+      "limiteCaloricoPorRefeicao": 800,
+      "exemplos": [
+        "1 hambúrguer artesanal simples + porção pequena de batata ≈ 750 kcal",
+        "2 fatias de pizza muçarela média ≈ 700 kcal",
+        "1 prato executivo no rodízio japonês com 8 peças + missoshiru ≈ 700 kcal"
+      ],
+      "dica": "Evite combinar bebida alcoólica + sobremesa na mesma refeição livre — fica fácil ultrapassar 1500 kcal sem perceber."
+    }
   }
 }`;
 
