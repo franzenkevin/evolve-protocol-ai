@@ -487,6 +487,9 @@ const Onboarding = () => {
       setGenStage("Pronto!");
       await new Promise((r) => setTimeout(r, 400));
       try { localStorage.removeItem(STORAGE_KEY); } catch {}
+      if (user) {
+        try { await supabase.from("onboarding_drafts").delete().eq("user_id", user.id); } catch {}
+      }
       navigate("/dashboard");
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
