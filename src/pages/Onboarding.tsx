@@ -895,10 +895,19 @@ const Onboarding = () => {
             <div className="text-5xl animate-pulse">📸</div>
             <div>
               <h3 className="text-xl font-heading font-bold text-foreground mb-1">Analisando suas fotos</h3>
-              <p className="text-sm text-muted-foreground">A IA está avaliando composição corporal, postura e pontos fortes/fracos…</p>
+              <p className="text-sm text-muted-foreground">{analyzeStage}</p>
+            </div>
+            <div className="space-y-2">
+              <Progress value={Math.min(100, (analyzeElapsed / ANALYZE_TARGET_SECONDS) * 100)} className="h-3" />
+              <p className="text-3xl font-bold text-primary font-heading tabular-nums">
+                {String(Math.floor(analyzeElapsed / 60)).padStart(2, "0")}:{String(analyzeElapsed % 60).padStart(2, "0")}
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                Tempo médio: 20–60 segundos. Mantenha esta tela aberta.
+              </p>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              Isso normalmente leva 20–60 segundos. Mantenha esta tela aberta.
+              Seu progresso já está salvo na nuvem — pode fechar e voltar a qualquer momento.
             </p>
           </div>
         </div>
