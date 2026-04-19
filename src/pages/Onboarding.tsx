@@ -404,21 +404,31 @@ const Onboarding = () => {
   };
 
   const next = async () => {
+    // Step 7 is special: if photos exist but analysis has not run yet,
+    // trigger the analysis BEFORE the generic validation that requires assessment.
+    if (step === 7 && !assessment && !analyzing) {
+      if (!data.aiDataConsent) {
+        setValidationError("Você precisa autorizar o uso dos seus dados pela IA para gerar o protocolo personalizado.");
+        return;
+      }
+
+      if (Object.keys(assessmentPhotos).length === 0) {
+        setValidationError("Envie pelo menos uma foto para análise corporal.");
+        return;
+      }
+
+      setValidationError("");
+      const ok = await runAssessment();
+      if (ok) {
+        setStep((s) => (s < STEPS.length - 1 ? s + 1 : s));
+      }
+      return;
+    }
+
     // Validate current step
     const error = validateStep();
     if (error) {
       setValidationError(error);
-      return;
-    }
-
-    // On step 7 (assessment), trigger analysis if photos exist and no assessment yet
-    if (step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment && !analyzing) {
-      const ok = await runAssessment();
-      if (ok) {
-        // Auto-advance to confirmation step right after a successful analysis
-        setStep((s) => (s < STEPS.length - 1 ? s + 1 : s));
-        setValidationError("");
-      }
       return;
     }
 
