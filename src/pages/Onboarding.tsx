@@ -117,35 +117,68 @@ interface FormData {
   aiDataConsent: boolean;
 }
 
+const STORAGE_KEY = "hypertrophy:onboarding:v1";
+
+const DEFAULT_FORM: FormData = {
+  fullName: "", age: "", sex: "", weight: "", height: "",
+  goal: "", activityLevel: "", neat: "", trainingDays: "", trainingWeekdays: [], trainingTime: "",
+  experience: "", gymType: "", injuries: "",
+  cardioEnabled: "", cardioFrequency: "", cardioDuration: "", cardioTiming: "", cardioTypePreference: "",
+  foodsLike: [],
+  foodsDislike: "", allergies: [], sweetPreference: "", supplements: [],
+  freeMeals: "", mealCount: "", sleepHours: "", stressLevel: "",
+  aiDataConsent: false,
+};
+
+const DEFAULT_CONFIRMATIONS: ProtocolConfirmations = {
+  bodyEmphasis: { wants: "", description: "" },
+  split: { agree: "", justification: "" },
+  cardio: { agree: "", justification: "" },
+  mealTimes: { agree: "", justification: "" },
+};
+
+const loadPersisted = () => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
+
 const Onboarding = () => {
-  const [step, setStep] = useState(0);
+  const persisted = typeof window !== "undefined" ? loadPersisted() : null;
+  const [step, setStep] = useState<number>(persisted?.step ?? 0);
   const [saving, setSaving] = useState(false);
   const [genElapsed, setGenElapsed] = useState(0); // seconds
   const [genStage, setGenStage] = useState("");
-  const [assessmentPhotos, setAssessmentPhotos] = useState<Record<string, string>>({});
-  const [assessment, setAssessment] = useState<any>(null);
+  const [assessmentPhotos, setAssessmentPhotos] = useState<Record<string, string>>(persisted?.assessmentPhotos ?? {});
+  const [assessment, setAssessment] = useState<any>(persisted?.assessment ?? null);
   const [analyzing, setAnalyzing] = useState(false);
   const [validationError, setValidationError] = useState("");
-  const [confirmations, setConfirmations] = useState<ProtocolConfirmations>({
-    bodyEmphasis: { wants: "", description: "" },
-    split: { agree: "", justification: "" },
-    cardio: { agree: "", justification: "" },
-    mealTimes: { agree: "", justification: "" },
-  });
-  const [data, setData] = useState<FormData>({
-    fullName: "", age: "", sex: "", weight: "", height: "",
-    goal: "", activityLevel: "", neat: "", trainingDays: "", trainingWeekdays: [], trainingTime: "",
-    experience: "", gymType: "", injuries: "",
-    cardioEnabled: "", cardioFrequency: "", cardioDuration: "", cardioTiming: "", cardioTypePreference: "",
-    foodsLike: [],
-    foodsDislike: "", allergies: [], sweetPreference: "", supplements: [],
-    freeMeals: "", mealCount: "", sleepHours: "", stressLevel: "",
-    aiDataConsent: false,
-  });
+  const [confirmations, setConfirmations] = useState<ProtocolConfirmations>(
+    persisted?.confirmations ?? DEFAULT_CONFIRMATIONS,
+  );
+  const [data, setData] = useState<FormData>(
+    persisted?.data ? { ...DEFAULT_FORM, ...persisted.data } : DEFAULT_FORM,
+  );
   const navigate = useNavigate();
   const { toast } = useToast();
   const updateProfile = useUpdateProfile();
   const createProtocol = useCreateProtocol();
+
+  // Auto-save the entire onboarding state on every change so the user never loses progress
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ step, data, assessmentPhotos, assessment, confirmations }),
+      );
+    } catch {
+      // ignore quota / private mode errors
+    }
+  }, [step, data, assessmentPhotos, assessment, confirmations]);
 
   // Real elapsed timer (up to 4 min) — IA analisa avaliação + lesões antes de prescrever
   const TARGET_SECONDS = 240;
