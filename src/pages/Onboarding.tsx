@@ -308,6 +308,9 @@ const Onboarding = () => {
     // On step 7 (assessment), trigger analysis if photos exist and no assessment yet
     if (step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment && !analyzing) {
       await runAssessment();
+      // Auto-advance to confirmation step right after the analysis completes
+      setStep((s) => (s < STEPS.length - 1 ? s + 1 : s));
+      setValidationError("");
       return;
     }
 
