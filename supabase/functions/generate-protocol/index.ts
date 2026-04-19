@@ -516,7 +516,20 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
       }
     ],
     "notes": ["Creatina: 7g por dia, pode tomar a qualquer hora com água."],
-    "carbFrontLoading": "Método carb front loading: maioria dos carboidratos nas 2 refeições antes do treino..."
+    "carbFrontLoading": "Método carb front loading: maioria dos carboidratos nas 2 refeições antes do treino...",
+    "supplementation": ["Whey Isolado 30g pós-treino (lactose <1%)", "Creatina 5g/dia"],
+    "freeMealsGuide": {
+      "frequenciaEscolhida": "Uma por semana",
+      "frequenciaRecomendada": "Uma por semana",
+      "compativelComObjetivo": true,
+      "limiteCaloricoPorRefeicao": 800,
+      "exemplos": [
+        "1 hambúrguer artesanal simples + porção pequena de batata ≈ 750 kcal",
+        "2 fatias de pizza muçarela média ≈ 700 kcal",
+        "1 prato executivo no rodízio japonês com 8 peças + missoshiru ≈ 700 kcal"
+      ],
+      "dica": "Evite combinar bebida alcoólica + sobremesa na mesma refeição livre — fica fácil ultrapassar 1500 kcal sem perceber."
+    }
   }
 }`;
 
