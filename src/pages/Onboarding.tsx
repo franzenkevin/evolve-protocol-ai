@@ -781,6 +781,21 @@ const Onboarding = () => {
         </div>
       </div>
 
+      {analyzing && !saving && (
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
+          <div className="max-w-sm w-full text-center space-y-5">
+            <div className="text-5xl animate-pulse">📸</div>
+            <div>
+              <h3 className="text-xl font-heading font-bold text-foreground mb-1">Analisando suas fotos</h3>
+              <p className="text-sm text-muted-foreground">A IA está avaliando composição corporal, postura e pontos fortes/fracos…</p>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Isso normalmente leva 20–60 segundos. Mantenha esta tela aberta.
+            </p>
+          </div>
+        </div>
+      )}
+
       {saving && (
         <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
           <div className="max-w-sm w-full text-center space-y-5">
