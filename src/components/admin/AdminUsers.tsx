@@ -328,11 +328,12 @@ const AdminUsers = () => {
           </DialogHeader>
 
           <Tabs defaultValue="profile">
-            <TabsList className="w-full">
-              <TabsTrigger value="profile" className="flex-1 gap-1"><UserIcon size={12} />Perfil</TabsTrigger>
-              <TabsTrigger value="subscription" className="flex-1 gap-1"><CreditCard size={12} />Plano</TabsTrigger>
-              <TabsTrigger value="role" className="flex-1 gap-1"><ShieldCheck size={12} />Role</TabsTrigger>
-              <TabsTrigger value="danger" className="flex-1 gap-1 text-destructive"><Ban size={12} />Risco</TabsTrigger>
+            <TabsList className="w-full grid grid-cols-5">
+              <TabsTrigger value="profile" className="gap-1"><UserIcon size={12} />Perfil</TabsTrigger>
+              <TabsTrigger value="access" className="gap-1"><Mail size={12} />Acesso</TabsTrigger>
+              <TabsTrigger value="subscription" className="gap-1"><CreditCard size={12} />Plano</TabsTrigger>
+              <TabsTrigger value="role" className="gap-1"><ShieldCheck size={12} />Role</TabsTrigger>
+              <TabsTrigger value="danger" className="gap-1 text-destructive"><Ban size={12} />Risco</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-3 mt-3">
