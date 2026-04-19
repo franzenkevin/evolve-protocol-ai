@@ -27,12 +27,15 @@ import {
   CheckCircle2,
   XCircle,
   Activity,
+  Coffee,
 } from "lucide-react";
 import ExerciseVideo from "@/components/ExerciseVideo";
 import MobilityDrawer from "@/components/MobilityDrawer";
+import CardioCard from "@/components/CardioCard";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import { useActiveProtocol } from "@/hooks/useProtocol";
+import { useProfile } from "@/hooks/useProfile";
 import {
   useWorkoutLogs,
   usePreviousWorkoutLogs,
@@ -116,6 +119,7 @@ const todayWeekday = WEEKDAY_MAP[new Date().getDay()];
 
 const Training = () => {
   const { data: protocol, isLoading } = useActiveProtocol();
+  const { data: profile } = useProfile();
   const [selectedDay, setSelectedDay] = useState(-1); // -1 = not yet initialized
   const [initialized, setInitialized] = useState(false);
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null);
@@ -134,7 +138,14 @@ const Training = () => {
 
   const training = (protocol?.training as any[]) || [];
 
-  // Auto-select today's training day on first load
+  // Detect: is today a "rest day"? (today isn't in any of the training day weekdays)
+  const todayHasTraining = useMemo(
+    () => training.some((d: any) => d.weekday === todayWeekday),
+    [training]
+  );
+  const isRestDayToday = training.length > 0 && !todayHasTraining;
+
+  // Auto-select today's training day on first load. If today is rest, default to first day.
   useEffect(() => {
     if (initialized || training.length === 0) return;
     const todayIndex = training.findIndex((d: any) => d.weekday === todayWeekday);
@@ -144,6 +155,7 @@ const Training = () => {
 
   const day = selectedDay >= 0 ? training[selectedDay] : null;
   const isTodayDay = (d: any) => d.weekday === todayWeekday;
+  const viewingTodayTraining = day && isTodayDay(day);
 
   const { data: currentLogs } = useWorkoutLogs(selectedDay, sessionDate);
   const { data: previousLogs } = usePreviousWorkoutLogs(selectedDay, sessionDate);
@@ -387,10 +399,38 @@ const Training = () => {
     }).length || 0;
   const total = day?.exercises?.length || 0;
 
+  // Cardio prescribed for today within the training day (when applicable)
+  const cardioOnDay = day?.cardio || null;
+  const cardioTiming = (profile?.cardio_timing || "").toLowerCase();
+
   return (
     <AppLayout>
       <div className="p-4 max-w-lg mx-auto space-y-4 animate-fade-in pb-24">
         <h1 className="text-2xl font-heading font-bold text-foreground pt-2">Treino</h1>
+
+        {/* REST DAY BANNER + CARDIO */}
+        {isRestDayToday && (
+          <Card className="p-4 bg-gradient-to-br from-primary/15 to-primary/5 border-primary/30">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                <Coffee size={18} className="text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-heading font-semibold text-foreground text-sm">
+                  Hoje é dia de descanso
+                </h3>
+                <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                  Aproveite para recuperar. Veja abaixo seus treinos da semana ou complete um cardio leve, se estiver no seu protocolo.
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Cardio dedicated card on rest day */}
+        {isRestDayToday && profile?.cardio_enabled && (
+          <CardioCard profile={profile} variant="rest" />
+        )}
 
         {/* Day selector */}
         <div className="flex gap-2 overflow-x-auto pb-2">
@@ -412,6 +452,11 @@ const Training = () => {
 
         {day && (
           <>
+            {/* Cardio BEFORE training (if timing=before and today's training day) */}
+            {viewingTodayTraining && profile?.cardio_enabled && cardioTiming === "before" && (
+              <CardioCard profile={profile} variant="training" />
+            )}
+
             {/* Summary card */}
             <Card className="p-4 card-gradient border-border">
               <div className="flex items-center justify-between">
@@ -447,6 +492,29 @@ const Training = () => {
                 </div>
               )}
             </Card>
+
+            {/* Cardio prescribed inside the day from the protocol */}
+            {cardioOnDay && cardioOnDay.modality && (
+              <Card className="p-3 bg-orange-500/10 border-orange-500/30">
+                <div className="flex items-start gap-2">
+                  <Activity size={16} className="text-orange-400 mt-0.5 shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-foreground">
+                      Cardio: {cardioOnDay.modality}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      {cardioOnDay.duration ? `${cardioOnDay.duration} min` : ""}
+                      {cardioOnDay.intensity ? ` · ${cardioOnDay.intensity}` : ""}
+                    </p>
+                    {cardioOnDay.notes && (
+                      <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                        {cardioOnDay.notes}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            )}
 
             {/* Split explanation button */}
             <Button
@@ -851,6 +919,11 @@ const Training = () => {
                 );
               })}
             </div>
+
+            {/* Cardio AFTER training (if timing=after and today's training day) */}
+            {viewingTodayTraining && profile?.cardio_enabled && cardioTiming === "after" && (
+              <CardioCard profile={profile} variant="training" />
+            )}
 
             {/* Finalize workout button */}
             {!showFeedback && (
