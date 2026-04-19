@@ -168,17 +168,65 @@ const Onboarding = () => {
   const updateProfile = useUpdateProfile();
   const createProtocol = useCreateProtocol();
 
+  const { user } = useAuth();
+  const [cloudLoaded, setCloudLoaded] = useState(false);
+
+  // Load cloud draft on mount (so user can resume from another device)
+  useEffect(() => {
+    if (!user) { setCloudLoaded(true); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: row } = await supabase
+          .from("onboarding_drafts")
+          .select("data, updated_at")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (cancelled || !row?.data) return;
+        const cloud = row.data as any;
+        const local = persisted;
+        // Prefer cloud unless local has more progress (higher step)
+        const useCloud = !local || (cloud.step ?? 0) > (local.step ?? 0);
+        if (useCloud) {
+          if (typeof cloud.step === "number") setStep(cloud.step);
+          if (cloud.data) setData({ ...DEFAULT_FORM, ...cloud.data });
+          if (cloud.assessmentPhotos) setAssessmentPhotos(cloud.assessmentPhotos);
+          if (cloud.assessment) setAssessment(cloud.assessment);
+          if (cloud.confirmations) setConfirmations(cloud.confirmations);
+        }
+      } catch (e) {
+        console.warn("Failed to load cloud onboarding draft", e);
+      } finally {
+        if (!cancelled) setCloudLoaded(true);
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
   // Auto-save the entire onboarding state on every change so the user never loses progress
   useEffect(() => {
+    const payload = { step, data, assessmentPhotos, assessment, confirmations };
     try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ step, data, assessmentPhotos, assessment, confirmations }),
-      );
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     } catch {
       // ignore quota / private mode errors
     }
-  }, [step, data, assessmentPhotos, assessment, confirmations]);
+    // Debounced cloud sync (only after initial cloud load to avoid overwriting it)
+    if (!user || !cloudLoaded) return;
+    const t = setTimeout(() => {
+      supabase
+        .from("onboarding_drafts")
+        .upsert(
+          { user_id: user.id, data: payload as any, updated_at: new Date().toISOString() },
+          { onConflict: "user_id" },
+        )
+        .then(({ error }) => {
+          if (error) console.warn("Cloud draft sync failed", error);
+        });
+    }, 800);
+    return () => clearTimeout(t);
+  }, [step, data, assessmentPhotos, assessment, confirmations, user?.id, cloudLoaded]);
 
   // Real elapsed timer (up to 4 min) — IA analisa avaliação + lesões antes de prescrever
   const TARGET_SECONDS = 240;
