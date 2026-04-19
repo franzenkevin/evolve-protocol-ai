@@ -231,18 +231,19 @@ const Onboarding = () => {
   }, [step, data, assessmentPhotos, assessment, confirmations, user?.id, cloudLoaded]);
 
   // Real elapsed timer (up to 4 min) — IA analisa avaliação + lesões antes de prescrever
-  const TARGET_SECONDS = 240;
+  const TARGET_SECONDS = 180;
   useEffect(() => {
     if (!saving) return;
     setGenElapsed(0);
-    setGenStage("Analisando seu perfil e avaliação corporal...");
+    setGenStage("👨‍⚕️ Médico nutrólogo lendo seu perfil e avaliação corporal...");
     const stages: { at: number; label: string }[] = [
-      { at: 20, label: "Identificando lesões e desvios posturais..." },
-      { at: 50, label: "Selecionando exercícios seguros e adequados..." },
-      { at: 90, label: "Priorizando seus pontos fracos..." },
-      { at: 130, label: "Calculando macros e montando refeições..." },
-      { at: 180, label: "Refinando combinações e substituições..." },
-      { at: 220, label: "Finalizando seu protocolo personalizado..." },
+      { at: 12, label: "👨‍⚕️ Verificando lesões, intolerâncias e contraindicações..." },
+      { at: 28, label: "🏋️ Treinador escolhendo a divisão e os exercícios seguros..." },
+      { at: 50, label: "🏋️ Priorizando seus pontos fracos no volume de treino..." },
+      { at: 75, label: "🥗 Nutricionista calculando macros e montando refeições..." },
+      { at: 105, label: "🥗 Calibrando refeições livres ao seu objetivo..." },
+      { at: 135, label: "🤝 Comitê validando treino + dieta + suplementação juntos..." },
+      { at: 165, label: "✨ Finalizando seu protocolo personalizado..." },
     ];
     const t0 = Date.now();
     const id = setInterval(() => {
@@ -253,6 +254,28 @@ const Onboarding = () => {
     }, 1000);
     return () => clearInterval(id);
   }, [saving]);
+
+  // Timer + estágios para análise de fotos (~15-60s)
+  const ANALYZE_TARGET_SECONDS = 45;
+  useEffect(() => {
+    if (!analyzing) return;
+    setAnalyzeElapsed(0);
+    setAnalyzeStage("📸 Carregando suas fotos para a IA...");
+    const stages: { at: number; label: string }[] = [
+      { at: 4, label: "👁️ Avaliando composição corporal e gordura estimada..." },
+      { at: 12, label: "🧍 Identificando desvios posturais (postura, ombros, lombar)..." },
+      { at: 22, label: "💪 Mapeando pontos fortes e fracos do desenvolvimento muscular..." },
+      { at: 35, label: "📋 Gerando recomendações personalizadas..." },
+    ];
+    const t0 = Date.now();
+    const id = setInterval(() => {
+      const sec = Math.floor((Date.now() - t0) / 1000);
+      setAnalyzeElapsed(sec);
+      const cur = [...stages].reverse().find((s) => sec >= s.at);
+      if (cur) setAnalyzeStage(cur.label);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [analyzing]);
 
   const update = (field: keyof FormData, value: any) => {
     setData((prev) => ({ ...prev, [field]: value }));
