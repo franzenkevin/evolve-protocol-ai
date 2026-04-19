@@ -32,7 +32,10 @@ export type AuditAction =
   | "delete_coupon"
   | "approve_refund"
   | "deny_refund"
-  | "mark_refunded";
+  | "mark_refunded"
+  | "create_mobility"
+  | "update_mobility"
+  | "delete_mobility";
 
 export const useLogAudit = () => {
   const { user } = useAuth();

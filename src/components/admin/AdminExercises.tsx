@@ -40,12 +40,22 @@ import { useLogAudit } from "@/hooks/useAuditLog";
 import VideoUploader from "@/components/admin/VideoUploader";
 import { Plus, Pencil, Trash2, Search, Dumbbell } from "lucide-react";
 
+const DIFFICULTIES = ["iniciante", "intermediario", "avancado"];
+const PATTERNS = ["empurrar", "puxar", "agachar", "dobrar_quadril", "core", "isolado", "cardio"];
+const LOAD_TYPES = ["composto", "isolado"];
+
 const empty: Partial<Exercise> = {
   name: "",
   category: "",
   equipment: "",
   video_url: null,
   instructions: "",
+  difficulty: "iniciante",
+  movement_pattern: null,
+  primary_muscles: [],
+  secondary_muscles: [],
+  load_type: null,
+  tempo: "",
 };
 
 const AdminExercises = () => {
@@ -109,6 +119,12 @@ const AdminExercises = () => {
       equipment: draft.equipment?.trim() || null,
       video_url: draft.video_url || null,
       instructions: draft.instructions?.trim() || null,
+      difficulty: draft.difficulty || null,
+      movement_pattern: draft.movement_pattern || null,
+      primary_muscles: draft.primary_muscles || [],
+      secondary_muscles: draft.secondary_muscles || [],
+      load_type: draft.load_type || null,
+      tempo: draft.tempo?.trim() || null,
     };
     try {
       if (editing) {
@@ -251,6 +267,95 @@ const AdminExercises = () => {
                   className="mt-1"
                 />
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Dificuldade</Label>
+                <Select
+                  value={draft.difficulty || "iniciante"}
+                  onValueChange={(v) => setDraft({ ...draft, difficulty: v })}
+                >
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {DIFFICULTIES.map((d) => (
+                      <SelectItem key={d} value={d}>{d}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Padrão movimento</Label>
+                <Select
+                  value={draft.movement_pattern || ""}
+                  onValueChange={(v) => setDraft({ ...draft, movement_pattern: v })}
+                >
+                  <SelectTrigger className="mt-1"><SelectValue placeholder="—" /></SelectTrigger>
+                  <SelectContent>
+                    {PATTERNS.map((p) => (
+                      <SelectItem key={p} value={p}>{p.replace("_", " ")}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Tipo carga</Label>
+                <Select
+                  value={draft.load_type || ""}
+                  onValueChange={(v) => setDraft({ ...draft, load_type: v })}
+                >
+                  <SelectTrigger className="mt-1"><SelectValue placeholder="—" /></SelectTrigger>
+                  <SelectContent>
+                    {LOAD_TYPES.map((l) => (
+                      <SelectItem key={l} value={l}>{l}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Tempo (ex: 2-1-1-0)</Label>
+                <Input
+                  value={draft.tempo || ""}
+                  onChange={(e) => setDraft({ ...draft, tempo: e.target.value })}
+                  placeholder="Excêntrica-Pausa-Concêntrica-Pausa"
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            <div>
+              <Label>Músculos primários (separar por vírgula)</Label>
+              <Input
+                value={(draft.primary_muscles || []).join(", ")}
+                onChange={(e) =>
+                  setDraft({
+                    ...draft,
+                    primary_muscles: e.target.value
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter(Boolean),
+                  })
+                }
+                placeholder="peitoral, triceps"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label>Músculos secundários (separar por vírgula)</Label>
+              <Input
+                value={(draft.secondary_muscles || []).join(", ")}
+                onChange={(e) =>
+                  setDraft({
+                    ...draft,
+                    secondary_muscles: e.target.value
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter(Boolean),
+                  })
+                }
+                placeholder="deltoide_anterior"
+                className="mt-1"
+              />
             </div>
             <VideoUploader
               value={draft.video_url ?? null}

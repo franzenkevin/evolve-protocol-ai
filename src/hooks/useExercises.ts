@@ -8,6 +8,12 @@ export interface Exercise {
   equipment: string | null;
   video_url: string | null;
   instructions: string | null;
+  difficulty: string | null;
+  movement_pattern: string | null;
+  primary_muscles: string[] | null;
+  secondary_muscles: string[] | null;
+  load_type: string | null;
+  tempo: string | null;
 }
 
 export const useExercises = () => {
