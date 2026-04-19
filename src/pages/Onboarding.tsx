@@ -153,6 +153,8 @@ const Onboarding = () => {
   const [saving, setSaving] = useState(false);
   const [genElapsed, setGenElapsed] = useState(0); // seconds
   const [genStage, setGenStage] = useState("");
+  const [analyzeElapsed, setAnalyzeElapsed] = useState(0); // seconds
+  const [analyzeStage, setAnalyzeStage] = useState("");
   const [assessmentPhotos, setAssessmentPhotos] = useState<Record<string, string>>(persisted?.assessmentPhotos ?? {});
   const [assessment, setAssessment] = useState<any>(persisted?.assessment ?? null);
   const [analyzing, setAnalyzing] = useState(false);
