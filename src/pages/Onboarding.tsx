@@ -919,7 +919,7 @@ const Onboarding = () => {
             <div className="text-5xl animate-pulse">🤖</div>
             <div>
               <h3 className="text-xl font-heading font-bold text-foreground mb-1">Gerando seu protocolo</h3>
-              <p className="text-sm text-muted-foreground">{genStage}</p>
+              <p className="text-sm text-muted-foreground min-h-[2.5rem]">{genStage}</p>
             </div>
             <div className="space-y-2">
               <Progress value={Math.min(100, (genElapsed / TARGET_SECONDS) * 100)} className="h-3" />
@@ -927,11 +927,11 @@ const Onboarding = () => {
                 {String(Math.floor(genElapsed / 60)).padStart(2, "0")}:{String(genElapsed % 60).padStart(2, "0")}
               </p>
               <p className="text-[11px] text-muted-foreground">
-                Tempo estimado: até 4 minutos (análise detalhada da sua avaliação)
+                Tempo médio: 1–3 minutos. Comitê de 3 profissionais (médico nutrólogo, nutricionista de performance e treinador) analisando cada detalhe.
               </p>
             </div>
             <p className="text-xs text-muted-foreground">
-              Mantenha esta tela aberta enquanto montamos seu treino e dieta personalizados.
+              Seu progresso está salvo. Pode fechar a aba — quando voltar, retomamos de onde parou.
             </p>
           </div>
         </div>
