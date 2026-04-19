@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 type AdminAction =
   | { action: "update_profile"; target_user_id: string; payload: Record<string, unknown> }
   | { action: "update_email"; target_user_id: string; payload: { email: string } }
+  | { action: "update_password"; target_user_id: string; payload: { password: string } }
   | { action: "upsert_subscription"; target_user_id: string; payload: Record<string, unknown> }
   | { action: "cancel_subscription"; target_user_id: string }
   | { action: "set_role"; target_user_id: string; payload: { role: "admin" | "user" } }
