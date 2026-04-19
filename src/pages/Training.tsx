@@ -29,6 +29,7 @@ import {
   Activity,
 } from "lucide-react";
 import ExerciseVideo from "@/components/ExerciseVideo";
+import MobilityDrawer from "@/components/MobilityDrawer";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import { useActiveProtocol } from "@/hooks/useProtocol";
@@ -128,6 +129,7 @@ const Training = () => {
   const [swapResults, setSwapResults] = useState<Record<string, { available: boolean; newExercise?: string; reason?: string; message?: string }>>({});
   const [swapping, setSwapping] = useState<string | null>(null);
   const [swappedNames, setSwappedNames] = useState<Record<string, string>>({});
+  const [showMobilityDrawer, setShowMobilityDrawer] = useState(false);
   const ai = useAIExplanation();
 
   const training = (protocol?.training as any[]) || [];
@@ -500,6 +502,17 @@ const Training = () => {
                 </div>
               </div>
             </Card>
+
+            {/* Mobility drawer trigger — opcional, sugerido pelo grupo do dia */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full gap-2 text-xs border-warning/30 text-warning hover:text-warning hover:bg-warning/10"
+              onClick={() => setShowMobilityDrawer(true)}
+            >
+              <Activity size={14} />
+              Ver rotina de mobilidade
+            </Button>
 
             {/* Mobility & stretching (based on posture deviations) */}
             {Array.isArray(day.mobility) && day.mobility.length > 0 && (
