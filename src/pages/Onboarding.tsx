@@ -277,8 +277,6 @@ const Onboarding = () => {
     });
   };
 
-  const { user } = useAuth();
-
   // Validation per step
   const validateStep = (): string | null => {
     switch (step) {
