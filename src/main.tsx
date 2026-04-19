@@ -2,7 +2,8 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-const APP_BUILD_ID = "2026-04-19T16:55Z";
+const APP_BUILD_ID = "2026-04-19T17:30Z";
+const BUILD_STORAGE_KEY = "app-build-id";
 
 // Guard: never register SW in iframes or preview hosts
 const isInIframe = (() => {
@@ -27,6 +28,23 @@ const clearAppCaches = async () => {
 };
 
 void clearAppCaches();
+
+// Detect stale build and hard-reload once if version changed between visits.
+try {
+  const previousBuild = localStorage.getItem(BUILD_STORAGE_KEY);
+  if (previousBuild && previousBuild !== APP_BUILD_ID) {
+    localStorage.setItem(BUILD_STORAGE_KEY, APP_BUILD_ID);
+    const reloadedKey = `app-build-reloaded-${APP_BUILD_ID}`;
+    if (!sessionStorage.getItem(reloadedKey) && !isInIframe && !isPreviewHost) {
+      sessionStorage.setItem(reloadedKey, "1");
+      window.location.reload();
+    }
+  } else if (!previousBuild) {
+    localStorage.setItem(BUILD_STORAGE_KEY, APP_BUILD_ID);
+  }
+} catch {
+  // Ignore storage failures (private mode, quota, etc.)
+}
 
 document.documentElement.setAttribute("data-app-build", APP_BUILD_ID);
 
