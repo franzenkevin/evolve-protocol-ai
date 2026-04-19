@@ -17,6 +17,8 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
+      injectRegister: false,
+      selfDestroying: true,
       devOptions: { enabled: false },
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/],
