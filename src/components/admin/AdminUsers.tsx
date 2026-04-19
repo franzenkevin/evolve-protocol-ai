@@ -358,6 +358,51 @@ const AdminUsers = () => {
               </Button>
             </TabsContent>
 
+            <TabsContent value="access" className="space-y-4 mt-3">
+              <div className="space-y-2">
+                <Label className="flex items-center gap-1.5"><Mail size={12} />Alterar email</Label>
+                <Input
+                  type="email"
+                  value={pEmail}
+                  onChange={(e) => setPEmail(e.target.value)}
+                  placeholder="novo@email.com"
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  O email é trocado direto e marcado como confirmado. O usuário <strong>não</strong> precisa aprovar.
+                </p>
+                <Button onClick={updateEmail} disabled={action.isPending} variant="outline" className="w-full">
+                  {action.isPending ? "Alterando..." : "Trocar email"}
+                </Button>
+              </div>
+
+              <div className="border-t border-border pt-4 space-y-2">
+                <Label>Redefinir senha</Label>
+                <Input
+                  type="text"
+                  value={pPassword}
+                  onChange={(e) => setPPassword(e.target.value)}
+                  placeholder="Nova senha (mín. 6 caracteres)"
+                  autoComplete="new-password"
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  A senha é alterada imediatamente. Compartilhe com o usuário em canal seguro (WhatsApp pessoal, etc).
+                </p>
+                <Button onClick={updatePassword} disabled={action.isPending} variant="outline" className="w-full">
+                  {action.isPending ? "Salvando..." : "Definir nova senha"}
+                </Button>
+              </div>
+
+              <div className="border-t border-border pt-4 space-y-2">
+                <Label className="flex items-center gap-1.5"><Gift size={12} />Liberar regeneração de protocolo</Label>
+                <p className="text-[10px] text-muted-foreground">
+                  Concede um crédito gratuito para o usuário gerar um novo protocolo antes do prazo.
+                </p>
+                <Button onClick={grantRegen} disabled={action.isPending} variant="outline" className="w-full">
+                  {action.isPending ? "Liberando..." : "Conceder regeneração grátis"}
+                </Button>
+              </div>
+            </TabsContent>
+
             <TabsContent value="subscription" className="space-y-3 mt-3">
               <div>
                 <Label>Plano</Label>
