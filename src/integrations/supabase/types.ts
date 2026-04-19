@@ -280,30 +280,48 @@ export type Database = {
         Row: {
           category: string
           created_at: string
+          difficulty: string | null
           equipment: string | null
           id: string
           instructions: string | null
+          load_type: string | null
+          movement_pattern: string | null
           name: string
+          primary_muscles: string[] | null
+          secondary_muscles: string[] | null
+          tempo: string | null
           updated_at: string
           video_url: string | null
         }
         Insert: {
           category: string
           created_at?: string
+          difficulty?: string | null
           equipment?: string | null
           id?: string
           instructions?: string | null
+          load_type?: string | null
+          movement_pattern?: string | null
           name: string
+          primary_muscles?: string[] | null
+          secondary_muscles?: string[] | null
+          tempo?: string | null
           updated_at?: string
           video_url?: string | null
         }
         Update: {
           category?: string
           created_at?: string
+          difficulty?: string | null
           equipment?: string | null
           id?: string
           instructions?: string | null
+          load_type?: string | null
+          movement_pattern?: string | null
           name?: string
+          primary_muscles?: string[] | null
+          secondary_muscles?: string[] | null
+          tempo?: string | null
           updated_at?: string
           video_url?: string | null
         }
@@ -489,6 +507,54 @@ export type Database = {
           scheduled_at?: string
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      mobility_exercises: {
+        Row: {
+          created_at: string
+          difficulty: string | null
+          duration_seconds: number | null
+          equipment: string | null
+          id: string
+          instructions: string | null
+          name: string
+          region: string
+          reps: number | null
+          side: string | null
+          type: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          difficulty?: string | null
+          duration_seconds?: number | null
+          equipment?: string | null
+          id?: string
+          instructions?: string | null
+          name: string
+          region: string
+          reps?: number | null
+          side?: string | null
+          type?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          difficulty?: string | null
+          duration_seconds?: number | null
+          equipment?: string | null
+          id?: string
+          instructions?: string | null
+          name?: string
+          region?: string
+          reps?: number | null
+          side?: string | null
+          type?: string
+          updated_at?: string
+          video_url?: string | null
         }
         Relationships: []
       }
