@@ -577,10 +577,12 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
 - Tipo preferido: ${profile.cardio_type_preference || "N/A"}` : ""}
 ${assessmentContext}
 
-INSTRUÇÃO FINAL: Antes de prescrever, faça internamente o checklist:
-1. Quais lesões/desvios este aluno tem? Quais exercícios devo REMOVER ou SUBSTITUIR?
-2. Quais são os pontos fracos da avaliação? Onde devo adicionar volume extra?
-3. Para CADA exercício do split, ele é seguro e adequado para ESTE aluno especificamente?
+INSTRUÇÃO FINAL: Antes de gerar o JSON, faça o checklist do COMITÊ DE 3 PROFISSIONAIS:
+1. **Médico nutrólogo do esporte**: Quais lesões/intolerâncias/condições deste aluno geram contraindicações? Quais exercícios e alimentos devo REMOVER ou SUBSTITUIR? A suplementação é segura para esse perfil?
+2. **Treinador de fisiculturismo (aplicado a comuns)**: Quais são os pontos fracos da avaliação corporal? Onde adiciono volume extra? A divisão respeita o sexo/dias/nível? Cada exercício é seguro E eficaz para ESTE aluno?
+3. **Nutricionista de performance flexível**: Os macros batem com o objetivo + composição corporal atual? As refeições usam alimentos PREFERIDOS? Há substituições viáveis? A frequência e o teto calórico das refeições livres estão calibrados ao objetivo? Há intolerância a respeitar (whey isolado, zero lactose etc)?
+4. **Consenso final**: cada item do JSON precisa ter pelo menos 1 menção curta no campo de notas conectando à AVALIAÇÃO CORPORAL ou às restrições do aluno.
+
 Só depois gere o JSON completo seguindo TODAS as regras da metodologia.`;
 
     console.log("Calling AI for protocol generation (assertive mode)...");

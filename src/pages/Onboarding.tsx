@@ -153,6 +153,8 @@ const Onboarding = () => {
   const [saving, setSaving] = useState(false);
   const [genElapsed, setGenElapsed] = useState(0); // seconds
   const [genStage, setGenStage] = useState("");
+  const [analyzeElapsed, setAnalyzeElapsed] = useState(0); // seconds
+  const [analyzeStage, setAnalyzeStage] = useState("");
   const [assessmentPhotos, setAssessmentPhotos] = useState<Record<string, string>>(persisted?.assessmentPhotos ?? {});
   const [assessment, setAssessment] = useState<any>(persisted?.assessment ?? null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -229,18 +231,19 @@ const Onboarding = () => {
   }, [step, data, assessmentPhotos, assessment, confirmations, user?.id, cloudLoaded]);
 
   // Real elapsed timer (up to 4 min) — IA analisa avaliação + lesões antes de prescrever
-  const TARGET_SECONDS = 240;
+  const TARGET_SECONDS = 180;
   useEffect(() => {
     if (!saving) return;
     setGenElapsed(0);
-    setGenStage("Analisando seu perfil e avaliação corporal...");
+    setGenStage("👨‍⚕️ Médico nutrólogo lendo seu perfil e avaliação corporal...");
     const stages: { at: number; label: string }[] = [
-      { at: 20, label: "Identificando lesões e desvios posturais..." },
-      { at: 50, label: "Selecionando exercícios seguros e adequados..." },
-      { at: 90, label: "Priorizando seus pontos fracos..." },
-      { at: 130, label: "Calculando macros e montando refeições..." },
-      { at: 180, label: "Refinando combinações e substituições..." },
-      { at: 220, label: "Finalizando seu protocolo personalizado..." },
+      { at: 12, label: "👨‍⚕️ Verificando lesões, intolerâncias e contraindicações..." },
+      { at: 28, label: "🏋️ Treinador escolhendo a divisão e os exercícios seguros..." },
+      { at: 50, label: "🏋️ Priorizando seus pontos fracos no volume de treino..." },
+      { at: 75, label: "🥗 Nutricionista calculando macros e montando refeições..." },
+      { at: 105, label: "🥗 Calibrando refeições livres ao seu objetivo..." },
+      { at: 135, label: "🤝 Comitê validando treino + dieta + suplementação juntos..." },
+      { at: 165, label: "✨ Finalizando seu protocolo personalizado..." },
     ];
     const t0 = Date.now();
     const id = setInterval(() => {
@@ -251,6 +254,28 @@ const Onboarding = () => {
     }, 1000);
     return () => clearInterval(id);
   }, [saving]);
+
+  // Timer + estágios para análise de fotos (~15-60s)
+  const ANALYZE_TARGET_SECONDS = 45;
+  useEffect(() => {
+    if (!analyzing) return;
+    setAnalyzeElapsed(0);
+    setAnalyzeStage("📸 Carregando suas fotos para a IA...");
+    const stages: { at: number; label: string }[] = [
+      { at: 4, label: "👁️ Avaliando composição corporal e gordura estimada..." },
+      { at: 12, label: "🧍 Identificando desvios posturais (postura, ombros, lombar)..." },
+      { at: 22, label: "💪 Mapeando pontos fortes e fracos do desenvolvimento muscular..." },
+      { at: 35, label: "📋 Gerando recomendações personalizadas..." },
+    ];
+    const t0 = Date.now();
+    const id = setInterval(() => {
+      const sec = Math.floor((Date.now() - t0) / 1000);
+      setAnalyzeElapsed(sec);
+      const cur = [...stages].reverse().find((s) => sec >= s.at);
+      if (cur) setAnalyzeStage(cur.label);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [analyzing]);
 
   const update = (field: keyof FormData, value: any) => {
     setData((prev) => ({ ...prev, [field]: value }));
@@ -858,7 +883,7 @@ const Onboarding = () => {
           <div className="flex gap-3">
             {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving || analyzing}>Voltar</Button>}
             <Button onClick={next} className="flex-1 glow" disabled={saving || analyzing}>
-              {saving ? "🤖 Gerando protocolo com IA..." : analyzing ? "Analisando suas fotos..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar e gerar protocolo" : step === STEPS.length - 1 ? "Finalizar e gerar protocolo" : "Próximo"}
+              {saving ? "🤖 Gerando protocolo com IA..." : analyzing ? "Analisando suas fotos..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar minhas fotos" : step === STEPS.length - 1 ? "Finalizar e gerar protocolo" : "Próximo"}
             </Button>
           </div>
         </div>
@@ -870,10 +895,19 @@ const Onboarding = () => {
             <div className="text-5xl animate-pulse">📸</div>
             <div>
               <h3 className="text-xl font-heading font-bold text-foreground mb-1">Analisando suas fotos</h3>
-              <p className="text-sm text-muted-foreground">A IA está avaliando composição corporal, postura e pontos fortes/fracos…</p>
+              <p className="text-sm text-muted-foreground">{analyzeStage}</p>
+            </div>
+            <div className="space-y-2">
+              <Progress value={Math.min(100, (analyzeElapsed / ANALYZE_TARGET_SECONDS) * 100)} className="h-3" />
+              <p className="text-3xl font-bold text-primary font-heading tabular-nums">
+                {String(Math.floor(analyzeElapsed / 60)).padStart(2, "0")}:{String(analyzeElapsed % 60).padStart(2, "0")}
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                Tempo médio: 20–60 segundos. Mantenha esta tela aberta.
+              </p>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              Isso normalmente leva 20–60 segundos. Mantenha esta tela aberta.
+              Seu progresso já está salvo na nuvem — pode fechar e voltar a qualquer momento.
             </p>
           </div>
         </div>
@@ -885,7 +919,7 @@ const Onboarding = () => {
             <div className="text-5xl animate-pulse">🤖</div>
             <div>
               <h3 className="text-xl font-heading font-bold text-foreground mb-1">Gerando seu protocolo</h3>
-              <p className="text-sm text-muted-foreground">{genStage}</p>
+              <p className="text-sm text-muted-foreground min-h-[2.5rem]">{genStage}</p>
             </div>
             <div className="space-y-2">
               <Progress value={Math.min(100, (genElapsed / TARGET_SECONDS) * 100)} className="h-3" />
@@ -893,11 +927,11 @@ const Onboarding = () => {
                 {String(Math.floor(genElapsed / 60)).padStart(2, "0")}:{String(genElapsed % 60).padStart(2, "0")}
               </p>
               <p className="text-[11px] text-muted-foreground">
-                Tempo estimado: até 4 minutos (análise detalhada da sua avaliação)
+                Tempo médio: 1–3 minutos. Comitê de 3 profissionais (médico nutrólogo, nutricionista de performance e treinador) analisando cada detalhe.
               </p>
             </div>
             <p className="text-xs text-muted-foreground">
-              Mantenha esta tela aberta enquanto montamos seu treino e dieta personalizados.
+              Seu progresso está salvo. Pode fechar a aba — quando voltar, retomamos de onde parou.
             </p>
           </div>
         </div>
