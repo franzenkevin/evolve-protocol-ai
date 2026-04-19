@@ -170,13 +170,29 @@ Deno.serve(async (req) => {
         if (!newEmail || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(newEmail)) {
           return json({ error: "Email inválido" }, 400);
         }
-        // email_confirm:false -> envia email de confirmação ao novo endereço
+        // email_confirm:true -> troca direta sem precisar de confirmação do usuário
         const { error } = await admin.auth.admin.updateUserById(target_user_id, {
           email: newEmail,
-          email_confirm: false,
+          email_confirm: true,
         });
         if (error) throw error;
         await audit("admin_update_email", { new_email: newEmail });
+        return json({ ok: true });
+      }
+
+      case "update_password": {
+        const newPassword: string | undefined = payload?.password;
+        if (!newPassword || typeof newPassword !== "string" || newPassword.length < 6) {
+          return json({ error: "Senha deve ter pelo menos 6 caracteres" }, 400);
+        }
+        if (newPassword.length > 128) {
+          return json({ error: "Senha muito longa" }, 400);
+        }
+        const { error } = await admin.auth.admin.updateUserById(target_user_id, {
+          password: newPassword,
+        });
+        if (error) throw error;
+        await audit("admin_update_password", {});
         return json({ ok: true });
       }
 

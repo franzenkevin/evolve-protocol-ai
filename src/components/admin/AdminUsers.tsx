@@ -88,6 +88,7 @@ const AdminUsers = () => {
   const [pGoal, setPGoal] = useState("");
   const [pOnboarded, setPOnboarded] = useState(false);
   const [pEmail, setPEmail] = useState("");
+  const [pPassword, setPPassword] = useState("");
 
   // Subscription form state
   const [sPlan, setSPlan] = useState("monthly");
@@ -103,6 +104,7 @@ const AdminUsers = () => {
     setPGoal(p.goal ?? "");
     setPOnboarded(p.onboarding_complete);
     setPEmail("");
+    setPPassword("");
 
     const sub = subByUser.get(p.user_id);
     setSPlan(sub?.plan_type ?? "monthly");
@@ -196,10 +198,32 @@ const AdminUsers = () => {
         payload: { email: pEmail.trim() },
       });
       toast({
-        title: "Email enviado para confirmação",
-        description: "O usuário precisa clicar no link no novo endereço.",
+        title: "Email alterado",
+        description: "O email do usuário foi atualizado e já está confirmado.",
       });
       setPEmail("");
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const updatePassword = async () => {
+    if (!editing) return;
+    if (!pPassword || pPassword.length < 6) {
+      toast({ title: "Senha deve ter pelo menos 6 caracteres", variant: "destructive" });
+      return;
+    }
+    try {
+      await action.mutateAsync({
+        action: "update_password",
+        target_user_id: editing.user_id,
+        payload: { password: pPassword },
+      });
+      toast({
+        title: "Senha redefinida",
+        description: "Compartilhe a nova senha com o usuário em canal seguro.",
+      });
+      setPPassword("");
     } catch (e: any) {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
     }
@@ -304,11 +328,12 @@ const AdminUsers = () => {
           </DialogHeader>
 
           <Tabs defaultValue="profile">
-            <TabsList className="w-full">
-              <TabsTrigger value="profile" className="flex-1 gap-1"><UserIcon size={12} />Perfil</TabsTrigger>
-              <TabsTrigger value="subscription" className="flex-1 gap-1"><CreditCard size={12} />Plano</TabsTrigger>
-              <TabsTrigger value="role" className="flex-1 gap-1"><ShieldCheck size={12} />Role</TabsTrigger>
-              <TabsTrigger value="danger" className="flex-1 gap-1 text-destructive"><Ban size={12} />Risco</TabsTrigger>
+            <TabsList className="w-full grid grid-cols-5">
+              <TabsTrigger value="profile" className="gap-1"><UserIcon size={12} />Perfil</TabsTrigger>
+              <TabsTrigger value="access" className="gap-1"><Mail size={12} />Acesso</TabsTrigger>
+              <TabsTrigger value="subscription" className="gap-1"><CreditCard size={12} />Plano</TabsTrigger>
+              <TabsTrigger value="role" className="gap-1"><ShieldCheck size={12} />Role</TabsTrigger>
+              <TabsTrigger value="danger" className="gap-1 text-destructive"><Ban size={12} />Risco</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-3 mt-3">
@@ -331,6 +356,51 @@ const AdminUsers = () => {
               <Button onClick={saveProfile} disabled={action.isPending} className="w-full">
                 {action.isPending ? "Salvando..." : "Salvar perfil"}
               </Button>
+            </TabsContent>
+
+            <TabsContent value="access" className="space-y-4 mt-3">
+              <div className="space-y-2">
+                <Label className="flex items-center gap-1.5"><Mail size={12} />Alterar email</Label>
+                <Input
+                  type="email"
+                  value={pEmail}
+                  onChange={(e) => setPEmail(e.target.value)}
+                  placeholder="novo@email.com"
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  O email é trocado direto e marcado como confirmado. O usuário <strong>não</strong> precisa aprovar.
+                </p>
+                <Button onClick={updateEmail} disabled={action.isPending} variant="outline" className="w-full">
+                  {action.isPending ? "Alterando..." : "Trocar email"}
+                </Button>
+              </div>
+
+              <div className="border-t border-border pt-4 space-y-2">
+                <Label>Redefinir senha</Label>
+                <Input
+                  type="text"
+                  value={pPassword}
+                  onChange={(e) => setPPassword(e.target.value)}
+                  placeholder="Nova senha (mín. 6 caracteres)"
+                  autoComplete="new-password"
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  A senha é alterada imediatamente. Compartilhe com o usuário em canal seguro (WhatsApp pessoal, etc).
+                </p>
+                <Button onClick={updatePassword} disabled={action.isPending} variant="outline" className="w-full">
+                  {action.isPending ? "Salvando..." : "Definir nova senha"}
+                </Button>
+              </div>
+
+              <div className="border-t border-border pt-4 space-y-2">
+                <Label className="flex items-center gap-1.5"><Gift size={12} />Liberar regeneração de protocolo</Label>
+                <p className="text-[10px] text-muted-foreground">
+                  Concede um crédito gratuito para o usuário gerar um novo protocolo antes do prazo.
+                </p>
+                <Button onClick={grantRegen} disabled={action.isPending} variant="outline" className="w-full">
+                  {action.isPending ? "Liberando..." : "Conceder regeneração grátis"}
+                </Button>
+              </div>
             </TabsContent>
 
             <TabsContent value="subscription" className="space-y-3 mt-3">
