@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-const APP_BUILD_ID = "2026-04-19T17:30Z";
+const APP_BUILD_ID = "2026-04-19T18:15Z";
 const BUILD_STORAGE_KEY = "app-build-id";
 
 // Guard: never register SW in iframes or preview hosts
