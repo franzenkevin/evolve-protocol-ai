@@ -18,6 +18,7 @@ import {
   Tag,
   DollarSign,
   Receipt,
+  Activity,
 } from "lucide-react";
 import AdminMetrics from "@/components/admin/AdminMetrics";
 import AdminSales from "@/components/admin/AdminSales";
@@ -31,6 +32,7 @@ import AdminCoupons from "@/components/admin/AdminCoupons";
 import AdminRefunds from "@/components/admin/AdminRefunds";
 import AdminFoods from "@/components/admin/AdminFoods";
 import AdminExercises from "@/components/admin/AdminExercises";
+import AdminMobility from "@/components/admin/AdminMobility";
 import AdminJournal from "@/components/admin/AdminJournal";
 
 const Admin = () => {
@@ -73,6 +75,7 @@ const Admin = () => {
             <TabsTrigger value="plans" className="gap-1"><DollarSign size={14} />Planos</TabsTrigger>
             <TabsTrigger value="coupons" className="gap-1"><Tag size={14} />Cupons</TabsTrigger>
             <TabsTrigger value="exercises" className="gap-1"><Dumbbell size={14} />Exercícios</TabsTrigger>
+            <TabsTrigger value="mobility" className="gap-1"><Activity size={14} />Mobilidades</TabsTrigger>
             <TabsTrigger value="foods" className="gap-1"><UtensilsCrossed size={14} />Alimentos</TabsTrigger>
             <TabsTrigger value="journal" className="gap-1"><Newspaper size={14} />Journal</TabsTrigger>
             <TabsTrigger value="users" className="gap-1"><UserCog size={14} />Usuários</TabsTrigger>
@@ -88,6 +91,7 @@ const Admin = () => {
           <TabsContent value="plans" className="mt-4"><AdminPlans /></TabsContent>
           <TabsContent value="coupons" className="mt-4"><AdminCoupons /></TabsContent>
           <TabsContent value="exercises" className="mt-4"><AdminExercises /></TabsContent>
+          <TabsContent value="mobility" className="mt-4"><AdminMobility /></TabsContent>
           <TabsContent value="foods" className="mt-4"><AdminFoods /></TabsContent>
           <TabsContent value="journal" className="mt-4"><AdminJournal /></TabsContent>
           <TabsContent value="users" className="mt-4"><AdminUsers /></TabsContent>
