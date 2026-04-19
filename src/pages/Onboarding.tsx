@@ -258,9 +258,9 @@ const Onboarding = () => {
     }
   };
 
-  const runAssessment = async () => {
+  const runAssessment = async (): Promise<boolean> => {
     const photoPaths = Object.values(assessmentPhotos);
-    if (photoPaths.length === 0) return;
+    if (photoPaths.length === 0) return false;
     setAnalyzing(true);
     try {
       const { data: fnData, error } = await supabase.functions.invoke("analyze-body", {
@@ -290,8 +290,10 @@ const Onboarding = () => {
           overall_summary: result.overall_summary || null,
         });
       }
+      return !!result;
     } catch (err: any) {
       toast({ title: "Erro na análise", description: err.message, variant: "destructive" });
+      return false;
     } finally {
       setAnalyzing(false);
     }
@@ -307,7 +309,12 @@ const Onboarding = () => {
 
     // On step 7 (assessment), trigger analysis if photos exist and no assessment yet
     if (step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment && !analyzing) {
-      await runAssessment();
+      const ok = await runAssessment();
+      if (ok) {
+        // Auto-advance to confirmation step right after a successful analysis
+        setStep((s) => (s < STEPS.length - 1 ? s + 1 : s));
+        setValidationError("");
+      }
       return;
     }
 
@@ -768,11 +775,26 @@ const Onboarding = () => {
           <div className="flex gap-3">
             {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving || analyzing}>Voltar</Button>}
             <Button onClick={next} className="flex-1 glow" disabled={saving || analyzing}>
-              {saving ? "🤖 Gerando protocolo com IA..." : analyzing ? "Analisando..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar Fotos" : step === STEPS.length - 1 ? "Finalizar" : "Próximo"}
+              {saving ? "🤖 Gerando protocolo com IA..." : analyzing ? "Analisando suas fotos..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar e gerar protocolo" : step === STEPS.length - 1 ? "Finalizar e gerar protocolo" : "Próximo"}
             </Button>
           </div>
         </div>
       </div>
+
+      {analyzing && !saving && (
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
+          <div className="max-w-sm w-full text-center space-y-5">
+            <div className="text-5xl animate-pulse">📸</div>
+            <div>
+              <h3 className="text-xl font-heading font-bold text-foreground mb-1">Analisando suas fotos</h3>
+              <p className="text-sm text-muted-foreground">A IA está avaliando composição corporal, postura e pontos fortes/fracos…</p>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Isso normalmente leva 20–60 segundos. Mantenha esta tela aberta.
+            </p>
+          </div>
+        </div>
+      )}
 
       {saving && (
         <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
