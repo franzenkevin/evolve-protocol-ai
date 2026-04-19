@@ -440,6 +440,7 @@ const Onboarding = () => {
       await createProtocol.mutateAsync(protocol);
       setGenStage("Pronto!");
       await new Promise((r) => setTimeout(r, 400));
+      try { localStorage.removeItem(STORAGE_KEY); } catch {}
       navigate("/dashboard");
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
