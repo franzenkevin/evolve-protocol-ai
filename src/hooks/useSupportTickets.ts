@@ -104,7 +104,7 @@ export const useUpdateTicket = () => {
       status?: SupportTicket["status"];
       admin_notes?: string;
     }) => {
-      const updates: Record<string, any> = {};
+      const updates: { status?: SupportTicket["status"]; admin_notes?: string } = {};
       if (status) updates.status = status;
       if (admin_notes !== undefined) updates.admin_notes = admin_notes;
       const { error } = await supabase.from("support_tickets").update(updates).eq("id", id);
