@@ -104,6 +104,7 @@ const AdminUsers = () => {
     setPGoal(p.goal ?? "");
     setPOnboarded(p.onboarding_complete);
     setPEmail("");
+    setPPassword("");
 
     const sub = subByUser.get(p.user_id);
     setSPlan(sub?.plan_type ?? "monthly");
