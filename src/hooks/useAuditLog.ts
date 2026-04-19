@@ -35,7 +35,11 @@ export type AuditAction =
   | "mark_refunded"
   | "create_mobility"
   | "update_mobility"
-  | "delete_mobility";
+  | "delete_mobility"
+  | "approve_testimonial"
+  | "unapprove_testimonial"
+  | "delete_testimonial"
+  | "update_support_ticket";
 
 export const useLogAudit = () => {
   const { user } = useAuth();
