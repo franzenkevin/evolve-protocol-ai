@@ -883,7 +883,7 @@ const Onboarding = () => {
           <div className="flex gap-3">
             {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving || analyzing}>Voltar</Button>}
             <Button onClick={next} className="flex-1 glow" disabled={saving || analyzing}>
-              {saving ? "🤖 Gerando protocolo com IA..." : analyzing ? "Analisando suas fotos..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar e gerar protocolo" : step === STEPS.length - 1 ? "Finalizar e gerar protocolo" : "Próximo"}
+              {saving ? "🤖 Gerando protocolo com IA..." : analyzing ? "Analisando suas fotos..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar minhas fotos" : step === STEPS.length - 1 ? "Finalizar e gerar protocolo" : "Próximo"}
             </Button>
           </div>
         </div>
