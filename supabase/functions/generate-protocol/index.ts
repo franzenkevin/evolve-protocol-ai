@@ -585,11 +585,14 @@ INSTRUÇÃO FINAL: Antes de gerar o JSON, faça o checklist do COMITÊ DE 3 PROF
 
 Só depois gere o JSON completo seguindo TODAS as regras da metodologia.`;
 
-    console.log("Calling AI for protocol generation (assertive mode)...");
+    console.log("Calling AI for protocol generation (fast mode)...");
 
-    // Use GPT-5: raciocínio mais profundo para analisar avaliação + lesões + desvios
-    // antes de prescrever cada exercício. Trade-off: ~60-120s vs Flash (~30s),
-    // mas o usuário prioriza ASSERTIVIDADE sobre velocidade.
+    // IMPORTANT: Supabase edge functions have a 150s hard idle timeout.
+    // GPT-5 frequently exceeds it (2-3 min) → 504 IDLE_TIMEOUT for the user.
+    // Switched to gemini-2.5-flash (~15-40s) which still respects the full
+    // methodology prompt and supports response_format json_object.
+    // AbortSignal capped at 120s so we fail before the edge timeout and the
+    // client falls back to the local rule-based protocol.
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -597,14 +600,14 @@ Só depois gere o JSON completo seguindo TODAS as regras da metodologia.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openai/gpt-5",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
         response_format: { type: "json_object" },
       }),
-      signal: AbortSignal.timeout(180000),
+      signal: AbortSignal.timeout(120000),
     });
 
     if (!aiResponse.ok) {
