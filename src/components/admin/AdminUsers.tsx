@@ -198,10 +198,32 @@ const AdminUsers = () => {
         payload: { email: pEmail.trim() },
       });
       toast({
-        title: "Email enviado para confirmação",
-        description: "O usuário precisa clicar no link no novo endereço.",
+        title: "Email alterado",
+        description: "O email do usuário foi atualizado e já está confirmado.",
       });
       setPEmail("");
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const updatePassword = async () => {
+    if (!editing) return;
+    if (!pPassword || pPassword.length < 6) {
+      toast({ title: "Senha deve ter pelo menos 6 caracteres", variant: "destructive" });
+      return;
+    }
+    try {
+      await action.mutateAsync({
+        action: "update_password",
+        target_user_id: editing.user_id,
+        payload: { password: pPassword },
+      });
+      toast({
+        title: "Senha redefinida",
+        description: "Compartilhe a nova senha com o usuário em canal seguro.",
+      });
+      setPPassword("");
     } catch (e: any) {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
     }
