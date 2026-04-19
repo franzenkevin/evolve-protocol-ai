@@ -929,6 +929,11 @@ const Training = () => {
           </>
         )}
       </div>
+      <MobilityDrawer
+        open={showMobilityDrawer}
+        onOpenChange={setShowMobilityDrawer}
+        suggestedRegion={day?.muscleGroup}
+      />
     </AppLayout>
   );
 };
