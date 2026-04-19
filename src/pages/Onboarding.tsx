@@ -258,9 +258,9 @@ const Onboarding = () => {
     }
   };
 
-  const runAssessment = async () => {
+  const runAssessment = async (): Promise<boolean> => {
     const photoPaths = Object.values(assessmentPhotos);
-    if (photoPaths.length === 0) return;
+    if (photoPaths.length === 0) return false;
     setAnalyzing(true);
     try {
       const { data: fnData, error } = await supabase.functions.invoke("analyze-body", {
@@ -290,8 +290,10 @@ const Onboarding = () => {
           overall_summary: result.overall_summary || null,
         });
       }
+      return !!result;
     } catch (err: any) {
       toast({ title: "Erro na análise", description: err.message, variant: "destructive" });
+      return false;
     } finally {
       setAnalyzing(false);
     }
