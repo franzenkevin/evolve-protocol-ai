@@ -88,6 +88,7 @@ const AdminUsers = () => {
   const [pGoal, setPGoal] = useState("");
   const [pOnboarded, setPOnboarded] = useState(false);
   const [pEmail, setPEmail] = useState("");
+  const [pPassword, setPPassword] = useState("");
 
   // Subscription form state
   const [sPlan, setSPlan] = useState("monthly");
