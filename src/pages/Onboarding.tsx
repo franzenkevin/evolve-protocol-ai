@@ -140,6 +140,7 @@ interface FormData {
   cardioTiming: string;
   cardioTypePreference: string;
   foodsLike: string[];
+  foodsLikeExtra: string;
   foodsDislike: string;
   dislikedFromList: string;
   currentDietDescription: string;
@@ -162,6 +163,7 @@ const DEFAULT_FORM: FormData = {
   experience: "", gymType: "", injuries: "",
   cardioEnabled: "", cardioFrequency: "", cardioDuration: "", cardioTiming: "", cardioTypePreference: "",
   foodsLike: [],
+  foodsLikeExtra: "",
   foodsDislike: "", dislikedFromList: "", currentDietDescription: "",
   allergies: [], sweetPreference: "", supplements: [],
   freeMeals: "", mealCount: "", sleepHours: "", stressLevel: "",
