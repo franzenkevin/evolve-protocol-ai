@@ -1,0 +1,1 @@
+UPDATE public.plans SET code = 'annual' WHERE code = 'anualy';
