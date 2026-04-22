@@ -640,6 +640,19 @@ const Onboarding = () => {
                   {EXPERIENCE_LEVELS.map((l) => radioOption(l, l, l))}
                 </RadioGroup>
               </div>
+              <div>
+                <Label>Atividades extras, rotina ou contexto relevante</Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  Conte qualquer coisa que ajude a IA a montar um protocolo melhor pra você. Ex: "sou triatleta e treino bike 3x/sem", "jogo futebol aos domingos", "trabalho 12h em pé", "tenho rotina de viagem", "preciso melhorar resistência cardiovascular", etc.
+                </p>
+                <Textarea
+                  value={data.extraActivities}
+                  onChange={(e) => update("extraActivities", e.target.value)}
+                  placeholder="Descreva atividades extras, rotina ou qualquer ponto relevante para o seu protocolo..."
+                  className="min-h-[100px]"
+                  maxLength={1000}
+                />
+              </div>
             </>
           )}
 
@@ -787,8 +800,36 @@ const Onboarding = () => {
               </div>
 
               <div>
-                <Label>Alimentos que NÃO gosta</Label>
-                <Textarea value={data.foodsDislike} onChange={(e) => update("foodsDislike", e.target.value)} placeholder="Liste os alimentos que não gosta..." className="mt-1" />
+                <Label>Algum desses alimentos da lista acima você NÃO come?</Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  Mesmo entre os que marcou, há algum que prefira evitar? Descreva.
+                </p>
+                <Textarea
+                  value={data.dislikedFromList}
+                  onChange={(e) => update("dislikedFromList", e.target.value)}
+                  placeholder="Ex: marquei frango mas não como sobrecoxa, marquei peixes mas só atum em lata..."
+                  className="mt-1"
+                  maxLength={500}
+                />
+              </div>
+
+              <div>
+                <Label>Outros alimentos que NÃO gosta (fora da lista)</Label>
+                <Textarea value={data.foodsDislike} onChange={(e) => update("foodsDislike", e.target.value)} placeholder="Liste outros alimentos que não gosta..." className="mt-1" />
+              </div>
+
+              <div>
+                <Label>Como é sua alimentação atual? *</Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  Descreva de forma direta e curta sua rotina alimentar de hoje, da primeira à última refeição (mesmo que não siga dieta fixa). Isso ajuda a IA a montar um plano realista.
+                </p>
+                <Textarea
+                  value={data.currentDietDescription}
+                  onChange={(e) => update("currentDietDescription", e.target.value)}
+                  placeholder="Ex: café 7h pão com ovo + café preto, almoço 12h arroz feijão frango salada, lanche 16h fruta + iogurte, janta 20h o que tem em casa..."
+                  className="min-h-[110px]"
+                  maxLength={1000}
+                />
               </div>
 
               <div>
