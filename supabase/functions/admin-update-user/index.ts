@@ -219,7 +219,17 @@ Deno.serve(async (req) => {
         const { error } = await admin.auth.admin.updateUserById(target_user_id, {
           password: newPassword,
         });
-        if (error) throw error;
+        if (error) {
+          const msg = (error as any).message ?? "";
+          // Senha vazada (HIBP) → devolver 400 com mensagem amigável
+          if (/weak|known|pwned|leaked/i.test(msg)) {
+            return json({
+              error:
+                "Esta senha aparece em vazamentos conhecidos e foi bloqueada. Escolha outra (use letras, números e símbolos, evite senhas comuns).",
+            }, 400);
+          }
+          throw error;
+        }
         await audit("admin_update_password", {});
         return json({ ok: true });
       }
