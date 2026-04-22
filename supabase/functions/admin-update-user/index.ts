@@ -185,7 +185,10 @@ Deno.serve(async (req) => {
         if (target_user_id === callerId)
           return json({ error: "Cannot delete self" }, 400);
         const { error } = await admin.auth.admin.deleteUser(target_user_id);
-        if (error) throw error;
+        // Idempotente: se o usuário já não existe, considera sucesso
+        if (error && (error as any).status !== 404 && (error as any).code !== "user_not_found") {
+          throw error;
+        }
         await audit("admin_delete_user");
         return json({ ok: true });
       }
