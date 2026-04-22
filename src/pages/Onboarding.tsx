@@ -503,7 +503,9 @@ const Onboarding = () => {
         cardio_type_preference: data.cardioEnabled === "yes" ? data.cardioTypePreference : null,
         ai_data_consent: data.aiDataConsent,
         ai_data_consent_at: data.aiDataConsent ? new Date().toISOString() : null,
-        preferred_foods: data.foodsLike,
+        preferred_foods: data.foodsLikeExtra.trim()
+          ? [...data.foodsLike, `Outros: ${data.foodsLikeExtra.trim()}`]
+          : data.foodsLike,
         disliked_foods: data.foodsDislike,
         disliked_from_list: data.dislikedFromList || null,
         current_diet_description: data.currentDietDescription || null,
