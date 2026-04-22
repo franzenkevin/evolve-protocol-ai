@@ -46,6 +46,46 @@ export default function Plans() {
   const { data: subscription, refetch: refetchSub } = useSubscription();
   const [portalLoading, setPortalLoading] = useState(false);
   const [reconcileLoading, setReconcileLoading] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; type: "referral" | "promo"; discount: number } | null>(null);
+  const [validating, setValidating] = useState(false);
+
+  const validateCoupon = async () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) return;
+    setValidating(true);
+    try {
+      // 1) Try referral code
+      const { data: ref } = await supabase
+        .from("referrals")
+        .select("referral_code, user_id")
+        .eq("referral_code", code)
+        .maybeSingle();
+      if (ref) {
+        setAppliedCoupon({ code, type: "referral", discount: 10 });
+        toast.success(`Cupom ${code} aplicado! 10% de desconto.`);
+        return;
+      }
+      // 2) Try promo coupon
+      const { data: cp } = await supabase
+        .from("coupons")
+        .select("code, discount_percent, active, valid_until")
+        .eq("code", code)
+        .eq("active", true)
+        .maybeSingle();
+      if (cp && (!cp.valid_until || new Date(cp.valid_until) > new Date())) {
+        setAppliedCoupon({ code, type: "promo", discount: cp.discount_percent });
+        toast.success(`Cupom ${code} aplicado! ${cp.discount_percent}% de desconto.`);
+        return;
+      }
+      toast.error("Cupom inválido ou expirado.");
+    } catch (e) {
+      console.error(e);
+      toast.error("Erro ao validar cupom.");
+    } finally {
+      setValidating(false);
+    }
+  };
 
   const isActive =
     subscription &&
