@@ -435,7 +435,7 @@ PROIBIDO: "1 colher", "1 copo", "1 xícara", "1 scoop", "1 fatia (sem peso)", "�
 - Use EXCLUSIVAMENTE os alimentos da lista "preferred_foods" do aluno (com a única exceção dos staples obrigatórios: Feijão, Lentilha, Vegetais/salada, Whey/Creatina se forem suplementos selecionados, e o doce escolhido em sweet_preference).
 - NUNCA introduza um alimento que NÃO esteja em preferred_foods. Se a categoria (ex: carbo do café) tiver poucos preferidos, REPITA os preferidos entre as opções em vez de adicionar outros.
 - **FILTRO PÓS-PREFERIDOS — disliked_from_list**: se o aluno descreveu alimentos que NÃO come dentre os marcados como preferidos, REMOVA esses itens de qualquer refeição/substituição. Trate-os como se NÃO estivessem em preferred_foods.
-- Nas listas de "substitutions" de cada refeição, liste APENAS alimentos preferidos (e não-detestados) da mesma categoria (ou indique "Repita as opções acima" se só houver um preferido válido).
+- Nas listas de "substitutions" (NOVO formato com objetos), liste APENAS alimentos preferidos (e não-detestados) da mesma categoria. Cada option deve trazer porção em gramas + macros calculados, equivalentes ao referenceFood (±5% kcal e macro principal). Se só houver UM preferido válido, repita-o como option única (com a mesma porção do referenceFood).
 - Se um alimento preferido (e não-detestado) se encaixa na refeição, ele deve ser a Opção 1.
 
 **3.1 USO DA ALIMENTAÇÃO ATUAL DO ALUNO (current_diet_description):**
