@@ -690,7 +690,8 @@ const Training = () => {
                           )}
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          {ex.sets}x{ex.reps} • Descanso: {ex.rest}
+                          {/* Se reps já descreve múltiplas séries (ex: "10/8/falha", "8/8/8 cluster"), mostrar só reps. Senão, "Nx reps". */}
+                          {/[\/x]/i.test(String(ex.reps)) ? ex.reps : `${ex.sets}x${ex.reps}`} • Descanso: {ex.rest}
                           {exTonnage > 0 && ` • ${exTonnage.toLocaleString("pt-BR")}kg`}
                         </p>
                       </div>
