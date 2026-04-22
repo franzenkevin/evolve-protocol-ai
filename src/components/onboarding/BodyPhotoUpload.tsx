@@ -1,21 +1,25 @@
 import { useState, useRef } from "react";
-import { Camera, Upload, Check, X, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Camera, Check, X, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import poseFront from "@/assets/pose-front.png";
+import poseBack from "@/assets/pose-back.png";
+import poseRight from "@/assets/pose-right.png";
+import poseLeft from "@/assets/pose-left.png";
 
 interface PhotoSlot {
   key: string;
   label: string;
   description: string;
+  silhouette: string;
 }
 
 const PHOTO_SLOTS: PhotoSlot[] = [
-  { key: "front", label: "Frente", description: "De frente, braços relaxados ao lado do corpo" },
-  { key: "back", label: "Costas", description: "De costas, braços relaxados ao lado do corpo" },
-  { key: "right", label: "Lateral Direita", description: "Perfil direito, braços relaxados" },
-  { key: "left", label: "Lateral Esquerda", description: "Perfil esquerdo, braços relaxados" },
+  { key: "front", label: "Frente", description: "Braços relaxados ao lado do corpo", silhouette: poseFront },
+  { key: "back", label: "Costas", description: "De costas para a câmera", silhouette: poseBack },
+  { key: "right", label: "Lateral Direita", description: "Perfil direito, braços relaxados", silhouette: poseRight },
+  { key: "left", label: "Lateral Esquerda", description: "Perfil esquerdo, braços relaxados", silhouette: poseLeft },
 ];
 
 interface BodyPhotoUploadProps {
@@ -126,10 +130,20 @@ export const BodyPhotoUpload = ({ photos, onPhotosChange }: BodyPhotoUploadProps
                   </>
                 ) : (
                   <>
-                    <Camera className="w-6 h-6 text-muted-foreground mb-1" />
-                    <span className="text-[10px] text-muted-foreground text-center px-2">
-                      {slot.description}
-                    </span>
+                    <img
+                      src={slot.silhouette}
+                      alt={`Pose ${slot.label}`}
+                      width={512}
+                      height={768}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-contain opacity-40"
+                    />
+                    <div className="relative z-10 flex flex-col items-center bg-background/60 backdrop-blur-sm rounded-md px-2 py-1.5">
+                      <Camera className="w-5 h-5 text-primary mb-1" />
+                      <span className="text-[10px] text-foreground text-center font-medium leading-tight">
+                        {slot.description}
+                      </span>
+                    </div>
                   </>
                 )}
 
