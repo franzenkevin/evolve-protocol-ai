@@ -30,14 +30,22 @@ const ResetPassword = () => {
     }
   }, []);
 
+  const passwordChecks = {
+    length: password.length >= 8,
+    upper: /[A-Z]/.test(password),
+    lower: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+  };
+  const passwordValid = Object.values(passwordChecks).every(Boolean);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirm) {
       toast({ title: "Erro", description: "Senhas não conferem", variant: "destructive" });
       return;
     }
-    if (password.length < 6) {
-      toast({ title: "Erro", description: "Mínimo 6 caracteres", variant: "destructive" });
+    if (!passwordValid) {
+      toast({ title: "Senha fraca", description: "Atenda a todos os requisitos abaixo do campo de senha.", variant: "destructive" });
       return;
     }
     setLoading(true);
