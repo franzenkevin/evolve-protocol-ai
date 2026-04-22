@@ -522,7 +522,7 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
       "muscleGroup": "Push (Peito + Ombros + Tríceps)",
       "weekday": "Segunda",
       "splitCode": "A",
-      "dynamicNotes": "Comece pelo composto pesado para máxima carga, depois isole. Aquecimento 50% sem chegar perto da falha, válida 1 alvo 10 reps, válida 2 alvo 8 reps mesma carga, válida 3 falha total mesma carga.",
+      "dynamicNotes": "Comece pelo composto pesado, depois isole. ESQUEMA: aquecimento 50%×15 + V1 (10 reps com sua carga máxima) + V2 (+10-20% de carga, 8 reps) + V3 (mesma carga da V2, FALHA TOTAL). PROGRESSÃO: na falha passou de 12 → sobe carga; abaixo de 8 → reduz; entre 8-12 → +1 rep/semana até chegar em 12.",
       "mobility": [
         { "name": "Alongamento peitoral na parede", "type": "alongamento", "duration": "2x 30s cada lado", "target": "Ombros protraídos / hipercifose", "videoQuery": "Alongamento peitoral na parede execução" }
       ],
