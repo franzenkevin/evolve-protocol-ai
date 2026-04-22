@@ -533,10 +533,25 @@ const Training = () => {
               onClick={() => {
                 setShowSplitExplanation(!showSplitExplanation);
                 if (!showSplitExplanation) {
-                  const allExercises = day.exercises.map((e: any) => e.name).join(", ");
+                  const allExercises = day.exercises.map((e: any) => `${e.name} (${e.sets}x${e.reps})`).join("; ");
                   ai.ask(
                     `split-${selectedDay}`,
-                    `Explique de forma breve (máximo 3 parágrafos) a lógica da periodização deste treino de ${day.muscleGroup}. Exercícios: ${allExercises}. Por que essa divisão muscular? Como os exercícios se complementam? Qual a lógica da ordem?`
+                    `Explique a lógica deste treino de **${day.muscleGroup}** de forma curta, didática e em MARKDOWN com seções claras. Exercícios na ordem: ${allExercises}.
+
+Use EXATAMENTE este formato (sem inventar outras seções):
+
+### 🎯 Por que essa divisão
+2 frases curtas explicando por que esses músculos juntos hoje e como isso encaixa na semana.
+
+### 🔁 Lógica da ordem
+- 1º exercício: por quê começa por ele (composto/maior gasto neural)
+- 2º: como complementa o ângulo
+- (continue na ordem real, 1 linha por exercício, foco no porquê biomecânico)
+
+### 📈 Como progredir hoje
+2-3 bullets diretos: como saber se aumenta carga, quando fica na mesma e o sinal da última série de falha.
+
+Seja direto, sem floreio. Máximo 180 palavras no total.`
                   );
                 }
               }}
@@ -552,31 +567,122 @@ const Training = () => {
                     <Loader2 size={14} className="animate-spin" /> Analisando...
                   </div>
                 ) : (
-                  <div className="prose prose-sm prose-invert max-w-none text-xs [&>p]:mb-2 [&>ul]:mb-2 [&>h1]:text-sm [&>h2]:text-xs [&>h3]:text-xs [&>p]:text-xs [&>li]:text-xs">
+                  <div className="prose prose-sm prose-invert max-w-none text-xs [&>p]:mb-2 [&>ul]:mb-2 [&>ul]:pl-4 [&>ul>li]:mb-1 [&>h3]:text-sm [&>h3]:text-primary [&>h3]:font-heading [&>h3]:mt-3 [&>h3:first-child]:mt-0 [&>h3]:mb-1 [&>p]:text-xs [&>li]:text-xs">
                     <ReactMarkdown>{ai.texts[`split-${selectedDay}`] || ""}</ReactMarkdown>
                   </div>
                 )}
               </Card>
             )}
 
-            {/* Warmup instruction */}
-            <Card className="p-3 border-border bg-muted/30">
-              <div className="flex items-start gap-2">
-                <Flame size={16} className="text-primary mt-0.5 shrink-0" />
-                <div className="text-xs text-muted-foreground space-y-2">
-                  <div>
-                    <p className="font-semibold text-foreground mb-1">Dinâmica do treino</p>
-                    {day.dynamicNotes ? (
-                      <p>{day.dynamicNotes}</p>
-                    ) : (
-                      <p>
-                        1ª série: ~50% da carga máxima (12 reps). 2ª série: ~75% da carga máxima (10
-                        reps). Depois, séries válidas próximas da falha. Última série: até a falha
-                        total (alvo 8-12 reps).
-                      </p>
-                    )}
+            {/* Dinâmica do treino — visual, organizada por nível */}
+            <Card className="p-4 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+              <div className="flex items-center gap-2 mb-3">
+                <Flame size={16} className="text-primary" />
+                <h3 className="font-heading font-semibold text-sm text-foreground">
+                  Dinâmica do treino
+                </h3>
+                {profile?.experience && (
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-primary/30 text-primary capitalize ml-auto">
+                    {profile.experience}
+                  </Badge>
+                )}
+              </div>
+
+              {day.dynamicNotes ? (
+                <p className="text-xs text-muted-foreground leading-relaxed">{day.dynamicNotes}</p>
+              ) : profile?.experience === "iniciante" ? (
+                <div className="space-y-2.5">
+                  <div className="flex gap-2.5">
+                    <div className="w-6 h-6 rounded-full bg-muted text-foreground flex items-center justify-center text-[10px] font-bold shrink-0">A</div>
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-foreground">Aquecimento — 50% da carga máx. já usada</p>
+                      <p className="text-[11px] text-muted-foreground">15 reps controladas. SEM chegar perto da falha. Só preparar o músculo.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2.5">
+                    <div className="w-6 h-6 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">1</div>
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-foreground">Válida 1 — carga máxima já usada</p>
+                      <p className="text-[11px] text-muted-foreground">Vai até 10 reps, próximo da falha (RIR 1-2).</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2.5">
+                    <div className="w-6 h-6 rounded-full bg-primary/25 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">2</div>
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-foreground">Válida 2 — sobe 10–20% da carga</p>
+                      <p className="text-[11px] text-muted-foreground">Alvo de 8 reps, próximo da falha.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2.5">
+                    <div className="w-6 h-6 rounded-full bg-primary/40 text-primary-foreground flex items-center justify-center text-[10px] font-bold shrink-0">3</div>
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-foreground">Válida 3 — MESMA carga da V2, FALHA TOTAL</p>
+                      <p className="text-[11px] text-muted-foreground">A série mais importante. Só pare quando o músculo travar.</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
+                    <p className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
+                      <TrendingUp size={11} className="text-success" /> Como progredir na próxima sessão
+                    </p>
+                    <ul className="text-[11px] text-muted-foreground space-y-1 pl-4 list-disc marker:text-primary/60">
+                      <li>Passou de <span className="text-foreground font-medium">10 reps</span> na V3 (falha) → <span className="text-success font-medium">aumenta carga</span></li>
+                      <li>Ficou abaixo de <span className="text-foreground font-medium">6 reps</span> na V3 → <span className="text-warning font-medium">reduz carga</span></li>
+                      <li>Entre 7-10 reps → mantém e sobe 1 rep por semana</li>
+                    </ul>
                   </div>
                 </div>
+              ) : (
+                <div className="space-y-2.5">
+                  <div className="flex gap-2.5">
+                    <div className="w-6 h-6 rounded-full bg-muted text-foreground flex items-center justify-center text-[10px] font-bold shrink-0">A1</div>
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-foreground">Aquecimento 1 — 50% da carga (12 reps)</p>
+                      <p className="text-[11px] text-muted-foreground">Movimento controlado, ativação muscular.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2.5">
+                    <div className="w-6 h-6 rounded-full bg-muted text-foreground flex items-center justify-center text-[10px] font-bold shrink-0">A2</div>
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-foreground">Aquecimento 2 — 75% da carga (5–8 reps)</p>
+                      <p className="text-[11px] text-muted-foreground">Preparação neural. Ainda longe da falha.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2.5">
+                    <div className="w-6 h-6 rounded-full bg-primary/25 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">V</div>
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-foreground">2 a 3 séries válidas (RIR 1-2)</p>
+                      <p className="text-[11px] text-muted-foreground">Próximo da falha. A <span className="text-foreground font-medium">última é SEMPRE falha total</span>.</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
+                    <p className="text-[11px] font-semibold text-foreground">Zona-alvo de repetições</p>
+                    <ul className="text-[11px] text-muted-foreground space-y-1 pl-4 list-disc marker:text-primary/60">
+                      <li>Compostos pesados / força: <span className="text-foreground font-medium">5–9 reps</span></li>
+                      <li>Hipertrofia clássica: <span className="text-foreground font-medium">6–10 ou 8–12 reps</span></li>
+                      <li>Isolados / resistência: <span className="text-foreground font-medium">10–15 ou 15–20 reps</span></li>
+                    </ul>
+                  </div>
+
+                  <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
+                    <p className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
+                      <TrendingUp size={11} className="text-success" /> Progressão contínua (olhe a SÉRIE DE FALHA)
+                    </p>
+                    <ul className="text-[11px] text-muted-foreground space-y-1 pl-4 list-disc marker:text-primary/60">
+                      <li>Passou do <span className="text-foreground font-medium">topo da zona-alvo</span> → <span className="text-success font-medium">aumenta carga</span></li>
+                      <li>Abaixo do <span className="text-foreground font-medium">piso da zona</span> → <span className="text-warning font-medium">reduz carga</span></li>
+                      <li>Dentro da zona → +1 rep por semana até bater o topo</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-3 pt-3 border-t border-border/40 flex items-start gap-2">
+                <Info size={12} className="text-primary mt-0.5 shrink-0" />
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Siga a <span className="text-foreground font-medium">ordem dos exercícios</span> abaixo. Respeite o descanso entre séries indicado em cada exercício para manter a intensidade.
+                </p>
               </div>
             </Card>
 
