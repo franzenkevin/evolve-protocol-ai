@@ -814,6 +814,20 @@ const Onboarding = () => {
               </div>
 
               <div>
+                <Label>Outros alimentos que GOSTA (fora da lista)</Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  Cite outros alimentos que você consome regularmente e quer que a IA considere ao montar o plano (ex: kefir, pão de queijo, whey, barrinha...).
+                </p>
+                <Textarea
+                  value={data.foodsLikeExtra}
+                  onChange={(e) => update("foodsLikeExtra", e.target.value)}
+                  placeholder="Ex: kefir, pão de queijo, whey, barrinha de proteína..."
+                  className="mt-1"
+                  maxLength={500}
+                />
+              </div>
+
+              <div>
                 <Label>Outros alimentos que NÃO gosta (fora da lista)</Label>
                 <Textarea value={data.foodsDislike} onChange={(e) => update("foodsDislike", e.target.value)} placeholder="Liste outros alimentos que não gosta..." className="mt-1" />
               </div>
