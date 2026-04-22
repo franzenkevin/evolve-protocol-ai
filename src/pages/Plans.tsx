@@ -192,6 +192,52 @@ export default function Plans() {
           </ul>
         </Card>
 
+        {!isActive && (
+          <Card className="p-3 card-gradient border-border">
+            <div className="flex items-center gap-2 mb-2">
+              <Tag size={14} className="text-primary" />
+              <span className="text-xs font-semibold text-foreground">Cupom de indicação ou promoção</span>
+            </div>
+            {appliedCoupon ? (
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex-1">
+                  <p className="text-xs text-primary font-mono font-bold">{appliedCoupon.code}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {appliedCoupon.discount}% de desconto aplicado no checkout
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => { setAppliedCoupon(null); setCouponInput(""); }}
+                >
+                  Remover
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Input
+                  value={couponInput}
+                  onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                  placeholder="Digite o cupom"
+                  className="h-9 text-sm uppercase"
+                  maxLength={32}
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={validateCoupon}
+                  disabled={validating || !couponInput.trim()}
+                  className="h-9 shrink-0"
+                >
+                  {validating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Aplicar"}
+                </Button>
+              </div>
+            )}
+          </Card>
+        )}
+
         <div className="grid grid-cols-1 gap-3">
           {PLANS.map((p) => {
             const isCurrent = isActive && subscription?.plan_type === p.code;
@@ -220,7 +266,11 @@ export default function Plans() {
                 <Button
                   className="w-full glow"
                   disabled={checkoutLoading || isCurrent}
-                  onClick={() => openCheckout({ priceId: p.priceId })}
+                  onClick={() => openCheckout({
+                    priceId: p.priceId,
+                    referralCode: appliedCoupon?.type === "referral" ? appliedCoupon.code : undefined,
+                    couponCode: appliedCoupon?.type === "promo" ? appliedCoupon.code : undefined,
+                  })}
                 >
                   {checkoutLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
