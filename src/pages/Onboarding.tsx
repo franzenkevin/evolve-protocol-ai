@@ -68,10 +68,10 @@ const FOOD_CATEGORIES: { label: string; items: string[] }[] = [
   {
     label: "🍚 Carboidratos",
     items: [
-      "Arroz branco", "Arroz integral", "Arroz parboilizado", "Macarrão comum", "Macarrão integral",
-      "Batata inglesa", "Batata doce", "Batata baroa (mandioquinha)", "Mandioca", "Inhame", "Cará",
-      "Pão de forma", "Pão integral", "Pão francês", "Pão de hambúrguer", "Pão sírio", "Rap10", "Wrap integral",
-      "Cuscuz", "Tapioca", "Aveia em flocos", "Granola", "Milho", "Polenta", "Quinoa",
+      "Arroz branco", "Arroz integral", "Macarrão comum", "Macarrão integral",
+      "Batata inglesa", "Batata doce", "Batata baroa (mandioquinha)", "Mandioca", "Inhame",
+      "Pão de forma", "Pão integral", "Pão francês", "Wrap (sírio/Rap10/integral)",
+      "Cuscuz", "Tapioca", "Aveia em flocos", "Granola",
     ],
   },
   {
@@ -83,36 +83,35 @@ const FOOD_CATEGORIES: { label: string; items: string[] }[] = [
     ],
   },
   {
-    label: "🥩 Proteínas animais",
+    label: "🥩 Carnes e ovos",
     items: [
-      "Peito de frango", "Coxa de frango sem pele", "Sobrecoxa sem pele", "Frango desfiado", "Filé de peru",
-      "Patinho", "Músculo", "Coxão mole", "Coxão duro", "Filé mignon bovino", "Alcatra", "Maminha", "Acém", "Carne moída magra",
-      "Filé mignon suíno", "Lombo suíno", "Carne de porco magra",
-      "Salmão", "Tilápia", "Atum (fresco/lata)", "Sardinha", "Bacalhau", "Pescada", "Linguado", "Camarão",
-      "Ovo inteiro", "Clara de ovo",
+      "Peito de frango", "Sobrecoxa sem pele", "Carne vermelha magra (patinho/alcatra/coxão mole)",
+      "Salmão", "Tilápia", "Atum enlatado", "Ovo (inteiro/clara)",
     ],
   },
   {
-    label: "🥛 Laticínios e derivados",
+    label: "🥛 Laticínios",
     items: [
-      "Leite integral", "Leite semidesnatado", "Leite desnatado", "Leite zero lactose", "Leite vegetal (amêndoa/aveia/coco)",
-      "Iogurte natural integral", "Iogurte natural desnatado", "Iogurte grego", "Skyr",
-      "Queijo branco / minas", "Queijo cottage", "Ricota", "Mussarela light", "Requeijão light", "Cream cheese light", "Parmesão",
+      "Leite", "Iogurte", "Queijo", "Queijo branco / minas", "Requeijão", "Leite vegetal",
     ],
   },
   {
-    label: "🥦 Vegetais e leguminosas",
+    label: "🥦 Vegetais",
     items: [
-      "Alface", "Rúcula", "Espinafre", "Couve", "Repolho", "Acelga", "Agrião",
-      "Brócolis", "Couve-flor", "Abobrinha", "Berinjela", "Pepino", "Tomate", "Cenoura", "Beterraba", "Pimentão", "Cebola", "Aspargos",
-      "Feijão preto", "Feijão carioca", "Feijão branco", "Lentilha", "Grão de bico", "Ervilha", "Soja em grãos", "Edamame",
+      "Gosto de vegetais em geral (folhas, legumes variados)",
+    ],
+  },
+  {
+    label: "🫘 Leguminosas",
+    items: [
+      "Feijão", "Lentilha", "Grão de bico", "Proteína de soja texturizada (PTS)",
     ],
   },
   {
     label: "🥜 Gorduras boas e oleaginosas",
     items: [
-      "Pasta de amendoim integral", "Amendoim", "Castanha do Pará", "Castanha de caju", "Nozes", "Amêndoas", "Avelã",
-      "Azeite de oliva extravirgem", "Óleo de coco", "Manteiga ghee", "Manteiga comum", "Sementes de chia", "Sementes de linhaça", "Semente de abóbora",
+      "Castanhas (do Pará / caju / nozes / amêndoas)", "Amendoim", "Pasta de amendoim integral",
+      "Azeite de oliva extravirgem", "Abacate",
     ],
   },
 ];
@@ -141,6 +140,7 @@ interface FormData {
   cardioTiming: string;
   cardioTypePreference: string;
   foodsLike: string[];
+  foodsLikeExtra: string;
   foodsDislike: string;
   dislikedFromList: string;
   currentDietDescription: string;
@@ -163,6 +163,7 @@ const DEFAULT_FORM: FormData = {
   experience: "", gymType: "", injuries: "",
   cardioEnabled: "", cardioFrequency: "", cardioDuration: "", cardioTiming: "", cardioTypePreference: "",
   foodsLike: [],
+  foodsLikeExtra: "",
   foodsDislike: "", dislikedFromList: "", currentDietDescription: "",
   allergies: [], sweetPreference: "", supplements: [],
   freeMeals: "", mealCount: "", sleepHours: "", stressLevel: "",
@@ -502,7 +503,9 @@ const Onboarding = () => {
         cardio_type_preference: data.cardioEnabled === "yes" ? data.cardioTypePreference : null,
         ai_data_consent: data.aiDataConsent,
         ai_data_consent_at: data.aiDataConsent ? new Date().toISOString() : null,
-        preferred_foods: data.foodsLike,
+        preferred_foods: data.foodsLikeExtra.trim()
+          ? [...data.foodsLike, `Outros: ${data.foodsLikeExtra.trim()}`]
+          : data.foodsLike,
         disliked_foods: data.foodsDislike,
         disliked_from_list: data.dislikedFromList || null,
         current_diet_description: data.currentDietDescription || null,
@@ -809,6 +812,20 @@ const Onboarding = () => {
                   value={data.dislikedFromList}
                   onChange={(e) => update("dislikedFromList", e.target.value)}
                   placeholder="Ex: marquei frango mas não como sobrecoxa, marquei peixes mas só atum em lata..."
+                  className="mt-1"
+                  maxLength={500}
+                />
+              </div>
+
+              <div>
+                <Label>Outros alimentos que GOSTA (fora da lista)</Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  Cite outros alimentos que você consome regularmente e quer que a IA considere ao montar o plano (ex: kefir, pão de queijo, whey, barrinha...).
+                </p>
+                <Textarea
+                  value={data.foodsLikeExtra}
+                  onChange={(e) => update("foodsLikeExtra", e.target.value)}
+                  placeholder="Ex: kefir, pão de queijo, whey, barrinha de proteína..."
                   className="mt-1"
                   maxLength={500}
                 />
