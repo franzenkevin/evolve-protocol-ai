@@ -179,25 +179,59 @@ const Diet = () => {
                       </Button>
 
                       {showSubs === idx && (
-                        <div className="mt-2 space-y-2">
-                          {meal.substitutions.map((sub: any, si: number) => (
-                            <div key={si} className="bg-muted/30 rounded-md p-2">
-                              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                                {sub.category}
-                              </p>
-                              <div className="flex flex-wrap gap-1">
-                                {sub.options.map((opt: string, oi: number) => (
-                                  <Badge
-                                    key={oi}
-                                    variant="outline"
-                                    className="text-[10px] py-0"
-                                  >
-                                    {opt}
-                                  </Badge>
-                                ))}
+                        <div className="mt-2 space-y-3">
+                          {meal.substitutions.map((sub: any, si: number) => {
+                            const opts = sub.options || [];
+                            const isLegacy = opts.length > 0 && typeof opts[0] === "string";
+                            const ref = sub.referenceFood;
+
+                            return (
+                              <div key={si} className="bg-muted/30 rounded-md p-2.5 space-y-2">
+                                <div>
+                                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                                    {sub.category}
+                                  </p>
+                                  {ref && (
+                                    <p className="text-[10px] text-primary/80 mt-0.5">
+                                      Referência: <span className="font-medium text-foreground">{ref.name}</span> · {ref.amount} · {ref.calories} kcal · P{ref.protein}g C{ref.carbs}g G{ref.fat}g
+                                    </p>
+                                  )}
+                                </div>
+
+                                {isLegacy ? (
+                                  <div className="flex flex-wrap gap-1">
+                                    {opts.map((opt: string, oi: number) => (
+                                      <Badge key={oi} variant="outline" className="text-[10px] py-0">
+                                        {opt}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <div className="space-y-1">
+                                    {opts.map((opt: any, oi: number) => (
+                                      <div
+                                        key={oi}
+                                        className="flex items-center justify-between gap-2 py-1 border-b border-border/30 last:border-0"
+                                      >
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-xs text-foreground font-medium truncate">{opt.name}</p>
+                                          <p className="text-[10px] text-primary/80 font-mono">{opt.amount}</p>
+                                        </div>
+                                        <div className="text-right shrink-0">
+                                          <span className="text-[10px] text-muted-foreground block">
+                                            {opt.calories} kcal
+                                          </span>
+                                          <span className="text-[10px] text-muted-foreground">
+                                            P{opt.protein}g C{opt.carbs}g G{opt.fat}g
+                                          </span>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>
