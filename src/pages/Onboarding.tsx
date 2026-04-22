@@ -158,11 +158,13 @@ const STORAGE_KEY = "hypertrophy:onboarding:v1";
 
 const DEFAULT_FORM: FormData = {
   fullName: "", age: "", sex: "", weight: "", height: "",
-  goal: "", activityLevel: "", neat: "", trainingDays: "", trainingWeekdays: [], trainingTime: "",
+  goal: "", activityLevel: "", neat: "", extraActivities: "",
+  trainingDays: "", trainingWeekdays: [], trainingTime: "",
   experience: "", gymType: "", injuries: "",
   cardioEnabled: "", cardioFrequency: "", cardioDuration: "", cardioTiming: "", cardioTypePreference: "",
   foodsLike: [],
-  foodsDislike: "", allergies: [], sweetPreference: "", supplements: [],
+  foodsDislike: "", dislikedFromList: "", currentDietDescription: "",
+  allergies: [], sweetPreference: "", supplements: [],
   freeMeals: "", mealCount: "", sleepHours: "", stressLevel: "",
   aiDataConsent: false,
 };
