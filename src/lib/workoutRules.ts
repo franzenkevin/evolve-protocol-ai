@@ -274,6 +274,12 @@ export const SET_SCHEME_BEGINNER: SetScheme = {
 /**
  * INTERMEDIÁRIO / AVANÇADO — 2 aquecimentos + 2 a 3 séries válidas (a última sempre falha total)
  * 1 aquecimento 50% + 1 aquecimento 75% + 2-3 válidas próximas da falha
+ *
+ * Zona-alvo de repetições é VARIÁVEL — escolhida pela IA conforme exercício/objetivo:
+ *   - Compostos pesados / força: 5-9 reps (ex.: 3x6-9)
+ *   - Hipertrofia clássica: 6-10 ou 8-12 reps (ex.: 3x6-10, 3x8-12)
+ *   - Resistência muscular / isolados leves: 10-15 ou 15-20 reps
+ *
  * Pode aplicar UMA técnica avançada (backoffset, cluster set, pico de contração ou bi-set sutil)
  */
 export const SET_SCHEME_ADVANCED: SetScheme = {
@@ -283,14 +289,14 @@ export const SET_SCHEME_ADVANCED: SetScheme = {
     { percent: 75, reps: "5-8", note: "Aquecimento 2 — preparação neural" },
   ],
   validSets: [
-    { reps: "8-12", effort: "próximo da falha", note: "Válida 1 — RIR 1-2" },
-    { reps: "8-12", effort: "próximo da falha", note: "Válida 2 — RIR 1-2" },
+    { reps: "8-12", effort: "próximo da falha", note: "Válida 1 — RIR 1-2 (zona-alvo definida pela IA: 5-9, 6-10, 8-12, 10-15 ou 15-20)" },
+    { reps: "8-12", effort: "próximo da falha", note: "Válida 2 — RIR 1-2 (mesma zona-alvo)" },
     { reps: "falha", effort: "FALHA TOTAL", note: "Última válida — SEMPRE falha total" },
   ],
   description:
-    "Intermediário/Avançado: 2 aquecimentos (50% + 75%) + 2 a 3 séries válidas (a ÚLTIMA é SEMPRE falha total). Pode aplicar 1 técnica avançada quando indicado.",
+    "Intermediário/Avançado: 2 aquecimentos (50% + 75%) + 2 a 3 séries válidas (a ÚLTIMA é SEMPRE falha total). Zona-alvo de reps escolhida pela IA conforme exercício: 5-9 (força), 6-10 ou 8-12 (hipertrofia), 10-15 ou 15-20 (resistência/isolados). Pode aplicar 1 técnica avançada quando indicado.",
   progressionRule:
-    "Se na série de FALHA passar de 12 reps → AUMENTAR carga. Se ficar abaixo de 8 reps → DIMINUIR. Entre 8 e 12 → progredir 1 rep/semana até chegar em 12, depois subir carga.",
+    "Olhe SEMPRE a série de FALHA: passou do TOPO da zona-alvo → AUMENTAR carga. Ficou abaixo do PISO → DIMINUIR carga. Dentro da zona → progredir 1 rep/semana até chegar no topo, depois subir carga.",
 };
 
 export function getSetScheme(experience: string | null | undefined): {
