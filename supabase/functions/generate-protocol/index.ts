@@ -471,9 +471,18 @@ Cada refeição precisa fazer SENTIDO como um prato real que um brasileiro comer
 - Doce em refeição principal (sempre como sobremesa de lanche, máx 1x/dia)
 
 ### Estrutura das refeições:
-- Cada refeição deve ter 3 OPÇÕES intercambiáveis (para variar) — TODAS seguindo o template da refeição
-- Cada refeição deve ter uma lista de SUBSTITUIÇÕES por categoria (carboidrato, proteína, fruta, leguminosa)
-- Substituições devem manter a CATEGORIA correta (não substitua arroz por banana)
+- Cada refeição deve ter **3 OPÇÕES intercambiáveis** (para variar) — TODAS seguindo o template da refeição.
+- **REGRA CRÍTICA — ISOCALORIA ENTRE OPÇÕES**: as 3 opções da MESMA refeição DEVEM ter soma de **calorias e macros (proteína, carbo, gordura) dentro de ±5%** entre si. Antes de finalizar, some os foods de cada opção e CONFIRME a equivalência. Se uma opção ficar fora da faixa, ajuste a quantidade (g) de algum item para bater.
+- Cada refeição deve ter uma lista de **SUBSTITUIÇÕES por categoria** (carboidrato, proteína, fruta, leguminosa) no NOVO FORMATO ABAIXO.
+- Substituições devem manter a CATEGORIA correta (não substitua arroz por banana).
+
+### NOVO FORMATO DE SUBSTITUIÇÕES (OBRIGATÓRIO — trocas iso-macro):
+Cada item de "substitutions" agora é um objeto com:
+- "category": nome da categoria (ex: "Carboidrato", "Proteína", "Fruta", "Leguminosa").
+- "referenceFood": o alimento BASE da Opção 1 daquela categoria, com porção em gramas e macros calculados. Ex: { "name": "Pão de forma", "amount": "50g", "calories": 140, "protein": 5, "carbs": 24, "fat": 2 }.
+- "options": ARRAY DE OBJETOS (não mais strings). Cada substituto tem { "name", "amount" (gramas), "calories", "protein", "carbs", "fat" } e a porção deve ser CALCULADA para igualar **kcal e o macro principal da categoria (carbo p/ carboidrato, proteína p/ proteína, etc) dentro de ±5% do referenceFood**.
+- Exemplo de cálculo: se referenceFood é "Pão de forma 50g (140 kcal / 24g carb)", a opção "Tapioca" NÃO pode ser 80g (vira 200 kcal / 48g carb). Calcule: tapioca tem ~2.5 kcal/g e ~0.6g carb/g → para bater 140 kcal use ~56g, para bater 24g carb use ~40g — escolha o ponto que mantenha kcal e carbo dentro de ±5% (ex: "Tapioca 38g — 95 kcal / 23g carb" se prioriza carbo, ou "Tapioca 55g — 138 kcal / 33g carb" se prioriza kcal). PREFIRA priorizar o **macro principal** da categoria e manter as kcal o mais próximo possível.
+- A LISTA pode incluir o próprio referenceFood (com porção idêntica) ou apenas alternativas — a UI mostra ambos.
 
 ### Suplementação (dosagens obrigatórias):
 - Creatina: 5g (mulher) ou 7g (homem) por dia, qualquer horário
@@ -557,7 +566,15 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
           }
         ],
         "substitutions": [
-          { "category": "Carboidrato", "options": ["Pão de forma", "Tapioca", "Cuscuz"] }
+          {
+            "category": "Carboidrato",
+            "referenceFood": { "name": "Pão de forma", "amount": "50g", "calories": 140, "protein": 5, "carbs": 24, "fat": 2 },
+            "options": [
+              { "name": "Pão de forma", "amount": "50g", "calories": 140, "protein": 5, "carbs": 24, "fat": 2 },
+              { "name": "Tapioca", "amount": "38g", "calories": 95, "protein": 1, "carbs": 23, "fat": 0 },
+              { "name": "Cuscuz", "amount": "95g", "calories": 108, "protein": 3, "carbs": 24, "fat": 1 }
+            ]
+          }
         ]
       }
     ],
