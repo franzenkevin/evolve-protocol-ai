@@ -374,6 +374,12 @@ const AdminUsers = () => {
             </TabsContent>
 
             <TabsContent value="access" className="space-y-4 mt-3">
+              {editing && emails[editing.user_id] && (
+                <div className="rounded-md border border-border bg-muted/30 px-3 py-2">
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Email atual</p>
+                  <p className="text-sm text-foreground font-medium break-all">{emails[editing.user_id]}</p>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label className="flex items-center gap-1.5"><Mail size={12} />Alterar email</Label>
                 <Input
