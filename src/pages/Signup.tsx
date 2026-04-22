@@ -21,10 +21,18 @@ const Signup = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  const passwordChecks = {
+    length: password.length >= 8,
+    upper: /[A-Z]/.test(password),
+    lower: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+  };
+  const passwordValid = Object.values(passwordChecks).every(Boolean);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
-      toast({ title: "Senha fraca", description: "Mínimo 6 caracteres", variant: "destructive" });
+    if (!passwordValid) {
+      toast({ title: "Senha fraca", description: "Atenda a todos os requisitos abaixo do campo de senha.", variant: "destructive" });
       return;
     }
     if (!acceptedTerms) {
