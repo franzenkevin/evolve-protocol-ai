@@ -237,66 +237,107 @@ export const SPLITS_MEN: Record<number, SplitVariant[]> = {
 };
 
 // ============================================================================
-// ESQUEMA DE SÉRIES POR NÍVEL DE EXPERIÊNCIA
-// Iniciante + Intermediário = MESMO esquema base.
-// Avançado = esquema separado com mais aquecimentos.
+// ESQUEMA DE SÉRIES POR NÍVEL DE EXPERIÊNCIA (METODOLOGIA OFICIAL)
 // ============================================================================
 
 export type SetScheme = {
+  repsLabel: string; // formato curto exibido no card: "10/8/falha", "2x até falha (8-12)" etc.
   warmups: { percent: number; reps: string; note: string }[];
   validSets: { reps: string; effort: string; note: string }[];
   description: string;
+  progressionRule: string;
 };
 
-export const SET_SCHEME_BASE: SetScheme = {
-  warmups: [{ percent: 50, reps: "12", note: "Sem chegar próximo da falha — ativação" }],
-  validSets: [
-    { reps: "10", effort: "próximo da falha (RIR 1-2)", note: "Válida 1 — buscar 10 reps boas" },
-    { reps: "8", effort: "próximo da falha (RIR 1-2)", note: "Válida 2 — manter mesma carga, alvo 8 reps" },
-    { reps: "falha total", effort: "FALHA TOTAL", note: "Válida 3 — REPETIR carga da válida 2, ir até a falha total" },
-  ],
-  description: "Iniciantes e intermediários começam com 1 aquecimento 50% + 1 série 10 reps + 1 série 8 reps + 1 série falha (mesma carga das válidas)",
-};
-
-export const SET_SCHEME_ADVANCED: SetScheme = {
+/**
+ * INICIANTE — esquema fixo 10/8/falha
+ * 1 aquecimento (50% × 15 reps, sem aproximar da falha)
+ * Válida 1: carga máxima já usada → ALVO 10 reps (próximo da falha)
+ * Válida 2: AUMENTA 10-20% da carga → ALVO 8 reps (próximo da falha)
+ * Válida 3: MANTÉM a carga da V2 → FALHA TOTAL (a série mais importante)
+ */
+export const SET_SCHEME_BEGINNER: SetScheme = {
+  repsLabel: "10/8/falha",
   warmups: [
-    { percent: 50, reps: "12", note: "Aquecimento 1 — ativação" },
+    { percent: 50, reps: "15", note: "Aquecimento — 50% da carga máxima já usada, SEM chegar próximo da falha" },
+  ],
+  validSets: [
+    { reps: "10", effort: "próximo da falha", note: "Válida 1 — sua carga máxima já usada, vai até 10 somente" },
+    { reps: "8", effort: "próximo da falha", note: "Válida 2 — AUMENTA 10-20% da carga, alvo 8 reps" },
+    { reps: "falha", effort: "FALHA TOTAL", note: "Válida 3 — MANTÉM a carga da V2, vai até falhar (não conseguir mais movimentar)" },
+  ],
+  description:
+    "Iniciante: 1 aquecimento 50%×15 + 10/8/falha (V1=10 com carga máxima atual, V2=8 com +10-20%, V3=falha total mantendo a carga da V2)",
+  progressionRule:
+    "Se na série de FALHA passar de 12 reps → AUMENTAR todos os pesos. Se ficar abaixo de 8 reps → DIMINUIR o peso. Entre 8 e 12 → progredir pelo menos 1 rep por semana até chegar em 12, depois subir carga. (Progressão contínua)",
+};
+
+/**
+ * INTERMEDIÁRIO / AVANÇADO — 2 aquecimentos + 2 a 3 séries válidas (a última sempre falha total)
+ * 1 aquecimento 50% + 1 aquecimento 75% + 2-3 válidas próximas da falha
+ * Pode aplicar UMA técnica avançada (backoffset, cluster set, pico de contração ou bi-set sutil)
+ */
+export const SET_SCHEME_ADVANCED: SetScheme = {
+  repsLabel: "2-3x até falha",
+  warmups: [
+    { percent: 50, reps: "12", note: "Aquecimento 1 — ativação (sem aproximar da falha)" },
     { percent: 75, reps: "5-8", note: "Aquecimento 2 — preparação neural" },
   ],
   validSets: [
-    { reps: "6-12 (variar entre exercícios)", effort: "próximo da falha", note: "Válida 1" },
-    { reps: "6-12", effort: "próximo da falha", note: "Válida 2 (opcional)" },
-    { reps: "falha total", effort: "FALHA TOTAL", note: "Última válida sempre falha total" },
+    { reps: "8-12", effort: "próximo da falha", note: "Válida 1 — RIR 1-2" },
+    { reps: "8-12", effort: "próximo da falha", note: "Válida 2 — RIR 1-2" },
+    { reps: "falha", effort: "FALHA TOTAL", note: "Última válida — SEMPRE falha total" },
   ],
-  description: "Avançados: 1 aquecimento 50% + 1 aquecimento 75% + 1 a 3 séries válidas (a última SEMPRE falha total)",
+  description:
+    "Intermediário/Avançado: 2 aquecimentos (50% + 75%) + 2 a 3 séries válidas (a ÚLTIMA é SEMPRE falha total). Pode aplicar 1 técnica avançada quando indicado.",
+  progressionRule:
+    "Se na série de FALHA passar de 12 reps → AUMENTAR carga. Se ficar abaixo de 8 reps → DIMINUIR. Entre 8 e 12 → progredir 1 rep/semana até chegar em 12, depois subir carga.",
 };
 
 export function getSetScheme(experience: string | null | undefined): {
   scheme: SetScheme;
-  level: "base" | "advanced";
+  level: "beginner" | "advanced";
 } {
   const exp = (experience || "").toLowerCase();
-  const isAdvanced = exp.includes("avançado") || exp.includes("avancado");
-  return isAdvanced
-    ? { scheme: SET_SCHEME_ADVANCED, level: "advanced" }
-    : { scheme: SET_SCHEME_BASE, level: "base" };
+  const isBeginner = exp.includes("iniciante");
+  return isBeginner
+    ? { scheme: SET_SCHEME_BEGINNER, level: "beginner" }
+    : { scheme: SET_SCHEME_ADVANCED, level: "advanced" };
 }
 
 // ============================================================================
-// TÉCNICAS AVANÇADAS — para uso sutil em trocas de treino (a cada 60 dias)
+// TÉCNICAS AVANÇADAS — uso pontual e justificado pela IA
 // ============================================================================
 
-export type AdvancedTechnique = "standard" | "backoffset" | "peak_contraction" | "cluster_set";
+export type AdvancedTechnique =
+  | "standard"
+  | "backoffset"
+  | "peak_contraction"
+  | "cluster_set"
+  | "bi_set";
 
 export const TECHNIQUES_DESCRIPTION: Record<AdvancedTechnique, string> = {
-  standard: "Execução padrão — séries válidas conforme nível",
+  standard: "Execução padrão — séries válidas conforme o nível do aluno",
   backoffset:
-    "BACKOFFSET: após a última série de falha, fazer mais 1 série até a falha com até 30s de descanso, reduzindo carga em 20-40%. NÃO conta como série válida — é EXTRA. Aluno não precisa anotar a carga.",
+    "BACK-OFF SET: após a última série de falha, REDUZIR 20% da carga e fazer mais 1 série até a falha (até 30s de descanso). Não conta como série válida — é EXTRA. Aluno não precisa anotar a carga.",
   peak_contraction:
-    "PICO DE CONTRAÇÃO: micro-isometria de 1-2s no pico de contração de cada repetição. Usar em músculos com dificuldade de ativação. Aplicar em todas as séries normais.",
+    "PICO DE CONTRAÇÃO: isometria de 2s no pico de contração em CADA repetição de TODAS as séries válidas. Aplicar em músculos com dificuldade de ativação (ex.: glúteo, dorsal, posterior).",
   cluster_set:
-    "CLUSTER SET: 4 blocos de 4 reps com 10s de intervalo entre blocos, com carga que normalmente faria apenas 8 reps. Após aquecimento, máximo 2 séries assim. Aluno anota carga + reps comuns + abrir aba 'blocos' no log.",
+    "CLUSTER SET (formato 8/8/8): com uma carga que normalmente faria apenas 12 reps, faz 8 → descansa 10-15s → +8 → descansa 10-15s → +8. Aquecimento ÚNICO de 50% antes (sem 75%). Máximo 2 séries assim por exercício. Aluno anota carga e abre aba 'blocos' no log.",
+  bi_set:
+    "BI-SET: 2 exercícios de músculos DIFERENTES executados em sequência sem descanso entre eles. Usar APENAS em alguns exercícios do treino (não em todos), ideal para alunos com pouco tempo. Não substitui o esquema de séries válidas — apenas reorganiza o descanso.",
 };
+
+// Sugestão de quando a IA pode aplicar cada técnica (uso parcimonioso)
+export const TECHNIQUE_USAGE_GUIDE = `
+QUANDO usar cada técnica (uso PARCIMONIOSO — não em todos os exercícios):
+- INICIANTE: 100% standard. Nenhuma técnica avançada.
+- INTERMEDIÁRIO: até 1-2 exercícios por treino com técnica (geralmente pico de contração ou back-off em isolados).
+- AVANÇADO: até 30-40% dos exercícios podem ter técnica, variando entre back-off, cluster set, pico de contração ou bi-set.
+- BI-SET: prescrever quando o aluno informa POUCO TEMPO disponível (ex.: <45 min/sessão).
+- CLUSTER SET: prescrever 1x por treino em compostos pesados quando objetivo é força + hipertrofia.
+- BACK-OFF: ótimo finalizador em isolados (bíceps, tríceps, lateral, panturrilha).
+- PICO DE CONTRAÇÃO: para músculos com mind-muscle connection ruim.
+`;
 
 // ============================================================================
 // REGRA DE CONTAGEM DE VOLUME
