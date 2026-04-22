@@ -56,10 +56,26 @@ const NewProtocol = () => {
 
   const handleGenerate = async () => {
     if (!status?.availableCredit) return;
+    if (!profile) {
+      toast.error("Perfil não carregado. Tente novamente.");
+      return;
+    }
     setGenerating(true);
     try {
+      // Fetch latest body assessment (optional context for AI)
+      const { data: assessment } = await supabase
+        .from("body_assessments")
+        .select("*")
+        .eq("user_id", profile.user_id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
       const { error } = await supabase.functions.invoke("generate-protocol", {
         body: {
+          profile,
+          bodyAssessment: assessment ?? undefined,
+          bodyEmphasis: profile.body_emphasis ?? undefined,
           force_regenerate: true,
           reanalysisFeedback: reanalysis,
         },
