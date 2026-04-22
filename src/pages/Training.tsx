@@ -44,6 +44,7 @@ import {
 } from "@/hooks/useWorkoutLogs";
 import { useWorkoutFeedback, useSaveWorkoutFeedback } from "@/hooks/useWorkoutFeedback";
 import { toast } from "sonner";
+import { normalizeTraining } from "@/lib/dietNormalize";
 
 // AI explanation hook — streams from the chat edge function
 function useAIExplanation() {
@@ -136,7 +137,10 @@ const Training = () => {
   const [showMobilityDrawer, setShowMobilityDrawer] = useState(false);
   const ai = useAIExplanation();
 
-  const training = (protocol?.training as any[]) || [];
+  const training = useMemo(
+    () => normalizeTraining(protocol?.training),
+    [protocol?.training]
+  );
 
   // Detect: is today a "rest day"? (today isn't in any of the training day weekdays)
   const todayHasTraining = useMemo(

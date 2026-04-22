@@ -18,6 +18,7 @@ import { useActiveProtocol } from "@/hooks/useProtocol";
 import DietFeedbackCard from "@/components/DietFeedbackCard";
 import RecipeCalculator from "@/components/RecipeCalculator";
 import { Calculator } from "lucide-react";
+import { normalizeSubstitutions } from "@/lib/dietNormalize";
 
 const Diet = () => {
   const { data: protocol, isLoading } = useActiveProtocol();
@@ -180,16 +181,21 @@ const Diet = () => {
 
                       {showSubs === idx && (
                         <div className="mt-2 space-y-3">
-                          {meal.substitutions.map((sub: any, si: number) => {
-                            const opts = sub.options || [];
-                            const isLegacy = opts.length > 0 && typeof opts[0] === "string";
+                          {normalizeSubstitutions(meal.substitutions).map((sub, si) => {
                             const ref = sub.referenceFood;
+                            const wasLegacy = (meal.substitutions[si]?.options?.length ?? 0) > 0
+                              && typeof meal.substitutions[si].options[0] === "string";
 
                             return (
                               <div key={si} className="bg-muted/30 rounded-md p-2.5 space-y-2">
                                 <div>
                                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                                     {sub.category}
+                                    {wasLegacy && (
+                                      <span className="ml-1.5 text-[9px] text-muted-foreground/70 normal-case font-normal">
+                                        (porções estimadas)
+                                      </span>
+                                    )}
                                   </p>
                                   {ref && (
                                     <p className="text-[10px] text-primary/80 mt-0.5">
@@ -198,37 +204,27 @@ const Diet = () => {
                                   )}
                                 </div>
 
-                                {isLegacy ? (
-                                  <div className="flex flex-wrap gap-1">
-                                    {opts.map((opt: string, oi: number) => (
-                                      <Badge key={oi} variant="outline" className="text-[10px] py-0">
-                                        {opt}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                ) : (
-                                  <div className="space-y-1">
-                                    {opts.map((opt: any, oi: number) => (
-                                      <div
-                                        key={oi}
-                                        className="flex items-center justify-between gap-2 py-1 border-b border-border/30 last:border-0"
-                                      >
-                                        <div className="flex-1 min-w-0">
-                                          <p className="text-xs text-foreground font-medium truncate">{opt.name}</p>
-                                          <p className="text-[10px] text-primary/80 font-mono">{opt.amount}</p>
-                                        </div>
-                                        <div className="text-right shrink-0">
-                                          <span className="text-[10px] text-muted-foreground block">
-                                            {opt.calories} kcal
-                                          </span>
-                                          <span className="text-[10px] text-muted-foreground">
-                                            P{opt.protein}g C{opt.carbs}g G{opt.fat}g
-                                          </span>
-                                        </div>
+                                <div className="space-y-1">
+                                  {sub.options.map((opt, oi) => (
+                                    <div
+                                      key={oi}
+                                      className="flex items-center justify-between gap-2 py-1 border-b border-border/30 last:border-0"
+                                    >
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-xs text-foreground font-medium truncate">{opt.name}</p>
+                                        <p className="text-[10px] text-primary/80 font-mono">{opt.amount}</p>
                                       </div>
-                                    ))}
-                                  </div>
-                                )}
+                                      <div className="text-right shrink-0">
+                                        <span className="text-[10px] text-muted-foreground block">
+                                          {opt.calories} kcal
+                                        </span>
+                                        <span className="text-[10px] text-muted-foreground">
+                                          P{opt.protein}g C{opt.carbs}g G{opt.fat}g
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
                             );
                           })}
