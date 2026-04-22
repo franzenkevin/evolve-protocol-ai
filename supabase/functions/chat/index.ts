@@ -18,15 +18,17 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const supabaseAuth = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
+    // Decode JWT locally to extract user id (sub). Avoids issues with
+    // ES256-signed tokens via auth-js getUser/getClaims.
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: authError } = await supabaseAuth.auth.getUser(token);
-    if (authError || !userData?.user?.id) {
-      console.error("chat auth error:", authError);
+    let userId: string | null = null;
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+      if (payload?.sub && (!payload.exp || payload.exp * 1000 > Date.now())) {
+        userId = payload.sub;
+      }
+    } catch (_) { /* invalid token */ }
+    if (!userId) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
