@@ -376,6 +376,7 @@ const Onboarding = () => {
         if (!data.mealCount) return "Selecione quantas refeições por dia.";
         if (data.foodsLike.length === 0) return "Selecione ao menos 5 alimentos que gosta.";
         if (data.foodsLike.length < 5) return "Selecione ao menos 5 alimentos que gosta.";
+        if (!data.currentDietDescription.trim()) return "Descreva brevemente sua alimentação atual (da primeira à última refeição).";
         if (data.allergies.length === 0) return "Selecione suas alergias ou marque 'Não tenho alergias'.";
         if (!data.freeMeals) return "Selecione a frequência de refeições livres.";
         return null;

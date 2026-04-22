@@ -558,12 +558,15 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
 - Experiência: ${profile.experience}
 - Tipo de academia: ${profile.gym_type}
 - Lesões: ${profile.injuries || "Nenhuma"}
+- Atividades extras / contexto relevante: ${profile.extra_activities || "Nenhum"}
 - Dias de treino: ${profile.training_days}x/semana
 - Dias da semana: ${(profile.training_weekdays || []).join(", ")}
 - Horário do treino: ${profile.training_time}
 - Número de refeições: ${profile.meal_count}
-- Alimentos preferidos: ${(profile.preferred_foods || []).join(", ")}
-- Alimentos que não gosta: ${profile.disliked_foods || "Nenhum"}
+- Alimentos preferidos (USAR EXCLUSIVAMENTE ESTES): ${(profile.preferred_foods || []).join(", ")}
+- Da lista acima, alimentos que o aluno NÃO come (EXCLUIR mesmo se marcados como preferidos): ${profile.disliked_from_list || "Nenhum"}
+- Outros alimentos que não gosta: ${profile.disliked_foods || "Nenhum"}
+- Alimentação atual do aluno (rotina real, usar como referência de palatabilidade/realismo): ${profile.current_diet_description || "Não informado"}
 - Alergias: ${profile.allergies || "Nenhuma"}
 - Preferência de doce: ${profile.sweet_preference || "Nenhum"}
 - Suplementos: ${(profile.supplements || []).join(", ") || "Nenhum"}
