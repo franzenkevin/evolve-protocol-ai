@@ -18,6 +18,7 @@ import { useActiveProtocol } from "@/hooks/useProtocol";
 import DietFeedbackCard from "@/components/DietFeedbackCard";
 import RecipeCalculator from "@/components/RecipeCalculator";
 import { Calculator } from "lucide-react";
+import { normalizeSubstitutions } from "@/lib/dietNormalize";
 
 const Diet = () => {
   const { data: protocol, isLoading } = useActiveProtocol();
