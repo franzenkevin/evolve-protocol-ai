@@ -25,16 +25,20 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 
-    // Client with the user's JWT — only to identify the caller.
-    const supabaseUser = createClient(supabaseUrl, serviceKey, {
+    // Client with the user's JWT (anon key + Authorization header) to identify the caller.
+    const supabaseUser = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
     });
     // Client with pure service role — bypasses RLS for the upsert.
     const supabase = createClient(supabaseUrl, serviceKey);
 
     const { data: userData, error: userErr } = await supabaseUser.auth.getUser();
-    if (userErr || !userData.user) return json({ error: 'Invalid user' }, 401);
+    if (userErr || !userData.user) {
+      console.error('getUser failed:', userErr);
+      return json({ error: 'Invalid user' }, 401);
+    }
     const userId = userData.user.id;
 
     const body = await req.json().catch(() => ({}));
