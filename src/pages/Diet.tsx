@@ -242,7 +242,7 @@ const Diet = () => {
         <DietFeedbackCard />
 
         {/* Supplement notes */}
-        {diet.notes && diet.notes.length > 0 && (
+        {Array.isArray(diet.notes) && diet.notes.length > 0 && (
           <Card className="p-4 border-border">
             <div className="flex items-center gap-2 mb-2">
               <Info size={14} className="text-primary" />
