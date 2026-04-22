@@ -31,6 +31,8 @@ import Plans from "./pages/Plans";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import NewProtocol from "./pages/NewProtocol";
 import NotFound from "./pages/NotFound";
+import Feedback from "./pages/Feedback";
+import Support from "./pages/Support";
 import { CURRENT_TERMS_VERSION } from "@/lib/terms";
 
 const queryClient = new QueryClient();
@@ -76,8 +78,10 @@ const App = () => (
             <Route path="/admin" element={<ProtectedRoute><AdminGate><Admin /></AdminGate></ProtectedRoute>} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/accept-terms" element={<ProtectedRoute><AcceptTerms /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><Profile /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
-            <Route path="/profile/edit" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><EditProfile /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><StudentGate><SubscriptionGate><Profile /></SubscriptionGate></StudentGate></ProtectedRoute>} />
+            <Route path="/profile/edit" element={<ProtectedRoute><StudentGate><SubscriptionGate><EditProfile /></SubscriptionGate></StudentGate></ProtectedRoute>} />
+            <Route path="/support" element={<ProtectedRoute><StudentGate><SubscriptionGate><Support /></SubscriptionGate></StudentGate></ProtectedRoute>} />
+            <Route path="/feedback" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><Feedback /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
             <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
             <Route path="/checkout/success" element={<ProtectedRoute><CheckoutSuccess /></ProtectedRoute>} />
             <Route path="/new-protocol" element={<ProtectedRoute><StudentGate><SubscriptionGate><OnboardingGate><NewProtocol /></OnboardingGate></SubscriptionGate></StudentGate></ProtectedRoute>} />
