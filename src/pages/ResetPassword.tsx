@@ -70,7 +70,15 @@ const ResetPassword = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="password">Nova senha</Label>
-            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" required className="mt-1" />
+            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={8} className="mt-1" />
+            {password.length > 0 && (
+              <ul className="mt-2 space-y-1 text-xs">
+                <PwReq ok={passwordChecks.length} text="Mínimo 8 caracteres" />
+                <PwReq ok={passwordChecks.upper} text="1 letra maiúscula (A-Z)" />
+                <PwReq ok={passwordChecks.lower} text="1 letra minúscula (a-z)" />
+                <PwReq ok={passwordChecks.number} text="1 número (0-9)" />
+              </ul>
+            )}
           </div>
           <div>
             <Label htmlFor="confirm">Confirmar senha</Label>
