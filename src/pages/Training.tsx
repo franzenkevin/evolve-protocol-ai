@@ -44,6 +44,7 @@ import {
 } from "@/hooks/useWorkoutLogs";
 import { useWorkoutFeedback, useSaveWorkoutFeedback } from "@/hooks/useWorkoutFeedback";
 import { toast } from "sonner";
+import { normalizeTraining } from "@/lib/dietNormalize";
 
 // AI explanation hook — streams from the chat edge function
 function useAIExplanation() {
