@@ -9,6 +9,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Mail, CheckCircle2, Check, X } from "lucide-react";
 import logo from "@/assets/logo.png";
 
+const PwReq = ({ ok, text }: { ok: boolean; text: string }) => (
+  <li className={`flex items-center gap-1.5 ${ok ? "text-primary" : "text-muted-foreground"}`}>
+    {ok ? <Check size={12} className="shrink-0" /> : <X size={12} className="shrink-0 opacity-60" />}
+    <span>{text}</span>
+  </li>
+);
+
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
