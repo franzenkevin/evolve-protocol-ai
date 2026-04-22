@@ -10,6 +10,7 @@ export function usePaddleCheckout() {
   const openCheckout = async (options: {
     priceId: string;
     referralCode?: string;
+    couponCode?: string;
     successUrl?: string;
     customData?: Record<string, string>;
   }) => {
@@ -25,9 +26,11 @@ export function usePaddleCheckout() {
       window.Paddle.Checkout.open({
         items: [{ priceId: paddlePriceId, quantity: 1 }],
         customer: user.email ? { email: user.email } : undefined,
+        ...(options.couponCode ? { discountCode: options.couponCode } : {}),
         customData: {
           userId: user.id,
           ...(options.referralCode ? { referralCode: options.referralCode } : {}),
+          ...(options.couponCode ? { couponCode: options.couponCode } : {}),
           ...(options.customData || {}),
         },
         settings: {

@@ -6,8 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, CheckCircle2 } from "lucide-react";
+import { Mail, CheckCircle2, Check, X } from "lucide-react";
 import logo from "@/assets/logo.png";
+
+const PwReq = ({ ok, text }: { ok: boolean; text: string }) => (
+  <li className={`flex items-center gap-1.5 ${ok ? "text-primary" : "text-muted-foreground"}`}>
+    {ok ? <Check size={12} className="shrink-0" /> : <X size={12} className="shrink-0 opacity-60" />}
+    <span>{text}</span>
+  </li>
+);
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -21,10 +28,18 @@ const Signup = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  const passwordChecks = {
+    length: password.length >= 8,
+    upper: /[A-Z]/.test(password),
+    lower: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+  };
+  const passwordValid = Object.values(passwordChecks).every(Boolean);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
-      toast({ title: "Senha fraca", description: "Mínimo 6 caracteres", variant: "destructive" });
+    if (!passwordValid) {
+      toast({ title: "Senha fraca", description: "Atenda a todos os requisitos abaixo do campo de senha.", variant: "destructive" });
       return;
     }
     if (!acceptedTerms) {
@@ -138,7 +153,15 @@ const Signup = () => {
           </div>
           <div>
             <Label htmlFor="password">Senha</Label>
-            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} className="mt-1" />
+            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={8} className="mt-1" />
+            {password.length > 0 && (
+              <ul className="mt-2 space-y-1 text-xs">
+                <PwReq ok={passwordChecks.length} text="Mínimo 8 caracteres" />
+                <PwReq ok={passwordChecks.upper} text="1 letra maiúscula (A-Z)" />
+                <PwReq ok={passwordChecks.lower} text="1 letra minúscula (a-z)" />
+                <PwReq ok={passwordChecks.number} text="1 número (0-9)" />
+              </ul>
+            )}
           </div>
 
           <div className="flex items-start gap-2 pt-1">

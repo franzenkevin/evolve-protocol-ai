@@ -932,17 +932,14 @@ const Onboarding = () => {
                     personalizar seu acompanhamento, e você pode solicitar exclusão a qualquer momento.
                   </p>
                 </details>
-                <div
-                  className="flex items-start gap-3 p-3 rounded-lg border border-border bg-background/50 cursor-pointer hover:border-primary/50 transition-colors"
-                  onClick={() => setData((prev) => ({ ...prev, aiDataConsent: !prev.aiDataConsent }))}
-                >
+                <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-background/50 hover:border-primary/50 transition-colors">
                   <Checkbox
                     checked={data.aiDataConsent}
                     onCheckedChange={(c) => setData((prev) => ({ ...prev, aiDataConsent: !!c }))}
                     id="ai-consent"
                     className="mt-0.5"
                   />
-                  <Label htmlFor="ai-consent" className="cursor-pointer text-sm text-foreground leading-snug">
+                  <Label htmlFor="ai-consent" className="cursor-pointer text-sm text-foreground leading-snug flex-1">
                     <strong>Autorizo</strong> o uso dos meus dados pela IA do Hypertrophy. *
                   </Label>
                 </div>

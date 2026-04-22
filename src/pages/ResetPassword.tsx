@@ -5,7 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Check, X } from "lucide-react";
 import logo from "@/assets/logo.png";
+
+const PwReq = ({ ok, text }: { ok: boolean; text: string }) => (
+  <li className={`flex items-center gap-1.5 ${ok ? "text-primary" : "text-muted-foreground"}`}>
+    {ok ? <Check size={12} className="shrink-0" /> : <X size={12} className="shrink-0 opacity-60" />}
+    <span>{text}</span>
+  </li>
+);
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -22,14 +30,22 @@ const ResetPassword = () => {
     }
   }, []);
 
+  const passwordChecks = {
+    length: password.length >= 8,
+    upper: /[A-Z]/.test(password),
+    lower: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+  };
+  const passwordValid = Object.values(passwordChecks).every(Boolean);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirm) {
       toast({ title: "Erro", description: "Senhas não conferem", variant: "destructive" });
       return;
     }
-    if (password.length < 6) {
-      toast({ title: "Erro", description: "Mínimo 6 caracteres", variant: "destructive" });
+    if (!passwordValid) {
+      toast({ title: "Senha fraca", description: "Atenda a todos os requisitos abaixo do campo de senha.", variant: "destructive" });
       return;
     }
     setLoading(true);
@@ -54,7 +70,15 @@ const ResetPassword = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="password">Nova senha</Label>
-            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mínimo 6 caracteres" required className="mt-1" />
+            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={8} className="mt-1" />
+            {password.length > 0 && (
+              <ul className="mt-2 space-y-1 text-xs">
+                <PwReq ok={passwordChecks.length} text="Mínimo 8 caracteres" />
+                <PwReq ok={passwordChecks.upper} text="1 letra maiúscula (A-Z)" />
+                <PwReq ok={passwordChecks.lower} text="1 letra minúscula (a-z)" />
+                <PwReq ok={passwordChecks.number} text="1 número (0-9)" />
+              </ul>
+            )}
           </div>
           <div>
             <Label htmlFor="confirm">Confirmar senha</Label>
