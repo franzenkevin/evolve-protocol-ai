@@ -5,7 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Check, X } from "lucide-react";
 import logo from "@/assets/logo.png";
+
+const PwReq = ({ ok, text }: { ok: boolean; text: string }) => (
+  <li className={`flex items-center gap-1.5 ${ok ? "text-primary" : "text-muted-foreground"}`}>
+    {ok ? <Check size={12} className="shrink-0" /> : <X size={12} className="shrink-0 opacity-60" />}
+    <span>{text}</span>
+  </li>
+);
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
