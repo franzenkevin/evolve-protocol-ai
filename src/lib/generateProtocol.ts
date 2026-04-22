@@ -265,11 +265,29 @@ interface MealOption {
   foods: FoodItem[];
 }
 
+// New format: each substitution option carries the exact portion + macros
+// to keep swaps isocaloric & iso-macro relative to a referenceFood.
+// Old format (string[]) is still rendered as a fallback in the UI.
+export interface SubstitutionOption {
+  name: string;
+  amount: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}
+
+export interface MealSubstitution {
+  category: string;
+  referenceFood?: SubstitutionOption;
+  options: SubstitutionOption[] | string[];
+}
+
 interface Meal {
   label: string;
   time: string;
   options: MealOption[];
-  substitutions: { category: string; options: string[] }[];
+  substitutions: MealSubstitution[];
 }
 
 // Food database with macros per typical serving
