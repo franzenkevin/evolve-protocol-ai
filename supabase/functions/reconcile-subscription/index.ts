@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
         environment: env,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: 'paddle_subscription_id' }
+      { onConflict: 'user_id' }
     );
 
     if (upsertErr) {
