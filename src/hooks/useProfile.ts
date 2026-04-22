@@ -39,6 +39,9 @@ export interface Profile {
   terms_version: string | null;
   terms_accepted_at: string | null;
   body_emphasis: string | null;
+  extra_activities: string | null;
+  current_diet_description: string | null;
+  disliked_from_list: string | null;
   onboarding_complete: boolean;
 }
 

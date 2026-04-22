@@ -660,8 +660,11 @@ export type Database = {
           cardio_timing: string | null
           cardio_type_preference: string | null
           created_at: string
+          current_diet_description: string | null
           disliked_foods: string | null
+          disliked_from_list: string | null
           experience: string | null
+          extra_activities: string | null
           free_meals: string | null
           full_name: string | null
           goal: string | null
@@ -701,8 +704,11 @@ export type Database = {
           cardio_timing?: string | null
           cardio_type_preference?: string | null
           created_at?: string
+          current_diet_description?: string | null
           disliked_foods?: string | null
+          disliked_from_list?: string | null
           experience?: string | null
+          extra_activities?: string | null
           free_meals?: string | null
           full_name?: string | null
           goal?: string | null
@@ -742,8 +748,11 @@ export type Database = {
           cardio_timing?: string | null
           cardio_type_preference?: string | null
           created_at?: string
+          current_diet_description?: string | null
           disliked_foods?: string | null
+          disliked_from_list?: string | null
           experience?: string | null
+          extra_activities?: string | null
           free_meals?: string | null
           full_name?: string | null
           goal?: string | null

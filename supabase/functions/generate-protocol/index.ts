@@ -412,8 +412,21 @@ PROIBIDO: "1 colher", "1 copo", "1 xícara", "1 scoop", "1 fatia (sem peso)", "�
 **3. RESTRIÇÃO ESTRITA AOS PREFERIDOS:**
 - Use EXCLUSIVAMENTE os alimentos da lista "preferred_foods" do aluno (com a única exceção dos staples obrigatórios: Feijão, Lentilha, Vegetais/salada, Whey/Creatina se forem suplementos selecionados, e o doce escolhido em sweet_preference).
 - NUNCA introduza um alimento que NÃO esteja em preferred_foods. Se a categoria (ex: carbo do café) tiver poucos preferidos, REPITA os preferidos entre as opções em vez de adicionar outros.
-- Nas listas de "substitutions" de cada refeição, liste APENAS alimentos preferidos da mesma categoria (ou indique "Repita as opções acima" se só houver um preferido).
-- Se um alimento preferido se encaixa na refeição, ele deve ser a Opção 1.
+- **FILTRO PÓS-PREFERIDOS — disliked_from_list**: se o aluno descreveu alimentos que NÃO come dentre os marcados como preferidos, REMOVA esses itens de qualquer refeição/substituição. Trate-os como se NÃO estivessem em preferred_foods.
+- Nas listas de "substitutions" de cada refeição, liste APENAS alimentos preferidos (e não-detestados) da mesma categoria (ou indique "Repita as opções acima" se só houver um preferido válido).
+- Se um alimento preferido (e não-detestado) se encaixa na refeição, ele deve ser a Opção 1.
+
+**3.1 USO DA ALIMENTAÇÃO ATUAL DO ALUNO (current_diet_description):**
+- Leia a descrição da rotina alimentar atual do aluno. Use-a para CALIBRAR a transição: respeite horários reais, refeições que ele já faz bem, e proponha mudanças graduais (não substitua todas as refeições de uma vez se a rotina dele já tem padrão).
+- Se a rotina atual tem lacunas (ex: pula café, lanche tarde-noite vazio), preencha com o template adequado usando preferidos.
+- Mencione no campo de notas da dieta pelo menos 1 ajuste feito com base na alimentação atual (ex: "mantemos seu pão+ovo no café que você já faz, ajustamos a quantidade").
+
+**3.2 ATIVIDADES EXTRAS (extra_activities):**
+- Se o aluno relatou esportes, atividades extras ou rotina específica (ex: triatlo, jiu-jitsu, futebol semanal, trabalho físico), o COMITÊ deve:
+  - Treinador: ajustar volume/intensidade do treino para não conflitar com a recuperação dessas atividades; se a atividade extra já cobre cardio, REDUZIR cardio prescrito.
+  - Nutricionista: aumentar carboidratos no dia da atividade extra e considerar carga calórica gasta.
+  - Médico: alertar sobre overtraining se atividades extras + treino + cardio somarem volume excessivo.
+- Mencione explicitamente no campo de notas (dieta + treino) o ajuste feito por causa da atividade extra.
 
 **4. COMBINAÇÕES BRASILEIRAS LÓGICAS (CRÍTICO — pense no SABOR):**
 
@@ -558,12 +571,15 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
 - Experiência: ${profile.experience}
 - Tipo de academia: ${profile.gym_type}
 - Lesões: ${profile.injuries || "Nenhuma"}
+- Atividades extras / contexto relevante: ${profile.extra_activities || "Nenhum"}
 - Dias de treino: ${profile.training_days}x/semana
 - Dias da semana: ${(profile.training_weekdays || []).join(", ")}
 - Horário do treino: ${profile.training_time}
 - Número de refeições: ${profile.meal_count}
-- Alimentos preferidos: ${(profile.preferred_foods || []).join(", ")}
-- Alimentos que não gosta: ${profile.disliked_foods || "Nenhum"}
+- Alimentos preferidos (USAR EXCLUSIVAMENTE ESTES): ${(profile.preferred_foods || []).join(", ")}
+- Da lista acima, alimentos que o aluno NÃO come (EXCLUIR mesmo se marcados como preferidos): ${profile.disliked_from_list || "Nenhum"}
+- Outros alimentos que não gosta: ${profile.disliked_foods || "Nenhum"}
+- Alimentação atual do aluno (rotina real, usar como referência de palatabilidade/realismo): ${profile.current_diet_description || "Não informado"}
 - Alergias: ${profile.allergies || "Nenhuma"}
 - Preferência de doce: ${profile.sweet_preference || "Nenhum"}
 - Suplementos: ${(profile.supplements || []).join(", ") || "Nenhum"}

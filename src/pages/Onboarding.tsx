@@ -67,19 +67,53 @@ const FREE_MEAL_OPTIONS = [
 const FOOD_CATEGORIES: { label: string; items: string[] }[] = [
   {
     label: "🍚 Carboidratos",
-    items: ["Arroz", "Macarrão", "Batata inglesa", "Batata doce", "Mandioca", "Pão de forma", "Pão francês", "Pão de hambúrguer", "Rap10", "Cuscuz", "Tapioca", "Inhame", "Milho"],
+    items: [
+      "Arroz branco", "Arroz integral", "Arroz parboilizado", "Macarrão comum", "Macarrão integral",
+      "Batata inglesa", "Batata doce", "Batata baroa (mandioquinha)", "Mandioca", "Inhame", "Cará",
+      "Pão de forma", "Pão integral", "Pão francês", "Pão de hambúrguer", "Pão sírio", "Rap10", "Wrap integral",
+      "Cuscuz", "Tapioca", "Aveia em flocos", "Granola", "Milho", "Polenta", "Quinoa",
+    ],
   },
   {
     label: "🍌 Frutas",
-    items: ["Banana", "Mamão", "Melão", "Melancia", "Kiwi", "Uva", "Manga", "Abacate", "Laranja", "Limão", "Morango", "Maçã", "Pera", "Abacaxi", "Goiaba", "Ameixa", "Pêssego"],
+    items: [
+      "Banana", "Mamão", "Melão", "Melancia", "Kiwi", "Uva", "Uva passa", "Manga",
+      "Abacate", "Laranja", "Tangerina/Mexerica", "Limão", "Morango", "Maçã", "Pera", "Abacaxi",
+      "Goiaba", "Ameixa", "Pêssego", "Maracujá", "Cereja", "Coco", "Açaí (puro)", "Romã", "Caqui", "Pitaya", "Frutas vermelhas (mix)",
+    ],
   },
   {
-    label: "🥩 Proteínas",
-    items: ["Peito de frango", "Sobrecoxa sem pele", "Patinho", "Músculo", "Filé mignon", "Coxão mole", "Salmão", "Tilápia", "Atum", "Ovo", "Queijo", "Leite desnatado", "Leite semi desnatado", "Sardinha", "Camarão", "Carne de porco magra"],
+    label: "🥩 Proteínas animais",
+    items: [
+      "Peito de frango", "Coxa de frango sem pele", "Sobrecoxa sem pele", "Frango desfiado", "Filé de peru",
+      "Patinho", "Músculo", "Coxão mole", "Coxão duro", "Filé mignon bovino", "Alcatra", "Maminha", "Acém", "Carne moída magra",
+      "Filé mignon suíno", "Lombo suíno", "Carne de porco magra",
+      "Salmão", "Tilápia", "Atum (fresco/lata)", "Sardinha", "Bacalhau", "Pescada", "Linguado", "Camarão",
+      "Ovo inteiro", "Clara de ovo",
+    ],
   },
   {
-    label: "🥗 Outros",
-    items: ["Feijão", "Lentilha", "Granola", "Aveia", "Iogurte desnatado", "Requeijão light", "Vegetais e saladas em geral", "Grão de bico", "Pasta de amendoim", "Castanhas", "Azeite de oliva"],
+    label: "🥛 Laticínios e derivados",
+    items: [
+      "Leite integral", "Leite semidesnatado", "Leite desnatado", "Leite zero lactose", "Leite vegetal (amêndoa/aveia/coco)",
+      "Iogurte natural integral", "Iogurte natural desnatado", "Iogurte grego", "Skyr",
+      "Queijo branco / minas", "Queijo cottage", "Ricota", "Mussarela light", "Requeijão light", "Cream cheese light", "Parmesão",
+    ],
+  },
+  {
+    label: "🥦 Vegetais e leguminosas",
+    items: [
+      "Alface", "Rúcula", "Espinafre", "Couve", "Repolho", "Acelga", "Agrião",
+      "Brócolis", "Couve-flor", "Abobrinha", "Berinjela", "Pepino", "Tomate", "Cenoura", "Beterraba", "Pimentão", "Cebola", "Aspargos",
+      "Feijão preto", "Feijão carioca", "Feijão branco", "Lentilha", "Grão de bico", "Ervilha", "Soja em grãos", "Edamame",
+    ],
+  },
+  {
+    label: "🥜 Gorduras boas e oleaginosas",
+    items: [
+      "Pasta de amendoim integral", "Amendoim", "Castanha do Pará", "Castanha de caju", "Nozes", "Amêndoas", "Avelã",
+      "Azeite de oliva extravirgem", "Óleo de coco", "Manteiga ghee", "Manteiga comum", "Sementes de chia", "Sementes de linhaça", "Semente de abóbora",
+    ],
   },
 ];
 
@@ -94,6 +128,7 @@ interface FormData {
   goal: string;
   activityLevel: string;
   neat: string;
+  extraActivities: string;
   trainingDays: string;
   trainingWeekdays: string[];
   trainingTime: string;
@@ -107,6 +142,8 @@ interface FormData {
   cardioTypePreference: string;
   foodsLike: string[];
   foodsDislike: string;
+  dislikedFromList: string;
+  currentDietDescription: string;
   allergies: string[];
   sweetPreference: string;
   supplements: string[];
@@ -121,11 +158,13 @@ const STORAGE_KEY = "hypertrophy:onboarding:v1";
 
 const DEFAULT_FORM: FormData = {
   fullName: "", age: "", sex: "", weight: "", height: "",
-  goal: "", activityLevel: "", neat: "", trainingDays: "", trainingWeekdays: [], trainingTime: "",
+  goal: "", activityLevel: "", neat: "", extraActivities: "",
+  trainingDays: "", trainingWeekdays: [], trainingTime: "",
   experience: "", gymType: "", injuries: "",
   cardioEnabled: "", cardioFrequency: "", cardioDuration: "", cardioTiming: "", cardioTypePreference: "",
   foodsLike: [],
-  foodsDislike: "", allergies: [], sweetPreference: "", supplements: [],
+  foodsDislike: "", dislikedFromList: "", currentDietDescription: "",
+  allergies: [], sweetPreference: "", supplements: [],
   freeMeals: "", mealCount: "", sleepHours: "", stressLevel: "",
   aiDataConsent: false,
 };
@@ -337,6 +376,7 @@ const Onboarding = () => {
         if (!data.mealCount) return "Selecione quantas refeições por dia.";
         if (data.foodsLike.length === 0) return "Selecione ao menos 5 alimentos que gosta.";
         if (data.foodsLike.length < 5) return "Selecione ao menos 5 alimentos que gosta.";
+        if (!data.currentDietDescription.trim()) return "Descreva brevemente sua alimentação atual (da primeira à última refeição).";
         if (data.allergies.length === 0) return "Selecione suas alergias ou marque 'Não tenho alergias'.";
         if (!data.freeMeals) return "Selecione a frequência de refeições livres.";
         return null;
@@ -464,6 +504,9 @@ const Onboarding = () => {
         ai_data_consent_at: data.aiDataConsent ? new Date().toISOString() : null,
         preferred_foods: data.foodsLike,
         disliked_foods: data.foodsDislike,
+        disliked_from_list: data.dislikedFromList || null,
+        current_diet_description: data.currentDietDescription || null,
+        extra_activities: data.extraActivities || null,
         allergies: data.allergies.filter(a => a !== "Não tenho alergias").join(", "),
         sweet_preference: data.sweetPreference === "Nenhum" ? null : data.sweetPreference,
         supplements: data.supplements.filter(s => s !== "Nenhum"),
@@ -597,6 +640,19 @@ const Onboarding = () => {
                 <RadioGroup value={data.experience} onValueChange={(v) => update("experience", v)} className="mt-2 space-y-2">
                   {EXPERIENCE_LEVELS.map((l) => radioOption(l, l, l))}
                 </RadioGroup>
+              </div>
+              <div>
+                <Label>Atividades extras, rotina ou contexto relevante</Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  Conte qualquer coisa que ajude a IA a montar um protocolo melhor pra você. Ex: "sou triatleta e treino bike 3x/sem", "jogo futebol aos domingos", "trabalho 12h em pé", "tenho rotina de viagem", "preciso melhorar resistência cardiovascular", etc.
+                </p>
+                <Textarea
+                  value={data.extraActivities}
+                  onChange={(e) => update("extraActivities", e.target.value)}
+                  placeholder="Descreva atividades extras, rotina ou qualquer ponto relevante para o seu protocolo..."
+                  className="min-h-[100px]"
+                  maxLength={1000}
+                />
               </div>
             </>
           )}
@@ -745,8 +801,36 @@ const Onboarding = () => {
               </div>
 
               <div>
-                <Label>Alimentos que NÃO gosta</Label>
-                <Textarea value={data.foodsDislike} onChange={(e) => update("foodsDislike", e.target.value)} placeholder="Liste os alimentos que não gosta..." className="mt-1" />
+                <Label>Algum desses alimentos da lista acima você NÃO come?</Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  Mesmo entre os que marcou, há algum que prefira evitar? Descreva.
+                </p>
+                <Textarea
+                  value={data.dislikedFromList}
+                  onChange={(e) => update("dislikedFromList", e.target.value)}
+                  placeholder="Ex: marquei frango mas não como sobrecoxa, marquei peixes mas só atum em lata..."
+                  className="mt-1"
+                  maxLength={500}
+                />
+              </div>
+
+              <div>
+                <Label>Outros alimentos que NÃO gosta (fora da lista)</Label>
+                <Textarea value={data.foodsDislike} onChange={(e) => update("foodsDislike", e.target.value)} placeholder="Liste outros alimentos que não gosta..." className="mt-1" />
+              </div>
+
+              <div>
+                <Label>Como é sua alimentação atual? *</Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  Descreva de forma direta e curta sua rotina alimentar de hoje, da primeira à última refeição (mesmo que não siga dieta fixa). Isso ajuda a IA a montar um plano realista.
+                </p>
+                <Textarea
+                  value={data.currentDietDescription}
+                  onChange={(e) => update("currentDietDescription", e.target.value)}
+                  placeholder="Ex: café 7h pão com ovo + café preto, almoço 12h arroz feijão frango salada, lanche 16h fruta + iogurte, janta 20h o que tem em casa..."
+                  className="min-h-[110px]"
+                  maxLength={1000}
+                />
               </div>
 
               <div>
