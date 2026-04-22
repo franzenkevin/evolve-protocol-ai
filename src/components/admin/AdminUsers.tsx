@@ -33,6 +33,7 @@ import {
   useAdminProfiles,
   useAdminUserRoles,
   useAdminSubscriptions,
+  useAdminEmails,
 } from "@/hooks/useAdminData";
 import { useAdminUserAction } from "@/hooks/useAdminUserAction";
 import {
@@ -64,6 +65,7 @@ const AdminUsers = () => {
   const { data: profiles = [], isLoading } = useAdminProfiles();
   const { data: roles = [] } = useAdminUserRoles();
   const { data: subs = [] } = useAdminSubscriptions();
+  const { data: emails = {} } = useAdminEmails();
   const action = useAdminUserAction();
   const { toast } = useToast();
 
