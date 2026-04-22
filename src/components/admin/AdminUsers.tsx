@@ -33,6 +33,7 @@ import {
   useAdminProfiles,
   useAdminUserRoles,
   useAdminSubscriptions,
+  useAdminEmails,
 } from "@/hooks/useAdminData";
 import { useAdminUserAction } from "@/hooks/useAdminUserAction";
 import {
@@ -64,6 +65,7 @@ const AdminUsers = () => {
   const { data: profiles = [], isLoading } = useAdminProfiles();
   const { data: roles = [] } = useAdminUserRoles();
   const { data: subs = [] } = useAdminSubscriptions();
+  const { data: emails = {} } = useAdminEmails();
   const action = useAdminUserAction();
   const { toast } = useToast();
 
@@ -77,7 +79,12 @@ const AdminUsers = () => {
   const filtered = profiles.filter((p) => {
     if (!search) return true;
     const q = search.toLowerCase();
-    return p.full_name?.toLowerCase().includes(q) || p.user_id.toLowerCase().includes(q);
+    const email = emails[p.user_id]?.toLowerCase() ?? "";
+    return (
+      p.full_name?.toLowerCase().includes(q) ||
+      p.user_id.toLowerCase().includes(q) ||
+      email.includes(q)
+    );
   });
 
   // Profile form state
@@ -268,7 +275,7 @@ const AdminUsers = () => {
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar por nome ou ID..."
+          placeholder="Buscar por nome, email ou ID..."
           className="pl-9"
         />
       </div>
@@ -307,6 +314,12 @@ const AdminUsers = () => {
                     </Badge>
                   )}
                 </div>
+                {emails[p.user_id] && (
+                  <p className="text-[11px] text-foreground/80 truncate flex items-center gap-1 mt-0.5">
+                    <Mail size={10} className="shrink-0 text-muted-foreground" />
+                    {emails[p.user_id]}
+                  </p>
+                )}
                 <p className="text-[10px] text-muted-foreground truncate">{p.user_id}</p>
               </div>
               <Button size="sm" variant="outline" className="shrink-0 gap-1" onClick={() => openEditor(p as Profile)}>
@@ -323,7 +336,9 @@ const AdminUsers = () => {
           <DialogHeader>
             <DialogTitle>Editar usuário</DialogTitle>
             <DialogDescription className="text-xs">
-              {editing?.full_name || "—"} · {editing?.user_id}
+              {editing?.full_name || "—"}
+              {editing && emails[editing.user_id] && ` · ${emails[editing.user_id]}`}
+              {editing && ` · ${editing.user_id}`}
             </DialogDescription>
           </DialogHeader>
 
@@ -359,6 +374,12 @@ const AdminUsers = () => {
             </TabsContent>
 
             <TabsContent value="access" className="space-y-4 mt-3">
+              {editing && emails[editing.user_id] && (
+                <div className="rounded-md border border-border bg-muted/30 px-3 py-2">
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Email atual</p>
+                  <p className="text-sm text-foreground font-medium break-all">{emails[editing.user_id]}</p>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label className="flex items-center gap-1.5"><Mail size={12} />Alterar email</Label>
                 <Input

@@ -26,6 +26,7 @@ export const useAdminUserAction = () => {
       qc.invalidateQueries({ queryKey: ["admin-profiles"] });
       qc.invalidateQueries({ queryKey: ["admin-user-roles"] });
       qc.invalidateQueries({ queryKey: ["admin-subscriptions"] });
+      qc.invalidateQueries({ queryKey: ["admin-emails"] });
     },
   });
 };

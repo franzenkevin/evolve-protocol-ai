@@ -53,6 +53,20 @@ export const useAdminUserRoles = () => {
   });
 };
 
+export const useAdminEmails = () => {
+  return useQuery({
+    queryKey: ["admin-emails"],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke("admin-update-user", {
+        body: { action: "list_emails" },
+      });
+      if (error) throw error;
+      return (data?.emails ?? {}) as Record<string, string>;
+    },
+    staleTime: 60_000,
+  });
+};
+
 export const usePromoteAdmin = () => {
   const qc = useQueryClient();
   return useMutation({
