@@ -277,7 +277,7 @@ export const SET_SCHEME_BEGINNER: SetScheme = {
  * Pode aplicar UMA técnica avançada (backoffset, cluster set, pico de contração ou bi-set sutil)
  */
 export const SET_SCHEME_ADVANCED: SetScheme = {
-  repsLabel: "2-3x até falha",
+  repsLabel: "8-12/8-12/falha",
   warmups: [
     { percent: 50, reps: "12", note: "Aquecimento 1 — ativação (sem aproximar da falha)" },
     { percent: 75, reps: "5-8", note: "Aquecimento 2 — preparação neural" },
