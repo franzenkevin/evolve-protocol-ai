@@ -435,7 +435,7 @@ PROIBIDO: "1 colher", "1 copo", "1 xícara", "1 scoop", "1 fatia (sem peso)", "�
 - Use EXCLUSIVAMENTE os alimentos da lista "preferred_foods" do aluno (com a única exceção dos staples obrigatórios: Feijão, Lentilha, Vegetais/salada, Whey/Creatina se forem suplementos selecionados, e o doce escolhido em sweet_preference).
 - NUNCA introduza um alimento que NÃO esteja em preferred_foods. Se a categoria (ex: carbo do café) tiver poucos preferidos, REPITA os preferidos entre as opções em vez de adicionar outros.
 - **FILTRO PÓS-PREFERIDOS — disliked_from_list**: se o aluno descreveu alimentos que NÃO come dentre os marcados como preferidos, REMOVA esses itens de qualquer refeição/substituição. Trate-os como se NÃO estivessem em preferred_foods.
-- Nas listas de "substitutions" de cada refeição, liste APENAS alimentos preferidos (e não-detestados) da mesma categoria (ou indique "Repita as opções acima" se só houver um preferido válido).
+- Nas listas de "substitutions" (NOVO formato com objetos), liste APENAS alimentos preferidos (e não-detestados) da mesma categoria. Cada option deve trazer porção em gramas + macros calculados, equivalentes ao referenceFood (±5% kcal e macro principal). Se só houver UM preferido válido, repita-o como option única (com a mesma porção do referenceFood).
 - Se um alimento preferido (e não-detestado) se encaixa na refeição, ele deve ser a Opção 1.
 
 **3.1 USO DA ALIMENTAÇÃO ATUAL DO ALUNO (current_diet_description):**
@@ -471,9 +471,18 @@ Cada refeição precisa fazer SENTIDO como um prato real que um brasileiro comer
 - Doce em refeição principal (sempre como sobremesa de lanche, máx 1x/dia)
 
 ### Estrutura das refeições:
-- Cada refeição deve ter 3 OPÇÕES intercambiáveis (para variar) — TODAS seguindo o template da refeição
-- Cada refeição deve ter uma lista de SUBSTITUIÇÕES por categoria (carboidrato, proteína, fruta, leguminosa)
-- Substituições devem manter a CATEGORIA correta (não substitua arroz por banana)
+- Cada refeição deve ter **3 OPÇÕES intercambiáveis** (para variar) — TODAS seguindo o template da refeição.
+- **REGRA CRÍTICA — ISOCALORIA ENTRE OPÇÕES**: as 3 opções da MESMA refeição DEVEM ter soma de **calorias e macros (proteína, carbo, gordura) dentro de ±5%** entre si. Antes de finalizar, some os foods de cada opção e CONFIRME a equivalência. Se uma opção ficar fora da faixa, ajuste a quantidade (g) de algum item para bater.
+- Cada refeição deve ter uma lista de **SUBSTITUIÇÕES por categoria** (carboidrato, proteína, fruta, leguminosa) no NOVO FORMATO ABAIXO.
+- Substituições devem manter a CATEGORIA correta (não substitua arroz por banana).
+
+### NOVO FORMATO DE SUBSTITUIÇÕES (OBRIGATÓRIO — trocas iso-macro):
+Cada item de "substitutions" agora é um objeto com:
+- "category": nome da categoria (ex: "Carboidrato", "Proteína", "Fruta", "Leguminosa").
+- "referenceFood": o alimento BASE da Opção 1 daquela categoria, com porção em gramas e macros calculados. Ex: { "name": "Pão de forma", "amount": "50g", "calories": 140, "protein": 5, "carbs": 24, "fat": 2 }.
+- "options": ARRAY DE OBJETOS (não mais strings). Cada substituto tem { "name", "amount" (gramas), "calories", "protein", "carbs", "fat" } e a porção deve ser CALCULADA para igualar **kcal e o macro principal da categoria (carbo p/ carboidrato, proteína p/ proteína, etc) dentro de ±5% do referenceFood**.
+- Exemplo de cálculo: se referenceFood é "Pão de forma 50g (140 kcal / 24g carb)", a opção "Tapioca" NÃO pode ser 80g (vira 200 kcal / 48g carb). Calcule: tapioca tem ~2.5 kcal/g e ~0.6g carb/g → para bater 140 kcal use ~56g, para bater 24g carb use ~40g — escolha o ponto que mantenha kcal e carbo dentro de ±5% (ex: "Tapioca 38g — 95 kcal / 23g carb" se prioriza carbo, ou "Tapioca 55g — 138 kcal / 33g carb" se prioriza kcal). PREFIRA priorizar o **macro principal** da categoria e manter as kcal o mais próximo possível.
+- A LISTA pode incluir o próprio referenceFood (com porção idêntica) ou apenas alternativas — a UI mostra ambos.
 
 ### Suplementação (dosagens obrigatórias):
 - Creatina: 5g (mulher) ou 7g (homem) por dia, qualquer horário
@@ -557,7 +566,15 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
           }
         ],
         "substitutions": [
-          { "category": "Carboidrato", "options": ["Pão de forma", "Tapioca", "Cuscuz"] }
+          {
+            "category": "Carboidrato",
+            "referenceFood": { "name": "Pão de forma", "amount": "50g", "calories": 140, "protein": 5, "carbs": 24, "fat": 2 },
+            "options": [
+              { "name": "Pão de forma", "amount": "50g", "calories": 140, "protein": 5, "carbs": 24, "fat": 2 },
+              { "name": "Tapioca", "amount": "38g", "calories": 95, "protein": 1, "carbs": 23, "fat": 0 },
+              { "name": "Cuscuz", "amount": "95g", "calories": 108, "protein": 3, "carbs": 24, "fat": 1 }
+            ]
+          }
         ]
       }
     ],
