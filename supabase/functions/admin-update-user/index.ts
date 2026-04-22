@@ -54,7 +54,32 @@ Deno.serve(async (req) => {
   }
 
   const { action, target_user_id, payload } = body ?? {};
-  if (!action || !target_user_id) return json({ error: "Missing fields" }, 400);
+  if (!action) return json({ error: "Missing action" }, 400);
+
+  // Read-only action: list emails of all users (for admin panel display)
+  if (action === "list_emails") {
+    try {
+      const emails: Record<string, string> = {};
+      let page = 1;
+      const perPage = 1000;
+      while (true) {
+        const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
+        if (error) throw error;
+        for (const u of data.users) {
+          if (u.email) emails[u.id] = u.email;
+        }
+        if (data.users.length < perPage) break;
+        page++;
+        if (page > 20) break; // safety cap (20k users)
+      }
+      return json({ ok: true, emails });
+    } catch (e) {
+      console.error("list_emails error:", e);
+      return json({ error: (e as Error).message }, 500);
+    }
+  }
+
+  if (!target_user_id) return json({ error: "Missing target_user_id" }, 400);
 
   // Audit helper
   const audit = async (act: string, meta: Record<string, unknown> = {}) => {
