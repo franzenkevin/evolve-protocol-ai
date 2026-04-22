@@ -67,19 +67,53 @@ const FREE_MEAL_OPTIONS = [
 const FOOD_CATEGORIES: { label: string; items: string[] }[] = [
   {
     label: "🍚 Carboidratos",
-    items: ["Arroz", "Macarrão", "Batata inglesa", "Batata doce", "Mandioca", "Pão de forma", "Pão francês", "Pão de hambúrguer", "Rap10", "Cuscuz", "Tapioca", "Inhame", "Milho"],
+    items: [
+      "Arroz branco", "Arroz integral", "Arroz parboilizado", "Macarrão comum", "Macarrão integral",
+      "Batata inglesa", "Batata doce", "Batata baroa (mandioquinha)", "Mandioca", "Inhame", "Cará",
+      "Pão de forma", "Pão integral", "Pão francês", "Pão de hambúrguer", "Pão sírio", "Rap10", "Wrap integral",
+      "Cuscuz", "Tapioca", "Aveia em flocos", "Granola", "Milho", "Polenta", "Quinoa",
+    ],
   },
   {
     label: "🍌 Frutas",
-    items: ["Banana", "Mamão", "Melão", "Melancia", "Kiwi", "Uva", "Manga", "Abacate", "Laranja", "Limão", "Morango", "Maçã", "Pera", "Abacaxi", "Goiaba", "Ameixa", "Pêssego"],
+    items: [
+      "Banana", "Mamão", "Melão", "Melancia", "Kiwi", "Uva", "Uva passa", "Manga",
+      "Abacate", "Laranja", "Tangerina/Mexerica", "Limão", "Morango", "Maçã", "Pera", "Abacaxi",
+      "Goiaba", "Ameixa", "Pêssego", "Maracujá", "Cereja", "Coco", "Açaí (puro)", "Romã", "Caqui", "Pitaya", "Frutas vermelhas (mix)",
+    ],
   },
   {
-    label: "🥩 Proteínas",
-    items: ["Peito de frango", "Sobrecoxa sem pele", "Patinho", "Músculo", "Filé mignon", "Coxão mole", "Salmão", "Tilápia", "Atum", "Ovo", "Queijo", "Leite desnatado", "Leite semi desnatado", "Sardinha", "Camarão", "Carne de porco magra"],
+    label: "🥩 Proteínas animais",
+    items: [
+      "Peito de frango", "Coxa de frango sem pele", "Sobrecoxa sem pele", "Frango desfiado", "Filé de peru",
+      "Patinho", "Músculo", "Coxão mole", "Coxão duro", "Filé mignon bovino", "Alcatra", "Maminha", "Acém", "Carne moída magra",
+      "Filé mignon suíno", "Lombo suíno", "Carne de porco magra",
+      "Salmão", "Tilápia", "Atum (fresco/lata)", "Sardinha", "Bacalhau", "Pescada", "Linguado", "Camarão",
+      "Ovo inteiro", "Clara de ovo",
+    ],
   },
   {
-    label: "🥗 Outros",
-    items: ["Feijão", "Lentilha", "Granola", "Aveia", "Iogurte desnatado", "Requeijão light", "Vegetais e saladas em geral", "Grão de bico", "Pasta de amendoim", "Castanhas", "Azeite de oliva"],
+    label: "🥛 Laticínios e derivados",
+    items: [
+      "Leite integral", "Leite semidesnatado", "Leite desnatado", "Leite zero lactose", "Leite vegetal (amêndoa/aveia/coco)",
+      "Iogurte natural integral", "Iogurte natural desnatado", "Iogurte grego", "Skyr",
+      "Queijo branco / minas", "Queijo cottage", "Ricota", "Mussarela light", "Requeijão light", "Cream cheese light", "Parmesão",
+    ],
+  },
+  {
+    label: "🥦 Vegetais e leguminosas",
+    items: [
+      "Alface", "Rúcula", "Espinafre", "Couve", "Repolho", "Acelga", "Agrião",
+      "Brócolis", "Couve-flor", "Abobrinha", "Berinjela", "Pepino", "Tomate", "Cenoura", "Beterraba", "Pimentão", "Cebola", "Aspargos",
+      "Feijão preto", "Feijão carioca", "Feijão branco", "Lentilha", "Grão de bico", "Ervilha", "Soja em grãos", "Edamame",
+    ],
+  },
+  {
+    label: "🥜 Gorduras boas e oleaginosas",
+    items: [
+      "Pasta de amendoim integral", "Amendoim", "Castanha do Pará", "Castanha de caju", "Nozes", "Amêndoas", "Avelã",
+      "Azeite de oliva extravirgem", "Óleo de coco", "Manteiga ghee", "Manteiga comum", "Sementes de chia", "Sementes de linhaça", "Semente de abóbora",
+    ],
   },
 ];
 
@@ -94,6 +128,7 @@ interface FormData {
   goal: string;
   activityLevel: string;
   neat: string;
+  extraActivities: string;
   trainingDays: string;
   trainingWeekdays: string[];
   trainingTime: string;
@@ -107,6 +142,8 @@ interface FormData {
   cardioTypePreference: string;
   foodsLike: string[];
   foodsDislike: string;
+  dislikedFromList: string;
+  currentDietDescription: string;
   allergies: string[];
   sweetPreference: string;
   supplements: string[];
