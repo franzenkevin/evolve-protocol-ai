@@ -136,6 +136,26 @@ const Dashboard = () => {
           </Card>
         )}
 
+        {/* Legacy protocol upgrade notice */}
+        {protocol && (training as any)?.needs_upgrade && (
+          <Card className="p-4 border-primary/40 bg-primary/5">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex-1">
+                <h3 className="font-heading font-semibold text-foreground text-sm mb-1">
+                  ✨ Novidades disponíveis no seu protocolo
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  {(training as any)?.upgrade_reason || "Atualizamos a metodologia: substituições isocalóricas e faixas de repetições variáveis."}
+                  Regere o protocolo para aplicar.
+                </p>
+              </div>
+              <Link to="/new-protocol">
+                <Button size="sm" className="glow whitespace-nowrap">Regerar protocolo</Button>
+              </Link>
+            </div>
+          </Card>
+        )}
+
         {/* 60-day journey widget */}
         {protocol && (
           <ProtocolProgressWidget
