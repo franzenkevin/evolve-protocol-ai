@@ -263,13 +263,18 @@ Cada exercício:
 2. **Aquecimento 2** — 75% da carga, 5-8 reps (preparação neural)
 3. **2 ou 3 séries válidas** — próximas da falha (RIR 1-2), zona alvo 8-12 reps. A ÚLTIMA é SEMPRE falha total.
 
-→ No JSON do exercício: \`"sets": 3, "reps": "2x 8-12 + falha"\` OU \`"sets": 3, "reps": "8-12/8-12/falha"\` — texto curto e claro, sem parênteses explicativos.
+→ No JSON do exercício: \`"sets": 3, "reps": "8-12/8-12/falha"\` OU \`"sets": 2, "reps": "8-12/falha"\` — texto curto e claro, sem parênteses explicativos.
 
 Para EXERCÍCIOS COM TÉCNICA, use formato dedicado no campo "reps":
-- Cluster set: \`"reps": "3x8/8/8 cluster"\`
+- Cluster set: \`"reps": "8/8/8 cluster"\` (NÃO escrever "3x" antes — o número de blocos já está claro)
 - Back-off: \`"reps": "8-12/8-12/falha + back-off"\`
 - Pico de contração: \`"reps": "8-12/8-12/falha (pico 2s)"\`
 - Bi-set: \`"reps": "8-12/8-12/falha (bi-set com X)"\` e citar o exercício parceiro
+
+⚠️ REGRA CRÍTICA DE FORMATAÇÃO DO CAMPO "reps":
+- NUNCA prefixe com "Nx" quando o reps já lista múltiplas séries separadas por "/" (ex: "10/8/falha", "8/8/8 cluster"). O usuário é LEIGO — vai achar que precisa fazer 3 vezes os 3 valores.
+- O campo "sets" é apenas metadado para contagem de volume. A UI esconde o "Nx" automaticamente quando o reps já descreve cada série.
+- Para UMA série apenas, use \`"reps": "8-12"\` ou \`"reps": "falha"\`.
 
 Exercícios totais: Intermediário 5-7/sessão | Avançado 6-8/sessão.
 
