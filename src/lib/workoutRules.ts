@@ -57,23 +57,34 @@ export type SplitVariant = {
 };
 
 export const SPLITS_WOMEN: Record<number, SplitVariant[]> = {
+  2: [
+    {
+      name: "FB-FB com ênfase inferior (2x)",
+      days: [
+        { code: "A", focus: "Full Body — ênfase em inferiores (glúteo + quadríceps + posterior) + 1-2 superiores" },
+        { code: "B", focus: "Full Body — ênfase em inferiores (glúteo + posterior + quadríceps) + 1-2 superiores" },
+      ],
+      schedulingRules: ["NÃO pode em dias seguidos — exigir descanso entre eles"],
+      defaultChoice: true,
+    },
+  ],
   3: [
     {
-      name: "FB-FB-FB (Full Body 3x)",
+      name: "FB-FB-FB com ênfase inferior (3x)",
       days: [
-        { code: "A", focus: "Full Body — mobilidade específica + 5 inferiores + 2-3 superiores" },
-        { code: "B", focus: "Full Body — mobilidade específica + 5 inferiores + 2-3 superiores" },
-        { code: "C", focus: "Full Body — mobilidade específica + 5 inferiores + 2-3 superiores" },
+        { code: "A", focus: "Full Body — ênfase inferior (glúteo + quad)" },
+        { code: "B", focus: "Full Body — ênfase inferior (posterior + glúteo)" },
+        { code: "C", focus: "Full Body — ênfase inferior (glúteo médio + quad)" },
       ],
       schedulingRules: ["NÃO pode ser em dias seguidos — exigir 1 dia descanso entre treinos"],
       defaultChoice: true,
     },
     {
-      name: "Inf-Sup-Inf (3x)",
+      name: "Inf(quad)-Sup-Inf(post+glúteo) (3x)",
       days: [
-        { code: "A", focus: "Inferior" },
+        { code: "A", focus: "Inferior — ênfase QUADRÍCEPS" },
         { code: "B", focus: "Superior" },
-        { code: "C", focus: "Inferior" },
+        { code: "C", focus: "Inferior — ênfase POSTERIOR + GLÚTEO" },
       ],
       schedulingRules: ["Pode ser em dias consecutivos OU distintos"],
     },
@@ -103,6 +114,18 @@ export const SPLITS_WOMEN: Record<number, SplitVariant[]> = {
   ],
   5: [
     {
+      name: "Inf-Sup-Inf-Sup-Inf (5x — alternado)",
+      days: [
+        { code: "A", focus: "Inferior" },
+        { code: "B", focus: "Superior" },
+        { code: "C", focus: "Inferior" },
+        { code: "D", focus: "Superior" },
+        { code: "E", focus: "Inferior" },
+      ],
+      schedulingRules: ["Pode ser corrido ou intercalando 1 OFF"],
+      defaultChoice: true,
+    },
+    {
       name: "Inf-Sup-Inf-OFF-Inf-Sup (5x com folga no meio)",
       days: [
         { code: "A", focus: "Inferior" },
@@ -112,32 +135,20 @@ export const SPLITS_WOMEN: Record<number, SplitVariant[]> = {
         { code: "E", focus: "Superior" },
       ],
       schedulingRules: ["Inserir 1 dia OFF obrigatório entre C e D"],
-      defaultChoice: true,
-    },
-    {
-      name: "Inf-Sup-Inf-Sup-Inf (5x corrido)",
-      days: [
-        { code: "A", focus: "Inferior" },
-        { code: "B", focus: "Superior" },
-        { code: "C", focus: "Inferior" },
-        { code: "D", focus: "Superior" },
-        { code: "E", focus: "Inferior" },
-      ],
-      schedulingRules: ["Pode ser corrido"],
     },
   ],
   6: [
     {
-      name: "5x + 1 complemento",
+      name: "Inf-Sup-Inf-Sup-Inf-Sup (6x — alternado)",
       days: [
         { code: "A", focus: "Inferior" },
         { code: "B", focus: "Superior" },
         { code: "C", focus: "Inferior" },
         { code: "D", focus: "Superior" },
         { code: "E", focus: "Inferior" },
-        { code: "F", focus: "Cardio + abdômen + complemento (treinar mais que 5x para hipertrofia é desnecessário)" },
+        { code: "F", focus: "Superior" },
       ],
-      schedulingRules: ["Após 5 dias de treino real, F é só cardio/abs/complemento"],
+      schedulingRules: ["Volume alto — só se a recuperação acompanhar; manter ênfase em glúteo/posterior"],
       defaultChoice: true,
     },
   ],
