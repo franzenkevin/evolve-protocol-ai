@@ -27,7 +27,7 @@ export const SectionGoals = () => (
     <div className="text-center mb-12">
       <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">Pra qualquer objetivo</p>
       <h2 className="text-3xl md:text-5xl font-heading font-bold text-foreground leading-tight">
-        Um protocolo. <span className="text-gradient">Três caminhos.</span>
+        Protocolo completo.
       </h2>
       <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
         Você diz onde quer chegar. A metodologia monta o caminho mais curto.
