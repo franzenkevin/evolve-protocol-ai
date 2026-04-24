@@ -40,14 +40,16 @@ const SectionReferrals = () => {
       <Card className="p-3 card-gradient border-border space-y-3">
         <div className="flex items-start gap-2">
           <Sparkles size={16} className="text-primary mt-0.5 shrink-0" />
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            Compartilhe seu cupom:<br />
-            o amigo ganha <span className="text-primary font-semibold">10% na primeira assinatura</span><br />
-            você ganha <span className="text-primary font-semibold">10% de cashback</span>.
-            <span className="block mt-1 text-[10px] opacity-80">
+          <div className="space-y-1">
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              Compartilhe seu cupom:<br />
+              o amigo ganha <span className="text-primary font-semibold">10% na primeira assinatura</span><br />
+              você ganha <span className="text-primary font-semibold">10% de cashback</span>.
+            </p>
+            <p className="text-[10px] text-muted-foreground/80 leading-relaxed">
               💡 Cashback fica <span className="text-warning font-medium">pendente por 14 dias</span> após o pagamento e depois é liberado automaticamente.
-            </span>
-          </p>
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
