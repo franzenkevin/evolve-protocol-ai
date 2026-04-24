@@ -12,9 +12,14 @@ export type ConfirmationAnswer = {
   justification: string;
 };
 
+export type SplitConfirmation = ConfirmationAnswer & {
+  /** Nome da variante de split escolhida pelo aluno (override do default). */
+  chosenVariant?: string;
+};
+
 export type ProtocolConfirmations = {
   bodyEmphasis: { wants: "yes" | "no" | ""; description: string };
-  split: ConfirmationAnswer;
+  split: SplitConfirmation;
   cardio: ConfirmationAnswer;
   mealTimes: ConfirmationAnswer;
 };
@@ -35,16 +40,19 @@ interface Props {
 
 const DEFAULT_VALUE: ProtocolConfirmations = {
   bodyEmphasis: { wants: "", description: "" },
-  split: { agree: "", justification: "" },
+  split: { agree: "", justification: "", chosenVariant: undefined },
   cardio: { agree: "", justification: "" },
   mealTimes: { agree: "", justification: "" },
 };
 
-function getDefaultSplit(sex: string, days: number) {
+function getSplitVariants(sex: string, days: number) {
   const table = sex === "F" ? SPLITS_WOMEN : SPLITS_MEN;
-  const variants = table[days] || table[4] || table[3];
-  const variant = variants?.find((v) => v.defaultChoice) || variants?.[0];
-  return variant;
+  return table[days] || table[4] || table[3] || [];
+}
+
+function getDefaultSplit(sex: string, days: number) {
+  const variants = getSplitVariants(sex, days);
+  return variants.find((v) => v.defaultChoice) || variants[0];
 }
 
 function suggestMealTimes(count: number, trainingTime?: string): string {
