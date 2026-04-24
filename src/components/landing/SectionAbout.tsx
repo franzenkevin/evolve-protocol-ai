@@ -1,11 +1,5 @@
-import coach from "@/assets/coach-kevin.jpg";
 import { CheckCircle2 } from "lucide-react";
-
-const POINTS = [
-  "Anos formando atletas naturais e amadores em busca de evolução real",
-  "Metodologia construída na prática e validada por base científica atual",
-  "IA usada como ferramenta — quem dita as regras do protocolo é o profissional",
-];
+import { ABOUT_CONTENT } from "@/content/landing";
 
 export const SectionAbout = () => (
   <section className="py-20 border-t border-border">
@@ -16,8 +10,8 @@ export const SectionAbout = () => (
           style={{ background: "var(--gradient-glow)" }}
         />
         <img
-          src={coach}
-          alt="Kevin Franzen, treinador responsável pela metodologia"
+          src={ABOUT_CONTENT.photo}
+          alt={`${ABOUT_CONTENT.firstName} ${ABOUT_CONTENT.lastName}, treinador responsável pela metodologia`}
           loading="lazy"
           width={1024}
           height={1024}
@@ -26,25 +20,28 @@ export const SectionAbout = () => (
       </div>
 
       <div>
-        <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">Quem está por trás</p>
+        <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">
+          {ABOUT_CONTENT.eyebrow}
+        </p>
         <h2 className="text-3xl md:text-5xl font-heading font-bold text-foreground leading-tight mb-4">
-          Kevin <span className="text-gradient">Franzen</span>
+          {ABOUT_CONTENT.firstName}{" "}
+          <span className="text-gradient">{ABOUT_CONTENT.lastName}</span>
         </h2>
-        <p className="text-base text-muted-foreground leading-relaxed mb-6">
-          Sou treinador apaixonado por transformação real. Passei anos vendo gente boa desperdiçar tempo
-          com plano genérico, dieta restritiva e promessa milagrosa. Construí esse app pra entregar o que
-          eu daria pro meu aluno presencial — só que escalado, 24h, no seu bolso.
-        </p>
-        <p className="text-base text-muted-foreground leading-relaxed mb-6">
-          A metodologia une o que funciona na sala de musculação com o que a ciência confirma no laboratório.
-          A IA acelera o cálculo. Mas a regra final é sempre minha.
-        </p>
+
+        {ABOUT_CONTENT.paragraphs.map((p, i) => (
+          <p
+            key={i}
+            className="text-base text-muted-foreground leading-relaxed mb-6 last:mb-6"
+          >
+            {p}
+          </p>
+        ))}
 
         <ul className="space-y-3">
-          {POINTS.map((p) => (
-            <li key={p} className="flex items-start gap-3">
+          {ABOUT_CONTENT.bullets.map((b) => (
+            <li key={b} className="flex items-start gap-3">
               <CheckCircle2 size={18} className="text-primary shrink-0 mt-1" />
-              <span className="text-sm text-foreground">{p}</span>
+              <span className="text-sm text-foreground">{b}</span>
             </li>
           ))}
         </ul>
