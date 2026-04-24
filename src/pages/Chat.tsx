@@ -126,7 +126,7 @@ const Chat = () => {
                   <span className="text-foreground font-medium">desafios</span> durante sua jornada.
                 </p>
                 <p className="text-[11px] text-muted-foreground/80 mt-2 max-w-xs mx-auto">
-                  Sou instruída e municiada com muita informação para te guiar. 💪
+                  Sou instruída com muita informação para te guiar.
                 </p>
               </div>
             )}
