@@ -757,6 +757,47 @@ const Onboarding = () => {
               </div>
 
               <div>
+                <Label>Horários reais das suas refeições *</Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  Liste o HORÁRIO de cada refeição que você realmente consegue fazer. A IA vai usar esses horários no seu plano (não vai inventar).
+                </p>
+                <Textarea
+                  value={data.mealSchedule}
+                  onChange={(e) => update("mealSchedule", e.target.value)}
+                  placeholder="Ex: Café 09:30, Almoço 13:00, Lanche 16:30, Jantar 21:00"
+                  className="mt-1"
+                  maxLength={300}
+                />
+              </div>
+
+              <div>
+                <Label>Você faz jejum intermitente? *</Label>
+                <RadioGroup
+                  value={data.intermittentFasting}
+                  onValueChange={(v) => update("intermittentFasting", v)}
+                  className="flex gap-4 mt-2"
+                >
+                  <div className="flex items-center gap-1"><RadioGroupItem value="yes" id="if-yes" /><Label htmlFor="if-yes">Sim</Label></div>
+                  <div className="flex items-center gap-1"><RadioGroupItem value="no" id="if-no" /><Label htmlFor="if-no">Não</Label></div>
+                </RadioGroup>
+                {data.intermittentFasting === "yes" && (
+                  <div className="mt-3">
+                    <Label>Sua janela alimentar *</Label>
+                    <Input
+                      value={data.fastingWindow}
+                      onChange={(e) => update("fastingWindow", e.target.value)}
+                      placeholder="Ex: 12h–20h (jejum 16/8)"
+                      className="mt-1"
+                      maxLength={60}
+                    />
+                    <p className="text-[11px] text-muted-foreground mt-1">
+                      A IA vai concentrar TODAS as refeições dentro dessa janela.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div>
                 <Label>Alimentos que você gosta (marque ao menos 5) *</Label>
                 {FOOD_CATEGORIES.map((cat) => (
                   <div key={cat.label} className="mt-3">
@@ -879,6 +920,10 @@ const Onboarding = () => {
                 <RadioGroup value={data.neat} onValueChange={(v) => update("neat", v)} className="mt-2 space-y-2">
                   {NEAT_OPTIONS.map((n) => radioOption(n, `neat-${n}`, n))}
                 </RadioGroup>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Hora que acorda *</Label><Input type="time" value={data.wakeTime} onChange={(e) => update("wakeTime", e.target.value)} className="mt-1" /></div>
+                <div><Label>Hora que dorme *</Label><Input type="time" value={data.sleepTime} onChange={(e) => update("sleepTime", e.target.value)} className="mt-1" /></div>
               </div>
               <div><Label>Horas de sono por noite *</Label><Input type="number" value={data.sleepHours} onChange={(e) => update("sleepHours", e.target.value)} placeholder="7" className="mt-1" /></div>
               <div>
