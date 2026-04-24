@@ -40,7 +40,7 @@ export const FEATURES_CONTENT: FeatureContent[] = [
   {
     eyebrow: "Treino sob medida",
     title: "Cada série calculada pra te levar adiante",
-    desc: "Divisão, exercícios, séries, reps, descanso e progressão definidos pela metodologia. Seu treino evolui semana a semana — sem chute, sem cópia.",
+    desc: "Divisão, exercícios, séries, reps, descanso e progressão definidos pela metodologia. Seu treino evolui semana a semana.",
     image: mockTraining,
   },
   {
@@ -59,7 +59,7 @@ export const FEATURES_CONTENT: FeatureContent[] = [
   {
     eyebrow: "Progresso medido",
     title: "Você vê o resultado antes do espelho mostrar",
-    desc: "Peso, gordura, treinos completados, ranking semanal. Tudo num só lugar — pra manter o foco quando a motivação some.",
+    desc: "Peso, gordura, treinos completados, ranking semanal. Tudo num só lugar, para manter o foco quando a motivação some.",
     image: mockProgress,
     reverse: true,
   },
@@ -116,14 +116,14 @@ export const ABOUT_CONTENT = {
   photo: coachKevin,
   // Cada string é um parágrafo — adicione/remova quantos quiser
   paragraphs: [
-    "Sou treinador apaixonado por transformação real. Passei anos vendo gente boa desperdiçar tempo com plano genérico, dieta restritiva e promessa milagrosa. Construí esse app pra entregar o que eu daria pro meu aluno presencial — só que escalado, 24h, no seu bolso.",
+    "Sou treinador e atleta apaixonado por transformação real. Passei anos vendo gente boa desperdiçar tempo com plano genérico, dieta restritiva e promessa milagrosa.\n \nConstruí esse app pra entregar o melhor do meu conhecimento, assim como fazemos na minha consultoria individual — só que escalado, acessível, 24h e no seu bolso.",
     "A metodologia une o que funciona na sala de musculação com o que a ciência confirma no laboratório. A IA acelera o cálculo. Mas a regra final é sempre minha.",
   ],
   // Pontos fortes (lista com check verde)
   bullets: [
-    "Anos formando atletas naturais e amadores em busca de evolução real",
+    "Anos formando atletas e amadores em busca de evolução real",
     "Metodologia construída na prática e validada por base científica atual",
-    "IA usada como ferramenta — quem dita as regras do protocolo é o profissional",
+    "IA usada como ferramenta, quem dita as regras do protocolo é o profissional",
   ],
 };
 

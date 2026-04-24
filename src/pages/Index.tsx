@@ -72,7 +72,7 @@ const Index = () => {
     }
   }, [user, authLoading, profile, profileLoading, subscription, subLoading, isAdmin, adminLoading, navigate]);
 
-  const ctaPrimary = user ? "Continuar protocolo" : "Começar agora — é grátis";
+  const ctaPrimary = user ? "Continuar protocolo" : "Começar agora";
   const ctaPrimaryTo = user ? "/welcome" : "/signup";
 
   return (
@@ -99,16 +99,15 @@ const Index = () => {
             <img src={logo} alt="Hypertrophy" className="w-16 h-16 mb-6" />
           </div>
           <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-primary mb-5 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5">
-            <Sparkles size={12} /> Consultoria fitness com IA
+            <Sparkles size={12} /> CONSULTORIA FITNESS COM IA INTELIGENTE
           </p>
-          <h1 className="text-5xl md:text-7xl font-heading font-bold text-foreground mb-5 leading-[1.05] tracking-tight">
-            O corpo que você quer <br className="hidden md:block" />
-            <span className="text-gradient">não nasce no chute.</span>
+          <h1 className="md:text-7xl font-heading font-bold text-foreground mb-5 leading-[1.05] tracking-tight text-2xl">
+            Uma revolução contra o mercado genérico <br className="hidden md:block" />
+            <span className="text-gradient">das consultorias online.</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl md:max-w-2xl">
-            Pare de copiar treino do YouTube e dieta do amigo. Receba um protocolo de treino e
-            alimentação <strong className="text-foreground">100% personalizado</strong> pro seu objetivo,
-            corpo e rotina — calculado pela metodologia, ajustado a cada 60 dias.
+            Aqui você vai receber um protocolo de treino e alimentação <strong className="text-foreground">100% personalizado</strong> pro seu corpo,
+            calculado pela metodologia ensinada a IA, e ajustado a cada 60 dias.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
             <Link to={ctaPrimaryTo}>
@@ -126,16 +125,16 @@ const Index = () => {
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 mt-6 justify-center md:justify-start text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Quiz gratuito
+              <CheckCircle2 size={14} className="text-primary" /> Quiz de formulário completo par todas suas informações
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Avaliação por IA inclusa
+              <CheckCircle2 size={14} className="text-primary" /> Avaliação postural completa por IA treinada
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Cancele quando quiser
+              <CheckCircle2 size={14} className="text-primary" /> Não é só uma IA é um software completo
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Teste 7 dias grátis
+              <CheckCircle2 size={14} className="text-primary" /> Teste por 7 dias garantidos
             </span>
           </div>
         </div>
@@ -189,7 +188,8 @@ const Index = () => {
             </Button>
           </Link>
           <p className="text-xs text-muted-foreground mt-5">
-            ✓ Tempo estimado: 5 a 8 minutos · ✓ Pague só ao liberar o protocolo
+            ✓ Tempo estimado: 5 a 8 minutos <br />
+            ✓ Pague só ao liberar o protocolo
           </p>
         </div>
       </section>
