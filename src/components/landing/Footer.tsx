@@ -7,7 +7,7 @@ export const Footer = () => (
       <div className="col-span-2 md:col-span-1">
         <img src={logo} alt="Hypertrophy" className="w-12 h-12 mb-3" />
         <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Hypertrophy. <br />
+          © 2026 Hypertrophy. <br />
           Inteligência artificial fitness inteligente.
         </p>
       </div>
