@@ -614,6 +614,10 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
 - Dias de treino: ${profile.training_days}x/semana
 - Dias da semana: ${(profile.training_weekdays || []).join(", ")}
 - Horário do treino: ${profile.training_time}
+- Hora que acorda: ${profile.wake_time || "não informado"}
+- Hora que dorme: ${profile.sleep_time || "não informado"}
+- Faz jejum intermitente: ${profile.intermittent_fasting ? `SIM — janela alimentar: ${profile.fasting_window || "não especificada"}` : "NÃO"}
+- HORÁRIOS REAIS DAS REFEIÇÕES (USAR EXATAMENTE ESTES no campo "time" de cada meal): ${profile.meal_schedule || "não informado — usar horários padrão"}
 - Número de refeições: ${profile.meal_count}
 - Alimentos preferidos (USAR EXCLUSIVAMENTE ESTES): ${(profile.preferred_foods || []).join(", ")}
 - Da lista acima, alimentos que o aluno NÃO come (EXCLUIR mesmo se marcados como preferidos): ${profile.disliked_from_list || "Nenhum"}
