@@ -6,50 +6,39 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import heroBg from "@/assets/hero-bg.jpg";
+import heroAthlete from "@/assets/hero-athlete.jpg";
 import logo from "@/assets/logo.png";
 import {
   ArrowRight,
-  Dumbbell,
-  UtensilsCrossed,
-  TrendingUp,
-  Brain,
-  ShieldCheck,
-  Camera,
-  ClipboardList,
   Sparkles,
+  ClipboardList,
+  Camera,
+  Rocket,
   CheckCircle2,
 } from "lucide-react";
+import { SectionGoals } from "@/components/landing/SectionGoals";
+import { SectionFeatures } from "@/components/landing/SectionFeatures";
+import { SectionResults } from "@/components/landing/SectionResults";
+import { SectionAbout } from "@/components/landing/SectionAbout";
+import { SectionFAQ } from "@/components/landing/SectionFAQ";
+import { Footer } from "@/components/landing/Footer";
 
 const HOW_IT_WORKS = [
   {
     icon: ClipboardList,
-    title: "Responda o quiz",
-    desc: "5 a 8 minutos. Conta seus objetivos, rotina e preferências.",
+    title: "1. Responda o quiz",
+    desc: "5 a 8 minutos. Conta seu objetivo, rotina, equipamento e o que você gosta de comer.",
   },
   {
     icon: Camera,
-    title: "Avaliação por foto com IA",
-    desc: "Análise de composição corporal, postura e pontos a desenvolver.",
+    title: "2. Avaliação por foto IA",
+    desc: "4 fotos analisadas em segundos: composição corporal, postura e prioridades.",
   },
   {
-    icon: Sparkles,
-    title: "Receba seu protocolo",
-    desc: "Treino e dieta personalizados, prontos para os próximos 60 dias.",
+    icon: Rocket,
+    title: "3. Receba seu protocolo",
+    desc: "Treino e dieta calculados pra seu objetivo, prontos pra começar hoje.",
   },
-];
-
-const FEATURES = [
-  { icon: Dumbbell, title: "Treino sob medida", desc: "Divisão, exercícios e progressão calculados pela metodologia." },
-  { icon: UtensilsCrossed, title: "Dieta inteligente", desc: "Macros e refeições com os alimentos que você gosta." },
-  { icon: Brain, title: "Coach IA 24/7", desc: "Tira dúvidas e ajusta no detalhe quando você precisar." },
-  { icon: TrendingUp, title: "Revisão a cada 60 dias", desc: "Seu protocolo evolui junto com seu progresso." },
-];
-
-const PROOF = [
-  { label: "Metodologia validada", desc: "Base científica + treinador profissional" },
-  { label: "IA + supervisão humana", desc: "Regras do profissional sempre acima da IA" },
-  { label: "Sem mensalidade no quiz", desc: "Pague só quando liberar seu protocolo" },
 ];
 
 const Index = () => {
@@ -59,7 +48,6 @@ const Index = () => {
   const { data: subscription, isLoading: subLoading } = useSubscription();
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
 
-  // Auto-redirect logged-in users to where they belong
   useEffect(() => {
     if (authLoading || !user) return;
     if (adminLoading || profileLoading || subLoading) return;
@@ -84,34 +72,45 @@ const Index = () => {
     }
   }, [user, authLoading, profile, profileLoading, subscription, subLoading, isAdmin, adminLoading, navigate]);
 
-  const ctaPrimary = user ? "Continuar" : "Iniciar protocolo completo";
+  const ctaPrimary = user ? "Continuar protocolo" : "Começar agora — é grátis";
   const ctaPrimaryTo = user ? "/welcome" : "/signup";
 
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
-      <section className="relative min-h-[88vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[100vh] flex items-center overflow-hidden">
         <img
-          src={heroBg}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover opacity-25"
+          src={heroAthlete}
+          alt="Atleta treinando em academia"
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
           width={1920}
           height={1080}
+          fetchPriority="high"
         />
-        <div className="absolute inset-0" style={{ background: "var(--gradient-glow)" }} />
-        <div className="relative z-10 text-center px-4 animate-fade-in max-w-2xl">
-          <img src={logo} alt="Hypertrophy" className="w-20 h-20 mx-auto mb-5" />
-          <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-primary mb-4 px-3 py-1 rounded-full border border-primary/30 bg-primary/5">
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, hsl(var(--background) / 0.7) 0%, hsl(var(--background) / 0.85) 60%, hsl(var(--background)) 100%)",
+          }}
+        />
+        <div className="relative z-10 max-w-3xl mx-auto px-4 py-24 text-center md:text-left animate-fade-in">
+          <div className="flex md:justify-start justify-center">
+            <img src={logo} alt="Hypertrophy" className="w-16 h-16 mb-6" />
+          </div>
+          <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-primary mb-5 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5">
             <Sparkles size={12} /> Consultoria fitness com IA
           </p>
-          <h1 className="text-4xl md:text-6xl font-heading font-bold text-foreground mb-4 leading-tight">
-            Seu protocolo de hipertrofia <span className="text-gradient">personalizado</span> em 8 minutos
+          <h1 className="text-5xl md:text-7xl font-heading font-bold text-foreground mb-5 leading-[1.05] tracking-tight">
+            O corpo que você quer <br className="hidden md:block" />
+            <span className="text-gradient">não nasce no chute.</span>
           </h1>
-          <p className="text-base md:text-lg text-muted-foreground mb-8 max-w-lg mx-auto">
-            Treino e dieta calculados pela sua metodologia, ajustados a cada 60 dias. Sem coach genérico, sem PDF
-            estático.
+          <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl md:max-w-2xl">
+            Pare de copiar treino do YouTube e dieta do amigo. Receba um protocolo de treino e
+            alimentação <strong className="text-foreground">100% personalizado</strong> pro seu objetivo,
+            corpo e rotina — calculado pela metodologia, ajustado a cada 60 dias.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
             <Link to={ctaPrimaryTo}>
               <Button size="lg" className="glow gap-2 h-14 px-8 text-base w-full sm:w-auto">
                 {ctaPrimary} <ArrowRight size={18} />
@@ -125,87 +124,74 @@ const Index = () => {
               </Link>
             )}
           </div>
-          <p className="text-xs text-muted-foreground mt-4">
-            ✓ Sem cobrança no quiz · ✓ Pague só ao liberar o protocolo
-          </p>
+          <div className="flex flex-wrap gap-x-5 gap-y-2 mt-6 justify-center md:justify-start text-xs text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 size={14} className="text-primary" /> Quiz gratuito
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 size={14} className="text-primary" /> Avaliação por IA inclusa
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 size={14} className="text-primary" /> Cancele quando quiser
+            </span>
+          </div>
         </div>
       </section>
 
       {/* Como funciona */}
-      <section className="max-w-4xl mx-auto px-4 py-16">
-        <div className="text-center mb-10">
+      <section className="max-w-5xl mx-auto px-4 py-20 border-t border-border">
+        <div className="text-center mb-12">
           <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">Como funciona</p>
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground">
-            3 passos até seu protocolo
+          <h2 className="text-3xl md:text-5xl font-heading font-bold text-foreground leading-tight">
+            Do quiz ao protocolo <br />
+            <span className="text-gradient">em menos de 10 minutos.</span>
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {HOW_IT_WORKS.map(({ icon: Icon, title, desc }, i) => (
-            <Card key={title} className="p-6 card-gradient border-border relative">
-              <span className="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold flex items-center justify-center text-sm">
-                {i + 1}
-              </span>
-              <Icon size={26} className="text-primary mb-3" />
-              <h3 className="font-heading font-semibold text-foreground mb-1">{title}</h3>
-              <p className="text-sm text-muted-foreground">{desc}</p>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* O que você recebe */}
-      <section className="max-w-4xl mx-auto px-4 py-16 border-t border-border">
-        <div className="text-center mb-10">
-          <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">O que você recebe</p>
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground">
-            Tudo que precisa, no mesmo lugar
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {FEATURES.map(({ icon: Icon, title, desc }) => (
+          {HOW_IT_WORKS.map(({ icon: Icon, title, desc }) => (
             <Card key={title} className="p-6 card-gradient border-border">
-              <Icon size={28} className="text-primary mb-3" />
-              <h3 className="font-heading font-semibold text-foreground mb-1">{title}</h3>
-              <p className="text-sm text-muted-foreground">{desc}</p>
+              <Icon size={28} className="text-primary mb-4" />
+              <h3 className="font-heading font-bold text-lg text-foreground mb-2">{title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
             </Card>
           ))}
         </div>
       </section>
 
-      {/* Prova social leve */}
-      <section className="max-w-4xl mx-auto px-4 py-12 border-t border-border">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {PROOF.map((p) => (
-            <div
-              key={p.label}
-              className="flex items-start gap-3 p-4 rounded-lg border border-primary/20 bg-primary/5"
-            >
-              <ShieldCheck size={20} className="text-primary shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-semibold text-foreground">{p.label}</p>
-                <p className="text-xs text-muted-foreground">{p.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <SectionGoals />
+      <SectionFeatures />
+      <SectionResults />
+      <SectionAbout />
+      <SectionFAQ />
 
       {/* CTA final */}
-      <section className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <CheckCircle2 size={36} className="text-primary mx-auto mb-4" />
-        <h2 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-3">
-          Pronto pra começar?
-        </h2>
-        <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-          Crie sua conta, responda o quiz e veja seu protocolo. Você só paga quando decidir liberar.
-        </p>
-        <Link to={ctaPrimaryTo}>
-          <Button size="lg" className="glow gap-2 h-14 px-8 text-base">
-            {ctaPrimary} <ArrowRight size={18} />
-          </Button>
-        </Link>
-        <p className="text-xs text-muted-foreground mt-4">Tempo estimado: 5 a 8 minutos</p>
+      <section className="relative py-24 border-t border-border overflow-hidden">
+        <div
+          className="absolute inset-0 -z-10 opacity-30"
+          style={{ background: "var(--gradient-glow)" }}
+        />
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <Sparkles size={32} className="text-primary mx-auto mb-4" />
+          <h2 className="text-4xl md:text-6xl font-heading font-bold text-foreground mb-5 leading-tight">
+            Seu próximo eu <br />
+            <span className="text-gradient">já te espera.</span>
+          </h2>
+          <p className="text-lg text-muted-foreground mb-8 max-w-lg mx-auto">
+            Pare de adiar. Faça o quiz, veja seu protocolo e decida se vale a pena. Você não paga
+            nada pra descobrir.
+          </p>
+          <Link to={ctaPrimaryTo}>
+            <Button size="lg" className="glow gap-2 h-14 px-10 text-base">
+              {ctaPrimary} <ArrowRight size={18} />
+            </Button>
+          </Link>
+          <p className="text-xs text-muted-foreground mt-5">
+            ✓ Tempo estimado: 5 a 8 minutos · ✓ Pague só ao liberar o protocolo
+          </p>
+        </div>
       </section>
+
+      <Footer />
     </div>
   );
 };
