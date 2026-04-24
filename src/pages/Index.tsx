@@ -99,16 +99,15 @@ const Index = () => {
             <img src={logo} alt="Hypertrophy" className="w-16 h-16 mb-6" />
           </div>
           <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-primary mb-5 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5">
-            <Sparkles size={12} /> Consultoria fitness com IA
+            <Sparkles size={12} /> CONSULTORIA FITNESS COM IA INTELIGENTE
           </p>
-          <h1 className="text-5xl md:text-7xl font-heading font-bold text-foreground mb-5 leading-[1.05] tracking-tight">
-            O corpo que você quer <br className="hidden md:block" />
-            <span className="text-gradient">não nasce no chute.</span>
+          <h1 className="md:text-7xl font-heading font-bold text-foreground mb-5 leading-[1.05] tracking-tight text-2xl">
+            Uma revolução contra o mercado genérico <br className="hidden md:block" />
+            <span className="text-gradient">das consultorias online.</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl md:max-w-2xl">
-            Pare de copiar treino do YouTube e dieta do amigo. Receba um protocolo de treino e
-            alimentação <strong className="text-foreground">100% personalizado</strong> pro seu objetivo,
-            corpo e rotina — calculado pela metodologia, ajustado a cada 60 dias.
+            Aqui você vai receber um protocolo de treino e alimentação <strong className="text-foreground">100% personalizado</strong> pro seu corpo,
+            calculado pela metodologia ensinada a IA, e ajustado a cada 60 dias.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
             <Link to={ctaPrimaryTo}>
