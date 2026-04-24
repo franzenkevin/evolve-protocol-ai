@@ -125,16 +125,16 @@ const Index = () => {
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 mt-6 justify-center md:justify-start text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Quiz gratuito
+              <CheckCircle2 size={14} className="text-primary" /> Quiz de formulário completo par todas suas informações
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Avaliação por IA inclusa
+              <CheckCircle2 size={14} className="text-primary" /> Avaliação postural completa por IA treinada
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Cancele quando quiser
+              <CheckCircle2 size={14} className="text-primary" /> Não é só uma IA é um software completo
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Teste 7 dias grátis
+              <CheckCircle2 size={14} className="text-primary" /> Teste por 7 dias garantidos
             </span>
           </div>
         </div>
