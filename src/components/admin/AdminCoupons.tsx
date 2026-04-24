@@ -124,6 +124,23 @@ const AdminCoupons = () => {
               </p>
             </div>
             <Switch checked={c.active} onCheckedChange={() => handleToggle(c)} />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              title="Sincronizar com Paddle"
+              onClick={async () => {
+                try {
+                  await resyncCoupon.mutateAsync(c);
+                  toast({ title: "Cupom sincronizado com Paddle" });
+                } catch (e: any) {
+                  toast({ title: "Erro ao sincronizar", description: e.message, variant: "destructive" });
+                }
+              }}
+              disabled={resyncCoupon.isPending}
+            >
+              <RefreshCw size={13} className={resyncCoupon.isPending ? "animate-spin" : ""} />
+            </Button>
             <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleting(c)}><Trash2 size={13} /></Button>
           </Card>
         );
