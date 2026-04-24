@@ -4,13 +4,20 @@ import AppLayout from "@/components/AppLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Camera, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Camera, Loader2, Save, Clock, Sparkles, Lock } from "lucide-react";
 import { toast } from "sonner";
+import {
+  useProtocolRegenStatus,
+  useConsumeRegenCredit,
+} from "@/hooks/useProtocolRegeneration";
 
 const EditProfile = () => {
   const { user } = useAuth();
@@ -19,6 +26,10 @@ const EditProfile = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { data: regenStatus } = useProtocolRegenStatus();
+  const consume = useConsumeRegenCredit();
+  const qc = useQueryClient();
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -26,10 +37,24 @@ const EditProfile = () => {
   const [savingEmail, setSavingEmail] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
 
+  // Schedule fields
+  const [wakeTime, setWakeTime] = useState("");
+  const [sleepTime, setSleepTime] = useState("");
+  const [intermittentFasting, setIntermittentFasting] = useState(false);
+  const [fastingWindow, setFastingWindow] = useState("");
+  const [mealSchedule, setMealSchedule] = useState("");
+  const [savingSchedule, setSavingSchedule] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
+
   useEffect(() => {
     if (profile) {
       setFullName(profile.full_name || "");
       setAvatarUrl(profile.avatar_url || "");
+      setWakeTime(profile.wake_time || "");
+      setSleepTime(profile.sleep_time || "");
+      setIntermittentFasting(!!profile.intermittent_fasting);
+      setFastingWindow(profile.fasting_window || "");
+      setMealSchedule(profile.meal_schedule || "");
     }
     if (user?.email) setEmail(user.email);
   }, [profile, user]);
@@ -95,6 +120,80 @@ const EditProfile = () => {
       toast.error(err.message || "Erro ao atualizar e-mail");
     } finally {
       setSavingEmail(false);
+    }
+  };
+
+  const handleSaveSchedule = async () => {
+    setSavingSchedule(true);
+    try {
+      await updateProfile.mutateAsync({
+        wake_time: wakeTime || null,
+        sleep_time: sleepTime || null,
+        intermittent_fasting: intermittentFasting,
+        fasting_window: intermittentFasting ? (fastingWindow.trim() || null) : null,
+        meal_schedule: mealSchedule.trim() || null,
+      });
+      toast.success("Horários atualizados!");
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao salvar horários");
+    } finally {
+      setSavingSchedule(false);
+    }
+  };
+
+  const handleRegenerate = async () => {
+    if (!profile) return toast.error("Perfil não carregado.");
+    if (!regenStatus?.availableCredit) {
+      navigate("/new-protocol");
+      return;
+    }
+    setRegenerating(true);
+    try {
+      // Save schedule first to ensure latest values are used
+      await updateProfile.mutateAsync({
+        wake_time: wakeTime || null,
+        sleep_time: sleepTime || null,
+        intermittent_fasting: intermittentFasting,
+        fasting_window: intermittentFasting ? (fastingWindow.trim() || null) : null,
+        meal_schedule: mealSchedule.trim() || null,
+      });
+
+      const { data: assessment } = await supabase
+        .from("body_assessments")
+        .select("*")
+        .eq("user_id", profile.user_id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const freshProfile = {
+        ...profile,
+        wake_time: wakeTime || null,
+        sleep_time: sleepTime || null,
+        intermittent_fasting: intermittentFasting,
+        fasting_window: intermittentFasting ? (fastingWindow.trim() || null) : null,
+        meal_schedule: mealSchedule.trim() || null,
+      };
+
+      const { error } = await supabase.functions.invoke("generate-protocol", {
+        body: {
+          profile: freshProfile,
+          bodyAssessment: assessment ?? undefined,
+          bodyEmphasis: profile.body_emphasis ?? undefined,
+          force_regenerate: true,
+          reanalysisFeedback: { progressNotes: "Atualização de horários e rotina" },
+        },
+      });
+      if (error) throw error;
+
+      await consume.mutateAsync(regenStatus.availableCredit.id);
+      qc.invalidateQueries({ queryKey: ["protocol"] });
+      toast.success("Protocolo regerado com seus novos horários!");
+      navigate("/training");
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao regerar protocolo");
+    } finally {
+      setRegenerating(false);
     }
   };
 
@@ -201,6 +300,113 @@ const EditProfile = () => {
             {savingEmail ? <Loader2 size={14} className="mr-1 animate-spin" /> : <Save size={14} className="mr-1" />}
             Atualizar e-mail
           </Button>
+        </Card>
+
+        <Card className="p-4 card-gradient border-border space-y-4">
+          <div className="flex items-center gap-2">
+            <Clock size={16} className="text-primary" />
+            <h3 className="font-heading font-semibold text-sm">Horários e rotina</h3>
+          </div>
+          <p className="text-[11px] text-muted-foreground -mt-2">
+            Atualize seus horários e regere o protocolo sem refazer o quiz inteiro.
+          </p>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="wake_time" className="text-xs">Hora que acorda</Label>
+              <Input
+                id="wake_time"
+                type="time"
+                value={wakeTime}
+                onChange={(e) => setWakeTime(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="sleep_time" className="text-xs">Hora que dorme</Label>
+              <Input
+                id="sleep_time"
+                type="time"
+                value={sleepTime}
+                onChange={(e) => setSleepTime(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="meal_schedule" className="text-xs">
+              Horários reais das refeições
+            </Label>
+            <Textarea
+              id="meal_schedule"
+              value={mealSchedule}
+              onChange={(e) => setMealSchedule(e.target.value)}
+              placeholder="Ex: Café 7h, almoço 12h, lanche 16h, jantar 20h"
+              rows={2}
+              className="resize-none text-sm"
+            />
+          </div>
+
+          <div className="flex items-center justify-between rounded-md border border-border/60 px-3 py-2">
+            <div className="space-y-0.5">
+              <Label htmlFor="if_switch" className="text-xs">Faço jejum intermitente</Label>
+              <p className="text-[10px] text-muted-foreground">
+                A IA respeitará sua janela alimentar.
+              </p>
+            </div>
+            <Switch
+              id="if_switch"
+              checked={intermittentFasting}
+              onCheckedChange={setIntermittentFasting}
+            />
+          </div>
+
+          {intermittentFasting && (
+            <div className="space-y-1.5">
+              <Label htmlFor="fasting_window" className="text-xs">Janela alimentar</Label>
+              <Input
+                id="fasting_window"
+                value={fastingWindow}
+                onChange={(e) => setFastingWindow(e.target.value)}
+                placeholder="Ex: 12h-20h"
+              />
+            </div>
+          )}
+
+          <div className="flex flex-col gap-2 pt-1">
+            <Button
+              onClick={handleSaveSchedule}
+              disabled={savingSchedule}
+              size="sm"
+              variant="outline"
+              className="w-full"
+            >
+              {savingSchedule ? <Loader2 size={14} className="mr-1 animate-spin" /> : <Save size={14} className="mr-1" />}
+              Salvar horários
+            </Button>
+
+            <Button
+              onClick={handleRegenerate}
+              disabled={regenerating}
+              size="sm"
+              className="w-full"
+            >
+              {regenerating ? (
+                <Loader2 size={14} className="mr-1 animate-spin" />
+              ) : regenStatus?.availableCredit ? (
+                <Sparkles size={14} className="mr-1" />
+              ) : (
+                <Lock size={14} className="mr-1" />
+              )}
+              {regenStatus?.availableCredit
+                ? "Salvar e regerar protocolo"
+                : "Regerar protocolo (requer crédito)"}
+            </Button>
+            {!regenStatus?.availableCredit && (
+              <p className="text-[10px] text-muted-foreground text-center">
+                Sem crédito disponível. Toque para adquirir um novo protocolo.
+              </p>
+            )}
+          </div>
         </Card>
       </div>
     </AppLayout>
