@@ -10,6 +10,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useProfile } from "@/hooks/useProfile";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import AssessmentTeaserCard from "@/components/AssessmentTeaserCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
