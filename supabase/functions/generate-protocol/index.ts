@@ -42,7 +42,26 @@ serve(async (req) => {
       bodyEmphasis: bodyEmphasisInput,
       confirmations,
       reanalysisFeedback,
+      previousProtocol: previousProtocolInput,
     } = body || {};
+
+    // Carrega último protocolo do aluno (para periodização ondulatória)
+    // se o caller não forneceu explicitamente.
+    let previousProtocol: any = previousProtocolInput || null;
+    if (!previousProtocol && user) {
+      try {
+        const { data: prev } = await supabase
+          .from("protocols")
+          .select("training, diet, version, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (prev) previousProtocol = prev;
+      } catch (e) {
+        console.warn("Could not load previous protocol:", e);
+      }
+    }
 
     if (!profile) {
       return new Response(JSON.stringify({ error: "Profile is required" }), {
