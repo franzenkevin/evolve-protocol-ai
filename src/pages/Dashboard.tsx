@@ -104,6 +104,7 @@ const Dashboard = () => {
 
   return (
     <AppLayout>
+      <AppTour open={tour.open} onClose={tour.close} />
       <div className="p-4 max-w-lg mx-auto space-y-4 animate-fade-in pb-24">
         <div className="flex items-center justify-between pt-2">
           <div>
