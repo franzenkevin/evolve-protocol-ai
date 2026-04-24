@@ -179,7 +179,7 @@ const Welcome = () => {
         </Button>
 
         <p className="text-[11px] text-muted-foreground text-center">
-          Tempo estimado: 5 a 8 minutos · Responda com calma e sinceridade
+          Tempo estimado: 5 a 8 minutos · Grátis até liberar o protocolo
         </p>
       </div>
 

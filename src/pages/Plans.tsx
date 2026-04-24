@@ -4,9 +4,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Check, Loader2, Tag } from "lucide-react";
+import { Check, Loader2, Tag, Sparkles } from "lucide-react";
 import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useProfile } from "@/hooks/useProfile";
+import { useActiveProtocol } from "@/hooks/useProtocol";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -44,11 +46,17 @@ const FEATURES = [
 export default function Plans() {
   const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
   const { data: subscription, refetch: refetchSub } = useSubscription();
+  const { data: profile } = useProfile();
+  const { data: protocol } = useActiveProtocol();
   const [portalLoading, setPortalLoading] = useState(false);
   const [reconcileLoading, setReconcileLoading] = useState(false);
   const [couponInput, setCouponInput] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; type: "referral" | "promo"; discount: number } | null>(null);
   const [validating, setValidating] = useState(false);
+
+  // Modo "pós-quiz": usuário terminou o onboarding mas ainda não pagou nem tem protocolo
+  const isPostQuiz = !!profile?.onboarding_complete && !protocol;
+  const firstName = (profile?.full_name || "").split(" ")[0] || "Atleta";
 
   const validateCoupon = async () => {
     const code = couponInput.trim().toUpperCase();
@@ -141,12 +149,32 @@ export default function Plans() {
     <AppLayout>
       <PaymentTestModeBanner />
       <div className="p-4 max-w-lg mx-auto space-y-4 pb-24 animate-fade-in">
-        <div className="pt-2">
-          <h1 className="text-2xl font-heading font-bold text-foreground">Planos</h1>
-          <p className="text-sm text-muted-foreground">
-            Acesso completo ao Hypertrophy. Escolha o ciclo que faz sentido pra você.
-          </p>
-        </div>
+        {isPostQuiz ? (
+          <Card className="p-5 border-primary/40 bg-primary/5 animate-fade-in">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                <Sparkles size={20} className="text-primary" />
+              </div>
+              <div>
+                <p className="text-base font-heading font-bold text-foreground">
+                  Seu protocolo está pronto pra ser gerado, {firstName}!
+                </p>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  Você terminou o quiz e a avaliação. Escolha um plano abaixo e em segundos
+                  liberamos seu treino + dieta personalizados pelos próximos{" "}
+                  <strong className="text-primary">60 dias</strong>.
+                </p>
+              </div>
+            </div>
+          </Card>
+        ) : (
+          <div className="pt-2">
+            <h1 className="text-2xl font-heading font-bold text-foreground">Planos</h1>
+            <p className="text-sm text-muted-foreground">
+              Acesso completo ao Hypertrophy. Escolha o ciclo que faz sentido pra você.
+            </p>
+          </div>
+        )}
 
         {isActive && (
           <Card className="p-4 card-gradient border-primary/30">
