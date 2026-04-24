@@ -357,6 +357,9 @@ const Onboarding = () => {
         return null;
       case 4:
         if (!data.mealCount) return "Selecione quantas refeições por dia.";
+        if (!data.mealSchedule.trim()) return "Informe os horários reais das suas refeições.";
+        if (!data.intermittentFasting) return "Indique se faz jejum intermitente.";
+        if (data.intermittentFasting === "yes" && !data.fastingWindow.trim()) return "Informe sua janela alimentar (ex: 12h–20h).";
         if (data.foodsLike.length === 0) return "Selecione ao menos 5 alimentos que gosta.";
         if (data.foodsLike.length < 5) return "Selecione ao menos 5 alimentos que gosta.";
         if (!data.currentDietDescription.trim()) return "Descreva brevemente sua alimentação atual (da primeira à última refeição).";
@@ -369,6 +372,8 @@ const Onboarding = () => {
         return null;
       case 6:
         if (!data.neat) return "Selecione sua rotina diária (NEAT).";
+        if (!data.wakeTime) return "Informe a hora que você acorda.";
+        if (!data.sleepTime) return "Informe a hora que você vai dormir.";
         if (!data.sleepHours) return "Informe suas horas de sono.";
         if (!data.stressLevel) return "Selecione seu nível de estresse.";
         return null;
