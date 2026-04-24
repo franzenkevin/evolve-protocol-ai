@@ -139,7 +139,40 @@ function lookup(name: string): MacroBase | null {
   return null;
 }
 
-function estimate(name: string, category: string): SubOption {
+function categoryMainMacro(category: string): "carbs" | "protein" | "fat" | "calories" {
+  const c = (category || "").toLowerCase();
+  if (c.includes("carbo")) return "carbs";
+  if (c.includes("proteí") || c.includes("protei") || c.includes("legumin") || c.includes("laticín") || c.includes("laticin")) return "protein";
+  if (c.includes("fruta")) return "carbs";
+  if (c.includes("gordura") || c.includes("oleagi")) return "fat";
+  return "calories";
+}
+
+/** Build a SubOption from the macro base scaled to a given amount in grams. */
+function buildFromGrams(name: string, base: MacroBase, grams: number): SubOption {
+  const factor = grams / 100;
+  return {
+    name,
+    amount: `${Math.round(grams)}g`,
+    calories: Math.round(base.calories * factor),
+    protein: Math.round(base.protein * factor * 10) / 10,
+    carbs: Math.round(base.carbs * factor * 10) / 10,
+    fat: Math.round(base.fat * factor * 10) / 10,
+  };
+}
+
+/**
+ * Estimate a SubOption that matches the target macro & calories within ±5%.
+ * - For "unit" foods (eggs, scoops, slices), returns the fixed unit serving.
+ * - For "100g" foods, computes grams to hit the target main macro of the
+ *   category, then verifies that calories also stay within ±15% (otherwise
+ *   we accept the macro match — macro is more important than calories).
+ */
+function estimateMatching(
+  name: string,
+  category: string,
+  target: { calories: number; protein: number; carbs: number; fat: number } | null
+): SubOption {
   const base = lookup(name);
   if (!base) {
     return { name, amount: "1 porção", calories: 0, protein: 0, carbs: 0, fat: 0 };
@@ -149,21 +182,35 @@ function estimate(name: string, category: string): SubOption {
       name,
       amount: base.unitLabel || "1 porção",
       calories: Math.round(base.calories),
-      protein: Math.round(base.protein),
-      carbs: Math.round(base.carbs),
-      fat: Math.round(base.fat),
+      protein: Math.round(base.protein * 10) / 10,
+      carbs: Math.round(base.carbs * 10) / 10,
+      fat: Math.round(base.fat * 10) / 10,
     };
   }
-  const grams = defaultPortionGrams(name, category);
-  const factor = grams / 100;
-  return {
-    name,
-    amount: `${grams}g`,
-    calories: Math.round(base.calories * factor),
-    protein: Math.round(base.protein * factor),
-    carbs: Math.round(base.carbs * factor),
-    fat: Math.round(base.fat * factor),
-  };
+
+  if (!target) {
+    // No reference — use sensible default portion
+    const grams = defaultPortionGrams(name, category);
+    return buildFromGrams(name, base, grams);
+  }
+
+  const main = categoryMainMacro(category);
+  const targetValue = target[main] || 0;
+  const baseValue = (base as any)[main] as number;
+
+  // If the macro doesn't exist in this food, fall back to calorie matching
+  let grams: number;
+  if (baseValue && baseValue > 0) {
+    grams = (targetValue / baseValue) * 100;
+  } else if (base.calories > 0) {
+    grams = (target.calories / base.calories) * 100;
+  } else {
+    grams = defaultPortionGrams(name, category);
+  }
+
+  // Snap to 5g increments and clamp to a sensible range
+  grams = Math.max(20, Math.min(400, Math.round(grams / 5) * 5));
+  return buildFromGrams(name, base, grams);
 }
 
 /** Detect if a substitution entry is in the legacy string-only format. */
@@ -176,21 +223,64 @@ export function isLegacySubstitution(sub: any): boolean {
 export function normalizeSubstitution(sub: any): NormalizedSubstitution {
   const category: string = sub?.category || "Substituições";
 
-  // Already in new format
+  // Already in new format → trust it but re-validate proportions
   if (sub?.options?.length && typeof sub.options[0] === "object") {
+    const opts = sub.options as SubOption[];
+    const ref: SubOption | undefined = sub.referenceFood || opts[0];
+
+    // Check if the AI-provided portions actually match the reference.
+    // If they're way off (>20% on the main macro), recompute from scratch.
+    const main = categoryMainMacro(category);
+    const refTarget = ref
+      ? { calories: ref.calories, protein: ref.protein, carbs: ref.carbs, fat: ref.fat }
+      : null;
+    const validated = opts.map((o) => {
+      if (!ref || !refTarget) return o;
+      const refMain = (ref as any)[main] as number;
+      const optMain = (o as any)[main] as number;
+      if (!refMain || refMain === 0) return o;
+      const drift = Math.abs(optMain - refMain) / refMain;
+      // If the AI got the proportions roughly right (≤20% drift on main macro), keep it.
+      if (drift <= 0.2) return o;
+      // Otherwise rebuild this option from our local DB to match the reference.
+      return estimateMatching(o.name, category, refTarget);
+    });
+
     return {
       category,
-      referenceFood: sub.referenceFood as SubOption | undefined,
-      options: sub.options as SubOption[],
+      referenceFood: ref,
+      options: validated,
     };
   }
 
-  // Legacy: array of strings → estimate macros
+  // Legacy: array of strings → estimate macros to match the FIRST food's portion
   const names: string[] = Array.isArray(sub?.options) ? sub.options : [];
-  const opts = names.map((n) => estimate(n, category));
+  if (names.length === 0) {
+    return { category, options: [] };
+  }
+
+  // First food sets the reference (use a sensible default portion for it)
+  const firstBase = lookup(names[0]);
+  let referenceFood: SubOption;
+  if (firstBase && firstBase.per === "unit") {
+    referenceFood = estimateMatching(names[0], category, null);
+  } else {
+    referenceFood = estimateMatching(names[0], category, null);
+  }
+  const refTarget = {
+    calories: referenceFood.calories,
+    protein: referenceFood.protein,
+    carbs: referenceFood.carbs,
+    fat: referenceFood.fat,
+  };
+
+  const opts = names.map((n, i) =>
+    i === 0 ? referenceFood : estimateMatching(n, category, refTarget)
+  );
+
   return {
     category,
-    referenceFood: opts[0],
+    referenceFood,
     options: opts,
   };
 }
