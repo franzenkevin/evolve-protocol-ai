@@ -72,7 +72,7 @@ const Index = () => {
     }
   }, [user, authLoading, profile, profileLoading, subscription, subLoading, isAdmin, adminLoading, navigate]);
 
-  const ctaPrimary = user ? "Continuar protocolo" : "Começar agora — é grátis";
+  const ctaPrimary = user ? "Continuar protocolo" : "Começar agora";
   const ctaPrimaryTo = user ? "/welcome" : "/signup";
 
   return (
