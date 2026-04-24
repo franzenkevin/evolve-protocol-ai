@@ -9,20 +9,35 @@ import SectionPlan from "./SectionPlan";
 import SectionMeetings from "./SectionMeetings";
 import SectionJournal from "./SectionJournal";
 import { Card } from "@/components/ui/card";
-import { Headphones, FileText, Shield, Star, MessageSquare, Mail, ShieldCheck, RefreshCw, LifeBuoy } from "lucide-react";
+import { Headphones, FileText, Shield, Star, MessageSquare, Mail, ShieldCheck, RefreshCw, LifeBuoy, GraduationCap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface AppSidebarProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+const TOUR_KEY_PREFIX = "hypertrophy:tour:done:";
+
 const SAC_EMAIL = "suporte@hypertrophy.app";
 
 const AppSidebar = ({ open, onOpenChange }: AppSidebarProps) => {
   const navigate = useNavigate();
   const { data: isAdmin } = useIsAdmin();
+  const { user } = useAuth();
+
+  const handleReplayTour = () => {
+    if (!user) return;
+    // Clear the "done" flag so the dashboard auto-opens the tour again,
+    // then send the user there.
+    localStorage.removeItem(`${TOUR_KEY_PREFIX}${user.id}`);
+    onOpenChange(false);
+    toast.success("Tutorial reaberto. Indo para o início...");
+    navigate("/dashboard");
+  };
 
   const handleSupport = () => {
     onOpenChange(false);
@@ -46,6 +61,7 @@ const AppSidebar = ({ open, onOpenChange }: AppSidebarProps) => {
   };
 
   const EXTRA_ITEMS = [
+    { icon: GraduationCap, label: "Exibir tutorial novamente", desc: "Refazer o tour de uso do app", onClick: handleReplayTour },
     { icon: LifeBuoy, label: "SAC / Suporte", desc: "Fale com nosso time pelo app", onClick: handleSupport },
     { icon: MessageSquare, label: "Feedback de alunos", desc: "Mural público de depoimentos", onClick: handleFeedback },
     { icon: Star, label: "Avaliar o app", desc: "Dê sua nota e comentário", onClick: handleRateApp },
