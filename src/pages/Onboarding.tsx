@@ -502,7 +502,12 @@ const Onboarding = () => {
         supplements: data.supplements.filter(s => s !== "Nenhum"),
         free_meals: data.freeMeals,
         meal_count: data.mealCount ? parseInt(data.mealCount) : null,
+        meal_schedule: data.mealSchedule || null,
+        intermittent_fasting: data.intermittentFasting === "yes",
+        fasting_window: data.intermittentFasting === "yes" ? (data.fastingWindow || null) : null,
         sleep_hours: data.sleepHours ? parseFloat(data.sleepHours) : null,
+        wake_time: data.wakeTime || null,
+        sleep_time: data.sleepTime || null,
         stress_level: data.stressLevel,
         body_emphasis: confirmations.bodyEmphasis.wants === "yes"
           ? confirmations.bodyEmphasis.description.trim() || null
