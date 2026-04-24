@@ -10,8 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUpdateProfile } from "@/hooks/useProfile";
-import { useCreateProtocol } from "@/hooks/useProtocol";
-import { generateProtocol } from "@/lib/generateProtocol";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { BodyPhotoUpload } from "@/components/onboarding/BodyPhotoUpload";
@@ -191,8 +189,6 @@ const Onboarding = () => {
   const persisted = typeof window !== "undefined" ? loadPersisted() : null;
   const [step, setStep] = useState<number>(persisted?.step ?? 0);
   const [saving, setSaving] = useState(false);
-  const [genElapsed, setGenElapsed] = useState(0); // seconds
-  const [genStage, setGenStage] = useState("");
   const [analyzeElapsed, setAnalyzeElapsed] = useState(0); // seconds
   const [analyzeStage, setAnalyzeStage] = useState("");
   const [assessmentPhotos, setAssessmentPhotos] = useState<Record<string, string>>(persisted?.assessmentPhotos ?? {});
@@ -208,7 +204,6 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const updateProfile = useUpdateProfile();
-  const createProtocol = useCreateProtocol();
 
   const { user } = useAuth();
   const [cloudLoaded, setCloudLoaded] = useState(false);
@@ -270,30 +265,8 @@ const Onboarding = () => {
     return () => clearTimeout(t);
   }, [step, data, assessmentPhotos, assessment, confirmations, user?.id, cloudLoaded]);
 
-  // Real elapsed timer (up to 4 min) — IA analisa avaliação + lesões antes de prescrever
-  const TARGET_SECONDS = 180;
-  useEffect(() => {
-    if (!saving) return;
-    setGenElapsed(0);
-    setGenStage("👨‍⚕️ Médico nutrólogo lendo seu perfil e avaliação corporal...");
-    const stages: { at: number; label: string }[] = [
-      { at: 12, label: "👨‍⚕️ Verificando lesões, intolerâncias e contraindicações..." },
-      { at: 28, label: "🏋️ Treinador escolhendo a divisão e os exercícios seguros..." },
-      { at: 50, label: "🏋️ Priorizando seus pontos fracos no volume de treino..." },
-      { at: 75, label: "🥗 Nutricionista calculando macros e montando refeições..." },
-      { at: 105, label: "🥗 Calibrando refeições livres ao seu objetivo..." },
-      { at: 135, label: "🤝 Comitê validando treino + dieta + suplementação juntos..." },
-      { at: 165, label: "✨ Finalizando seu protocolo personalizado..." },
-    ];
-    const t0 = Date.now();
-    const id = setInterval(() => {
-      const sec = Math.floor((Date.now() - t0) / 1000);
-      setGenElapsed(sec);
-      const cur = [...stages].reverse().find((s) => sec >= s.at);
-      if (cur) setGenStage(cur.label);
-    }, 1000);
-    return () => clearInterval(id);
-  }, [saving]);
+  // (Geração do protocolo agora acontece pós-pagamento em CheckoutSuccess.)
+
 
   // Timer + estágios para análise de fotos (~15-60s)
   const ANALYZE_TARGET_SECONDS = 45;
@@ -523,55 +496,33 @@ const Onboarding = () => {
         onboarding_complete: true,
       };
 
+      // Salva também as confirmações no draft para a IA usar quando gerar o protocolo (após o pagamento)
       await updateProfile.mutateAsync(profileData);
 
-      // Try AI-generated protocol first, fallback to rule-based
-      let protocol: { training: any; diet: any };
-      try {
-        // Fetch latest body assessment if available
-        let bodyAssessment = assessment;
-        if (!bodyAssessment && user) {
-          const { data: assessData } = await supabase
-            .from("body_assessments")
-            .select("*")
-            .eq("user_id", user.id)
-            .order("created_at", { ascending: false })
-            .limit(1)
-            .maybeSingle();
-          bodyAssessment = assessData;
-        }
-
-        toast({ title: "🤖 Gerando protocolo com IA...", description: "Isso pode levar alguns segundos." });
-
-        const { data: aiResult, error: aiError } = await supabase.functions.invoke("generate-protocol", {
-          body: {
-            profile: profileData,
-            bodyAssessment,
-            bodyEmphasis: profileData.body_emphasis,
-            confirmations,
-          },
-        });
-
-        if (aiError) throw aiError;
-        if (aiResult?.fallback) throw new Error("Fallback requested");
-        if (!aiResult?.training || !aiResult?.diet) throw new Error("Invalid AI response");
-
-        protocol = { training: aiResult.training, diet: aiResult.diet };
-        toast({ title: "✨ Protocolo personalizado gerado!", description: "Seu plano foi criado com inteligência artificial." });
-      } catch (aiErr) {
-        console.warn("AI protocol generation failed, using fallback:", aiErr);
-        protocol = generateProtocol(profileData as Profile);
-        toast({ title: "Protocolo gerado!", description: "Seu protocolo foi criado com sucesso." });
-      }
-
-      await createProtocol.mutateAsync(protocol);
-      setGenStage("Pronto!");
-      await new Promise((r) => setTimeout(r, 400));
-      try { localStorage.removeItem(STORAGE_KEY); } catch {}
       if (user) {
-        try { await supabase.from("onboarding_drafts").delete().eq("user_id", user.id); } catch {}
+        try {
+          await supabase
+            .from("onboarding_drafts")
+            .upsert(
+              {
+                user_id: user.id,
+                data: { confirmations, completedAt: new Date().toISOString() } as any,
+                updated_at: new Date().toISOString(),
+              },
+              { onConflict: "user_id" },
+            );
+        } catch (e) {
+          console.warn("Failed to persist confirmations to draft", e);
+        }
       }
-      navigate("/dashboard");
+
+      try { localStorage.removeItem(STORAGE_KEY); } catch {}
+
+      toast({
+        title: "Quiz finalizado! 🎉",
+        description: "Falta só liberar seu protocolo. Escolha um plano para continuar.",
+      });
+      navigate("/plans");
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
     } finally {
@@ -991,7 +942,7 @@ const Onboarding = () => {
           <div className="flex gap-3">
             {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving || analyzing}>Voltar</Button>}
             <Button onClick={next} className="flex-1 glow" disabled={saving || analyzing}>
-              {saving ? "🤖 Gerando protocolo com IA..." : analyzing ? "Analisando suas fotos..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar minhas fotos" : step === STEPS.length - 1 ? "Finalizar e gerar protocolo" : "Próximo"}
+              {saving ? "Salvando suas respostas..." : analyzing ? "Analisando suas fotos..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar minhas fotos" : step === STEPS.length - 1 ? "Finalizar quiz" : "Próximo"}
             </Button>
           </div>
         </div>
@@ -1023,23 +974,11 @@ const Onboarding = () => {
 
       {saving && (
         <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
-          <div className="max-w-sm w-full text-center space-y-5">
-            <div className="text-5xl animate-pulse">🤖</div>
-            <div>
-              <h3 className="text-xl font-heading font-bold text-foreground mb-1">Gerando seu protocolo</h3>
-              <p className="text-sm text-muted-foreground min-h-[2.5rem]">{genStage}</p>
-            </div>
-            <div className="space-y-2">
-              <Progress value={Math.min(100, (genElapsed / TARGET_SECONDS) * 100)} className="h-3" />
-              <p className="text-3xl font-bold text-primary font-heading tabular-nums">
-                {String(Math.floor(genElapsed / 60)).padStart(2, "0")}:{String(genElapsed % 60).padStart(2, "0")}
-              </p>
-              <p className="text-[11px] text-muted-foreground">
-                Tempo médio: 1–3 minutos. Comitê de 3 profissionais (médico nutrólogo, nutricionista de performance e treinador) analisando cada detalhe.
-              </p>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Seu progresso está salvo. Pode fechar a aba — quando voltar, retomamos de onde parou.
+          <div className="max-w-sm w-full text-center space-y-4">
+            <div className="text-5xl animate-pulse">💾</div>
+            <h3 className="text-xl font-heading font-bold text-foreground">Salvando suas respostas</h3>
+            <p className="text-sm text-muted-foreground">
+              Em seguida você escolhe seu plano para liberar a geração do protocolo.
             </p>
           </div>
         </div>
