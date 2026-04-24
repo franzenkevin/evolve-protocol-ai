@@ -665,6 +665,7 @@ export type Database = {
           disliked_from_list: string | null
           experience: string | null
           extra_activities: string | null
+          fasting_window: string | null
           free_meals: string | null
           full_name: string | null
           goal: string | null
@@ -672,12 +673,15 @@ export type Database = {
           height: number | null
           id: string
           injuries: string | null
+          intermittent_fasting: boolean | null
           meal_count: number | null
+          meal_schedule: string | null
           neat: string | null
           onboarding_complete: boolean
           preferred_foods: string[] | null
           sex: string | null
           sleep_hours: number | null
+          sleep_time: string | null
           stress_level: string | null
           supplements: string[] | null
           sweet_preference: string | null
@@ -688,6 +692,7 @@ export type Database = {
           training_weekdays: string[] | null
           updated_at: string
           user_id: string
+          wake_time: string | null
           weight: number | null
         }
         Insert: {
@@ -709,6 +714,7 @@ export type Database = {
           disliked_from_list?: string | null
           experience?: string | null
           extra_activities?: string | null
+          fasting_window?: string | null
           free_meals?: string | null
           full_name?: string | null
           goal?: string | null
@@ -716,12 +722,15 @@ export type Database = {
           height?: number | null
           id?: string
           injuries?: string | null
+          intermittent_fasting?: boolean | null
           meal_count?: number | null
+          meal_schedule?: string | null
           neat?: string | null
           onboarding_complete?: boolean
           preferred_foods?: string[] | null
           sex?: string | null
           sleep_hours?: number | null
+          sleep_time?: string | null
           stress_level?: string | null
           supplements?: string[] | null
           sweet_preference?: string | null
@@ -732,6 +741,7 @@ export type Database = {
           training_weekdays?: string[] | null
           updated_at?: string
           user_id: string
+          wake_time?: string | null
           weight?: number | null
         }
         Update: {
@@ -753,6 +763,7 @@ export type Database = {
           disliked_from_list?: string | null
           experience?: string | null
           extra_activities?: string | null
+          fasting_window?: string | null
           free_meals?: string | null
           full_name?: string | null
           goal?: string | null
@@ -760,12 +771,15 @@ export type Database = {
           height?: number | null
           id?: string
           injuries?: string | null
+          intermittent_fasting?: boolean | null
           meal_count?: number | null
+          meal_schedule?: string | null
           neat?: string | null
           onboarding_complete?: boolean
           preferred_foods?: string[] | null
           sex?: string | null
           sleep_hours?: number | null
+          sleep_time?: string | null
           stress_level?: string | null
           supplements?: string[] | null
           sweet_preference?: string | null
@@ -776,6 +790,7 @@ export type Database = {
           training_weekdays?: string[] | null
           updated_at?: string
           user_id?: string
+          wake_time?: string | null
           weight?: number | null
         }
         Relationships: []

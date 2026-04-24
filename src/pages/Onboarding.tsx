@@ -147,7 +147,12 @@ interface FormData {
   supplements: string[];
   freeMeals: string;
   mealCount: string;
+  mealSchedule: string;
+  intermittentFasting: string; // "yes" | "no"
+  fastingWindow: string;
   sleepHours: string;
+  wakeTime: string;
+  sleepTime: string;
   stressLevel: string;
   aiDataConsent: boolean;
 }
@@ -164,7 +169,11 @@ const DEFAULT_FORM: FormData = {
   foodsLikeExtra: "",
   foodsDislike: "", dislikedFromList: "", currentDietDescription: "",
   allergies: [], sweetPreference: "", supplements: [],
-  freeMeals: "", mealCount: "", sleepHours: "", stressLevel: "",
+  freeMeals: "", mealCount: "",
+  mealSchedule: "",
+  intermittentFasting: "", fastingWindow: "",
+  sleepHours: "", wakeTime: "", sleepTime: "",
+  stressLevel: "",
   aiDataConsent: false,
 };
 
@@ -348,6 +357,9 @@ const Onboarding = () => {
         return null;
       case 4:
         if (!data.mealCount) return "Selecione quantas refeições por dia.";
+        if (!data.mealSchedule.trim()) return "Informe os horários reais das suas refeições.";
+        if (!data.intermittentFasting) return "Indique se faz jejum intermitente.";
+        if (data.intermittentFasting === "yes" && !data.fastingWindow.trim()) return "Informe sua janela alimentar (ex: 12h–20h).";
         if (data.foodsLike.length === 0) return "Selecione ao menos 5 alimentos que gosta.";
         if (data.foodsLike.length < 5) return "Selecione ao menos 5 alimentos que gosta.";
         if (!data.currentDietDescription.trim()) return "Descreva brevemente sua alimentação atual (da primeira à última refeição).";
@@ -360,6 +372,8 @@ const Onboarding = () => {
         return null;
       case 6:
         if (!data.neat) return "Selecione sua rotina diária (NEAT).";
+        if (!data.wakeTime) return "Informe a hora que você acorda.";
+        if (!data.sleepTime) return "Informe a hora que você vai dormir.";
         if (!data.sleepHours) return "Informe suas horas de sono.";
         if (!data.stressLevel) return "Selecione seu nível de estresse.";
         return null;
@@ -488,7 +502,12 @@ const Onboarding = () => {
         supplements: data.supplements.filter(s => s !== "Nenhum"),
         free_meals: data.freeMeals,
         meal_count: data.mealCount ? parseInt(data.mealCount) : null,
+        meal_schedule: data.mealSchedule || null,
+        intermittent_fasting: data.intermittentFasting === "yes",
+        fasting_window: data.intermittentFasting === "yes" ? (data.fastingWindow || null) : null,
         sleep_hours: data.sleepHours ? parseFloat(data.sleepHours) : null,
+        wake_time: data.wakeTime || null,
+        sleep_time: data.sleepTime || null,
         stress_level: data.stressLevel,
         body_emphasis: confirmations.bodyEmphasis.wants === "yes"
           ? confirmations.bodyEmphasis.description.trim() || null
@@ -738,6 +757,47 @@ const Onboarding = () => {
               </div>
 
               <div>
+                <Label>Horários reais das suas refeições *</Label>
+                <p className="text-xs text-muted-foreground mt-1 mb-2">
+                  Liste o HORÁRIO de cada refeição que você realmente consegue fazer. A IA vai usar esses horários no seu plano (não vai inventar).
+                </p>
+                <Textarea
+                  value={data.mealSchedule}
+                  onChange={(e) => update("mealSchedule", e.target.value)}
+                  placeholder="Ex: Café 09:30, Almoço 13:00, Lanche 16:30, Jantar 21:00"
+                  className="mt-1"
+                  maxLength={300}
+                />
+              </div>
+
+              <div>
+                <Label>Você faz jejum intermitente? *</Label>
+                <RadioGroup
+                  value={data.intermittentFasting}
+                  onValueChange={(v) => update("intermittentFasting", v)}
+                  className="flex gap-4 mt-2"
+                >
+                  <div className="flex items-center gap-1"><RadioGroupItem value="yes" id="if-yes" /><Label htmlFor="if-yes">Sim</Label></div>
+                  <div className="flex items-center gap-1"><RadioGroupItem value="no" id="if-no" /><Label htmlFor="if-no">Não</Label></div>
+                </RadioGroup>
+                {data.intermittentFasting === "yes" && (
+                  <div className="mt-3">
+                    <Label>Sua janela alimentar *</Label>
+                    <Input
+                      value={data.fastingWindow}
+                      onChange={(e) => update("fastingWindow", e.target.value)}
+                      placeholder="Ex: 12h–20h (jejum 16/8)"
+                      className="mt-1"
+                      maxLength={60}
+                    />
+                    <p className="text-[11px] text-muted-foreground mt-1">
+                      A IA vai concentrar TODAS as refeições dentro dessa janela.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div>
                 <Label>Alimentos que você gosta (marque ao menos 5) *</Label>
                 {FOOD_CATEGORIES.map((cat) => (
                   <div key={cat.label} className="mt-3">
@@ -860,6 +920,10 @@ const Onboarding = () => {
                 <RadioGroup value={data.neat} onValueChange={(v) => update("neat", v)} className="mt-2 space-y-2">
                   {NEAT_OPTIONS.map((n) => radioOption(n, `neat-${n}`, n))}
                 </RadioGroup>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label>Hora que acorda *</Label><Input type="time" value={data.wakeTime} onChange={(e) => update("wakeTime", e.target.value)} className="mt-1" /></div>
+                <div><Label>Hora que dorme *</Label><Input type="time" value={data.sleepTime} onChange={(e) => update("sleepTime", e.target.value)} className="mt-1" /></div>
               </div>
               <div><Label>Horas de sono por noite *</Label><Input type="number" value={data.sleepHours} onChange={(e) => update("sleepHours", e.target.value)} placeholder="7" className="mt-1" /></div>
               <div>

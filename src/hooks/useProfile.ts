@@ -42,6 +42,11 @@ export interface Profile {
   extra_activities: string | null;
   current_diet_description: string | null;
   disliked_from_list: string | null;
+  meal_schedule: string | null;
+  intermittent_fasting: boolean | null;
+  fasting_window: string | null;
+  wake_time: string | null;
+  sleep_time: string | null;
   onboarding_complete: boolean;
 }
 
