@@ -67,8 +67,8 @@ const App = () => (
             <Route path="/register" element={<Navigate to="/signup" replace />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/welcome" element={<ProtectedRoute><StudentGate><SubscriptionGate><Welcome /></SubscriptionGate></StudentGate></ProtectedRoute>} />
-            <Route path="/onboarding" element={<ProtectedRoute><StudentGate><SubscriptionGate><Onboarding /></SubscriptionGate></StudentGate></ProtectedRoute>} />
+            <Route path="/welcome" element={<ProtectedRoute><StudentGate><Welcome /></StudentGate></ProtectedRoute>} />
+            <Route path="/onboarding" element={<ProtectedRoute><StudentGate><Onboarding /></StudentGate></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><Dashboard /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
             <Route path="/training" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><Training /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
             <Route path="/diet" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><Diet /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
