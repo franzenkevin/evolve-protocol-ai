@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useMobility } from "@/hooks/useMobility";
-import { isYoutubeUrl, getYoutubeEmbedUrl, getYoutubeThumbnail } from "@/lib/youtube";
+import ExerciseVideo from "@/components/ExerciseVideo";
 import { Activity, Clock, Repeat, Play, X } from "lucide-react";
 
 interface MobilityDrawerProps {
@@ -124,8 +124,6 @@ const MobilityDrawer = ({ open, onOpenChange, suggestedRegion }: MobilityDrawerP
                 </h4>
                 {list.map((m) => {
                   const isPlaying = playingId === m.id;
-                  const ytEmbed = getYoutubeEmbedUrl(m.video_url);
-                  const ytThumb = getYoutubeThumbnail(m.video_url);
                   return (
                     <Card key={m.id} className="p-3 space-y-2">
                       <div className="flex items-start justify-between gap-2">
@@ -165,37 +163,22 @@ const MobilityDrawer = ({ open, onOpenChange, suggestedRegion }: MobilityDrawerP
                         </p>
                       )}
 
-                      {m.video_url && !isPlaying && (
+                      {!isPlaying ? (
                         <Button
                           variant="outline"
                           size="sm"
                           className="w-full h-8 gap-1.5 text-xs"
                           onClick={() => setPlayingId(m.id)}
                         >
-                          <Play size={12} /> Ver vídeo
+                          <Play size={12} /> Ver vídeo de execução
                         </Button>
-                      )}
-
-                      {m.video_url && isPlaying && (
+                      ) : (
                         <div className="space-y-1">
-                          <div className="rounded-lg overflow-hidden border border-border bg-black aspect-video">
-                            {ytEmbed ? (
-                              <iframe
-                                src={ytEmbed}
-                                title={m.name}
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                className="w-full h-full"
-                                loading="lazy"
-                              />
-                            ) : (
-                              <video
-                                src={m.video_url}
-                                controls
-                                className="w-full h-full object-contain"
-                              />
-                            )}
-                          </div>
+                          <ExerciseVideo
+                            exerciseName={m.name}
+                            videoUrl={m.video_url}
+                            videoQuery={`${m.name} mobilidade execução`}
+                          />
                           <Button
                             variant="ghost"
                             size="sm"
