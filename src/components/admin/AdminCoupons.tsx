@@ -10,8 +10,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Trash2, Tag } from "lucide-react";
-import { useCoupons, useCreateCoupon, useUpdateCoupon, useDeleteCoupon, type Coupon } from "@/hooks/useCoupons";
+import { Plus, Trash2, Tag, RefreshCw } from "lucide-react";
+import { useCoupons, useCreateCoupon, useUpdateCoupon, useDeleteCoupon, useResyncCoupon, type Coupon } from "@/hooks/useCoupons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLogAudit } from "@/hooks/useAuditLog";
