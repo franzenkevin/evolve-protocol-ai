@@ -1,7 +1,31 @@
 // Sync a coupon (from public.coupons) to Paddle as a Discount in BOTH environments.
 // Called by admin actions when creating, updating or deleting a coupon.
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { gatewayFetch, type PaddleEnv } from '../_shared/paddle.ts';
+
+type PaddleEnv = 'sandbox' | 'live';
+const GATEWAY_BASE_URL = 'https://connector-gateway.lovable.dev/paddle';
+
+function getEnvVar(key: string): string {
+  const v = Deno.env.get(key);
+  if (!v) throw new Error(`${key} is not configured`);
+  return v;
+}
+
+async function gatewayFetch(env: PaddleEnv, path: string, init?: RequestInit): Promise<Response> {
+  const connectionApiKey = env === 'sandbox'
+    ? getEnvVar('PADDLE_SANDBOX_API_KEY')
+    : getEnvVar('PADDLE_LIVE_API_KEY');
+  const lovableApiKey = getEnvVar('LOVABLE_API_KEY');
+  return fetch(`${GATEWAY_BASE_URL}${path}`, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Connection-Api-Key': connectionApiKey,
+      'Lovable-API-Key': lovableApiKey,
+      ...(init?.headers || {}),
+    },
+  });
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
