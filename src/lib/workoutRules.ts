@@ -175,7 +175,28 @@ export const SPLITS_WOMEN: Record<number, SplitVariant[]> = {
 // ============================================================================
 
 export const SPLITS_MEN: Record<number, SplitVariant[]> = {
+  2: [
+    {
+      name: "FB-FB (Full Body 2x)",
+      days: [
+        { code: "A", focus: "Full Body — compostos pesados (1 quad, 1 push, 1 pull, 1 posterior, 1 core)" },
+        { code: "B", focus: "Full Body — compostos pesados (1 quad, 1 push, 1 pull, 1 posterior, 1 core)" },
+      ],
+      schedulingRules: ["DEVE ter pelo menos 2 dias de descanso entre eles"],
+      defaultChoice: true,
+    },
+  ],
   3: [
+    {
+      name: "Push-Pull-Legs (PPL 3x)",
+      days: [
+        { code: "A", focus: "Push (peito + ombros + tríceps)" },
+        { code: "B", focus: "Pull (costas + bíceps)" },
+        { code: "C", focus: "Legs (perna completa)" },
+      ],
+      schedulingRules: ["Pode ser direto ou alternado"],
+      defaultChoice: true,
+    },
     {
       name: "FB-FB-FB (Full Body 3x)",
       days: [
@@ -185,18 +206,19 @@ export const SPLITS_MEN: Record<number, SplitVariant[]> = {
       ],
       schedulingRules: ["DEVE ter descanso entre eles — não pode ser corrido"],
     },
-    {
-      name: "Push-Inferior-Pull (3x)",
-      days: [
-        { code: "A", focus: "Push (peito + ombros + tríceps)" },
-        { code: "B", focus: "Inferior (pernas completo)" },
-        { code: "C", focus: "Pull (costas + bíceps)" },
-      ],
-      schedulingRules: [],
-      defaultChoice: true,
-    },
   ],
   4: [
+    {
+      name: "Upper-Lower (4x)",
+      days: [
+        { code: "A", focus: "Upper (peito + costas + ombros + braços)" },
+        { code: "B", focus: "Lower (perna completa)" },
+        { code: "C", focus: "Upper" },
+        { code: "D", focus: "Lower" },
+      ],
+      schedulingRules: ["Padrão: 2 dias on + 1 off + 2 dias on"],
+      defaultChoice: true,
+    },
     {
       name: "Push-Pull-Legs-Upper (4x)",
       days: [
@@ -210,7 +232,6 @@ export const SPLITS_MEN: Record<number, SplitVariant[]> = {
         "PERGUNTAR: 1 perna completa só ou 1 perna + estímulos extra de inferior nos Push/Pull?",
         "Se aluno escolher 'estímulos extra de inferior': adicionar 1-2 exercícios de inferior nos Push e Pull, e SEMPRE inserir 1 dia OFF entre eles e o Legs",
       ],
-      defaultChoice: true,
     },
   ],
   5: [
@@ -225,23 +246,34 @@ export const SPLITS_MEN: Record<number, SplitVariant[]> = {
       ],
       schedulingRules: [
         "Pode ser direto ou ter descanso entre C e D (preferível: descanso entre C e D)",
-        "Outras variações parecidas são permitidas, mas NUNCA trabalhamos um único músculo por dia",
+        "NUNCA trabalhamos um único músculo por dia",
       ],
       defaultChoice: true,
+    },
+    {
+      name: "Push1-Pull1-Legs-Push2-Pull2 (5x)",
+      days: [
+        { code: "A", focus: "Push 1 (ênfase peito)" },
+        { code: "B", focus: "Pull 1 (ênfase costas largura)" },
+        { code: "C", focus: "Legs (perna completa)" },
+        { code: "D", focus: "Push 2 (ênfase ombro/tríceps)" },
+        { code: "E", focus: "Pull 2 (ênfase costas espessura + bíceps)" },
+      ],
+      schedulingRules: ["Boa para avançados que querem priorizar superiores"],
     },
   ],
   6: [
     {
-      name: "PPL x2 (6x)",
+      name: "Push1-Pull1-Legs1-Push2-Pull2-Legs2 (PPL x2 — 6x)",
       days: [
-        { code: "A", focus: "Push" },
-        { code: "B", focus: "Pull" },
-        { code: "C", focus: "Legs" },
-        { code: "D", focus: "Push" },
-        { code: "E", focus: "Pull" },
-        { code: "F", focus: "Legs" },
+        { code: "A", focus: "Push 1 (ênfase peito)" },
+        { code: "B", focus: "Pull 1 (ênfase largura)" },
+        { code: "C", focus: "Legs 1 (ênfase quadríceps)" },
+        { code: "D", focus: "Push 2 (ênfase ombro)" },
+        { code: "E", focus: "Pull 2 (ênfase espessura)" },
+        { code: "F", focus: "Legs 2 (ênfase posterior + glúteo)" },
       ],
-      schedulingRules: ["Volume alto — só para avançados com boa recuperação"],
+      schedulingRules: ["Volume alto — só para avançados com ótima recuperação"],
       defaultChoice: true,
     },
   ],
