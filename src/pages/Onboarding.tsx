@@ -10,8 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUpdateProfile } from "@/hooks/useProfile";
-import { useCreateProtocol } from "@/hooks/useProtocol";
-import { generateProtocol } from "@/lib/generateProtocol";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { BodyPhotoUpload } from "@/components/onboarding/BodyPhotoUpload";
@@ -191,8 +189,6 @@ const Onboarding = () => {
   const persisted = typeof window !== "undefined" ? loadPersisted() : null;
   const [step, setStep] = useState<number>(persisted?.step ?? 0);
   const [saving, setSaving] = useState(false);
-  const [genElapsed, setGenElapsed] = useState(0); // seconds
-  const [genStage, setGenStage] = useState("");
   const [analyzeElapsed, setAnalyzeElapsed] = useState(0); // seconds
   const [analyzeStage, setAnalyzeStage] = useState("");
   const [assessmentPhotos, setAssessmentPhotos] = useState<Record<string, string>>(persisted?.assessmentPhotos ?? {});
@@ -208,7 +204,6 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const updateProfile = useUpdateProfile();
-  const createProtocol = useCreateProtocol();
 
   const { user } = useAuth();
   const [cloudLoaded, setCloudLoaded] = useState(false);
