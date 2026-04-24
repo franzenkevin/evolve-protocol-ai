@@ -40,7 +40,7 @@ export const FEATURES_CONTENT: FeatureContent[] = [
   {
     eyebrow: "Treino sob medida",
     title: "Cada série calculada pra te levar adiante",
-    desc: "Divisão, exercícios, séries, reps, descanso e progressão definidos pela metodologia. Seu treino evolui semana a semana — sem chute, sem cópia.",
+    desc: "Divisão, exercícios, séries, reps, descanso e progressão definidos pela metodologia. Seu treino evolui semana a semana.",
     image: mockTraining,
   },
   {
@@ -59,7 +59,7 @@ export const FEATURES_CONTENT: FeatureContent[] = [
   {
     eyebrow: "Progresso medido",
     title: "Você vê o resultado antes do espelho mostrar",
-    desc: "Peso, gordura, treinos completados, ranking semanal. Tudo num só lugar — pra manter o foco quando a motivação some.",
+    desc: "Peso, gordura, treinos completados, ranking semanal. Tudo num só lugar, para manter o foco quando a motivação some.",
     image: mockProgress,
     reverse: true,
   },
