@@ -68,7 +68,9 @@ const SectionRanking = () => {
         <div className="flex items-center gap-2 mb-2">
           <Flame size={14} className="text-warning" />
           <p className="text-[10px] text-muted-foreground leading-tight">
-            +1 ponto por check-in, +2 por treino registrado. Top 3 ganha medalha 🏆
+            +1 ponto por check-in,<br />
+            +2 por treino registrado.<br />
+            Top 3 ganha medalha 🏆
           </p>
         </div>
 
@@ -80,7 +82,7 @@ const SectionRanking = () => {
           </div>
         ) : ranking.length === 0 ? (
           <p className="text-xs text-muted-foreground text-center py-2">
-            Seja o primeiro a pontuar este mês! 💪
+            Seja o primeiro a pontuar este mês!
           </p>
         ) : (
           <div className="space-y-1.5">
