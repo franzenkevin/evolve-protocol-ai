@@ -137,6 +137,7 @@ const Index = () => {
             <span className="flex items-center gap-1.5">
               <CheckCircle2 size={14} className="text-primary" /> Teste 7 dias grátis
             </span>
+          </div>
         </div>
       </section>
 
