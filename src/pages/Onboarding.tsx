@@ -1001,23 +1001,11 @@ const Onboarding = () => {
 
       {saving && (
         <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
-          <div className="max-w-sm w-full text-center space-y-5">
-            <div className="text-5xl animate-pulse">🤖</div>
-            <div>
-              <h3 className="text-xl font-heading font-bold text-foreground mb-1">Gerando seu protocolo</h3>
-              <p className="text-sm text-muted-foreground min-h-[2.5rem]">{genStage}</p>
-            </div>
-            <div className="space-y-2">
-              <Progress value={Math.min(100, (genElapsed / TARGET_SECONDS) * 100)} className="h-3" />
-              <p className="text-3xl font-bold text-primary font-heading tabular-nums">
-                {String(Math.floor(genElapsed / 60)).padStart(2, "0")}:{String(genElapsed % 60).padStart(2, "0")}
-              </p>
-              <p className="text-[11px] text-muted-foreground">
-                Tempo médio: 1–3 minutos. Comitê de 3 profissionais (médico nutrólogo, nutricionista de performance e treinador) analisando cada detalhe.
-              </p>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Seu progresso está salvo. Pode fechar a aba — quando voltar, retomamos de onde parou.
+          <div className="max-w-sm w-full text-center space-y-4">
+            <div className="text-5xl animate-pulse">💾</div>
+            <h3 className="text-xl font-heading font-bold text-foreground">Salvando suas respostas</h3>
+            <p className="text-sm text-muted-foreground">
+              Em seguida você escolhe seu plano para liberar a geração do protocolo.
             </p>
           </div>
         </div>
