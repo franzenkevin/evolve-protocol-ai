@@ -121,11 +121,66 @@ Você DEVE excluir do treino qualquer exercício que solicite ou agrave a estrut
 Essa solicitação SOBRESCREVE a priorização automática por pontos fracos. Adicionar volume EXTRA (sem ultrapassar o máximo da faixa do sexo) nos músculos pedidos. Se o pedido conflitar com lesões/desvios posturais, PRIORIZAR a segurança e explicar no campo dynamicNotes do dia mais relevante.`;
     }
 
+    // ---- Validação de variantes oficiais (espelhar src/lib/workoutRules.ts) ----
+    // Mantém em sincronia com SPLITS_MEN / SPLITS_WOMEN. Se a variante enviada
+    // pelo cliente não pertencer à lista para o (sex, training_days) do aluno,
+    // descartamos para evitar que o prompt gere divisões inválidas.
+    const VALID_SPLIT_VARIANTS: Record<"male" | "female", Record<number, string[]>> = {
+      female: {
+        2: ["FB-FB com ênfase inferior (2x)"],
+        3: [
+          "FB-FB-FB com ênfase inferior (3x)",
+          "Inf(quad)-Sup-Inf(post+glúteo) (3x)",
+        ],
+        4: [
+          "Inf-Sup-Inf-Sup (4x — divisão mais comum)",
+          "Inf-Sup-Inf(post)-Sup+gluteo (4x)",
+        ],
+        5: [
+          "Inf-Sup-Inf-Sup-Inf (5x — alternado)",
+          "Inf-Sup-Inf-OFF-Inf-Sup (5x com folga no meio)",
+        ],
+        6: ["Inf-Sup-Inf-Sup-Inf-Sup (6x — alternado)"],
+        7: ["5x + 2 complementos"],
+      },
+      male: {
+        2: ["FB-FB (Full Body 2x)"],
+        3: ["Push-Pull-Legs (PPL 3x)", "FB-FB-FB (Full Body 3x)"],
+        4: ["Upper-Lower (4x)", "Push-Pull-Legs-Upper (4x)"],
+        5: [
+          "Legs-Push-Pull-Legs-Upper (5x)",
+          "Push1-Pull1-Legs-Push2-Pull2 (5x)",
+        ],
+        6: ["Push1-Pull1-Legs1-Push2-Pull2-Legs2 (PPL x2 — 6x)"],
+      },
+    };
+
+    const sexKey: "male" | "female" =
+      (profile?.sex || "").toLowerCase().startsWith("f") ? "female" : "male";
+    const daysKey = Number(profile?.training_days);
+    const allowedVariants =
+      (VALID_SPLIT_VARIANTS[sexKey]?.[daysKey] as string[] | undefined) || [];
+
+    let chosenVariantValid: string | null = null;
+    if (confirmations?.split?.chosenVariant) {
+      const requested = String(confirmations.split.chosenVariant).trim();
+      if (allowedVariants.includes(requested)) {
+        chosenVariantValid = requested;
+      } else {
+        console.warn(
+          `[generate-protocol] chosenVariant inválida descartada: "${requested}" (sex=${sexKey}, days=${daysKey}). Permitidas:`,
+          allowedVariants
+        );
+      }
+    }
+
     if (confirmations) {
       const parts: string[] = [];
       // Aluno escolheu uma variante específica de divisão (override do padrão)
-      if (confirmations.split?.chosenVariant) {
-        parts.push(`- DIVISÃO ESCOLHIDA PELO ALUNO: "${confirmations.split.chosenVariant}". USAR EXATAMENTE essa variante (ignorar a marcada como ⭐ padrão).`);
+      if (chosenVariantValid) {
+        parts.push(`- DIVISÃO ESCOLHIDA PELO ALUNO: "${chosenVariantValid}". USAR EXATAMENTE essa variante (ignorar a marcada como ⭐ padrão).`);
+      } else if (confirmations.split?.chosenVariant) {
+        parts.push(`- DIVISÃO: o aluno tentou escolher uma variante (\"${confirmations.split.chosenVariant}\") que NÃO existe na metodologia oficial para ${sexKey === "female" ? "mulher" : "homem"} ${daysKey}x/semana. IGNORAR e usar a variante padrão ⭐.`);
       }
       if (confirmations.split?.agree === "no" && confirmations.split?.justification) {
         parts.push(`- DIVISÃO: o aluno NÃO concordou com a divisão padrão. Justificativa: "${confirmations.split.justification}". AJUSTAR a divisão respeitando essa preferência (mas mantendo as regras da metodologia oficial — combinar grupos, descanso entre sinérgicos, etc.).`);
