@@ -177,6 +177,9 @@ export default function Plans() {
           </div>
         )}
 
+        {/* Teaser da avaliação postural — só pra quem fez o quiz e ainda não pagou */}
+        {isPostQuiz && <AssessmentTeaserCard />}
+
         {isActive && (
           <Card className="p-4 card-gradient border-primary/30">
             <div className="flex items-center justify-between mb-2">
