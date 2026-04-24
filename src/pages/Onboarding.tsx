@@ -265,30 +265,8 @@ const Onboarding = () => {
     return () => clearTimeout(t);
   }, [step, data, assessmentPhotos, assessment, confirmations, user?.id, cloudLoaded]);
 
-  // Real elapsed timer (up to 4 min) — IA analisa avaliação + lesões antes de prescrever
-  const TARGET_SECONDS = 180;
-  useEffect(() => {
-    if (!saving) return;
-    setGenElapsed(0);
-    setGenStage("👨‍⚕️ Médico nutrólogo lendo seu perfil e avaliação corporal...");
-    const stages: { at: number; label: string }[] = [
-      { at: 12, label: "👨‍⚕️ Verificando lesões, intolerâncias e contraindicações..." },
-      { at: 28, label: "🏋️ Treinador escolhendo a divisão e os exercícios seguros..." },
-      { at: 50, label: "🏋️ Priorizando seus pontos fracos no volume de treino..." },
-      { at: 75, label: "🥗 Nutricionista calculando macros e montando refeições..." },
-      { at: 105, label: "🥗 Calibrando refeições livres ao seu objetivo..." },
-      { at: 135, label: "🤝 Comitê validando treino + dieta + suplementação juntos..." },
-      { at: 165, label: "✨ Finalizando seu protocolo personalizado..." },
-    ];
-    const t0 = Date.now();
-    const id = setInterval(() => {
-      const sec = Math.floor((Date.now() - t0) / 1000);
-      setGenElapsed(sec);
-      const cur = [...stages].reverse().find((s) => sec >= s.at);
-      if (cur) setGenStage(cur.label);
-    }, 1000);
-    return () => clearInterval(id);
-  }, [saving]);
+  // (Geração do protocolo agora acontece pós-pagamento em CheckoutSuccess.)
+
 
   // Timer + estágios para análise de fotos (~15-60s)
   const ANALYZE_TARGET_SECONDS = 45;
