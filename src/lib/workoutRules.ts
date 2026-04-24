@@ -456,6 +456,51 @@ ${VOLUME_COUNT_RULE}
 Mesmo nas divisões 5x/6x, sempre combinar grupos. NUNCA ter um dia "só peito" ou "só bíceps".
 
 ### SE A DIVISÃO ESCOLHIDA TEM MÚLTIPLAS VARIANTES:
-Escolher a marcada como ⭐ padrão. As outras variantes serão oferecidas na fase de confirmação pós-análise (Fase 2).
+Usar a marcada como ⭐ padrão, A MENOS QUE o aluno tenha selecionado outra variante na confirmação pós-análise (campo confirmations.split.chosenVariant).
+
+### REGRAS UNIVERSAIS DE PRESCRIÇÃO
+
+**ABDÔMEN (OBRIGATÓRIO ${isWoman ? "para mulheres" : "para homens"})**:
+- Pelo menos **2x na semana**, distribuído nos treinos (NÃO em dia separado para hipertrofia ${isWoman ? "" : "— exceto se for o 6º/7º dia complementar"})
+- USAR APENAS: **Reto abdominal** (crunch, abdominal infra/elevação de pernas, prancha frontal). **NUNCA prescrever oblíquo** (treinar oblíquo aumenta a circunferência da cintura — não desejado em estética).
+
+${
+  isWoman
+    ? `**MULHER — REGRAS ESPECÍFICAS**:
+- **Peito**: NO MÁXIMO **1 exercício de peito por semana** (não há necessidade de mais). Mulher não precisa hipertrofiar peito.
+- **Ênfase nos superiores**: SEMPRE **ombro (lateral + posterior) + costas** > peito + braços.
+- **Ênfase nos inferiores**: protocolo COMPLETO de inferior, mas com **PRIORIDADE em GLÚTEO MÉDIO** (abdução, clamshell, hip thrust com rotação externa) e nos pontos fracos identificados na avaliação corporal.
+- Nos dias de FB: ênfase obrigatória em inferiores (5+ exercícios de perna vs 1-2 superiores).`
+    : `**HOMEM — REGRAS ESPECÍFICAS (anti-overtraining)**:
+- Homens **TENDEM A TREINAR DEMAIS**. Você DEVE prescrever o **NECESSÁRIO**, NÃO o exagerado.
+- Manter volume DENTRO da faixa, **preferindo o meio-baixo da faixa** quando o aluno é iniciante/intermediário.
+- Explicar isso textualmente em **dynamicNotes** do primeiro dia: ex. "O volume está calibrado para o estímulo necessário — mais não é melhor, é overtraining. Confie no protocolo."`
+}
+
+### TÉCNICAS AVANÇADAS — USO PONTUAL APENAS
+- Técnicas avançadas (back-off, pico de contração, cluster set, bi-set) são para serem usadas **APENAS EM ALGUNS EXERCÍCIOS** (não em todos) e **APENAS para protocolos de alunos AVANÇADOS**.
+- INICIANTE: 100% standard.
+- INTERMEDIÁRIO: 1-2 exercícios por treino com técnica.
+- AVANÇADO: até 30-40% dos exercícios podem ter técnica.
+
+### TREINO EM CASA (gym_type = "casa" ou similar)
+- Dividir entre **superior / inferior** (2-4x semana) OU **fullbody** (2-3x semana). NÃO usar PPL ou divisões de academia.
+- Indicar exercícios **com peso do corpo** (flexão, agachamento, afundo, prancha, ponte, dips de cadeira) e **uso de elásticos** (mini-band para abdução, faixa elástica para puxadas e remadas).
+- Citar nas instruções que o aluno deve usar elásticos de tensões variadas para progressão.
+
+### PERIODIZAÇÃO ONDULATÓRIA (METODOLOGIA OFICIAL)
+- Usamos **periodização ondulatória** dentro do protocolo de 60 dias. Não é linear.
+- **Sequência típica de volume entre os ciclos**:
+  - Ciclo 1 (primeiro protocolo): volume **MEDIANO** dentro da faixa do músculo (alvo no MEIO da faixa).
+  - Ciclo 2 (60 dias depois): volume **SUBINDO** — aproximar do TOPO da faixa nos músculos que progrediram.
+  - Ciclo 3: volume **BAIXANDO** — descer para o piso/meio da faixa (funciona como **deload de volume**).
+  - Ciclo 4 em diante: oscilar conforme evolução, sempre considerando o protocolo anterior.
+- **Zona de repetições oscila junto**: alternar zonas (5-9 / 6-10 / 8-12 / 10-15) entre ciclos para o mesmo exercício, a fim de variar estímulo neural e mecânico.
+- **OBRIGATÓRIO usar o protocolo anterior como BASE** quando ele for fornecido (campo previousProtocol no contexto):
+  - Ler que exercícios o aluno já fez, em que zona de reps, em que volume.
+  - **Manter coerência**: trocar 30-50% dos exercícios (variação de estímulo), MAS conservar a base do que funcionou.
+  - **Ajustar volume e zona de reps** conforme a posição do ciclo na ondulação (subir/baixar).
+  - **Progredir cargas** com base no histórico (se passou do topo da zona em V_falha → subiu carga; se ficou abaixo do piso → manteve ou baixou).
+  - Citar a estratégia no campo dynamicNotes do primeiro dia: "Este ciclo é [médio/alto/baixo] em volume porque o ciclo anterior foi [X]. Variamos exercícios para novos estímulos e mantivemos os que mais funcionaram para você."
 `;
 }
