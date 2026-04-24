@@ -123,6 +123,10 @@ Essa solicitação SOBRESCREVE a priorização automática por pontos fracos. Ad
 
     if (confirmations) {
       const parts: string[] = [];
+      // Aluno escolheu uma variante específica de divisão (override do padrão)
+      if (confirmations.split?.chosenVariant) {
+        parts.push(`- DIVISÃO ESCOLHIDA PELO ALUNO: "${confirmations.split.chosenVariant}". USAR EXATAMENTE essa variante (ignorar a marcada como ⭐ padrão).`);
+      }
       if (confirmations.split?.agree === "no" && confirmations.split?.justification) {
         parts.push(`- DIVISÃO: o aluno NÃO concordou com a divisão padrão. Justificativa: "${confirmations.split.justification}". AJUSTAR a divisão respeitando essa preferência (mas mantendo as regras da metodologia oficial — combinar grupos, descanso entre sinérgicos, etc.).`);
       }
@@ -138,6 +142,46 @@ Essa solicitação SOBRESCREVE a priorização automática por pontos fracos. Ad
 ## AJUSTES SOLICITADOS PELO ALUNO NA CONFIRMAÇÃO PÓS-ANÁLISE (OBRIGATÓRIO RESPEITAR)
 ${parts.join("\n")}`;
       }
+    }
+
+    // Periodização ondulatória — alimentar IA com o protocolo anterior (resumido)
+    if (previousProtocol) {
+      const version = previousProtocol.version || 1;
+      // Resumir treino: lista de exercícios por dia + reps/sets (compacto)
+      let trainingSummary = "";
+      try {
+        const days = previousProtocol.training?.days || previousProtocol.training || [];
+        if (Array.isArray(days)) {
+          trainingSummary = days
+            .slice(0, 7)
+            .map((d: any, i: number) => {
+              const focus = d.focus || d.title || `Dia ${i + 1}`;
+              const exs = (d.exercises || [])
+                .slice(0, 10)
+                .map((e: any) => `${e.name} (${e.sets || "?"}x ${e.reps || "?"})`)
+                .join(", ");
+              return `  • ${focus}: ${exs}`;
+            })
+            .join("\n");
+        }
+      } catch (_) { /* ignore */ }
+
+      assessmentContext += `
+
+## PROTOCOLO ANTERIOR DO ALUNO (USAR COMO BASE PARA PERIODIZAÇÃO ONDULATÓRIA — OBRIGATÓRIO)
+- Versão anterior: v${version}
+- Esta nova versão será v${version + 1}
+- Resumo do treino anterior:
+${trainingSummary || "(treino anterior não pôde ser resumido — usar critério padrão)"}
+
+INSTRUÇÕES DE ONDULAÇÃO:
+- Trocar 30-50% dos exercícios para variar estímulo, mantendo os que funcionaram.
+- Ajustar VOLUME por músculo conforme a posição na ondulação:
+  • v2 sobre v1: SUBIR volume (aproximar do TOPO da faixa) e/ou mudar zona de reps.
+  • v3 sobre v2: BAIXAR volume (deload — voltar ao piso/meio da faixa).
+  • v4+: oscilar (subir/baixar) conforme a evolução.
+- Variar a zona de reps entre ciclos (5-9 / 6-10 / 8-12 / 10-15) para o mesmo exercício.
+- Citar a estratégia de ondulação no campo dynamicNotes do PRIMEIRO dia: ex. "Este ciclo aumenta volume vs o anterior porque você respondeu bem; trocamos X exercícios e mantivemos Y."`;
     }
 
     if (reanalysisFeedback) {
