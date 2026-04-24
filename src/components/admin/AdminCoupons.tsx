@@ -22,6 +22,7 @@ const AdminCoupons = () => {
   const createCoupon = useCreateCoupon();
   const updateCoupon = useUpdateCoupon();
   const deleteCoupon = useDeleteCoupon();
+  const resyncCoupon = useResyncCoupon();
   const logAudit = useLogAudit();
   const { toast } = useToast();
 
