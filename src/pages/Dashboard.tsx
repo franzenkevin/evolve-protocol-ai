@@ -37,6 +37,7 @@ const Dashboard = () => {
   const { data: allLogs = [] } = useAllWorkoutLogs();
   const { data: articles = [] } = useJournalArticles();
   const saveRating = useSaveDailyRating();
+  const tour = useAppTour();
 
   const [starRating, setStarRating] = useState(0);
   const [ratingNotes, setRatingNotes] = useState("");
