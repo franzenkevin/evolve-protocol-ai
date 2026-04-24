@@ -194,6 +194,18 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Disclaimer Legal */}
+      <section className="border-t border-border bg-card/20">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <p className="text-[10px] leading-relaxed text-muted-foreground/60 text-justify">
+            <strong>O Hypertrophy NÃO garante qualquer resultado específico.</strong> Os resultados dependem de inúmeros fatores fora do controle da plataforma, como genética, adesão do usuário ao protocolo, sono, estresse, condições hormonais, alimentação real, ambiente, lesões prévias e variabilidade biológica individual. As referências, exemplos, depoimentos e materiais de marketing têm caráter meramente ilustrativo e não constituem promessa contratual de resultado.
+          </p>
+          <p className="text-[10px] leading-relaxed text-muted-foreground/60 text-justify mt-3">
+            O Hypertrophy é uma plataforma totalmente automatizada que utiliza algoritmos próprios e modelos de inteligência artificial (IA) de terceiros para gerar protocolos de treino, dieta, cardio, mobilidade e recomendações de evolução. Os protocolos são gerados por software, sem intervenção humana individualizada em tempo real, salvo se contratado expressamente um pacote de acompanhamento humano em separado.
+          </p>
+        </div>
+      </section>
+
       <Footer />
     </div>
   );
