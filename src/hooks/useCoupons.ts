@@ -16,6 +16,23 @@ export type Coupon = {
   updated_at: string;
 };
 
+async function syncCouponToPaddle(args: {
+  action: "upsert" | "archive";
+  code: string;
+  description?: string | null;
+  discount_percent?: number;
+  valid_until?: string | null;
+  max_uses?: number | null;
+  active?: boolean;
+}) {
+  try {
+    const { error } = await supabase.functions.invoke("sync-coupon", { body: args });
+    if (error) console.error("[sync-coupon] error", error);
+  } catch (e) {
+    console.error("[sync-coupon] failed", e);
+  }
+}
+
 export const useCoupons = () =>
   useQuery({
     queryKey: ["coupons"],
@@ -39,6 +56,16 @@ export const useCreateCoupon = () => {
     }) => {
       const { data, error } = await supabase.from("coupons").insert(input).select().single();
       if (error) throw error;
+      // Sync to Paddle (sandbox + live) — non-blocking on fail
+      await syncCouponToPaddle({
+        action: "upsert",
+        code: data.code,
+        description: data.description,
+        discount_percent: data.discount_percent,
+        valid_until: data.valid_until,
+        max_uses: data.max_uses,
+        active: data.active,
+      });
       return data;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["coupons"] }),
@@ -51,6 +78,15 @@ export const useUpdateCoupon = () => {
     mutationFn: async ({ id, ...patch }: Partial<Coupon> & { id: string }) => {
       const { data, error } = await supabase.from("coupons").update(patch).eq("id", id).select().single();
       if (error) throw error;
+      await syncCouponToPaddle({
+        action: "upsert",
+        code: data.code,
+        description: data.description,
+        discount_percent: data.discount_percent,
+        valid_until: data.valid_until,
+        max_uses: data.max_uses,
+        active: data.active,
+      });
       return data;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["coupons"] }),
@@ -61,9 +97,30 @@ export const useDeleteCoupon = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
+      // Fetch code first so we can archive on Paddle
+      const { data: existing } = await supabase.from("coupons").select("code").eq("id", id).maybeSingle();
       const { error } = await supabase.from("coupons").delete().eq("id", id);
       if (error) throw error;
+      if (existing?.code) {
+        await syncCouponToPaddle({ action: "archive", code: existing.code });
+      }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["coupons"] }),
+  });
+};
+
+export const useResyncCoupon = () => {
+  return useMutation({
+    mutationFn: async (c: Coupon) => {
+      await syncCouponToPaddle({
+        action: "upsert",
+        code: c.code,
+        description: c.description,
+        discount_percent: c.discount_percent,
+        valid_until: c.valid_until,
+        max_uses: c.max_uses,
+        active: c.active,
+      });
+    },
   });
 };

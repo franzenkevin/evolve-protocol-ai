@@ -10,8 +10,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Trash2, Tag } from "lucide-react";
-import { useCoupons, useCreateCoupon, useUpdateCoupon, useDeleteCoupon, type Coupon } from "@/hooks/useCoupons";
+import { Plus, Trash2, Tag, RefreshCw } from "lucide-react";
+import { useCoupons, useCreateCoupon, useUpdateCoupon, useDeleteCoupon, useResyncCoupon, type Coupon } from "@/hooks/useCoupons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useLogAudit } from "@/hooks/useAuditLog";
@@ -22,6 +22,7 @@ const AdminCoupons = () => {
   const createCoupon = useCreateCoupon();
   const updateCoupon = useUpdateCoupon();
   const deleteCoupon = useDeleteCoupon();
+  const resyncCoupon = useResyncCoupon();
   const logAudit = useLogAudit();
   const { toast } = useToast();
 
@@ -123,6 +124,23 @@ const AdminCoupons = () => {
               </p>
             </div>
             <Switch checked={c.active} onCheckedChange={() => handleToggle(c)} />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              title="Sincronizar com Paddle"
+              onClick={async () => {
+                try {
+                  await resyncCoupon.mutateAsync(c);
+                  toast({ title: "Cupom sincronizado com Paddle" });
+                } catch (e: any) {
+                  toast({ title: "Erro ao sincronizar", description: e.message, variant: "destructive" });
+                }
+              }}
+              disabled={resyncCoupon.isPending}
+            >
+              <RefreshCw size={13} className={resyncCoupon.isPending ? "animate-spin" : ""} />
+            </Button>
             <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleting(c)}><Trash2 size={13} /></Button>
           </Card>
         );

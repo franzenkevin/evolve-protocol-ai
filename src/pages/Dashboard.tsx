@@ -9,6 +9,7 @@ import { useWorkoutLogs, useAllWorkoutLogs } from "@/hooks/useWorkoutLogs";
 import { useJournalArticles } from "@/hooks/useJournal";
 import AppLayout from "@/components/AppLayout";
 import ProtocolProgressWidget from "@/components/ProtocolProgressWidget";
+import AppTour, { useAppTour } from "@/components/AppTour";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,6 +37,7 @@ const Dashboard = () => {
   const { data: allLogs = [] } = useAllWorkoutLogs();
   const { data: articles = [] } = useJournalArticles();
   const saveRating = useSaveDailyRating();
+  const tour = useAppTour();
 
   const [starRating, setStarRating] = useState(0);
   const [ratingNotes, setRatingNotes] = useState("");
@@ -102,6 +104,7 @@ const Dashboard = () => {
 
   return (
     <AppLayout>
+      <AppTour open={tour.open} onClose={tour.close} />
       <div className="p-4 max-w-lg mx-auto space-y-4 animate-fade-in pb-24">
         <div className="flex items-center justify-between pt-2">
           <div>
