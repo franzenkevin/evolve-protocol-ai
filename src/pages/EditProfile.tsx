@@ -26,6 +26,10 @@ const EditProfile = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { data: regenStatus } = useProtocolRegenStatus();
+  const consume = useConsumeRegenCredit();
+  const qc = useQueryClient();
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -33,10 +37,24 @@ const EditProfile = () => {
   const [savingEmail, setSavingEmail] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
 
+  // Schedule fields
+  const [wakeTime, setWakeTime] = useState("");
+  const [sleepTime, setSleepTime] = useState("");
+  const [intermittentFasting, setIntermittentFasting] = useState(false);
+  const [fastingWindow, setFastingWindow] = useState("");
+  const [mealSchedule, setMealSchedule] = useState("");
+  const [savingSchedule, setSavingSchedule] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
+
   useEffect(() => {
     if (profile) {
       setFullName(profile.full_name || "");
       setAvatarUrl(profile.avatar_url || "");
+      setWakeTime(profile.wake_time || "");
+      setSleepTime(profile.sleep_time || "");
+      setIntermittentFasting(!!profile.intermittent_fasting);
+      setFastingWindow(profile.fasting_window || "");
+      setMealSchedule(profile.meal_schedule || "");
     }
     if (user?.email) setEmail(user.email);
   }, [profile, user]);
