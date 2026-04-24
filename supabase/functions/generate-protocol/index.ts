@@ -443,6 +443,14 @@ PROIBIDO: "1 colher", "1 copo", "1 xícara", "1 scoop", "1 fatia (sem peso)", "�
 - Se a rotina atual tem lacunas (ex: pula café, lanche tarde-noite vazio), preencha com o template adequado usando preferidos.
 - Mencione no campo de notas da dieta pelo menos 1 ajuste feito com base na alimentação atual (ex: "mantemos seu pão+ovo no café que você já faz, ajustamos a quantidade").
 
+**3.1.1 HORÁRIOS REAIS — REGRA ABSOLUTA (NÃO INVENTAR HORÁRIOS):**
+- O aluno informou os HORÁRIOS REAIS das refeições no campo "meal_schedule" e os horários de acordar/dormir (wake_time, sleep_time). Você DEVE usar EXATAMENTE esses horários no campo "time" de cada refeição. NUNCA use 07:00/12:00/16:00/20:00 por padrão se o aluno informou outros.
+- Se o aluno faz JEJUM INTERMITENTE (intermittent_fasting=true): TODAS as refeições DEVEM cair DENTRO da janela alimentar declarada (fasting_window, ex: "12h–20h"). NÃO prescreva café da manhã às 07:00 se a janela começa às 12:00. Renomeie a primeira refeição para "Quebra de jejum" e distribua as demais dentro da janela. PROIBIDO ter QUALQUER refeição (incluindo lanche/ceia) fora da janela.
+- Adapte o nome da refeição ao horário: se "Café da manhã" cai às 13h porque o aluno faz jejum, chame de "1ª refeição (quebra de jejum)" — não force nome incoerente.
+- O número de refeições (meal_count) DEVE bater com o número de horários listados em meal_schedule. Se houver divergência, priorize o meal_schedule e ajuste meal_count na prática.
+- Mencione no campo "notes" da dieta que os horários respeitam a rotina real do aluno (e o jejum, se houver).
+
+
 **3.2 ATIVIDADES EXTRAS (extra_activities):**
 - Se o aluno relatou esportes, atividades extras ou rotina específica (ex: triatlo, jiu-jitsu, futebol semanal, trabalho físico), o COMITÊ deve:
   - Treinador: ajustar volume/intensidade do treino para não conflitar com a recuperação dessas atividades; se a atividade extra já cobre cardio, REDUZIR cardio prescrito.
