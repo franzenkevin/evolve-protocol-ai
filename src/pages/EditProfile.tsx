@@ -301,6 +301,113 @@ const EditProfile = () => {
             Atualizar e-mail
           </Button>
         </Card>
+
+        <Card className="p-4 card-gradient border-border space-y-4">
+          <div className="flex items-center gap-2">
+            <Clock size={16} className="text-primary" />
+            <h3 className="font-heading font-semibold text-sm">Horários e rotina</h3>
+          </div>
+          <p className="text-[11px] text-muted-foreground -mt-2">
+            Atualize seus horários e regere o protocolo sem refazer o quiz inteiro.
+          </p>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="wake_time" className="text-xs">Hora que acorda</Label>
+              <Input
+                id="wake_time"
+                type="time"
+                value={wakeTime}
+                onChange={(e) => setWakeTime(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="sleep_time" className="text-xs">Hora que dorme</Label>
+              <Input
+                id="sleep_time"
+                type="time"
+                value={sleepTime}
+                onChange={(e) => setSleepTime(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="meal_schedule" className="text-xs">
+              Horários reais das refeições
+            </Label>
+            <Textarea
+              id="meal_schedule"
+              value={mealSchedule}
+              onChange={(e) => setMealSchedule(e.target.value)}
+              placeholder="Ex: Café 7h, almoço 12h, lanche 16h, jantar 20h"
+              rows={2}
+              className="resize-none text-sm"
+            />
+          </div>
+
+          <div className="flex items-center justify-between rounded-md border border-border/60 px-3 py-2">
+            <div className="space-y-0.5">
+              <Label htmlFor="if_switch" className="text-xs">Faço jejum intermitente</Label>
+              <p className="text-[10px] text-muted-foreground">
+                A IA respeitará sua janela alimentar.
+              </p>
+            </div>
+            <Switch
+              id="if_switch"
+              checked={intermittentFasting}
+              onCheckedChange={setIntermittentFasting}
+            />
+          </div>
+
+          {intermittentFasting && (
+            <div className="space-y-1.5">
+              <Label htmlFor="fasting_window" className="text-xs">Janela alimentar</Label>
+              <Input
+                id="fasting_window"
+                value={fastingWindow}
+                onChange={(e) => setFastingWindow(e.target.value)}
+                placeholder="Ex: 12h-20h"
+              />
+            </div>
+          )}
+
+          <div className="flex flex-col gap-2 pt-1">
+            <Button
+              onClick={handleSaveSchedule}
+              disabled={savingSchedule}
+              size="sm"
+              variant="outline"
+              className="w-full"
+            >
+              {savingSchedule ? <Loader2 size={14} className="mr-1 animate-spin" /> : <Save size={14} className="mr-1" />}
+              Salvar horários
+            </Button>
+
+            <Button
+              onClick={handleRegenerate}
+              disabled={regenerating}
+              size="sm"
+              className="w-full"
+            >
+              {regenerating ? (
+                <Loader2 size={14} className="mr-1 animate-spin" />
+              ) : regenStatus?.availableCredit ? (
+                <Sparkles size={14} className="mr-1" />
+              ) : (
+                <Lock size={14} className="mr-1" />
+              )}
+              {regenStatus?.availableCredit
+                ? "Salvar e regerar protocolo"
+                : "Regerar protocolo (requer crédito)"}
+            </Button>
+            {!regenStatus?.availableCredit && (
+              <p className="text-[10px] text-muted-foreground text-center">
+                Sem crédito disponível. Toque para adquirir um novo protocolo.
+              </p>
+            )}
+          </div>
+        </Card>
       </div>
     </AppLayout>
   );
