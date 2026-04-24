@@ -48,6 +48,7 @@ import {
   Gift,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import BulkRegenerateCard from "./BulkRegenerateCard";
 
 type Profile = {
   id: string;
@@ -270,6 +271,8 @@ const AdminUsers = () => {
 
   return (
     <div className="space-y-3">
+      <BulkRegenerateCard />
+
       <div className="relative">
         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <Input
