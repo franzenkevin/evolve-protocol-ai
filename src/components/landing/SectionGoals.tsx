@@ -17,7 +17,7 @@ const GOALS = [
   {
     icon: Zap,
     title: "Performance",
-    desc: "Mais força, mais resistência, mais explosão. Periodização pra quem treina pra render — não só pra estética.",
+    desc: "Mais força, mais resistência, mais explosão. Periodização pra quem treina pra render em outros esportes, e não só pra estética.",
     tag: "Condicionamento",
   },
 ];
