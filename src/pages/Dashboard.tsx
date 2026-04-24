@@ -9,6 +9,7 @@ import { useWorkoutLogs, useAllWorkoutLogs } from "@/hooks/useWorkoutLogs";
 import { useJournalArticles } from "@/hooks/useJournal";
 import AppLayout from "@/components/AppLayout";
 import ProtocolProgressWidget from "@/components/ProtocolProgressWidget";
+import AppTour, { useAppTour } from "@/components/AppTour";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
