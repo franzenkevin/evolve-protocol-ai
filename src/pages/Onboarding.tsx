@@ -523,55 +523,33 @@ const Onboarding = () => {
         onboarding_complete: true,
       };
 
+      // Salva também as confirmações no draft para a IA usar quando gerar o protocolo (após o pagamento)
       await updateProfile.mutateAsync(profileData);
 
-      // Try AI-generated protocol first, fallback to rule-based
-      let protocol: { training: any; diet: any };
-      try {
-        // Fetch latest body assessment if available
-        let bodyAssessment = assessment;
-        if (!bodyAssessment && user) {
-          const { data: assessData } = await supabase
-            .from("body_assessments")
-            .select("*")
-            .eq("user_id", user.id)
-            .order("created_at", { ascending: false })
-            .limit(1)
-            .maybeSingle();
-          bodyAssessment = assessData;
-        }
-
-        toast({ title: "🤖 Gerando protocolo com IA...", description: "Isso pode levar alguns segundos." });
-
-        const { data: aiResult, error: aiError } = await supabase.functions.invoke("generate-protocol", {
-          body: {
-            profile: profileData,
-            bodyAssessment,
-            bodyEmphasis: profileData.body_emphasis,
-            confirmations,
-          },
-        });
-
-        if (aiError) throw aiError;
-        if (aiResult?.fallback) throw new Error("Fallback requested");
-        if (!aiResult?.training || !aiResult?.diet) throw new Error("Invalid AI response");
-
-        protocol = { training: aiResult.training, diet: aiResult.diet };
-        toast({ title: "✨ Protocolo personalizado gerado!", description: "Seu plano foi criado com inteligência artificial." });
-      } catch (aiErr) {
-        console.warn("AI protocol generation failed, using fallback:", aiErr);
-        protocol = generateProtocol(profileData as Profile);
-        toast({ title: "Protocolo gerado!", description: "Seu protocolo foi criado com sucesso." });
-      }
-
-      await createProtocol.mutateAsync(protocol);
-      setGenStage("Pronto!");
-      await new Promise((r) => setTimeout(r, 400));
-      try { localStorage.removeItem(STORAGE_KEY); } catch {}
       if (user) {
-        try { await supabase.from("onboarding_drafts").delete().eq("user_id", user.id); } catch {}
+        try {
+          await supabase
+            .from("onboarding_drafts")
+            .upsert(
+              {
+                user_id: user.id,
+                data: { confirmations, completedAt: new Date().toISOString() } as any,
+                updated_at: new Date().toISOString(),
+              },
+              { onConflict: "user_id" },
+            );
+        } catch (e) {
+          console.warn("Failed to persist confirmations to draft", e);
+        }
       }
-      navigate("/dashboard");
+
+      try { localStorage.removeItem(STORAGE_KEY); } catch {}
+
+      toast({
+        title: "Quiz finalizado! 🎉",
+        description: "Falta só liberar seu protocolo. Escolha um plano para continuar.",
+      });
+      navigate("/plans");
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
     } finally {
