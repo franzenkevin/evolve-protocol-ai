@@ -123,6 +123,80 @@ const EditProfile = () => {
     }
   };
 
+  const handleSaveSchedule = async () => {
+    setSavingSchedule(true);
+    try {
+      await updateProfile.mutateAsync({
+        wake_time: wakeTime || null,
+        sleep_time: sleepTime || null,
+        intermittent_fasting: intermittentFasting,
+        fasting_window: intermittentFasting ? (fastingWindow.trim() || null) : null,
+        meal_schedule: mealSchedule.trim() || null,
+      });
+      toast.success("Horários atualizados!");
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao salvar horários");
+    } finally {
+      setSavingSchedule(false);
+    }
+  };
+
+  const handleRegenerate = async () => {
+    if (!profile) return toast.error("Perfil não carregado.");
+    if (!regenStatus?.availableCredit) {
+      navigate("/new-protocol");
+      return;
+    }
+    setRegenerating(true);
+    try {
+      // Save schedule first to ensure latest values are used
+      await updateProfile.mutateAsync({
+        wake_time: wakeTime || null,
+        sleep_time: sleepTime || null,
+        intermittent_fasting: intermittentFasting,
+        fasting_window: intermittentFasting ? (fastingWindow.trim() || null) : null,
+        meal_schedule: mealSchedule.trim() || null,
+      });
+
+      const { data: assessment } = await supabase
+        .from("body_assessments")
+        .select("*")
+        .eq("user_id", profile.user_id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const freshProfile = {
+        ...profile,
+        wake_time: wakeTime || null,
+        sleep_time: sleepTime || null,
+        intermittent_fasting: intermittentFasting,
+        fasting_window: intermittentFasting ? (fastingWindow.trim() || null) : null,
+        meal_schedule: mealSchedule.trim() || null,
+      };
+
+      const { error } = await supabase.functions.invoke("generate-protocol", {
+        body: {
+          profile: freshProfile,
+          bodyAssessment: assessment ?? undefined,
+          bodyEmphasis: profile.body_emphasis ?? undefined,
+          force_regenerate: true,
+          reanalysisFeedback: { progressNotes: "Atualização de horários e rotina" },
+        },
+      });
+      if (error) throw error;
+
+      await consume.mutateAsync(regenStatus.availableCredit.id);
+      qc.invalidateQueries({ queryKey: ["protocol"] });
+      toast.success("Protocolo regerado com seus novos horários!");
+      navigate("/training");
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao regerar protocolo");
+    } finally {
+      setRegenerating(false);
+    }
+  };
+
   return (
     <AppLayout>
       <div className="p-4 max-w-lg mx-auto space-y-4 animate-fade-in pb-24">
