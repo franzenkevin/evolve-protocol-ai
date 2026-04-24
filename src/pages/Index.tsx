@@ -188,7 +188,8 @@ const Index = () => {
             </Button>
           </Link>
           <p className="text-xs text-muted-foreground mt-5">
-            ✓ Tempo estimado: 5 a 8 minutos · ✓ Pague só ao liberar o protocolo
+            ✓ Tempo estimado: 5 a 8 minutos <br />
+            ✓ Pague só ao liberar o protocolo
           </p>
         </div>
       </section>
