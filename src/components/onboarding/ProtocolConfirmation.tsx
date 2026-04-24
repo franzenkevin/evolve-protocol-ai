@@ -12,9 +12,14 @@ export type ConfirmationAnswer = {
   justification: string;
 };
 
+export type SplitConfirmation = ConfirmationAnswer & {
+  /** Nome da variante de split escolhida pelo aluno (override do default). */
+  chosenVariant?: string;
+};
+
 export type ProtocolConfirmations = {
   bodyEmphasis: { wants: "yes" | "no" | ""; description: string };
-  split: ConfirmationAnswer;
+  split: SplitConfirmation;
   cardio: ConfirmationAnswer;
   mealTimes: ConfirmationAnswer;
 };
@@ -35,16 +40,19 @@ interface Props {
 
 const DEFAULT_VALUE: ProtocolConfirmations = {
   bodyEmphasis: { wants: "", description: "" },
-  split: { agree: "", justification: "" },
+  split: { agree: "", justification: "", chosenVariant: undefined },
   cardio: { agree: "", justification: "" },
   mealTimes: { agree: "", justification: "" },
 };
 
-function getDefaultSplit(sex: string, days: number) {
+function getSplitVariants(sex: string, days: number) {
   const table = sex === "F" ? SPLITS_WOMEN : SPLITS_MEN;
-  const variants = table[days] || table[4] || table[3];
-  const variant = variants?.find((v) => v.defaultChoice) || variants?.[0];
-  return variant;
+  return table[days] || table[4] || table[3] || [];
+}
+
+function getDefaultSplit(sex: string, days: number) {
+  const variants = getSplitVariants(sex, days);
+  return variants.find((v) => v.defaultChoice) || variants[0];
 }
 
 function suggestMealTimes(count: number, trainingTime?: string): string {
@@ -69,7 +77,10 @@ export const ProtocolConfirmation = ({
 }: Props) => {
   const [v, setV] = useState<ProtocolConfirmations>(initial || DEFAULT_VALUE);
 
-  const split = useMemo(() => getDefaultSplit(sex, trainingDays), [sex, trainingDays]);
+  const variants = useMemo(() => getSplitVariants(sex, trainingDays), [sex, trainingDays]);
+  const defaultSplit = useMemo(() => getDefaultSplit(sex, trainingDays), [sex, trainingDays]);
+  const selectedVariantName = v.split.chosenVariant || defaultSplit?.name || "";
+  const selectedVariant = variants.find((x) => x.name === selectedVariantName) || defaultSplit;
   const mealTimes = useMemo(() => suggestMealTimes(mealCount, trainingTime), [mealCount, trainingTime]);
 
   const update = (patch: Partial<ProtocolConfirmations>) => {
@@ -131,20 +142,63 @@ export const ProtocolConfirmation = ({
           <Target size={16} className="text-primary" />
           <p className="text-sm font-semibold text-foreground">Sua divisão de treino</p>
         </div>
-        {split ? (
+
+        {/* Seletor de variante (quando há mais de 1) */}
+        {variants.length > 1 && (
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">
+              Escolha a divisão que prefere para {trainingDays}x/semana:
+            </p>
+            <RadioGroup
+              value={selectedVariantName}
+              onValueChange={(val) =>
+                update({
+                  split: {
+                    ...v.split,
+                    chosenVariant: val,
+                    agree: "yes",
+                    justification: "",
+                  },
+                })
+              }
+              className="space-y-2"
+            >
+              {variants.map((variant) => (
+                <div key={variant.name} className="flex items-start gap-2">
+                  <RadioGroupItem value={variant.name} id={`split-var-${variant.name}`} className="mt-0.5" />
+                  <Label htmlFor={`split-var-${variant.name}`} className="cursor-pointer text-xs leading-snug">
+                    <span className="text-foreground font-medium">
+                      {variant.name}
+                      {variant.defaultChoice && <span className="text-primary ml-1">⭐ recomendada</span>}
+                    </span>
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
+        )}
+
+        {/* Detalhes da variante selecionada */}
+        {selectedVariant ? (
           <div className="rounded-md bg-muted/40 p-3 space-y-1">
-            <p className="text-sm text-foreground font-medium">{split.name}</p>
+            <p className="text-sm text-foreground font-medium">{selectedVariant.name}</p>
             <ul className="text-xs text-muted-foreground space-y-0.5">
-              {split.days.map((d) => (
+              {selectedVariant.days.map((d) => (
                 <li key={d.code}>
                   <span className="text-foreground">{d.code}:</span> {d.focus}
                 </li>
               ))}
             </ul>
+            {selectedVariant.schedulingRules.length > 0 && (
+              <p className="text-[11px] text-muted-foreground/80 italic pt-1">
+                {selectedVariant.schedulingRules.join(" · ")}
+              </p>
+            )}
           </div>
         ) : (
           <p className="text-xs text-muted-foreground">A IA escolherá a divisão ideal para {trainingDays}x/semana.</p>
         )}
+
         <p className="text-xs text-muted-foreground">Você concorda com essa divisão?</p>
         <RadioGroup
           value={v.split.agree}
@@ -157,12 +211,12 @@ export const ProtocolConfirmation = ({
           </div>
           <div className="flex items-center gap-2">
             <RadioGroupItem value="no" id="split-no" />
-            <Label htmlFor="split-no" className="cursor-pointer text-sm">Não, justificar</Label>
+            <Label htmlFor="split-no" className="cursor-pointer text-sm">Não, quero outra coisa</Label>
           </div>
         </RadioGroup>
         {v.split.agree === "no" && (
           <Textarea
-            placeholder="Ex: prefiro Push/Pull/Legs em vez de A/B/A/B..."
+            placeholder="Ex: prefiro outra estrutura específica, descreva..."
             value={v.split.justification}
             onChange={(e) => update({ split: { ...v.split, justification: e.target.value } })}
             maxLength={500}

@@ -57,23 +57,34 @@ export type SplitVariant = {
 };
 
 export const SPLITS_WOMEN: Record<number, SplitVariant[]> = {
+  2: [
+    {
+      name: "FB-FB com ênfase inferior (2x)",
+      days: [
+        { code: "A", focus: "Full Body — ênfase em inferiores (glúteo + quadríceps + posterior) + 1-2 superiores" },
+        { code: "B", focus: "Full Body — ênfase em inferiores (glúteo + posterior + quadríceps) + 1-2 superiores" },
+      ],
+      schedulingRules: ["NÃO pode em dias seguidos — exigir descanso entre eles"],
+      defaultChoice: true,
+    },
+  ],
   3: [
     {
-      name: "FB-FB-FB (Full Body 3x)",
+      name: "FB-FB-FB com ênfase inferior (3x)",
       days: [
-        { code: "A", focus: "Full Body — mobilidade específica + 5 inferiores + 2-3 superiores" },
-        { code: "B", focus: "Full Body — mobilidade específica + 5 inferiores + 2-3 superiores" },
-        { code: "C", focus: "Full Body — mobilidade específica + 5 inferiores + 2-3 superiores" },
+        { code: "A", focus: "Full Body — ênfase inferior (glúteo + quad)" },
+        { code: "B", focus: "Full Body — ênfase inferior (posterior + glúteo)" },
+        { code: "C", focus: "Full Body — ênfase inferior (glúteo médio + quad)" },
       ],
       schedulingRules: ["NÃO pode ser em dias seguidos — exigir 1 dia descanso entre treinos"],
       defaultChoice: true,
     },
     {
-      name: "Inf-Sup-Inf (3x)",
+      name: "Inf(quad)-Sup-Inf(post+glúteo) (3x)",
       days: [
-        { code: "A", focus: "Inferior" },
+        { code: "A", focus: "Inferior — ênfase QUADRÍCEPS" },
         { code: "B", focus: "Superior" },
-        { code: "C", focus: "Inferior" },
+        { code: "C", focus: "Inferior — ênfase POSTERIOR + GLÚTEO" },
       ],
       schedulingRules: ["Pode ser em dias consecutivos OU distintos"],
     },
@@ -103,6 +114,18 @@ export const SPLITS_WOMEN: Record<number, SplitVariant[]> = {
   ],
   5: [
     {
+      name: "Inf-Sup-Inf-Sup-Inf (5x — alternado)",
+      days: [
+        { code: "A", focus: "Inferior" },
+        { code: "B", focus: "Superior" },
+        { code: "C", focus: "Inferior" },
+        { code: "D", focus: "Superior" },
+        { code: "E", focus: "Inferior" },
+      ],
+      schedulingRules: ["Pode ser corrido ou intercalando 1 OFF"],
+      defaultChoice: true,
+    },
+    {
       name: "Inf-Sup-Inf-OFF-Inf-Sup (5x com folga no meio)",
       days: [
         { code: "A", focus: "Inferior" },
@@ -112,32 +135,20 @@ export const SPLITS_WOMEN: Record<number, SplitVariant[]> = {
         { code: "E", focus: "Superior" },
       ],
       schedulingRules: ["Inserir 1 dia OFF obrigatório entre C e D"],
-      defaultChoice: true,
-    },
-    {
-      name: "Inf-Sup-Inf-Sup-Inf (5x corrido)",
-      days: [
-        { code: "A", focus: "Inferior" },
-        { code: "B", focus: "Superior" },
-        { code: "C", focus: "Inferior" },
-        { code: "D", focus: "Superior" },
-        { code: "E", focus: "Inferior" },
-      ],
-      schedulingRules: ["Pode ser corrido"],
     },
   ],
   6: [
     {
-      name: "5x + 1 complemento",
+      name: "Inf-Sup-Inf-Sup-Inf-Sup (6x — alternado)",
       days: [
         { code: "A", focus: "Inferior" },
         { code: "B", focus: "Superior" },
         { code: "C", focus: "Inferior" },
         { code: "D", focus: "Superior" },
         { code: "E", focus: "Inferior" },
-        { code: "F", focus: "Cardio + abdômen + complemento (treinar mais que 5x para hipertrofia é desnecessário)" },
+        { code: "F", focus: "Superior" },
       ],
-      schedulingRules: ["Após 5 dias de treino real, F é só cardio/abs/complemento"],
+      schedulingRules: ["Volume alto — só se a recuperação acompanhar; manter ênfase em glúteo/posterior"],
       defaultChoice: true,
     },
   ],
@@ -164,7 +175,28 @@ export const SPLITS_WOMEN: Record<number, SplitVariant[]> = {
 // ============================================================================
 
 export const SPLITS_MEN: Record<number, SplitVariant[]> = {
+  2: [
+    {
+      name: "FB-FB (Full Body 2x)",
+      days: [
+        { code: "A", focus: "Full Body — compostos pesados (1 quad, 1 push, 1 pull, 1 posterior, 1 core)" },
+        { code: "B", focus: "Full Body — compostos pesados (1 quad, 1 push, 1 pull, 1 posterior, 1 core)" },
+      ],
+      schedulingRules: ["DEVE ter pelo menos 2 dias de descanso entre eles"],
+      defaultChoice: true,
+    },
+  ],
   3: [
+    {
+      name: "Push-Pull-Legs (PPL 3x)",
+      days: [
+        { code: "A", focus: "Push (peito + ombros + tríceps)" },
+        { code: "B", focus: "Pull (costas + bíceps)" },
+        { code: "C", focus: "Legs (perna completa)" },
+      ],
+      schedulingRules: ["Pode ser direto ou alternado"],
+      defaultChoice: true,
+    },
     {
       name: "FB-FB-FB (Full Body 3x)",
       days: [
@@ -174,18 +206,19 @@ export const SPLITS_MEN: Record<number, SplitVariant[]> = {
       ],
       schedulingRules: ["DEVE ter descanso entre eles — não pode ser corrido"],
     },
-    {
-      name: "Push-Inferior-Pull (3x)",
-      days: [
-        { code: "A", focus: "Push (peito + ombros + tríceps)" },
-        { code: "B", focus: "Inferior (pernas completo)" },
-        { code: "C", focus: "Pull (costas + bíceps)" },
-      ],
-      schedulingRules: [],
-      defaultChoice: true,
-    },
   ],
   4: [
+    {
+      name: "Upper-Lower (4x)",
+      days: [
+        { code: "A", focus: "Upper (peito + costas + ombros + braços)" },
+        { code: "B", focus: "Lower (perna completa)" },
+        { code: "C", focus: "Upper" },
+        { code: "D", focus: "Lower" },
+      ],
+      schedulingRules: ["Padrão: 2 dias on + 1 off + 2 dias on"],
+      defaultChoice: true,
+    },
     {
       name: "Push-Pull-Legs-Upper (4x)",
       days: [
@@ -199,7 +232,6 @@ export const SPLITS_MEN: Record<number, SplitVariant[]> = {
         "PERGUNTAR: 1 perna completa só ou 1 perna + estímulos extra de inferior nos Push/Pull?",
         "Se aluno escolher 'estímulos extra de inferior': adicionar 1-2 exercícios de inferior nos Push e Pull, e SEMPRE inserir 1 dia OFF entre eles e o Legs",
       ],
-      defaultChoice: true,
     },
   ],
   5: [
@@ -214,23 +246,34 @@ export const SPLITS_MEN: Record<number, SplitVariant[]> = {
       ],
       schedulingRules: [
         "Pode ser direto ou ter descanso entre C e D (preferível: descanso entre C e D)",
-        "Outras variações parecidas são permitidas, mas NUNCA trabalhamos um único músculo por dia",
+        "NUNCA trabalhamos um único músculo por dia",
       ],
       defaultChoice: true,
+    },
+    {
+      name: "Push1-Pull1-Legs-Push2-Pull2 (5x)",
+      days: [
+        { code: "A", focus: "Push 1 (ênfase peito)" },
+        { code: "B", focus: "Pull 1 (ênfase costas largura)" },
+        { code: "C", focus: "Legs (perna completa)" },
+        { code: "D", focus: "Push 2 (ênfase ombro/tríceps)" },
+        { code: "E", focus: "Pull 2 (ênfase costas espessura + bíceps)" },
+      ],
+      schedulingRules: ["Boa para avançados que querem priorizar superiores"],
     },
   ],
   6: [
     {
-      name: "PPL x2 (6x)",
+      name: "Push1-Pull1-Legs1-Push2-Pull2-Legs2 (PPL x2 — 6x)",
       days: [
-        { code: "A", focus: "Push" },
-        { code: "B", focus: "Pull" },
-        { code: "C", focus: "Legs" },
-        { code: "D", focus: "Push" },
-        { code: "E", focus: "Pull" },
-        { code: "F", focus: "Legs" },
+        { code: "A", focus: "Push 1 (ênfase peito)" },
+        { code: "B", focus: "Pull 1 (ênfase largura)" },
+        { code: "C", focus: "Legs 1 (ênfase quadríceps)" },
+        { code: "D", focus: "Push 2 (ênfase ombro)" },
+        { code: "E", focus: "Pull 2 (ênfase espessura)" },
+        { code: "F", focus: "Legs 2 (ênfase posterior + glúteo)" },
       ],
-      schedulingRules: ["Volume alto — só para avançados com boa recuperação"],
+      schedulingRules: ["Volume alto — só para avançados com ótima recuperação"],
       defaultChoice: true,
     },
   ],
@@ -413,6 +456,51 @@ ${VOLUME_COUNT_RULE}
 Mesmo nas divisões 5x/6x, sempre combinar grupos. NUNCA ter um dia "só peito" ou "só bíceps".
 
 ### SE A DIVISÃO ESCOLHIDA TEM MÚLTIPLAS VARIANTES:
-Escolher a marcada como ⭐ padrão. As outras variantes serão oferecidas na fase de confirmação pós-análise (Fase 2).
+Usar a marcada como ⭐ padrão, A MENOS QUE o aluno tenha selecionado outra variante na confirmação pós-análise (campo confirmations.split.chosenVariant).
+
+### REGRAS UNIVERSAIS DE PRESCRIÇÃO
+
+**ABDÔMEN (OBRIGATÓRIO ${isWoman ? "para mulheres" : "para homens"})**:
+- Pelo menos **2x na semana**, distribuído nos treinos (NÃO em dia separado para hipertrofia ${isWoman ? "" : "— exceto se for o 6º/7º dia complementar"})
+- USAR APENAS: **Reto abdominal** (crunch, abdominal infra/elevação de pernas, prancha frontal). **NUNCA prescrever oblíquo** (treinar oblíquo aumenta a circunferência da cintura — não desejado em estética).
+
+${
+  isWoman
+    ? `**MULHER — REGRAS ESPECÍFICAS**:
+- **Peito**: NO MÁXIMO **1 exercício de peito por semana** (não há necessidade de mais). Mulher não precisa hipertrofiar peito.
+- **Ênfase nos superiores**: SEMPRE **ombro (lateral + posterior) + costas** > peito + braços.
+- **Ênfase nos inferiores**: protocolo COMPLETO de inferior, mas com **PRIORIDADE em GLÚTEO MÉDIO** (abdução, clamshell, hip thrust com rotação externa) e nos pontos fracos identificados na avaliação corporal.
+- Nos dias de FB: ênfase obrigatória em inferiores (5+ exercícios de perna vs 1-2 superiores).`
+    : `**HOMEM — REGRAS ESPECÍFICAS (anti-overtraining)**:
+- Homens **TENDEM A TREINAR DEMAIS**. Você DEVE prescrever o **NECESSÁRIO**, NÃO o exagerado.
+- Manter volume DENTRO da faixa, **preferindo o meio-baixo da faixa** quando o aluno é iniciante/intermediário.
+- Explicar isso textualmente em **dynamicNotes** do primeiro dia: ex. "O volume está calibrado para o estímulo necessário — mais não é melhor, é overtraining. Confie no protocolo."`
+}
+
+### TÉCNICAS AVANÇADAS — USO PONTUAL APENAS
+- Técnicas avançadas (back-off, pico de contração, cluster set, bi-set) são para serem usadas **APENAS EM ALGUNS EXERCÍCIOS** (não em todos) e **APENAS para protocolos de alunos AVANÇADOS**.
+- INICIANTE: 100% standard.
+- INTERMEDIÁRIO: 1-2 exercícios por treino com técnica.
+- AVANÇADO: até 30-40% dos exercícios podem ter técnica.
+
+### TREINO EM CASA (gym_type = "casa" ou similar)
+- Dividir entre **superior / inferior** (2-4x semana) OU **fullbody** (2-3x semana). NÃO usar PPL ou divisões de academia.
+- Indicar exercícios **com peso do corpo** (flexão, agachamento, afundo, prancha, ponte, dips de cadeira) e **uso de elásticos** (mini-band para abdução, faixa elástica para puxadas e remadas).
+- Citar nas instruções que o aluno deve usar elásticos de tensões variadas para progressão.
+
+### PERIODIZAÇÃO ONDULATÓRIA (METODOLOGIA OFICIAL)
+- Usamos **periodização ondulatória** dentro do protocolo de 60 dias. Não é linear.
+- **Sequência típica de volume entre os ciclos**:
+  - Ciclo 1 (primeiro protocolo): volume **MEDIANO** dentro da faixa do músculo (alvo no MEIO da faixa).
+  - Ciclo 2 (60 dias depois): volume **SUBINDO** — aproximar do TOPO da faixa nos músculos que progrediram.
+  - Ciclo 3: volume **BAIXANDO** — descer para o piso/meio da faixa (funciona como **deload de volume**).
+  - Ciclo 4 em diante: oscilar conforme evolução, sempre considerando o protocolo anterior.
+- **Zona de repetições oscila junto**: alternar zonas (5-9 / 6-10 / 8-12 / 10-15) entre ciclos para o mesmo exercício, a fim de variar estímulo neural e mecânico.
+- **OBRIGATÓRIO usar o protocolo anterior como BASE** quando ele for fornecido (campo previousProtocol no contexto):
+  - Ler que exercícios o aluno já fez, em que zona de reps, em que volume.
+  - **Manter coerência**: trocar 30-50% dos exercícios (variação de estímulo), MAS conservar a base do que funcionou.
+  - **Ajustar volume e zona de reps** conforme a posição do ciclo na ondulação (subir/baixar).
+  - **Progredir cargas** com base no histórico (se passou do topo da zona em V_falha → subiu carga; se ficou abaixo do piso → manteve ou baixou).
+  - Citar a estratégia no campo dynamicNotes do primeiro dia: "Este ciclo é [médio/alto/baixo] em volume porque o ciclo anterior foi [X]. Variamos exercícios para novos estímulos e mantivemos os que mais funcionaram para você."
 `;
 }

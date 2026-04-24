@@ -42,7 +42,26 @@ serve(async (req) => {
       bodyEmphasis: bodyEmphasisInput,
       confirmations,
       reanalysisFeedback,
+      previousProtocol: previousProtocolInput,
     } = body || {};
+
+    // Carrega último protocolo do aluno (para periodização ondulatória)
+    // se o caller não forneceu explicitamente.
+    let previousProtocol: any = previousProtocolInput || null;
+    if (!previousProtocol && user) {
+      try {
+        const { data: prev } = await supabase
+          .from("protocols")
+          .select("training, diet, version, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (prev) previousProtocol = prev;
+      } catch (e) {
+        console.warn("Could not load previous protocol:", e);
+      }
+    }
 
     if (!profile) {
       return new Response(JSON.stringify({ error: "Profile is required" }), {
@@ -104,6 +123,10 @@ Essa solicitação SOBRESCREVE a priorização automática por pontos fracos. Ad
 
     if (confirmations) {
       const parts: string[] = [];
+      // Aluno escolheu uma variante específica de divisão (override do padrão)
+      if (confirmations.split?.chosenVariant) {
+        parts.push(`- DIVISÃO ESCOLHIDA PELO ALUNO: "${confirmations.split.chosenVariant}". USAR EXATAMENTE essa variante (ignorar a marcada como ⭐ padrão).`);
+      }
       if (confirmations.split?.agree === "no" && confirmations.split?.justification) {
         parts.push(`- DIVISÃO: o aluno NÃO concordou com a divisão padrão. Justificativa: "${confirmations.split.justification}". AJUSTAR a divisão respeitando essa preferência (mas mantendo as regras da metodologia oficial — combinar grupos, descanso entre sinérgicos, etc.).`);
       }
@@ -119,6 +142,46 @@ Essa solicitação SOBRESCREVE a priorização automática por pontos fracos. Ad
 ## AJUSTES SOLICITADOS PELO ALUNO NA CONFIRMAÇÃO PÓS-ANÁLISE (OBRIGATÓRIO RESPEITAR)
 ${parts.join("\n")}`;
       }
+    }
+
+    // Periodização ondulatória — alimentar IA com o protocolo anterior (resumido)
+    if (previousProtocol) {
+      const version = previousProtocol.version || 1;
+      // Resumir treino: lista de exercícios por dia + reps/sets (compacto)
+      let trainingSummary = "";
+      try {
+        const days = previousProtocol.training?.days || previousProtocol.training || [];
+        if (Array.isArray(days)) {
+          trainingSummary = days
+            .slice(0, 7)
+            .map((d: any, i: number) => {
+              const focus = d.focus || d.title || `Dia ${i + 1}`;
+              const exs = (d.exercises || [])
+                .slice(0, 10)
+                .map((e: any) => `${e.name} (${e.sets || "?"}x ${e.reps || "?"})`)
+                .join(", ");
+              return `  • ${focus}: ${exs}`;
+            })
+            .join("\n");
+        }
+      } catch (_) { /* ignore */ }
+
+      assessmentContext += `
+
+## PROTOCOLO ANTERIOR DO ALUNO (USAR COMO BASE PARA PERIODIZAÇÃO ONDULATÓRIA — OBRIGATÓRIO)
+- Versão anterior: v${version}
+- Esta nova versão será v${version + 1}
+- Resumo do treino anterior:
+${trainingSummary || "(treino anterior não pôde ser resumido — usar critério padrão)"}
+
+INSTRUÇÕES DE ONDULAÇÃO:
+- Trocar 30-50% dos exercícios para variar estímulo, mantendo os que funcionaram.
+- Ajustar VOLUME por músculo conforme a posição na ondulação:
+  • v2 sobre v1: SUBIR volume (aproximar do TOPO da faixa) e/ou mudar zona de reps.
+  • v3 sobre v2: BAIXAR volume (deload — voltar ao piso/meio da faixa).
+  • v4+: oscilar (subir/baixar) conforme a evolução.
+- Variar a zona de reps entre ciclos (5-9 / 6-10 / 8-12 / 10-15) para o mesmo exercício.
+- Citar a estratégia de ondulação no campo dynamicNotes do PRIMEIRO dia: ex. "Este ciclo aumenta volume vs o anterior porque você respondeu bem; trocamos X exercícios e mantivemos Y."`;
     }
 
     if (reanalysisFeedback) {
@@ -188,37 +251,79 @@ A maioria dos alunos receberá uma base semelhante (hipertrofia + nutrição esp
 
 ### MULHERES
 
-**3x na semana** — DUAS opções (escolher conforme avaliação):
-1. **FB-FB-FB (Full Body)** ⭐ padrão para iniciantes/recomposição: A=Full Body, B=Full Body, C=Full Body. Cada dia: mobilidade específica + ~5 exercícios de inferiores + 2-3 superiores. NÃO pode em dias seguidos — exigir descanso entre eles.
-2. **Inf-Sup-Inf**: A=Inferior, B=Superior, C=Inferior. Pode ser sequência ou distintos.
+**2x na semana** — **FB-FB com ênfase inferior** ⭐ (única opção): A=Full Body com ênfase em inferiores (glúteo+quad+posterior) + 1-2 superiores, B=igual com variação. NÃO em dias seguidos.
+
+**3x na semana** — DUAS opções:
+1. **FB-FB-FB com ênfase inferior** ⭐ padrão: A/B/C todos Full Body com forte ênfase em inferiores (glúteo + quadríceps em A, posterior+glúteo em B, glúteo médio+quad em C). NÃO em dias seguidos.
+2. **Inf(quad)-Sup-Inf(post+glúteo)**: A=Inferior ênfase QUADRÍCEPS, B=Superior, C=Inferior ênfase POSTERIOR + GLÚTEO.
 
 **4x na semana** — DUAS opções:
 1. **Inf-Sup-Inf-Sup** ⭐ MAIS COMUM (padrão): A=Inf, B=Sup, C=Inf, D=Sup. Independe dos dias.
-2. **Inf-Sup-Inf(post)-Sup+glúteo**: A=Inf, B=Sup, C=Inf com ÊNFASE POSTERIOR e exercícios multiarticulares que NÃO quebrem descanso de amanhã, D=Sup + glúteo isolado.
+2. **Inf-Sup-Inf(post)-Sup+glúteo**: A=Inf, B=Sup, C=Inf com ÊNFASE POSTERIOR, D=Sup + glúteo isolado.
 
 **5x na semana** — DUAS opções:
-1. **Inf-Sup-Inf-OFF-Inf-Sup** ⭐ padrão: A=Inf, B=Sup, C=Inf, [OFF obrigatório], D=Inf, E=Sup.
-2. **Inf-Sup-Inf-Sup-Inf** corrido: A=Inf, B=Sup, C=Inf, D=Sup, E=Inf.
+1. **Inf-Sup-Inf-Sup-Inf** ⭐ padrão (alternado): A=Inf, B=Sup, C=Inf, D=Sup, E=Inf.
+2. **Inf-Sup-Inf-OFF-Inf-Sup** com folga no meio.
 
-**6x ou 7x na semana** — TREINAR MAIS QUE 5x PARA HIPERTROFIA É DESNECESSÁRIO. Após o 5º dia hipertrófico, os dias EXTRA devem ser cardio + abdômen + complemento (não treino hipertrófico de membros).
+**6x na semana** — **Inf-Sup-Inf-Sup-Inf-Sup** ⭐ alternado, manter ênfase em glúteo/posterior.
+
+**7x na semana** — 6x hipertrófico + 1 dia complementar (cardio + abdômen + mobilidade).
 
 ### HOMENS
 
+**2x na semana** — **FB-FB** ⭐ (única opção): compostos pesados em ambos (1 quad, 1 push, 1 pull, 1 posterior, 1 core). DEVE ter pelo menos 2 dias de descanso entre eles.
+
 **3x na semana** — DUAS opções:
-1. **FB-FB-FB**: A=Full Body, B=Full Body, C=Full Body. DEVE ter descanso entre eles.
-2. **Push-Inferior-Pull** ⭐ padrão: A=Push (peito+ombros+tríceps), B=Inferior (perna completa), C=Pull (costas+bíceps).
+1. **Push-Pull-Legs (PPL)** ⭐ padrão: A=Push (peito+ombro+tríceps), B=Pull (costas+bíceps), C=Legs (perna completa).
+2. **FB-FB-FB**: A/B/C Full Body. DEVE ter descanso entre eles.
 
-**4x na semana** — Push-Pull-Legs-Upper:
-- A=Push, B=Pull, C=Legs, D=Upper (peito+costas+ombros+braços).
-- Pode ser sequência ou ter descanso entre algum dos dois.
-- IMPORTANTE: PERGUNTAR (na Fase 2 — confirmação pós-análise) se aluno quer 1 perna completa só OU 1 perna + estímulos extras de inferior nos Push/Pull. Se escolher estímulos extras: adicionar 1-2 exercícios de inferior nos Push/Pull e SEMPRE inserir 1 dia OFF entre eles e o Legs.
+**4x na semana** — DUAS opções:
+1. **Upper-Lower** ⭐ padrão: A=Upper, B=Lower, C=Upper, D=Lower (típico 2 on + 1 off + 2 on).
+2. **Push-Pull-Legs-Upper**: A=Push, B=Pull, C=Legs, D=Upper. PERGUNTAR se quer 1 perna só ou estímulos extras nos Push/Pull (se sim: 1-2 inferior nos Push/Pull + OFF antes do Legs).
 
-**5x na semana** — Legs-Push-Pull-Legs-Upper ⭐:
-- A=Legs, B=Push, C=Pull, D=Legs, E=Upper.
-- Pode ser direto ou com descanso entre C e D (preferível: descanso).
-- Outras variações similares são permitidas.
+**5x na semana** — DUAS opções:
+1. **Legs-Push-Pull-Legs-Upper** ⭐ padrão: A=Legs, B=Push, C=Pull, D=Legs, E=Upper. Preferível: descanso entre C e D.
+2. **Push1-Pull1-Legs-Push2-Pull2**: A=Push (ênfase peito), B=Pull (ênfase largura), C=Legs, D=Push (ênfase ombro/tríceps), E=Pull (ênfase espessura+bíceps).
+
+**6x na semana** — **Push1-Pull1-Legs1-Push2-Pull2-Legs2** ⭐ (PPL x2): cada dia com ênfase distinta (Push 1=peito, Push 2=ombro; Pull 1=largura, Pull 2=espessura; Legs 1=quadríceps, Legs 2=posterior+glúteo).
 
 **REGRA UNIVERSAL**: NUNCA trabalhar APENAS UM MÚSCULO POR DIA. Sempre combinar grupos.
+
+## REGRAS UNIVERSAIS DE PRESCRIÇÃO
+
+**ABDÔMEN — OBRIGATÓRIO 2x na semana**:
+- Distribuir nos próprios dias de treino (NÃO em dia separado para hipertrofia, exceto 6º/7º dia complementar de mulher).
+- USAR APENAS: **Reto abdominal** (crunch, abdominal infra, elevação de pernas) e **prancha frontal**.
+- **NUNCA prescrever exercício de oblíquo** (treinar oblíquo aumenta a circunferência da cintura — não desejado em estética).
+
+**MULHERES — REGRAS ESPECÍFICAS**:
+- **Peito**: NO MÁXIMO **1 exercício de peito por semana**. Não há necessidade de mais.
+- **Ênfase nos superiores**: SEMPRE **ombro (lateral + posterior) + costas** > peito + braços.
+- **Ênfase nos inferiores**: protocolo COMPLETO, mas com **PRIORIDADE em GLÚTEO MÉDIO** (abdução, clamshell, hip thrust com rotação externa) e nos pontos fracos identificados na avaliação corporal.
+
+**HOMENS — REGRAS ESPECÍFICAS (anti-overtraining)**:
+- Homens TENDEM A TREINAR DEMAIS. Prescreva o **NECESSÁRIO**, não o exagerado.
+- Manter volume DENTRO da faixa, **preferindo o meio-baixo** quando o aluno é iniciante/intermediário.
+- Adicionar texto em **dynamicNotes** do primeiro dia: "O volume está calibrado para o estímulo necessário — mais não é melhor, é overtraining. Confie no protocolo."
+
+**TREINO EM CASA (gym_type contém 'casa' / 'home' / sem academia)**:
+- Dividir entre **superior/inferior** (2-4x semana) OU **fullbody** (2-3x semana). NÃO usar PPL ou divisões de academia.
+- Indicar exercícios com **peso do corpo** (flexão, agachamento, afundo, prancha, ponte, dips de cadeira) e **uso de elásticos** (mini-band para abdução, faixa elástica para puxadas e remadas).
+- Citar nas instructions/dynamicNotes que o aluno deve usar elásticos de tensões variadas para progressão.
+
+**TÉCNICAS AVANÇADAS — USO PONTUAL**:
+- São para **APENAS ALGUNS EXERCÍCIOS** (não em todos) e **APENAS para alunos AVANÇADOS**.
+- INICIANTE: 100% standard. INTERMEDIÁRIO: 1-2 exercícios/treino com técnica. AVANÇADO: até 30-40%.
+
+**PERIODIZAÇÃO ONDULATÓRIA (METODOLOGIA OFICIAL)**:
+- Usamos periodização ondulatória dentro do ciclo de 60 dias (não linear).
+- Sequência de volume entre ciclos: Ciclo 1 = MEDIANO (meio da faixa) → Ciclo 2 = SUBINDO (topo) → Ciclo 3 = BAIXANDO (deload, piso/meio) → oscilar conforme evolução.
+- Zona de reps OSCILA junto: alternar entre ciclos as zonas (5-9 / 6-10 / 8-12 / 10-15) para o mesmo exercício, variando estímulo neural e mecânico.
+- **OBRIGATÓRIO usar o protocolo anterior como BASE** quando fornecido (campo previousProtocol):
+  - Manter coerência: trocar **30-50% dos exercícios** (variação de estímulo), conservar os que funcionaram.
+  - **Ajustar volume e zona de reps** conforme a posição na ondulação.
+  - **Progredir cargas** com base no histórico.
+  - Citar estratégia no dynamicNotes do primeiro dia: "Este ciclo é [médio/alto/baixo] em volume porque o ciclo anterior foi [X]. Variamos exercícios para novo estímulo e mantivemos os que mais funcionaram para você."
 
 ## VOLUME SEMANAL ALVO POR MÚSCULO (séries válidas/semana — RESPEITAR FAIXAS)
 
