@@ -77,7 +77,10 @@ export const ProtocolConfirmation = ({
 }: Props) => {
   const [v, setV] = useState<ProtocolConfirmations>(initial || DEFAULT_VALUE);
 
-  const split = useMemo(() => getDefaultSplit(sex, trainingDays), [sex, trainingDays]);
+  const variants = useMemo(() => getSplitVariants(sex, trainingDays), [sex, trainingDays]);
+  const defaultSplit = useMemo(() => getDefaultSplit(sex, trainingDays), [sex, trainingDays]);
+  const selectedVariantName = v.split.chosenVariant || defaultSplit?.name || "";
+  const selectedVariant = variants.find((x) => x.name === selectedVariantName) || defaultSplit;
   const mealTimes = useMemo(() => suggestMealTimes(mealCount, trainingTime), [mealCount, trainingTime]);
 
   const update = (patch: Partial<ProtocolConfirmations>) => {
