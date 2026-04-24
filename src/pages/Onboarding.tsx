@@ -147,7 +147,12 @@ interface FormData {
   supplements: string[];
   freeMeals: string;
   mealCount: string;
+  mealSchedule: string;
+  intermittentFasting: string; // "yes" | "no"
+  fastingWindow: string;
   sleepHours: string;
+  wakeTime: string;
+  sleepTime: string;
   stressLevel: string;
   aiDataConsent: boolean;
 }
@@ -164,7 +169,11 @@ const DEFAULT_FORM: FormData = {
   foodsLikeExtra: "",
   foodsDislike: "", dislikedFromList: "", currentDietDescription: "",
   allergies: [], sweetPreference: "", supplements: [],
-  freeMeals: "", mealCount: "", sleepHours: "", stressLevel: "",
+  freeMeals: "", mealCount: "",
+  mealSchedule: "",
+  intermittentFasting: "", fastingWindow: "",
+  sleepHours: "", wakeTime: "", sleepTime: "",
+  stressLevel: "",
   aiDataConsent: false,
 };
 
