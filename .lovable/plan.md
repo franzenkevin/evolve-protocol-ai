@@ -1,47 +1,57 @@
+## Objetivo
 
+Garantir que **todo navegador que já visitou o EVORIA** receba a versão nova automaticamente na próxima abertura, sem o usuário precisar limpar nada.
 
-## Garantir trocas isocalóricas e isomácros nas refeições
+## Diagnóstico do que já existe
 
-Hoje as substituições mostradas na aba **Dieta** são apenas nomes ("Pão de forma, Tapioca, Cuscuz") — sem porção, sem kcal, sem macros. O usuário não consegue trocar com confiança porque uma porção padrão de tapioca tem mais carbo que o pão. Além disso, as 3 "Opções" de cada refeição podem variar bastante em calorias entre si.
+O projeto já tem 3 mecanismos de auto-limpeza, mas eles têm furos:
 
-Vou ajustar o gerador de IA + a tela para que **toda troca seja equivalente em kcal e macros** ao item original (tolerância de ±5%).
+1. `public/sw.js` — service worker auto-destrutivo (limpa caches + se desregistra). ✅ OK
+2. `index.html` — manda `Cache-Control: no-cache`. ✅ OK
+3. `src/main.tsx` — chama `clearAppCaches()` e detecta build novo. ⚠️ Tem bugs:
+   - O `APP_BUILD_ID` está em `2026-04-19` (desatualizado) — então usuários antigos não disparam o hard-reload de versão.
+   - O hard-reload roda **depois** do React renderizar — o usuário vê a tela antiga por 1-2s.
+   - Não força o navegador a re-baixar `sw.js` (que pode estar cacheado pelo SW antigo).
 
-### O que muda
+## Causa raiz do problema do usuário
 
-**1. Prompt do gerador (`supabase/functions/generate-protocol/index.ts`)**
-Adicionar regras explícitas e atualizar o schema de saída:
+Quando o navegador antigo abre o site:
+- O SW antigo (vite-plugin-pwa) intercepta a request do HTML e serve a **versão cacheada antiga**.
+- Como o HTML antigo aponta para `assets/index-XXXX.js` antigos, o usuário vê o visual antigo.
+- O SW novo (`sw.js`) só executa se o navegador conseguir buscá-lo — mas o SW antigo pode estar respondendo o próprio `sw.js` pelo cache.
 
-- **Opções da refeição (Opção 1/2/3)**: as 3 opções devem ter **mesma soma de kcal e macros (±5%)** entre si. Adicionar uma checagem interna obrigatória antes de finalizar o JSON.
-- **Substituições**: deixam de ser strings soltas e passam a ser objetos com porção em gramas + macros calculados, equivalentes ao item de referência da refeição. Cada categoria de substituição passa a ter:
-  - `referenceFood`: alimento base e seus macros (o que está sendo substituído)
-  - `options`: lista de substitutos, cada um com `name`, `amount` (gramas), `protein`, `carbs`, `fat`, `calories` — **dentro de ±5% das kcal e do macro principal** do alimento de referência
-- Reforço no prompt: a IA deve calcular a porção do substituto (ex.: 50g de pão de forma ≈ 140 kcal / 24g carb → tapioca ≈ 38g para bater 140 kcal e ~24g carb, em vez dos 80g padrão).
+## Mudanças que vou fazer
 
-**2. Tipo TypeScript (`src/lib/generateProtocol.ts`)**
-Atualizar `Meal.substitutions` para refletir a nova estrutura:
-```ts
-substitutions: {
-  category: string;
-  referenceFood: { name: string; amount: string; calories: number; protein: number; carbs: number; fat: number };
-  options: { name: string; amount: string; calories: number; protein: number; carbs: number; fat: number }[];
-}[]
-```
-Manter compatibilidade lendo o formato antigo se vier (fallback).
+### 1. Atualizar `APP_BUILD_ID` em `src/main.tsx`
+Trocar para a data de hoje (`2026-04-27T16:30Z`). Isso dispara o hard-reload de uma vez para todo mundo que já visitou.
 
-**3. Renderização das substituições (`src/pages/Diet.tsx`)**
-Trocar os `Badge` simples por linhas mais informativas:
-- Cabeçalho da categoria mostra: "Carboidrato — referência: Pão de forma 50g · 140 kcal · C24g"
-- Cada opção em uma linha: nome + porção em destaque + kcal + P/C/G compacto
-- Layout mantém o estilo glass dark + lime já existente
-- Fallback: se vier o formato antigo (array de strings), renderiza como antes para não quebrar protocolos já gerados
+### 2. Tornar a limpeza síncrona e mais agressiva em `src/main.tsx`
+- Detectar build antigo **antes** de renderizar o React.
+- Se detectar SW antigo registrado, fazer `unregister()` + `caches.delete()` + `location.reload(true)` antes de qualquer renderização.
+- Forçar `navigator.serviceWorker.register('/sw.js?v=BUILD_ID', { updateViaCache: 'none' })` para garantir que o `sw.js` novo (auto-destrutivo) seja baixado da rede.
 
-**4. Compatibilidade com protocolos existentes**
-Protocolos já gerados antes da mudança continuam funcionando (fallback no render). Quando o usuário regerar o protocolo, a nova estrutura entra automaticamente.
+### 3. Adicionar headers anti-cache no `vercel.json`
+Adicionar regras de headers para:
+- `/sw.js` e `/registerSW.js` → `Cache-Control: no-cache, no-store, must-revalidate` (para que o navegador sempre busque a versão fresca).
+- `/index.html` e `/` → `Cache-Control: no-cache` no nível do CDN.
+- `/manifest.json` → `no-cache`.
 
-### Detalhes técnicos
+Isso fecha o último furo: o CDN/navegador para de servir `sw.js` cacheado.
 
-- Não muda schema do banco — `protocols.diet` é `jsonb`, aceita o novo formato direto.
-- Sem migração necessária.
-- Tolerância ±5% é uma regra do prompt; a IA já segue tabela de macros embutida no prompt para calcular porções.
-- Arquivos editados: `supabase/functions/generate-protocol/index.ts`, `src/lib/generateProtocol.ts`, `src/pages/Diet.tsx`.
+### 4. Bumpar o nome do `sw.js` via query param no registro
+No `main.tsx`, registrar `/sw.js?build=2026-04-27` força o navegador a tratar como SW novo (URL diferente) e descartar o antigo.
 
+## Resultado
+
+Após o deploy:
+- **Visitante antigo** abre o app → CDN entrega `index.html` fresco (header no-cache) → JS novo executa → detecta SW antigo → desregistra + limpa caches + recarrega → vê EVORIA novo. Tudo em ~1 segundo, **sem ação do usuário**.
+- **Próximas atualizações** nunca mais terão esse problema porque o `sw.js` auto-destrutivo já está rodando e não há mais SW de cache ativo.
+
+## Arquivos editados
+
+- `src/main.tsx` — bump build ID + lógica de limpeza síncrona pré-render.
+- `vercel.json` — adicionar bloco `headers` para `sw.js`, `index.html`, `manifest.json`.
+
+## Após aprovar
+
+Você precisa clicar em **Publish → Update** depois que eu aplicar as mudanças, porque é alteração de frontend e só vai pro ar publicado depois disso.
