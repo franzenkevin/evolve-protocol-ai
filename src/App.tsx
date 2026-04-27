@@ -34,6 +34,7 @@ import NewProtocol from "./pages/NewProtocol";
 import NotFound from "./pages/NotFound";
 import Feedback from "./pages/Feedback";
 import Support from "./pages/Support";
+import Install from "./pages/Install";
 import { CURRENT_TERMS_VERSION } from "@/lib/terms";
 
 const queryClient = new QueryClient();
@@ -78,6 +79,8 @@ const App = () => (
             <Route path="/chat" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><Chat /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminGate><Admin /></AdminGate></ProtectedRoute>} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/instalar" element={<Install />} />
+            <Route path="/install" element={<Navigate to="/instalar" replace />} />
             <Route path="/accept-terms" element={<ProtectedRoute><AcceptTerms /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><StudentGate><SubscriptionGate><Profile /></SubscriptionGate></StudentGate></ProtectedRoute>} />
             <Route path="/profile/edit" element={<ProtectedRoute><StudentGate><SubscriptionGate><EditProfile /></SubscriptionGate></StudentGate></ProtectedRoute>} />
