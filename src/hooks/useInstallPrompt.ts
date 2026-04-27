@@ -8,8 +8,9 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const STORAGE_KEY = "evoria_install_prompt_v1";
-const DISMISS_COOLDOWN_DAYS = 7;
-const MAX_DISMISSALS = 3;
+// Reaparece a cada 24h, no máximo 5 vezes; depois para definitivamente
+const DISMISS_COOLDOWN_HOURS = 24;
+const MAX_DISMISSALS = 5;
 const SHOW_DELAY_MS = 15000;
 
 interface PromptState {
@@ -111,10 +112,10 @@ export function useInstallPrompt() {
     // Hit max dismissals?
     if (state.dismissals >= MAX_DISMISSALS) return;
 
-    // Recently dismissed? Wait cooldown.
+    // Recently dismissed? Wait cooldown (24h).
     if (state.lastDismissedAt) {
-      const daysSince = (Date.now() - state.lastDismissedAt) / (1000 * 60 * 60 * 24);
-      if (daysSince < DISMISS_COOLDOWN_DAYS) return;
+      const hoursSince = (Date.now() - state.lastDismissedAt) / (1000 * 60 * 60);
+      if (hoursSince < DISMISS_COOLDOWN_HOURS) return;
     }
 
     const timer = setTimeout(() => setShouldShowBanner(true), SHOW_DELAY_MS);
