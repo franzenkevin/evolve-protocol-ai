@@ -8,8 +8,9 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const STORAGE_KEY = "evoria_install_prompt_v1";
-const DISMISS_COOLDOWN_DAYS = 7;
-const MAX_DISMISSALS = 3;
+// Reaparece a cada 24h, no máximo 5 vezes; depois para definitivamente
+const DISMISS_COOLDOWN_HOURS = 24;
+const MAX_DISMISSALS = 5;
 const SHOW_DELAY_MS = 15000;
 
 interface PromptState {
