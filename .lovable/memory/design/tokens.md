@@ -36,5 +36,6 @@ type: design
 - src/assets/logo.png (icon, used in all `import logo` references)
 - src/assets/evoria-logo-horizontal.png (dark bg)
 - src/assets/evoria-logo-horizontal-light.png (light bg)
-- src/assets/evoria-icon.png
-- public/pwa-192.png, pwa-512.png, favicon.png, apple-touch-icon.png
+- src/assets/evoria-logo-3d-black.png (NEW — premium 3D logo with black background)
+- src/assets/evoria-icon.png (NEW — 3D icon with black background)
+- public/pwa-192.png, pwa-512.png, favicon.png, apple-touch-icon.png (all with 3D black bg)
