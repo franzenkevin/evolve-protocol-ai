@@ -92,6 +92,7 @@ const App = () => (
             <Route path="/new-protocol" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><NewProtocol /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <InstallPrompt />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
