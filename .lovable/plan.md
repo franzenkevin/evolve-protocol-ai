@@ -1,59 +1,81 @@
+
+# Pop-up automático "Instalar como App" para usuários leigos
+
 ## Objetivo
+Usuário leigo abre o site no celular e **automaticamente** vê um aviso bonito ensinando a instalar como app — sem precisar saber que isso existe.
 
-Criar a página `/instalar` com detecção automática de plataforma (iOS, Android, Desktop), botão de instalação nativa no Android e tutorial visual no iPhone.
+## O que será criado
 
-## Arquivos
+### 1. Componente `InstallPrompt` (banner flutuante)
+Banner discreto que aparece **fixo no rodapé** do celular quando:
+- Usuário está em dispositivo móvel (iOS ou Android)
+- App ainda **não está instalado** (não está em modo standalone)
+- Usuário **ainda não dispensou** o aviso (controle via localStorage)
+- Já passou pelo menos **15 segundos** na primeira visita (não atrapalha)
 
-### 1. `src/pages/Install.tsx` (novo)
+Visual: card com ícone do app, texto "📱 Instale o EVORIA na tela inicial" + 2 botões: **"Instalar"** (primário) e **"Agora não"** (dispensa).
 
-Página pública (sem login) com:
+### 2. Modal de instruções (passo a passo visual)
+Quando o usuário toca em **"Instalar"** no banner:
 
-**Detecção automática de plataforma**
-- Lê `navigator.userAgent` no `useEffect`.
-- Detecta `iPad/iPhone/iPod` → iOS, `android` → Android, resto → Desktop.
-- Detecta se já está instalado via `display-mode: standalone` ou `navigator.standalone`.
+**Android**: dispara o instalador nativo do navegador (`beforeinstallprompt`) — instala com 1 toque.
 
-**Captura do prompt nativo PWA**
-- Listener `beforeinstallprompt` salva o evento em estado.
-- Listener `appinstalled` mostra toast de sucesso.
+**iOS**: abre um modal sobre a tela com tutorial visual ilustrado:
+- Passo 1: ícone Compartilhar 􀈂 → "Toque no botão de compartilhar"
+- Passo 2: ícone Adicionar 􀈎 → "Role e toque em 'Adicionar à Tela de Início'"  
+- Passo 3: ícone OK ✓ → "Toque em Adicionar e pronto!"
 
-**UI**
-- Header com logo EVORIA + botão voltar para `/`.
-- Hero: "Tenha o EVORIA na tela inicial".
-- Tabs (iPhone / Android / Computador) com a aba detectada selecionada por padrão (usuário pode trocar).
-- Card "EVORIA já está instalado" se detectado.
+Usa setas animadas pra indicar onde tocar. Botão "Já instalei" fecha tudo permanentemente.
 
-**Conteúdo iOS (Safari)**
-- Aviso: "Abra esta página no Safari".
-- 3 passos numerados com ícones lucide:
-  1. `Share` — Toque no botão Compartilhar
-  2. `PlusSquare` — Adicionar à Tela de Início
-  3. `CheckCircle2` — Toque em Adicionar
-- Mock visual com a sequência de ícones.
+### 3. Lógica de exibição inteligente
+- Não aparece em **rotas internas críticas** (checkout, paywall, onboarding em andamento)
+- Aparece em rotas públicas e no dashboard
+- Se usuário dispensar 3 vezes → para de mostrar permanentemente
+- Se dispensar 1 vez → reaparece após 7 dias
+- Após **instalado** (detecta `appinstalled` event) → nunca mais aparece
 
-**Conteúdo Android (Chrome)**
-- Botão grande "Instalar EVORIA agora" que dispara `deferredPrompt.prompt()`.
-- Botão fica desabilitado se o navegador ainda não disparou `beforeinstallprompt`.
-- Passo a passo manual abaixo (3 pontinhos → Instalar app).
+### 4. Detecção de Instagram/Facebook in-app browser
+Quando usuário clica num link do Instagram/WhatsApp/Facebook, o site abre no **navegador interno do app**, onde **não dá pra instalar PWA**. Nesse caso, o banner mostra mensagem diferente:
+> "Para instalar, abra no Safari/Chrome — toque no menu (•••) → 'Abrir no navegador'"
 
-**Conteúdo Desktop**
-- Mesmo botão de instalação nativa.
-- Instruções para ícone na barra de endereço.
+### 5. Atualizar página `/install` existente
+- Adicionar um vídeo curto/GIF demonstrativo (placeholder pra você adicionar depois)
+- Garantir que continua acessível pelo menu do app
 
-**Cards de benefícios** no fim: Acesso rápido / Tela cheia / Notificações.
+## Onde vai aparecer
 
-Usa apenas tokens semânticos (primary, foreground, muted-foreground, card, border) — sem cores hardcoded.
+| Local | Banner aparece? |
+|---|---|
+| Landing page (`/`) | ✅ Sim |
+| Quiz/Onboarding | ❌ Não (atrapalha) |
+| Paywall | ❌ Não |
+| Dashboard, Treino, Dieta | ✅ Sim |
+| Checkout em andamento | ❌ Não |
+| Já instalado | ❌ Nunca |
 
-### 2. `src/App.tsx` (editar)
+## Arquivos que serão criados/editados
 
-- Importar `Install` de `./pages/Install`.
-- Adicionar rotas públicas:
-  - `/instalar` → `<Install />`
-  - `/install` → redirect para `/instalar`
+**Criar:**
+- `src/components/InstallPrompt.tsx` — banner flutuante
+- `src/components/InstallInstructionsModal.tsx` — modal com tutorial iOS
+- `src/hooks/useInstallPrompt.ts` — lógica de detecção e estado
 
-## Resultado
+**Editar:**
+- `src/App.tsx` — montar o InstallPrompt globalmente
+- `src/pages/Install.tsx` — pequeno ajuste pra integrar com o novo modal
 
-- Link compartilhável: `evolve-protocol-ai.lovable.app/instalar`
-- Android com Chrome compatível: usuário aperta 1 botão → prompt nativo aparece.
-- iOS: tutorial passo a passo visual (única solução possível — Apple não permite instalação automática).
-- Funciona sem login, pode ser enviado por WhatsApp.
+## Detalhes técnicos
+- Usa evento `beforeinstallprompt` (Android/Desktop) para instalação automática
+- Detecta `display-mode: standalone` e `navigator.standalone` (iOS) para saber se já está instalado
+- Detecta in-app browsers via UserAgent (Instagram, FBAN, Line, etc.)
+- Estado persistido em `localStorage` com chave versionada
+- Animação suave de entrada (slide-up) usando Tailwind
+
+## O que NÃO faz parte deste plano
+- Notificações push (já está implementado separadamente)
+- App nativo via Capacitor (decidimos manter PWA por enquanto)
+- Vídeo tutorial gravado (você grava depois e me envia, eu encaixo)
+
+---
+
+**Resultado final**: usuário leigo abre o site no celular, depois de 15s vê um aviso bonito embaixo da tela: "Instale o EVORIA". Toca em **Instalar** → no Android instala sozinho, no iPhone vê o tutorial visual. Pronto. Zero conhecimento técnico necessário.
