@@ -9,7 +9,7 @@ import SectionPlan from "./SectionPlan";
 import SectionMeetings from "./SectionMeetings";
 import SectionJournal from "./SectionJournal";
 import { Card } from "@/components/ui/card";
-import { Headphones, FileText, Shield, Star, MessageSquare, Mail, ShieldCheck, RefreshCw, LifeBuoy, GraduationCap } from "lucide-react";
+import { Headphones, FileText, Shield, Star, MessageSquare, Mail, ShieldCheck, RefreshCw, LifeBuoy, GraduationCap, Smartphone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useAuth } from "@/contexts/AuthContext";
