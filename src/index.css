@@ -4,57 +4,88 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   EVORIA Design System
+   - Premium dark foundations
+   - Teal #00C4B3 = brand identity
+   - Orange #FF6A00 = CTA / conversion only
+   - Green #B7FF2C = progress / success
+   ============================================================ */
+
 @layer base {
   :root {
-    --background: 220 10% 8%;
-    --foreground: 30 20% 90%;
+    /* Core surfaces (deep premium dark) */
+    --background: 220 30% 6%;          /* #090B11 */
+    --foreground: 40 20% 95%;          /* #F3F1EC */
 
-    --card: 220 10% 11%;
-    --card-foreground: 30 20% 90%;
+    --card: 224 28% 9%;                /* #0F121B */
+    --card-foreground: 40 20% 95%;
 
-    --popover: 220 10% 11%;
-    --popover-foreground: 30 20% 90%;
+    --popover: 222 28% 9%;
+    --popover-foreground: 40 20% 95%;
 
-    --primary: 25 100% 50%;
-    --primary-foreground: 220 10% 8%;
+    /* Brand identity = TEAL */
+    --primary: 174 100% 38%;           /* #00C4B3 */
+    --primary-foreground: 220 30% 6%;
+    --primary-glow: 174 100% 48%;
 
-    --secondary: 220 10% 15%;
-    --secondary-foreground: 30 15% 80%;
+    --secondary: 213 16% 14%;          /* #1D242B */
+    --secondary-foreground: 222 14% 86%;
 
-    --muted: 220 8% 14%;
-    --muted-foreground: 220 8% 50%;
+    --muted: 222 22% 12%;              /* #10141D */
+    --muted-foreground: 222 14% 60%;   /* #8B93A7 */
 
-    --accent: 25 100% 50%;
-    --accent-foreground: 220 10% 8%;
+    /* Accent kept as teal for highlights */
+    --accent: 174 100% 38%;
+    --accent-foreground: 220 30% 6%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 220 8% 18%;
-    --input: 220 8% 18%;
-    --ring: 25 100% 50%;
+    --border: 220 14% 16%;
+    --input: 220 14% 14%;
+    --ring: 174 100% 38%;
 
-    --radius: 0.75rem;
+    --radius: 0.875rem;
 
-    --sidebar-background: 220 10% 9%;
-    --sidebar-foreground: 30 15% 80%;
-    --sidebar-primary: 25 100% 50%;
-    --sidebar-primary-foreground: 220 10% 8%;
-    --sidebar-accent: 220 8% 14%;
-    --sidebar-accent-foreground: 30 15% 80%;
-    --sidebar-border: 220 8% 18%;
-    --sidebar-ring: 25 100% 50%;
+    /* Sidebar */
+    --sidebar-background: 224 30% 7%;
+    --sidebar-foreground: 222 14% 80%;
+    --sidebar-primary: 174 100% 38%;
+    --sidebar-primary-foreground: 220 30% 6%;
+    --sidebar-accent: 222 22% 12%;
+    --sidebar-accent-foreground: 222 14% 86%;
+    --sidebar-border: 220 14% 16%;
+    --sidebar-ring: 174 100% 38%;
 
-    --success: 142 72% 45%;
-    --warning: 38 92% 50%;
-    --info: 217 91% 60%;
+    /* Functional state colors */
+    --success: 75 100% 59%;            /* #B7FF2C */
+    --warning: 38 92% 55%;
+    --info: 200 30% 60%;               /* steel blue support */
 
-    --gradient-primary: linear-gradient(135deg, hsl(25 100% 50%), hsl(20 100% 42%));
-    --gradient-card: linear-gradient(145deg, hsl(220 10% 12%), hsl(220 10% 9%));
-    --gradient-glow: radial-gradient(circle at 50% 50%, hsl(25 100% 50% / 0.12), transparent 70%);
+    /* CTA accent (orange) — used sparingly */
+    --cta: 22 100% 50%;                /* #FF6A00 */
+    --cta-foreground: 0 0% 100%;
+    --cta-hover: 27 100% 56%;          /* #FF7F1F */
 
-    --shadow-glow: 0 0 20px hsl(25 100% 50% / 0.2);
-    --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.3);
+    /* Brand teal helpers */
+    --brand-teal: 174 100% 38%;
+    --brand-steel: 202 26% 60%;        /* #7FA2B6 */
+    --brand-charcoal: 213 16% 14%;
+    --brand-graphite: 220 22% 8%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(174 100% 38%), hsl(174 100% 28%));
+    --gradient-cta: linear-gradient(135deg, hsl(22 100% 50%), hsl(27 100% 56%));
+    --gradient-card: linear-gradient(160deg, hsl(224 28% 11%), hsl(220 30% 7%));
+    --gradient-glow: radial-gradient(circle at 50% 50%, hsl(174 100% 38% / 0.18), transparent 70%);
+    --gradient-hero: linear-gradient(180deg, hsl(220 30% 6%) 0%, hsl(224 28% 9%) 100%);
+
+    /* Shadows */
+    --shadow-glow: 0 0 32px hsl(174 100% 38% / 0.22);
+    --shadow-cta: 0 8px 28px hsl(22 100% 50% / 0.32);
+    --shadow-card: 0 8px 32px hsl(220 30% 2% / 0.5);
+    --shadow-elevated: 0 20px 60px -12px hsl(220 30% 2% / 0.7);
 
     --font-heading: 'Space Grotesk', sans-serif;
     --font-body: 'Inter', sans-serif;
@@ -67,12 +98,14 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
+    font-feature-settings: "ss01", "cv11";
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
+    letter-spacing: -0.015em;
   }
 }
 
@@ -82,8 +115,17 @@
     background-image: var(--gradient-primary);
   }
 
+  .text-gradient-cta {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-cta);
+  }
+
   .glow {
     box-shadow: var(--shadow-glow);
+  }
+
+  .glow-cta {
+    box-shadow: var(--shadow-cta);
   }
 
   .card-gradient {
@@ -91,7 +133,22 @@
   }
 
   .glass {
-    @apply bg-card/80 backdrop-blur-xl border border-border;
+    @apply bg-card/70 backdrop-blur-xl border border-border;
+  }
+
+  .surface-elevated {
+    background: hsl(var(--card));
+    box-shadow: var(--shadow-elevated);
+    border: 1px solid hsl(var(--border));
+  }
+
+  .bg-cta {
+    background-color: hsl(var(--cta));
+    color: hsl(var(--cta-foreground));
+  }
+
+  .bg-cta:hover {
+    background-color: hsl(var(--cta-hover));
   }
 }
 
@@ -106,6 +163,6 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px hsl(25 100% 50% / 0.2); }
-  50% { box-shadow: 0 0 40px hsl(25 100% 50% / 0.4); }
+  0%, 100% { box-shadow: 0 0 20px hsl(174 100% 38% / 0.25); }
+  50% { box-shadow: 0 0 44px hsl(174 100% 38% / 0.5); }
 }
