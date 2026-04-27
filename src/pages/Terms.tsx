@@ -26,7 +26,7 @@ const Terms = () => {
               1. Termo de Uso da Plataforma (SaaS)
             </h2>
             <p>
-              O <strong>Hypertrophy</strong> é um software disponibilizado como serviço (SaaS — <em>Software as a Service</em>) acessado
+              O <strong>EVORIA</strong> é um software disponibilizado como serviço (SaaS — <em>Software as a Service</em>) acessado
               via internet. Ao criar uma conta, contratar um plano ou utilizar qualquer funcionalidade do Aplicativo, você declara que
               <strong> leu, compreendeu e concorda integralmente</strong> com todas as cláusulas abaixo. Caso não concorde com qualquer item, NÃO
               utilize o serviço.
@@ -36,7 +36,7 @@ const Terms = () => {
           <section>
             <h3 className="font-heading font-semibold text-foreground mb-1">1.1 Natureza do Serviço — Software Automatizado</h3>
             <p>
-              O Hypertrophy é uma <strong>plataforma totalmente automatizada</strong> que utiliza algoritmos próprios e modelos de inteligência
+              O EVORIA é uma <strong>plataforma totalmente automatizada</strong> que utiliza algoritmos próprios e modelos de inteligência
               artificial (IA) de terceiros para gerar protocolos de treino, dieta, cardio, mobilidade e recomendações de evolução. Os
               protocolos são <strong>gerados por software</strong>, sem intervenção humana individualizada em tempo real, salvo se contratado
               expressamente um pacote de acompanhamento humano em separado. O usuário reconhece e aceita que está contratando o uso de
@@ -48,7 +48,7 @@ const Terms = () => {
           <section>
             <h3 className="font-heading font-semibold text-foreground mb-1">1.2 Ausência de Garantia de Resultado</h3>
             <p>
-              O Hypertrophy <strong>NÃO garante qualquer resultado específico</strong> — incluindo, mas não se limitando a: ganho de massa
+              O EVORIA <strong>NÃO garante qualquer resultado específico</strong> — incluindo, mas não se limitando a: ganho de massa
               muscular, perda de gordura, melhora estética, performance esportiva, melhora de exames clínicos, longevidade ou qualquer
               outra métrica de saúde. Os resultados dependem de inúmeros fatores fora do controle da plataforma, como genética, adesão do
               usuário ao protocolo, sono, estresse, condições hormonais, alimentação real, ambiente, lesões prévias e variabilidade
@@ -60,7 +60,7 @@ const Terms = () => {
           <section>
             <h3 className="font-heading font-semibold text-foreground mb-1">1.3 Não Substituição de Profissional Habilitado</h3>
             <p>
-              O Hypertrophy <strong>NÃO substitui</strong>, em nenhuma hipótese, a avaliação, prescrição, diagnóstico ou acompanhamento de:
+              O EVORIA <strong>NÃO substitui</strong>, em nenhuma hipótese, a avaliação, prescrição, diagnóstico ou acompanhamento de:
               médico (CRM), nutricionista (CRN), educador físico (CREF), fisioterapeuta (CREFITO), psicólogo ou qualquer outro
               profissional de saúde legalmente habilitado. As informações e protocolos fornecidos têm caráter
               <strong> educacional e de orientação geral</strong>. O usuário se compromete a:
@@ -76,7 +76,7 @@ const Terms = () => {
           <section>
             <h3 className="font-heading font-semibold text-foreground mb-1">1.4 Uso por Conta e Risco do Usuário</h3>
             <p>
-              O usuário utiliza o Hypertrophy <strong>por sua exclusiva conta e risco</strong>. É de inteira responsabilidade do usuário:
+              O usuário utiliza o EVORIA <strong>por sua exclusiva conta e risco</strong>. É de inteira responsabilidade do usuário:
             </p>
             <ul className="list-disc list-inside space-y-1 text-muted-foreground mt-2">
               <li>Avaliar previamente sua aptidão física e médica para executar treinos e dietas;</li>
@@ -96,7 +96,7 @@ const Terms = () => {
           <section>
             <h3 className="font-heading font-semibold text-foreground mb-1">1.5 Limitação de Responsabilidade</h3>
             <p>
-              Na máxima extensão permitida pela legislação brasileira, o Hypertrophy, seus sócios, administradores, funcionários,
+              Na máxima extensão permitida pela legislação brasileira, o EVORIA, seus sócios, administradores, funcionários,
               parceiros e fornecedores <strong>NÃO se responsabilizam</strong> por quaisquer danos diretos, indiretos, incidentais, especiais,
               consequenciais, lucros cessantes ou morais decorrentes de:
             </p>
@@ -164,9 +164,9 @@ const Terms = () => {
           <section>
             <h3 className="font-heading font-semibold text-foreground mb-1">1.10 Propriedade Intelectual</h3>
             <p>
-              Todo o conteúdo do Hypertrophy — incluindo software, código-fonte, design, marca, logotipos, metodologia, prompts de IA,
+              Todo o conteúdo do EVORIA — incluindo software, código-fonte, design, marca, logotipos, metodologia, prompts de IA,
               banco de exercícios, banco de alimentos, textos, imagens, vídeos, artigos do Journal e materiais didáticos — é de
-              <strong> propriedade exclusiva</strong> do Hypertrophy ou de seus licenciadores, protegido pela Lei nº 9.610/98 (Direitos
+              <strong> propriedade exclusiva</strong> do EVORIA ou de seus licenciadores, protegido pela Lei nº 9.610/98 (Direitos
               Autorais), Lei nº 9.279/96 (Propriedade Industrial) e Lei nº 9.609/98 (Software). É proibida a reprodução, modificação ou
               uso comercial sem autorização expressa por escrito.
             </p>
@@ -175,7 +175,7 @@ const Terms = () => {
           <section>
             <h3 className="font-heading font-semibold text-foreground mb-1">1.11 Disponibilidade e Suporte</h3>
             <p>
-              O Hypertrophy se esforça para manter o serviço disponível 24/7, mas <strong>não garante disponibilidade ininterrupta</strong> —
+              O EVORIA se esforça para manter o serviço disponível 24/7, mas <strong>não garante disponibilidade ininterrupta</strong> —
               podem ocorrer manutenções programadas, atualizações, falhas de terceiros (provedores de nuvem, IA, internet) ou eventos de
               força maior. Suporte é prestado pelos canais oficiais dentro do app, em dias úteis.
             </p>
@@ -184,7 +184,7 @@ const Terms = () => {
           <section>
             <h3 className="font-heading font-semibold text-foreground mb-1">1.12 Rescisão</h3>
             <p>
-              Qualquer das partes pode rescindir o contrato a qualquer tempo. O Hypertrophy poderá <strong>encerrar a conta do usuário</strong>
+              Qualquer das partes pode rescindir o contrato a qualquer tempo. O EVORIA poderá <strong>encerrar a conta do usuário</strong>
               sem aviso prévio em caso de violação destes Termos, fraude, inadimplência ou conduta lesiva à comunidade. Após a rescisão,
               o usuário deixa de ter acesso aos protocolos e dados, salvo direito de portabilidade conforme LGPD.
             </p>
@@ -202,7 +202,7 @@ const Terms = () => {
           <section>
             <h3 className="font-heading font-semibold text-foreground mb-1">1.14 Alterações dos Termos</h3>
             <p>
-              O Hypertrophy poderá alterar estes Termos a qualquer momento. As alterações serão comunicadas dentro do app com no mínimo
+              O EVORIA poderá alterar estes Termos a qualquer momento. As alterações serão comunicadas dentro do app com no mínimo
               15 dias de antecedência. O uso continuado após a vigência das alterações implica aceitação tácita dos novos termos.
             </p>
           </section>
@@ -210,7 +210,7 @@ const Terms = () => {
           <section>
             <h3 className="font-heading font-semibold text-foreground mb-1">1.15 Lei Aplicável e Foro</h3>
             <p>
-              Estes Termos são regidos pela legislação brasileira. Fica eleito o <strong>foro da comarca da sede do Hypertrophy</strong> para
+              Estes Termos são regidos pela legislação brasileira. Fica eleito o <strong>foro da comarca da sede do EVORIA</strong> para
               dirimir quaisquer controvérsias, com renúncia expressa a qualquer outro, por mais privilegiado que seja, salvo nas
               hipóteses em que a lei consumerista determinar foro do domicílio do consumidor.
             </p>

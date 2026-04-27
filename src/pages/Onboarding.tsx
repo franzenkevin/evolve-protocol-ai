@@ -957,7 +957,7 @@ const Onboarding = () => {
                     <span className="hidden group-open:inline">Ocultar termo ↑</span>
                   </summary>
                   <p className="text-xs text-muted-foreground leading-relaxed mt-2">
-                    Para gerar seu protocolo personalizado de treino, dieta, cardio e acompanhamento, a inteligência artificial do Hypertrophy
+                    Para gerar seu protocolo personalizado de treino, dieta, cardio e acompanhamento, a inteligência artificial do EVORIA
                     precisa processar os dados que você forneceu (idade, peso, altura, objetivo, fotos da avaliação corporal, preferências
                     alimentares, rotina e respostas dos check-ins). <strong className="text-foreground">Em conformidade com a LGPD
                     (Lei nº 13.709/2018)</strong>, seus dados são tratados de forma confidencial, usados exclusivamente dentro do app para
@@ -972,7 +972,7 @@ const Onboarding = () => {
                     className="mt-0.5"
                   />
                   <Label htmlFor="ai-consent" className="cursor-pointer text-sm text-foreground leading-snug flex-1">
-                    <strong>Autorizo</strong> o uso dos meus dados pela IA do Hypertrophy. *
+                    <strong>Autorizo</strong> o uso dos meus dados pela IA do EVORIA. *
                   </Label>
                 </div>
               </div>

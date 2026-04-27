@@ -102,8 +102,8 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm animate-fade-in">
         <div className="flex flex-col items-center mb-6">
-          <img src={logo} alt="Hypertrophy" className="w-20 h-20 mb-4" />
-          <h1 className="text-3xl font-heading font-bold text-foreground">Hypertrophy</h1>
+          <img src={logo} alt="EVORIA" className="w-20 h-20 mb-4" />
+          <h1 className="text-3xl font-heading font-bold text-foreground">EVORIA</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             {mode === "admin" ? "Acesso do Criador" : "Entre na sua conta"}
           </p>

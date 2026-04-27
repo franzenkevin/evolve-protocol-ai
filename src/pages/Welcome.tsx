@@ -71,7 +71,7 @@ const Welcome = () => {
       <div className="w-full max-w-md mx-auto animate-fade-in space-y-5">
         {/* Header */}
         <div className="flex flex-col items-center text-center">
-          <img src={logo} alt="Hypertrophy" className="w-16 h-16 mb-4" />
+          <img src={logo} alt="EVORIA" className="w-16 h-16 mb-4" />
           <h1 className="text-2xl font-heading font-bold text-foreground">
             Bem-vindo, <span className="text-gradient">{firstName}</span>!
           </h1>

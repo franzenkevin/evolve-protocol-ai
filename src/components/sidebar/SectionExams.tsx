@@ -107,7 +107,7 @@ const SectionExams = () => {
 
   const copyList = () => {
     const text = EXAM_CHECKLIST.map((e) => `• ${e}`).join("\n");
-    navigator.clipboard.writeText(`Lista de exames Hypertrophy:\n\n${text}`);
+    navigator.clipboard.writeText(`Lista de exames EVORIA:\n\n${text}`);
   };
 
   return (

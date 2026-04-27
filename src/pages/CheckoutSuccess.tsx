@@ -186,7 +186,7 @@ const CheckoutSuccess = () => {
       } catch {}
 
       setStatus("done");
-      toast.success("Protocolo gerado! Bem-vindo ao Hypertrophy.");
+      toast.success("Protocolo gerado! Bem-vindo ao EVORIA.");
     } catch (err: any) {
       console.error("Protocol generation failed:", err);
       setErrorMessage(err?.message || "Falha ao gerar o protocolo.");
@@ -230,7 +230,7 @@ const CheckoutSuccess = () => {
     <div className="min-h-screen bg-background px-4 py-8 flex flex-col">
       <div className="w-full max-w-md mx-auto flex-1 flex flex-col animate-fade-in">
         <div className="flex flex-col items-center text-center mb-6">
-          <img src={logo} alt="Hypertrophy" className="w-14 h-14 mb-4" />
+          <img src={logo} alt="EVORIA" className="w-14 h-14 mb-4" />
           <div className="w-16 h-16 rounded-full bg-primary/15 flex items-center justify-center mb-4">
             <CheckCircle2 size={36} className="text-primary" />
           </div>
@@ -238,7 +238,7 @@ const CheckoutSuccess = () => {
             Pagamento confirmado, <span className="text-gradient">{firstName}</span>!
           </h1>
           <p className="text-sm text-muted-foreground mt-2 max-w-xs">
-            Bem-vindo ao Hypertrophy. Seu acesso completo está liberado.
+            Bem-vindo ao EVORIA. Seu acesso completo está liberado.
           </p>
         </div>
 

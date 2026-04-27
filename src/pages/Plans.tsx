@@ -38,7 +38,7 @@ const PLANS = [
 const FEATURES = [
   "Protocolo personalizado de treino e dieta",
   "Recálculo a cada 60 dias com base no seu progresso",
-  "Coach IA 24/7 (Hypertrophy AI)",
+  "Coach IA 24/7 (EVORIA AI)",
   "Journal científico semanal",
   "Ranking, ligas e comunidade",
   "Suporte prioritário",
@@ -172,7 +172,7 @@ export default function Plans() {
           <div className="pt-2">
             <h1 className="text-2xl font-heading font-bold text-foreground">Planos</h1>
             <p className="text-sm text-muted-foreground">
-              Acesso completo ao Hypertrophy. Escolha o ciclo que faz sentido pra você.
+              Acesso completo ao EVORIA. Escolha o ciclo que faz sentido pra você.
             </p>
           </div>
         )}

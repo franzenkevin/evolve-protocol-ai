@@ -5,9 +5,9 @@ export const Footer = () => (
   <footer className="border-t border-border bg-card/40">
     <div className="max-w-6xl mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
       <div className="col-span-2 md:col-span-1">
-        <img src={logo} alt="Hypertrophy" className="w-12 h-12 mb-3" />
+        <img src={logo} alt="EVORIA" className="w-12 h-12 mb-3" />
         <p className="text-xs text-muted-foreground">
-          © 2026 Hypertrophy. <br />
+          © 2026 EVORIA. <br />
           Inteligência artificial fitness inteligente.
         </p>
       </div>

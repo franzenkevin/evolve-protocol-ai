@@ -43,13 +43,13 @@ const AcceptTerms = () => {
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md animate-fade-in">
         <div className="flex flex-col items-center mb-6">
-          <img src={logo} alt="Hypertrophy" className="w-16 h-16 mb-3" />
+          <img src={logo} alt="EVORIA" className="w-16 h-16 mb-3" />
           <h1 className="text-2xl font-heading font-bold text-foreground text-center">
             {isUpdate ? "Termos atualizados" : "Aceite dos Termos"}
           </h1>
           <p className="text-muted-foreground mt-2 text-center text-sm">
             {isUpdate
-              ? "Atualizamos nossos Termos de Uso e Política de Privacidade. Para continuar usando o Hypertrophy, revise e aceite a nova versão."
+              ? "Atualizamos nossos Termos de Uso e Política de Privacidade. Para continuar usando o EVORIA, revise e aceite a nova versão."
               : "Para continuar, precisamos do seu aceite aos Termos de Uso e à Política de Privacidade."}
           </p>
         </div>
