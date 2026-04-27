@@ -35,6 +35,7 @@ import NotFound from "./pages/NotFound";
 import Feedback from "./pages/Feedback";
 import Support from "./pages/Support";
 import Install from "./pages/Install";
+import InstallPrompt from "./components/InstallPrompt";
 import { CURRENT_TERMS_VERSION } from "@/lib/terms";
 
 const queryClient = new QueryClient();
