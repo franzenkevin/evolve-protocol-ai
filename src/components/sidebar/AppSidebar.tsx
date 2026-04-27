@@ -60,12 +60,18 @@ const AppSidebar = ({ open, onOpenChange }: AppSidebarProps) => {
     navigate("/terms");
   };
 
+  const handleInstallGuide = () => {
+    onOpenChange(false);
+    navigate("/instalar");
+  };
+
   const EXTRA_ITEMS = [
     { icon: GraduationCap, label: "Exibir tutorial novamente", desc: "Refazer o tour de uso do app", onClick: handleReplayTour },
     { icon: LifeBuoy, label: "SAC / Suporte", desc: "Fale com nosso time pelo app", onClick: handleSupport },
     { icon: MessageSquare, label: "Feedback de alunos", desc: "Mural público de depoimentos", onClick: handleFeedback },
     { icon: Star, label: "Avaliar o app", desc: "Dê sua nota e comentário", onClick: handleRateApp },
     { icon: FileText, label: "Termos e Política de Privacidade", desc: "Termos de uso + LGPD em uma página", onClick: handleTerms },
+    { icon: Smartphone, label: "Como instalar o app no celular", desc: "Passo a passo para iOS e Android", onClick: handleInstallGuide },
   ];
 
   return (
