@@ -21,10 +21,10 @@ const SectionReferrals = () => {
 
   const shareCode = async () => {
     if (!code) return;
-    const text = `Use meu cupom ${code} no app Hypertrophy e treine com IA + acompanhamento personalizado! 💪`;
+    const text = `Use meu cupom ${code} no app EVORIA e treine com IA + acompanhamento personalizado! 💪`;
     if (navigator.share) {
       try {
-        await navigator.share({ title: "Hypertrophy", text });
+        await navigator.share({ title: "EVORIA", text });
       } catch {
         // user cancelled
       }

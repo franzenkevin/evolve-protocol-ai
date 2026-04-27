@@ -54,6 +54,17 @@ export default {
         success: "hsl(var(--success))",
         warning: "hsl(var(--warning))",
         info: "hsl(var(--info))",
+        cta: {
+          DEFAULT: "hsl(var(--cta))",
+          foreground: "hsl(var(--cta-foreground))",
+          hover: "hsl(var(--cta-hover))",
+        },
+        brand: {
+          teal: "hsl(var(--brand-teal))",
+          steel: "hsl(var(--brand-steel))",
+          charcoal: "hsl(var(--brand-charcoal))",
+          graphite: "hsl(var(--brand-graphite))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -88,8 +99,8 @@ export default {
           to: { opacity: "1", transform: "translateY(0)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px hsl(30 100% 50% / 0.2)" },
-          "50%": { boxShadow: "0 0 40px hsl(30 100% 50% / 0.4)" },
+          "0%, 100%": { boxShadow: "0 0 20px hsl(174 100% 38% / 0.25)" },
+          "50%": { boxShadow: "0 0 44px hsl(174 100% 38% / 0.5)" },
         },
       },
       animation: {

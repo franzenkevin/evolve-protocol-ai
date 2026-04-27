@@ -40,7 +40,7 @@ const Journal = () => {
             <h1 className="text-xl font-heading font-bold text-foreground mb-2 leading-tight">{selectedArticle.title}</h1>
 
             <div className="flex items-center gap-3 text-[10px] text-muted-foreground mb-4 flex-wrap">
-              <span className="flex items-center gap-1"><User size={10} />{selectedArticle.author || "Equipe Hypertrophy"}</span>
+              <span className="flex items-center gap-1"><User size={10} />{selectedArticle.author || "Equipe EVORIA"}</span>
               <span className="flex items-center gap-1"><Calendar size={10} />
                 {new Date(selectedArticle.published_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
               </span>

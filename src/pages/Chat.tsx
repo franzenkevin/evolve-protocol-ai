@@ -118,7 +118,7 @@ const Chat = () => {
                 <div className="w-14 h-14 rounded-full bg-primary/15 flex items-center justify-center mx-auto mb-3">
                   <Bot size={28} className="text-primary" />
                 </div>
-                <p className="text-base font-heading font-semibold text-foreground">Olá! Sou a IA do Hypertrophy.</p>
+                <p className="text-base font-heading font-semibold text-foreground">Olá! Sou a IA do EVORIA.</p>
                 <p className="text-xs text-muted-foreground mt-2 leading-relaxed max-w-xs mx-auto">
                   Pergunte sobre <span className="text-foreground font-medium">treino</span>,{" "}
                   <span className="text-foreground font-medium">dieta</span>,{" "}

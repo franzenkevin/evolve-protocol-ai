@@ -63,7 +63,7 @@ const ResetPassword = () => {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm animate-fade-in">
         <div className="flex flex-col items-center mb-8">
-          <img src={logo} alt="Hypertrophy" className="w-20 h-20 mb-4" />
+          <img src={logo} alt="EVORIA" className="w-20 h-20 mb-4" />
           <h1 className="text-2xl font-heading font-bold text-foreground">Nova Senha</h1>
         </div>
 

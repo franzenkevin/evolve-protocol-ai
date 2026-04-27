@@ -40,7 +40,7 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
               <AvatarFallback className="bg-primary/20 text-[10px] font-bold text-primary">{initials}</AvatarFallback>
             </Avatar>
           </button>
-          <span className="text-sm font-heading font-semibold text-foreground">Hypertrophy</span>
+          <span className="text-sm font-heading font-semibold text-foreground">EVORIA</span>
           <div className="w-12" />
         </div>
       </header>

@@ -130,7 +130,7 @@ const AppSidebar = ({ open, onOpenChange }: AppSidebarProps) => {
             </div>
 
             {/* Version */}
-            <p className="text-[10px] text-muted-foreground text-center pt-2">Hypertrophy v1.0.0</p>
+            <p className="text-[10px] text-muted-foreground text-center pt-2">EVORIA v1.0.0</p>
           </div>
         </ScrollArea>
       </SheetContent>

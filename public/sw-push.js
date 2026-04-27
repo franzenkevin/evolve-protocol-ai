@@ -1,6 +1,6 @@
 // Push notification service worker
 self.addEventListener('push', (event) => {
-  let data = { title: 'Hypertrophy', body: 'Nova notificação' };
+  let data = { title: 'EVORIA', body: 'Nova notificação' };
   try {
     data = event.data?.json() || data;
   } catch { /* use defaults */ }
