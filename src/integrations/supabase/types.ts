@@ -41,6 +41,39 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_usage_log: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          function_name: string
+          id: string
+          latency_ms: number | null
+          metadata: Json | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          function_name: string
+          id?: string
+          latency_ms?: number | null
+          metadata?: Json | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          function_name?: string
+          id?: string
+          latency_ms?: number | null
+          metadata?: Json | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       app_testimonials: {
         Row: {
           approved: boolean
@@ -1205,7 +1238,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_ai_rate_limit: {
+        Args: {
+          _function_name?: string
+          _per_day?: number
+          _per_hour?: number
+          _user_id: string
+        }
+        Returns: Json
+      }
       get_admin_metrics: { Args: never; Returns: Json }
+      get_ai_health_metrics: { Args: never; Returns: Json }
       get_monthly_ranking: {
         Args: { _month_start?: string }
         Returns: {

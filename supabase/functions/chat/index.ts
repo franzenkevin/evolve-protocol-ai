@@ -1,16 +1,45 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+// Limites: 10/hora e 30/dia por usuário (ajuste conforme necessário)
+const HOURLY_LIMIT = 10;
+const DAILY_LIMIT = 30;
+
+async function logUsage(
+  admin: ReturnType<typeof createClient>,
+  userId: string,
+  status: string,
+  latencyMs: number | null,
+  errorMessage: string | null,
+) {
+  try {
+    await admin.from("ai_usage_log").insert({
+      user_id: userId,
+      function_name: "chat",
+      status,
+      latency_ms: latencyMs,
+      error_message: errorMessage,
+    });
+  } catch (e) {
+    console.error("logUsage failed:", e);
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  const startedAt = Date.now();
+  const admin = createClient(SUPABASE_URL, SERVICE_ROLE, { auth: { persistSession: false } });
+
   try {
-    // Require authenticated user — prevents unauthenticated AI credit consumption
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -18,8 +47,6 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    // Decode JWT locally to extract user id (sub). Avoids issues with
-    // ES256-signed tokens via auth-js getUser/getClaims.
     const token = authHeader.replace("Bearer ", "");
     let userId: string | null = null;
     try {
@@ -27,10 +54,35 @@ serve(async (req) => {
       if (payload?.sub && (!payload.exp || payload.exp * 1000 > Date.now())) {
         userId = payload.sub;
       }
-    } catch (_) { /* invalid token */ }
+    } catch (_) { /* invalid */ }
     if (!userId) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Rate limit por usuário
+    const { data: rl, error: rlErr } = await admin.rpc("check_ai_rate_limit", {
+      _user_id: userId,
+      _function_name: "chat",
+      _per_hour: HOURLY_LIMIT,
+      _per_day: DAILY_LIMIT,
+    });
+    if (rlErr) {
+      console.error("rate limit check failed:", rlErr);
+    } else if (rl && (rl as any).allowed === false) {
+      const reason = (rl as any).reason;
+      const isHourly = reason === "hourly_limit";
+      const message = isHourly
+        ? `Limite de ${HOURLY_LIMIT} mensagens por hora atingido. Tente novamente em alguns minutos.`
+        : `Limite diário de ${DAILY_LIMIT} mensagens atingido. Volte amanhã para continuar conversando.`;
+      await logUsage(admin, userId, "rate_limited", Date.now() - startedAt, reason);
+      return new Response(JSON.stringify({
+        error: message,
+        rate_limit: rl,
+      }), {
+        status: 429,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -131,25 +183,38 @@ Sempre que o usuário pedir UM AJUSTE EXTRA no treino (trocar exercício, mudar 
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limited" }), {
+      const status = response.status;
+      let errBody = "";
+      try { errBody = await response.text(); } catch (_) { /* ignore */ }
+
+      if (status === 429) {
+        await logUsage(admin, userId, "gateway_rate_limited", Date.now() - startedAt, errBody.slice(0, 500));
+        return new Response(JSON.stringify({
+          error: "Estamos com muitas requisições no momento. Tente novamente em instantes.",
+        }), {
           status: 429,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Credits exhausted" }), {
+      if (status === 402) {
+        await logUsage(admin, userId, "credits_exhausted", Date.now() - startedAt, errBody.slice(0, 500));
+        return new Response(JSON.stringify({
+          error: "O serviço de IA está temporariamente indisponível. Estamos resolvendo.",
+        }), {
           status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
+      console.error("AI gateway error:", status, errBody);
+      await logUsage(admin, userId, "error", Date.now() - startedAt, `${status}: ${errBody.slice(0, 500)}`);
       return new Response(JSON.stringify({ error: "AI gateway error" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Sucesso: log fire-and-forget
+    logUsage(admin, userId, "success", Date.now() - startedAt, null);
 
     return new Response(response.body, {
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },

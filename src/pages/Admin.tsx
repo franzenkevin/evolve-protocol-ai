@@ -19,7 +19,9 @@ import {
   DollarSign,
   Receipt,
   Activity,
+  Sparkles,
 } from "lucide-react";
+import AdminAIHealth from "@/components/admin/AdminAIHealth";
 import AdminMetrics from "@/components/admin/AdminMetrics";
 import AdminSales from "@/components/admin/AdminSales";
 import AdminRenewals from "@/components/admin/AdminRenewals";
@@ -67,6 +69,7 @@ const Admin = () => {
         <Tabs defaultValue="overview">
           <TabsList className="w-full flex flex-wrap h-auto justify-start gap-1">
             <TabsTrigger value="overview" className="gap-1"><BarChart3 size={14} />Visão geral</TabsTrigger>
+            <TabsTrigger value="ai-health" className="gap-1"><Sparkles size={14} />IA & Saúde</TabsTrigger>
             <TabsTrigger value="sales" className="gap-1"><CreditCard size={14} />Vendas</TabsTrigger>
             <TabsTrigger value="renewals" className="gap-1"><Calendar size={14} />Renovações</TabsTrigger>
             <TabsTrigger value="refunds" className="gap-1"><Receipt size={14} />Reembolsos</TabsTrigger>
@@ -83,6 +86,7 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="overview" className="mt-4"><AdminMetrics /></TabsContent>
+          <TabsContent value="ai-health" className="mt-4"><AdminAIHealth /></TabsContent>
           <TabsContent value="sales" className="mt-4"><AdminSales /></TabsContent>
           <TabsContent value="renewals" className="mt-4"><AdminRenewals /></TabsContent>
           <TabsContent value="refunds" className="mt-4"><AdminRefunds /></TabsContent>

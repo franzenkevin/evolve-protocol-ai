@@ -48,12 +48,14 @@ const Chat = () => {
       );
 
       if (!resp.ok || !resp.body) {
+        let serverMsg = "";
+        try { const j = await resp.json(); serverMsg = j?.error || ""; } catch { /* ignore */ }
         if (resp.status === 429) {
-          setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ Limite de requisições atingido. Tente novamente em alguns segundos." }]);
+          setMessages((prev) => [...prev, { role: "assistant", content: `⚠️ ${serverMsg || "Limite de requisições atingido. Tente novamente em alguns segundos."}` }]);
         } else if (resp.status === 402) {
-          setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ Créditos esgotados. Entre em contato com o suporte." }]);
+          setMessages((prev) => [...prev, { role: "assistant", content: `⚠️ ${serverMsg || "Serviço de IA temporariamente indisponível."}` }]);
         } else {
-          setMessages((prev) => [...prev, { role: "assistant", content: "Erro ao processar sua mensagem. Tente novamente." }]);
+          setMessages((prev) => [...prev, { role: "assistant", content: serverMsg || "Erro ao processar sua mensagem. Tente novamente." }]);
         }
         setIsLoading(false);
         return;
