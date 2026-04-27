@@ -52,17 +52,17 @@ const CardioCard = ({ profile, variant = "training" }: CardioCardProps) => {
     <Card
       className={`p-4 ${
         isRest
-          ? "bg-gradient-to-br from-orange-500/15 to-rose-500/10 border-orange-500/40"
+          ? "bg-gradient-to-br from-primary/15 to-primary/5 border-primary/40"
           : "card-gradient border-border"
       }`}
     >
       <div className="flex items-start gap-3">
         <div
           className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-            isRest ? "bg-orange-500/25" : "bg-primary/15"
+            isRest ? "bg-primary/25" : "bg-primary/15"
           }`}
         >
-          <Heart size={18} className={isRest ? "text-orange-400" : "text-primary"} />
+          <Heart size={18} className="text-primary" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
