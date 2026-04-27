@@ -112,10 +112,10 @@ export function useInstallPrompt() {
     // Hit max dismissals?
     if (state.dismissals >= MAX_DISMISSALS) return;
 
-    // Recently dismissed? Wait cooldown.
+    // Recently dismissed? Wait cooldown (24h).
     if (state.lastDismissedAt) {
-      const daysSince = (Date.now() - state.lastDismissedAt) / (1000 * 60 * 60 * 24);
-      if (daysSince < DISMISS_COOLDOWN_DAYS) return;
+      const hoursSince = (Date.now() - state.lastDismissedAt) / (1000 * 60 * 60);
+      if (hoursSince < DISMISS_COOLDOWN_HOURS) return;
     }
 
     const timer = setTimeout(() => setShouldShowBanner(true), SHOW_DELAY_MS);
