@@ -504,9 +504,9 @@ const Training = () => {
 
             {/* Cardio prescribed inside the day from the protocol */}
             {cardioOnDay && cardioOnDay.modality && (
-              <Card className="p-3 bg-orange-500/10 border-orange-500/30">
+              <Card className="p-3 bg-primary/10 border-primary/30">
                 <div className="flex items-start gap-2">
-                  <Activity size={16} className="text-orange-400 mt-0.5 shrink-0" />
+                  <Activity size={16} className="text-primary mt-0.5 shrink-0" />
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-foreground">
                       Cardio: {cardioOnDay.modality}

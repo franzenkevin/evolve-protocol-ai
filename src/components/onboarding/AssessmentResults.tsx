@@ -88,7 +88,7 @@ export const AssessmentResults = ({ assessment, loading }: AssessmentResultsProp
       {assessment.weak_points && assessment.weak_points.length > 0 && (
         <div className="space-y-1.5">
           <p className="text-xs font-semibold text-foreground flex items-center gap-1">
-            <TrendingDown className="w-3 h-3 text-orange-400" /> Áreas para Melhorar
+            <TrendingDown className="w-3 h-3 text-info" /> Áreas para Melhorar
           </p>
           {assessment.weak_points.map((p, i) => (
             <p key={i} className="text-xs text-muted-foreground pl-4">• {p}</p>
