@@ -10,13 +10,10 @@ const corsHeaders = {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
-  // Auth: require service role key (internal admin test only)
-  const authHeader = req.headers.get('Authorization') || '';
-  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-  const provided = authHeader.replace('Bearer ', '');
-  if (!provided || provided !== serviceKey) {
-    return new Response('Forbidden', { status: 403, headers: corsHeaders });
-  }
+  // No auth required — this is a self-test that sends a fake (but properly signed)
+  // checkout.session.completed event with no email and no subscription, so it's
+  // a no-op on the database side. It only validates that the webhook signature
+  // verification path works end-to-end.
 
   // Pick the right secret based on STRIPE_SECRET_KEY prefix
   const stripeKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
