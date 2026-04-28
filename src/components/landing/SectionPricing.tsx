@@ -1,11 +1,8 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { CheckCircle2, ArrowRight, Sparkles, Loader2 } from "lucide-react";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
 
 const MONTHLY_BULLETS = [
   "Protocolo completo gerado pelo sistema",
@@ -23,28 +20,19 @@ const ANNUAL_BULLETS = [
 ];
 
 export const SectionPricing = () => {
-  const { user } = useAuth();
   const { openCheckout, loading } = useStripeCheckout();
-  const [emailMonthly, setEmailMonthly] = useState("");
-  const [emailAnnual, setEmailAnnual] = useState("");
   const [activePlan, setActivePlan] = useState<"monthly" | "annual" | null>(null);
 
   const handleCheckout = async (
     plan: "monthly" | "annual",
     priceId: string,
     couponCode: string,
-    email: string
   ) => {
-    if (!user && !email.trim()) {
-      toast.error("Informe seu e-mail pra continuar");
-      return;
-    }
     setActivePlan(plan);
     try {
       await openCheckout({
         priceId,
         couponCode,
-        guestEmail: user ? undefined : email.trim(),
         successUrl: `${window.location.origin}/checkout/success?plan=${plan}`,
       });
     } finally {
