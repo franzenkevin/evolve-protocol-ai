@@ -10,20 +10,13 @@ const corsHeaders = {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
-  // Auth check — only admins
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader) return new Response('Unauthorized', { status: 401, headers: corsHeaders });
-
-  const sb = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-  );
-  const token = authHeader.replace('Bearer ', '');
-  const { data: { user } } = await sb.auth.getUser(token);
-  if (!user) return new Response('Invalid token', { status: 401, headers: corsHeaders });
-  const { data: roles } = await sb.from('user_roles').select('role').eq('user_id', user.id);
-  const isAdmin = (roles || []).some((r: any) => r.role === 'admin');
-  if (!isAdmin) return new Response('Forbidden', { status: 403, headers: corsHeaders });
+  // Auth: require service role key (internal admin test only)
+  const authHeader = req.headers.get('Authorization') || '';
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+  const provided = authHeader.replace('Bearer ', '');
+  if (!provided || provided !== serviceKey) {
+    return new Response('Forbidden', { status: 403, headers: corsHeaders });
+  }
 
   // Pick the right secret based on STRIPE_SECRET_KEY prefix
   const stripeKey = Deno.env.get('STRIPE_SECRET_KEY') || '';
