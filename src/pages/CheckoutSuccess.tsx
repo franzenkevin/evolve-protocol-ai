@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -47,6 +47,13 @@ const CheckoutSuccess = () => {
   const { data: protocol, refetch: refetchProtocol } = useActiveProtocol();
   const createProtocol = useCreateProtocol();
   const qc = useQueryClient();
+  const sessionId = typeof window === "undefined"
+    ? null
+    : new URLSearchParams(window.location.search).get("session_id");
+  const [pendingEmail, setPendingEmail] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return sessionStorage.getItem("pendingCheckoutEmail");
+  });
 
   const [status, setStatus] = useState<GenStatus>("waiting_payment");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -55,6 +62,7 @@ const CheckoutSuccess = () => {
   const generationStarted = useRef(false);
 
   const firstName = (profile?.full_name || user?.user_metadata?.full_name || "Atleta").split(" ")[0];
+  const isGuestReturn = !user && !!pendingEmail;
 
   const isActive =
     subscription &&
@@ -70,6 +78,7 @@ const CheckoutSuccess = () => {
 
   // Poll do webhook de pagamento → só importa enquanto status = waiting_payment
   useEffect(() => {
+    if (!user) return;
     if (status !== "waiting_payment") return;
     if (isActive) {
       // Pagamento confirmado, aguardando início da geração
@@ -78,19 +87,20 @@ const CheckoutSuccess = () => {
     }
     const start = Date.now();
     let reconcileFired = false;
+    const reconcileDelay = sessionId ? 1500 : RECONCILE_AFTER_MS;
 
     const tick = async () => {
       qc.invalidateQueries({ queryKey: ["subscription"] });
       await refetch();
 
-      if (!reconcileFired && Date.now() - start > RECONCILE_AFTER_MS) {
+      if (!reconcileFired && Date.now() - start > reconcileDelay) {
         reconcileFired = true;
         const env =
           (import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN as string | undefined)?.startsWith("test_")
             ? "sandbox"
             : "live";
         supabase.functions
-          .invoke("reconcile-subscription", { body: { environment: env } })
+          .invoke("reconcile-subscription", { body: { environment: env, sessionId } })
           .then(() => {
             qc.invalidateQueries({ queryKey: ["subscription"] });
             refetch();
@@ -106,7 +116,13 @@ const CheckoutSuccess = () => {
 
     const id = setInterval(tick, POLL_INTERVAL_MS);
     return () => clearInterval(id);
-  }, [status, isActive, qc, refetch]);
+  }, [status, isActive, qc, refetch, sessionId]);
+
+  useEffect(() => {
+    if (!user) return;
+    sessionStorage.removeItem("pendingCheckoutEmail");
+    setPendingEmail(null);
+  }, [user]);
 
   // Timer + stages visuais durante processing
   useEffect(() => {
@@ -253,8 +269,37 @@ const CheckoutSuccess = () => {
           ))}
         </Card>
 
+        {isGuestReturn && (
+          <Card className="p-5 mb-4 border-primary/30 bg-primary/5 space-y-3">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-primary uppercase tracking-wider">
+                Acesso da sua conta
+              </p>
+              <h2 className="text-base font-heading font-bold text-foreground">
+                Pagamento concluído. Falta entrar na conta para liberar o app.
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Enviamos seu acesso para <span className="text-foreground">{pendingEmail}</span>. Abra o link do e-mail ou entre com esse endereço para continuar.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <Button asChild size="lg" className="w-full gap-2 h-11">
+                <Link to="/login">Entrar na conta</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="w-full gap-2 h-11">
+                <Link to="/signup">Criar senha</Link>
+              </Button>
+            </div>
+
+            <p className="text-[11px] text-muted-foreground text-center">
+              Depois de entrar, esta tela conclui a ativação automaticamente.
+            </p>
+          </Card>
+        )}
+
         {/* STATUS: aguardando webhook de pagamento */}
-        {status === "waiting_payment" && (
+        {status === "waiting_payment" && !isGuestReturn && (
           <Card className="p-4 mb-4 border-primary/30 bg-primary/5 flex items-center gap-3">
             <Loader2 size={18} className="text-primary animate-spin shrink-0" />
             <div className="flex-1">
@@ -269,7 +314,7 @@ const CheckoutSuccess = () => {
         )}
 
         {/* STATUS: pendente (pagamento OK, prestes a iniciar) */}
-        {status === "pending" && (
+        {status === "pending" && !isGuestReturn && (
           <Card className="p-4 mb-4 border-primary/30 bg-primary/5 flex items-center gap-3">
             <Clock size={18} className="text-primary shrink-0" />
             <div className="flex-1">
@@ -284,7 +329,7 @@ const CheckoutSuccess = () => {
         )}
 
         {/* STATUS: processando — loader cheio com stages */}
-        {status === "processing" && (
+        {status === "processing" && !isGuestReturn && (
           <Card className="p-5 mb-4 border-primary/30 bg-primary/5 space-y-3">
             <div className="text-center">
               <div className="text-3xl mb-1 animate-pulse">🤖</div>
@@ -308,7 +353,7 @@ const CheckoutSuccess = () => {
         )}
 
         {/* STATUS: concluído */}
-        {status === "done" && (
+        {status === "done" && !isGuestReturn && (
           <Card className="p-4 mb-4 border-primary/40 bg-primary/10 flex items-center gap-3">
             <CheckCircle2 size={20} className="text-primary shrink-0" />
             <div className="flex-1">
@@ -323,7 +368,7 @@ const CheckoutSuccess = () => {
         )}
 
         {/* STATUS: erro */}
-        {status === "error" && (
+        {status === "error" && !isGuestReturn && (
           <Card className="p-4 mb-4 border-destructive/40 bg-destructive/5 space-y-3">
             <div className="flex items-start gap-3">
               <AlertCircle size={20} className="text-destructive shrink-0 mt-0.5" />
@@ -356,8 +401,8 @@ const CheckoutSuccess = () => {
         <Button
           size="lg"
           className="w-full glow gap-2 h-14 text-base"
-          onClick={next}
-          disabled={status !== "done"}
+          onClick={isGuestReturn ? undefined : next}
+          disabled={isGuestReturn ? true : status !== "done"}
         >
           {status === "done" && (
             <>

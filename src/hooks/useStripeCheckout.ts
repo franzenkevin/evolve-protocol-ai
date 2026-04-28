@@ -41,6 +41,10 @@ export function useStripeCheckout() {
         return;
       }
 
+      if (!user && options.guestEmail) {
+        sessionStorage.setItem("pendingCheckoutEmail", options.guestEmail.trim().toLowerCase());
+      }
+
       // Redirect to Stripe-hosted checkout
       window.location.href = data.url;
     } catch (e) {

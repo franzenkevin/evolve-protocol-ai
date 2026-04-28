@@ -25,6 +25,7 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: auth } },
     });
     const service = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    const body = req.method === 'POST' ? await req.json().catch(() => ({})) : {};
 
     const { data: u, error: uerr } = await supabaseUser.auth.getUser();
     if (uerr || !u.user) return json({ error: 'Invalid user' }, 401);
@@ -32,6 +33,60 @@ Deno.serve(async (req) => {
     const env = getStripeEnv();
 
     const stripe = getStripe();
+    const sessionId = typeof body?.sessionId === 'string' ? body.sessionId : null;
+
+    if (sessionId) {
+      const session = await stripe.checkout.sessions.retrieve(sessionId, {
+        expand: ['subscription'],
+      });
+
+      if (session.metadata?.userId && session.metadata.userId !== userId) {
+        return json({ error: 'Session does not belong to authenticated user' }, 403);
+      }
+
+      const sessionSub = session.subscription;
+      if (session.mode === 'subscription' && sessionSub) {
+        const sub = typeof sessionSub === 'string'
+          ? await stripe.subscriptions.retrieve(sessionSub)
+          : sessionSub;
+
+        const item = sub.items.data[0];
+        const lookupKey = item?.price?.lookup_key || (sub.metadata?.priceId as string) || '';
+        const planCode = PLAN_CODE_FROM_LOOKUP[lookupKey] || 'monthly';
+        const productId =
+          typeof item?.price?.product === 'string' ? item.price.product : 'hypertrophy_plan';
+        const periodEnd = sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null;
+        const periodStart = sub.current_period_start
+          ? new Date(sub.current_period_start * 1000).toISOString()
+          : null;
+
+        const { error: upsertFromSessionErr } = await service.from('subscriptions').upsert(
+          {
+            user_id: userId,
+            stripe_subscription_id: sub.id,
+            stripe_customer_id: typeof sub.customer === 'string' ? sub.customer : sub.customer.id,
+            stripe_session_id: session.id,
+            product_id: productId,
+            price_id: lookupKey,
+            plan_type: planCode,
+            status: sub.status,
+            current_period_start: periodStart,
+            current_period_end: periodEnd,
+            next_billing_date: periodEnd ? periodEnd.split('T')[0] : null,
+            cancel_at_period_end: !!sub.cancel_at_period_end,
+            environment: env,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'stripe_subscription_id' },
+        );
+
+        if (upsertFromSessionErr) {
+          return json({ error: 'DB error', details: upsertFromSessionErr.message }, 500);
+        }
+
+        return json({ synced: true, subscription_id: sub.id, status: sub.status, plan: planCode });
+      }
+    }
 
     // Search subscriptions by metadata.userId
     const search = await stripe.subscriptions.search({
