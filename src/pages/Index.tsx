@@ -50,6 +50,7 @@ const Index = () => {
   const { data: profile, isLoading: profileLoading } = useProfile();
   const { data: subscription, isLoading: subLoading } = useSubscription();
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
+  const [stripeTutorialOpen, setStripeTutorialOpen] = useState(false);
 
   useEffect(() => {
     if (authLoading || !user) return;
