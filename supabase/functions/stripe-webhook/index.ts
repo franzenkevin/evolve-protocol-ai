@@ -18,8 +18,14 @@ function getSupabase() {
 }
 
 function getWebhookSecret(): string {
-  const v = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-  if (!v) throw new Error('STRIPE_WEBHOOK_SECRET not configured');
+  // Pick the right secret based on Stripe env (sandbox vs live)
+  const isSandbox = env === 'sandbox';
+  const v =
+    Deno.env.get('STRIPE_WEBHOOK_SECRET') ||
+    (isSandbox
+      ? Deno.env.get('PAYMENTS_SANDBOX_WEBHOOK_SECRET')
+      : Deno.env.get('PAYMENTS_LIVE_WEBHOOK_SECRET'));
+  if (!v) throw new Error('Stripe webhook secret not configured');
   return v;
 }
 
@@ -27,16 +33,16 @@ function buildWelcomeEmail(firstName: string, actionUrl: string) {
   const safeName = firstName || 'Atleta';
   return `<!DOCTYPE html>
 <html lang="pt-BR">
-<head><meta charset="utf-8"><title>Bem-vindo à Evoria</title></head>
+<head><meta charset="utf-8"><title>Bem-vindo à Evoria Coach App</title></head>
 <body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#fafafa;">
   <div style="max-width:560px;margin:0 auto;padding:32px 24px;">
     <div style="text-align:center;margin-bottom:32px;">
-      <h1 style="color:#22c55e;font-size:28px;margin:0;font-weight:700;letter-spacing:-0.5px;">EVORIA</h1>
+      <h1 style="color:#22c55e;font-size:28px;margin:0;font-weight:700;letter-spacing:-0.5px;">EVORIA COACH APP</h1>
     </div>
     <div style="background:#171717;border:1px solid #262626;border-radius:16px;padding:32px;">
       <h2 style="color:#fafafa;font-size:22px;margin:0 0 16px;font-weight:700;">Olá, ${safeName}! 🎉</h2>
       <p style="color:#a3a3a3;font-size:15px;line-height:1.6;margin:0 0 16px;">
-        Pagamento confirmado! Seja muito bem-vindo(a) à <strong style="color:#22c55e;">Evoria</strong>.
+        Pagamento confirmado! Seja muito bem-vindo(a) à <strong style="color:#22c55e;">Evoria Coach App</strong>.
       </p>
       <p style="color:#a3a3a3;font-size:15px;line-height:1.6;margin:0 0 24px;">
         Para acessar seu app e começar seu protocolo personalizado, clique no botão abaixo e <strong style="color:#fafafa;">crie sua senha</strong>:
@@ -57,7 +63,7 @@ function buildWelcomeEmail(firstName: string, actionUrl: string) {
       <p style="color:#525252;font-size:12px;margin:0;">
         Dúvidas? Responda este e-mail ou escreva para <a href="mailto:suporte@evoriacoach.com" style="color:#22c55e;">suporte@evoriacoach.com</a>
       </p>
-      <p style="color:#525252;font-size:11px;margin:8px 0 0;">© Evoria · Todos os direitos reservados</p>
+      <p style="color:#525252;font-size:11px;margin:8px 0 0;">© Evoria Coach App · Todos os direitos reservados</p>
     </div>
   </div>
 </body>
@@ -97,7 +103,7 @@ async function sendWelcomeEmail(userId: string) {
       },
       body: JSON.stringify({
         to: user.email,
-        subject: '🎉 Bem-vindo à Evoria — crie sua senha de acesso',
+        subject: '🎉 Bem-vindo à Evoria Coach App — crie sua senha de acesso',
         html: buildWelcomeEmail(firstName, actionUrl),
       }),
     });
