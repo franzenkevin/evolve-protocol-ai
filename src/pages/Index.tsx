@@ -98,21 +98,20 @@ const Index = () => {
           <div className="flex md:justify-start justify-center">
             <img src={logo} alt="EVORIA" className="w-16 h-16 mb-6" />
           </div>
-          <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-primary mb-5 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5">
-            <Sparkles size={12} /> CONSULTORIA FITNESS COM IA INTELIGENTE
+<p className="inline-flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-primary mb-5 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5">
+            <Sparkles size={12} /> METODOLOGIA FRANZEN • AGORA EM SISTEMA DIGITAL
           </p>
           <h1 className="md:text-7xl font-heading font-bold text-foreground mb-5 leading-[1.05] tracking-tight text-2xl">
-            Uma revolução contra o mercado genérico <br className="hidden md:block" />
-            <span className="text-gradient">das consultorias online.</span>
+            Você treina há anos. O problema nunca foi o esforço. <br className="hidden md:block" />
+            <span className="text-gradient">Foi o protocolo.</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl md:max-w-2xl">
-            Aqui você vai receber um protocolo de treino e alimentação <strong className="text-foreground">100% personalizado</strong> pro seu corpo,
-            calculado pela metodologia ensinada a IA, e ajustado a cada 60 dias.
+            O mesmo sistema que uso com meus clientes da consultoria, agora estruturado em IA, adaptado pro seu corpo, disponível <strong className="text-foreground">por menos de R$1 por dia.</strong>
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
             <Link to={ctaPrimaryTo}>
               <Button size="lg" className="glow gap-2 h-14 px-8 text-base w-full sm:w-auto">
-                {ctaPrimary} <ArrowRight size={18} />
+                Começar agora <ArrowRight size={18} />
               </Button>
             </Link>
             {!user && (
@@ -125,16 +124,16 @@ const Index = () => {
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 mt-6 justify-center md:justify-start text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Quiz de formulário completo par todas suas informações
+              <CheckCircle2 size={14} className="text-primary" /> Quiz de 5 minutos. Protocolo pronto hoje.
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Avaliação postural completa por IA treinada
+              <CheckCircle2 size={14} className="text-primary" /> Você vê o protocolo antes de pagar qualquer coisa
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Não é só uma IA é um software completo
+              <CheckCircle2 size={14} className="text-primary" /> Estrutura alimentar com os alimentos que você já come
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Teste por 7 dias garantidos
+              <CheckCircle2 size={14} className="text-primary" /> 7 dias de garantia é só cancelar se não gostar
             </span>
           </div>
         </div>
