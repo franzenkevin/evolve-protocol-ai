@@ -121,23 +121,11 @@ export const SectionPricing = () => {
               ))}
             </ul>
 
-            {!user && (
-              <Input
-                type="email"
-                placeholder="seu@email.com"
-                value={emailAnnual}
-                onChange={(e) => setEmailAnnual(e.target.value)}
-                className="mb-3 h-12"
-                disabled={isAnnualLoading}
-              />
-            )}
             <Button
               size="lg"
               className="w-full gap-2 h-12 text-base glow"
               disabled={isAnnualLoading || loading}
-              onClick={() =>
-                handleCheckout("annual", "hypertrophy_annual", "LANCAMENTOANUAL", emailAnnual)
-              }
+              onClick={() => handleCheckout("annual", "hypertrophy_annual", "LANCAMENTOANUAL")}
             >
               {isAnnualLoading ? (
                 <Loader2 size={18} className="animate-spin" />
