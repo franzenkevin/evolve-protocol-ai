@@ -137,8 +137,8 @@ Deno.serve(async (req) => {
     }));
 
     // Launch coupons referenced by SectionPricing
-    results.promos.push(await ensurePromo('LANCAMENTO', 69, 'Lançamento mensal — 69% off'));
-    results.promos.push(await ensurePromo('LANCAMENTOANUAL', 33, 'Lançamento anual — 33% off'));
+    results.promos.push(await ensurePromo('LANCAMENTO', 69.2, 'Lançamento mensal — 69,2% off'));
+    results.promos.push(await ensurePromo('LANCAMENTOANUAL', 33.1, 'Lançamento anual — 33,1% off'));
 
     return json({ ok: true, ...results });
   } catch (e) {
