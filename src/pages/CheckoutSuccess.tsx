@@ -62,7 +62,9 @@ const CheckoutSuccess = () => {
   const generationStarted = useRef(false);
 
   const firstName = (profile?.full_name || user?.user_metadata?.full_name || "Atleta").split(" ")[0];
-  const isGuestReturn = !user && !!pendingEmail;
+  // Guest return: user not logged in. We may or may not have the email cached in sessionStorage
+  // (sessionStorage is lost when Stripe opens in a different browser/tab).
+  const isGuestReturn = !user;
 
   const isActive =
     subscription &&
