@@ -10,10 +10,11 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, RefreshCw } from "lucide-react";
 import { usePlans, useCreatePlan, useUpdatePlan, useDeletePlan, type Plan } from "@/hooks/usePlans";
 import { useToast } from "@/hooks/use-toast";
 import { useLogAudit } from "@/hooks/useAuditLog";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminPlans = () => {
   const { data: plans = [], isLoading } = usePlans();
