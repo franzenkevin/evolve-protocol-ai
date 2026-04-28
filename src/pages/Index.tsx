@@ -78,17 +78,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* TEMP: Stripe key tutorial floating button */}
-      <button
-        onClick={() => setStripeTutorialOpen(true)}
-        className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-3 shadow-2xl shadow-primary/30 hover:scale-105 transition-transform text-sm font-semibold"
-        aria-label="Como conectar Stripe"
-      >
-        <KeyRound className="w-4 h-4" />
-        Conectar Stripe
-      </button>
-      <StripeKeyTutorialModal open={stripeTutorialOpen} onOpenChange={setStripeTutorialOpen} />
-
       {/* Hero */}
       <section className="relative min-h-[100vh] flex items-center overflow-hidden">
         <img
