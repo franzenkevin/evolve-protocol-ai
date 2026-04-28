@@ -108,13 +108,47 @@ Deno.serve(async (req) => {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
-        const userId = session.metadata?.userId as string | undefined;
+        let userId = session.metadata?.userId as string | undefined;
+
+        // Provision user account from Stripe-collected email if not yet linked
+        const buyerEmail =
+          session.customer_details?.email || session.customer_email || null;
+        if (!userId && buyerEmail) {
+          const sb = getSupabase();
+          const email = buyerEmail.toLowerCase();
+          const { data: list } = await sb.auth.admin.listUsers({ page: 1, perPage: 200 });
+          const existing = list?.users?.find((u: any) => u.email?.toLowerCase() === email);
+          if (existing) {
+            userId = existing.id;
+          } else {
+            const { data: created, error: cErr } = await sb.auth.admin.createUser({
+              email,
+              email_confirm: false,
+              user_metadata: { source: 'guest_checkout' },
+            });
+            if (cErr) {
+              console.error('post-payment createUser failed', cErr);
+            } else if (created.user) {
+              userId = created.user.id;
+            }
+          }
+          await sb.from('leads').upsert(
+            { email, name: null, source: 'paywall_guest', status: 'converted', converted_user_id: userId || null },
+            { onConflict: 'email' },
+          );
+        }
+
         if (session.mode === 'subscription' && session.subscription) {
           const subId = typeof session.subscription === 'string' ? session.subscription : session.subscription.id;
           const sub = await stripe.subscriptions.retrieve(subId);
-          // Carry over session metadata into the subscription if missing
+          // Inject userId into subscription metadata if it's missing
           if (!sub.metadata?.userId && userId) {
-            sub.metadata = { ...sub.metadata, ...session.metadata };
+            sub.metadata = { ...sub.metadata, userId, ...session.metadata };
+            try {
+              await stripe.subscriptions.update(subId, { metadata: sub.metadata });
+            } catch (e) {
+              console.warn('failed to update sub metadata', e);
+            }
           }
           await upsertSubscriptionFromStripe(sub, session.id);
           if (userId) await maybeSendMagicLink(userId);
