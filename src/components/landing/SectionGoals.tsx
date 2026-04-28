@@ -5,33 +5,31 @@ const GOALS = [
   {
     icon: Dumbbell,
     title: "Hipertrofia",
-    desc: "Ganhe massa magra com volume, intensidade e recuperação calculados pra você. Sem chutar série e repetição.",
-    tag: "Ganho de massa",
+    desc: "Volume, intensidade e recuperação calculados pelo sistema. Sem chutar série e repetição. Sem plateau por falta de progressão.",
+    tag: "GANHO DE MASSA",
   },
   {
     icon: Flame,
     title: "Emagrecimento",
-    desc: "Perca gordura sem perder músculo. Déficit calórico inteligente, treino que preserva força, dieta que cabe na rotina.",
-    tag: "Definição",
+    desc: "Déficit calórico inteligente. Programa de treino que preserva músculo. Organização alimentar que cabe na sua rotina sem te deixar com fome o dia todo.",
+    tag: "DEFINIÇÃO",
   },
   {
     icon: Zap,
     title: "Performance",
-    desc: "Mais força, mais resistência, mais explosão. Periodização pra quem treina pra render em outros esportes, e não só pra estética.",
-    tag: "Condicionamento",
+    desc: "Periodização pra quem quer render mais — dentro e fora da academia. Mais força, mais resistência, mais explosão.",
+    tag: "CONDICIONAMENTO",
   },
 ];
 
 export const SectionGoals = () => (
   <section className="max-w-5xl mx-auto px-4 py-20">
     <div className="text-center mb-12">
-      <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">Pra qualquer objetivo</p>
+      <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">Protocolo completo</p>
       <h2 className="text-3xl md:text-5xl font-heading font-bold text-foreground leading-tight">
-        Protocolo completo.
+        Você diz onde quer chegar. <br />
+        <span className="text-gradient">O sistema traça o caminho mais curto.</span>
       </h2>
-      <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-        Você diz onde quer chegar. A metodologia monta o caminho mais curto.
-      </p>
     </div>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {GOALS.map(({ icon: Icon, title, desc, tag }) => (
