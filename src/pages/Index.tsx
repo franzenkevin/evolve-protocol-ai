@@ -20,6 +20,7 @@ import { SectionGoals } from "@/components/landing/SectionGoals";
 import { SectionFeatures } from "@/components/landing/SectionFeatures";
 import { SectionResults } from "@/components/landing/SectionResults";
 import { SectionAbout } from "@/components/landing/SectionAbout";
+import { SectionPricing } from "@/components/landing/SectionPricing";
 import { SectionFAQ } from "@/components/landing/SectionFAQ";
 import { Footer } from "@/components/landing/Footer";
 
@@ -163,6 +164,7 @@ const Index = () => {
       <SectionFeatures />
       <SectionResults />
       <SectionAbout />
+      <SectionPricing />
       <SectionFAQ />
 
       {/* CTA final */}
