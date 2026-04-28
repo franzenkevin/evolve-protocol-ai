@@ -35,15 +35,16 @@ Deno.serve(async (req) => {
     for (const code of ['LANCAMENTO', 'LANCAMENTOANUAL']) {
       const list = await stripe.promotionCodes.list({ code, limit: 10 });
       out[code] = await Promise.all(list.data.map(async (pc) => {
-        const coupon = typeof pc.coupon === 'string'
-          ? await stripe.coupons.retrieve(pc.coupon)
-          : pc.coupon;
+        const couponId = typeof pc.coupon === 'string'
+          ? pc.coupon
+          : pc.coupon?.id ?? pc.promotion?.coupon;
+        const coupon = couponId ? await stripe.coupons.retrieve(couponId) : null;
         return {
           promo_id: pc.id,
           code: pc.code,
           active: pc.active,
           created: new Date(pc.created * 1000).toISOString(),
-          coupon_id: coupon?.id,
+          coupon_id: couponId,
           percent_off: coupon?.percent_off,
           coupon_name: coupon?.name,
         };

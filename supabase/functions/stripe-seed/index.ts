@@ -60,9 +60,10 @@ async function ensurePromo(code: string, percentOff: number, name: string) {
   // Look up active promotion codes with this code
   const existing = await stripe.promotionCodes.list({ code, active: true, limit: 10 });
   for (const pc of existing.data) {
-    const coupon = typeof pc.coupon === 'string'
-      ? await stripe.coupons.retrieve(pc.coupon)
-      : pc.coupon;
+    const couponId = typeof pc.coupon === 'string'
+      ? pc.coupon
+      : pc.coupon?.id ?? pc.promotion?.coupon;
+    const coupon = couponId ? await stripe.coupons.retrieve(couponId) : null;
     if (coupon && Math.abs((coupon.percent_off ?? 0) - percentOff) < 0.001) {
       return { code, status: 'exists', id: pc.id, percent_off: coupon.percent_off };
     }
@@ -76,7 +77,7 @@ async function ensurePromo(code: string, percentOff: number, name: string) {
     name,
   });
   const promo = await stripe.promotionCodes.create({
-    coupon: coupon.id,
+    promotion: { type: 'coupon', coupon: coupon.id },
     code,
     active: true,
   });
