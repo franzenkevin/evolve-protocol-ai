@@ -87,13 +87,12 @@ const SERVICES: {
 
 const SectionExams = () => {
   const [checked, setChecked] = useState<Set<string>>(new Set());
-  const { openCheckout, loading } = usePaddleCheckout();
+  const { openCheckout, loading } = useStripeCheckout();
 
   const buy = (priceId: string) => {
     openCheckout({
       priceId,
       successUrl: `${window.location.origin}/checkout/success?type=exam`,
-      customData: { purchaseType: "exam" },
     });
   };
 
