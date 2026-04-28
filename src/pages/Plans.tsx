@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Check, Loader2, Tag, Sparkles } from "lucide-react";
-import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useProfile } from "@/hooks/useProfile";
 import { useActiveProtocol } from "@/hooks/useProtocol";
@@ -45,7 +45,7 @@ const FEATURES = [
 ];
 
 export default function Plans() {
-  const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
+  const { openCheckout, loading: checkoutLoading } = useStripeCheckout();
   const { data: subscription, refetch: refetchSub } = useSubscription();
   const { data: profile } = useProfile();
   const { data: protocol } = useActiveProtocol();
@@ -119,24 +119,13 @@ export default function Plans() {
   const reconcile = async () => {
     setReconcileLoading(true);
     try {
-      const env =
-        (import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN as string | undefined)?.startsWith(
-          "test_"
-        )
-          ? "sandbox"
-          : "live";
-      const { data, error } = await supabase.functions.invoke(
-        "reconcile-subscription",
-        { body: { environment: env } }
-      );
+      const { data, error } = await supabase.functions.invoke("reconcile-subscription");
       if (error) throw error;
       if (data?.synced) {
         toast.success("Assinatura sincronizada! Acesso liberado.");
         await refetchSub();
       } else {
-        toast.info(
-          data?.message || "Nenhuma assinatura ativa encontrada no provedor."
-        );
+        toast.info(data?.message || "Nenhuma assinatura ativa encontrada no provedor.");
       }
     } catch (e) {
       console.error(e);

@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CheckCircle2, ArrowRight, Sparkles, Loader2 } from "lucide-react";
-import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -24,7 +24,7 @@ const ANNUAL_BULLETS = [
 
 export const SectionPricing = () => {
   const { user } = useAuth();
-  const { openCheckout, loading } = usePaddleCheckout();
+  const { openCheckout, loading } = useStripeCheckout();
   const [emailMonthly, setEmailMonthly] = useState("");
   const [emailAnnual, setEmailAnnual] = useState("");
   const [activePlan, setActivePlan] = useState<"monthly" | "annual" | null>(null);
