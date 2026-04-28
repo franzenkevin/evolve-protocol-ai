@@ -15,6 +15,8 @@ export function useStripeCheckout() {
   const [loading, setLoading] = useState(false);
 
   const openCheckout = async (options: CheckoutOptions) => {
+    const t0 = performance.now();
+    console.log("[checkout] start", { priceId: options.priceId, coupon: options.couponCode });
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("stripe-checkout", {
@@ -26,16 +28,43 @@ export function useStripeCheckout() {
         },
       });
 
-      if (error || !data?.url) {
-        console.error("stripe-checkout error", error, data);
-        toast.error(data?.error || "Não foi possível abrir o checkout. Tente novamente.");
+      const elapsed = Math.round(performance.now() - t0);
+      console.log("[checkout] response", { elapsed_ms: elapsed, hasUrl: !!data?.url, error, data });
+
+      if (error) {
+        console.error("[checkout] invoke error", error);
+        toast.error(`Erro no checkout: ${error.message || "tente novamente"}`);
         return;
       }
 
-      window.location.href = data.url;
+      if (!data?.url) {
+        console.error("[checkout] missing URL in response", data);
+        toast.error(data?.error || "Resposta inválida do servidor.");
+        return;
+      }
+
+      // Validate URL before redirecting
+      let target: URL;
+      try {
+        target = new URL(data.url);
+      } catch (e) {
+        console.error("[checkout] invalid URL", data.url, e);
+        toast.error("URL de checkout inválida.");
+        return;
+      }
+
+      if (!target.hostname.endsWith("stripe.com")) {
+        console.error("[checkout] suspicious host, refusing redirect", target.hostname);
+        toast.error("Destino de checkout inesperado.");
+        return;
+      }
+
+      console.log("[checkout] redirecting →", target.toString());
+      // Use assign so back-button returns to landing
+      window.location.assign(target.toString());
     } catch (e) {
-      console.error(e);
-      toast.error("Erro ao abrir checkout");
+      console.error("[checkout] unexpected error", e);
+      toast.error("Erro ao abrir checkout. Verifique sua conexão.");
     } finally {
       setLoading(false);
     }
