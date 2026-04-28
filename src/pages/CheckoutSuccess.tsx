@@ -62,7 +62,9 @@ const CheckoutSuccess = () => {
   const generationStarted = useRef(false);
 
   const firstName = (profile?.full_name || user?.user_metadata?.full_name || "Atleta").split(" ")[0];
-  const isGuestReturn = !user && !!pendingEmail;
+  // Guest return: user not logged in. We may or may not have the email cached in sessionStorage
+  // (sessionStorage is lost when Stripe opens in a different browser/tab).
+  const isGuestReturn = !user;
 
   const isActive =
     subscription &&
@@ -279,7 +281,11 @@ const CheckoutSuccess = () => {
                 Pagamento concluído. Falta entrar na conta para liberar o app.
               </h2>
               <p className="text-xs text-muted-foreground">
-                Enviamos seu acesso para <span className="text-foreground">{pendingEmail}</span>. Abra o link do e-mail ou entre com esse endereço para continuar.
+                {pendingEmail ? (
+                  <>Enviamos seu acesso para <span className="text-foreground">{pendingEmail}</span>. Abra o link do e-mail ou entre com esse endereço para continuar.</>
+                ) : (
+                  <>Enviamos um e-mail com seu acesso. Abra o link do e-mail ou entre com o endereço usado no checkout para continuar.</>
+                )}
               </p>
             </div>
 
