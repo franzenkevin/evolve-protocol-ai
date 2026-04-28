@@ -281,7 +281,11 @@ const CheckoutSuccess = () => {
                 Pagamento concluído. Falta entrar na conta para liberar o app.
               </h2>
               <p className="text-xs text-muted-foreground">
-                Enviamos seu acesso para <span className="text-foreground">{pendingEmail}</span>. Abra o link do e-mail ou entre com esse endereço para continuar.
+                {pendingEmail ? (
+                  <>Enviamos seu acesso para <span className="text-foreground">{pendingEmail}</span>. Abra o link do e-mail ou entre com esse endereço para continuar.</>
+                ) : (
+                  <>Enviamos um e-mail com seu acesso. Abra o link do e-mail ou entre com o endereço usado no checkout para continuar.</>
+                )}
               </p>
             </div>
 
