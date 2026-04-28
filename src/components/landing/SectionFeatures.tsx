@@ -4,11 +4,11 @@ export const SectionFeatures = () => (
   <section className="py-20 border-t border-border">
     <div className="max-w-5xl mx-auto px-4 mb-16 text-center">
       <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">
-        Tudo no app
+        TUDO NO APP
       </p>
       <h2 className="text-3xl md:text-5xl font-heading font-bold text-foreground leading-tight">
         Mais do que um plano. <br />
-        <span className="text-gradient">Um sistema completo.</span>
+        <span className="text-gradient">Um sistema que evolui com você.</span>
       </h2>
     </div>
 

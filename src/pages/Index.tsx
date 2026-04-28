@@ -27,17 +27,17 @@ const HOW_IT_WORKS = [
   {
     icon: ClipboardList,
     title: "1. Responda o quiz",
-    desc: "5 a 8 minutos. Conta seu objetivo, rotina, equipamento e o que você gosta de comer.",
+    desc: "Mais de 20 perguntas sobre seu corpo, rotina, objetivo e o que você come. O sistema usa essas respostas pra estruturar tudo. Sem julgamento. Sem complicação.",
   },
   {
     icon: Camera,
-    title: "2. Avaliação por foto IA",
-    desc: "4 fotos analisadas em segundos: composição corporal, postura e prioridades.",
+    title: "2. Análise por foto IA",
+    desc: "4 fotos processadas pelo sistema em segundos. O algoritmo estima composição corporal, identifica padrões posturais e define as prioridades do seu protocolo.",
   },
   {
     icon: Rocket,
-    title: "3. Receba seu protocolo",
-    desc: "Treino e dieta calculados pra seu objetivo, prontos pra começar hoje.",
+    title: "3. Seu protocolo ativo",
+    desc: "Programa de exercícios estruturado semana a semana. Organização de refeições com seus alimentos. Tudo no app. Tudo hoje.",
   },
 ];
 
@@ -124,7 +124,7 @@ const Index = () => {
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 mt-6 justify-center md:justify-start text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Quiz de 5 minutos. Protocolo pronto hoje.
+              <CheckCircle2 size={14} className="text-primary" /> Quiz de 5 a 8 minutos. Protocolo pronto hoje.
             </span>
             <span className="flex items-center gap-1.5">
               <CheckCircle2 size={14} className="text-primary" /> Você vê o protocolo antes de pagar qualquer coisa
