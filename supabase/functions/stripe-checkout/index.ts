@@ -110,12 +110,10 @@ Deno.serve(async (req) => {
       body.successUrl || `${origin}/checkout/success?plan=${planCode}&session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = body.cancelUrl || `${origin}/plans?canceled=1`;
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: 'subscription',
       line_items: [{ price: stripePriceId, quantity: 1 }],
       customer_email: userEmail || undefined,
-      allow_promotion_codes: !discounts,
-      discounts,
       success_url: successUrl.includes('{CHECKOUT_SESSION_ID}')
         ? successUrl
         : `${successUrl}${successUrl.includes('?') ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`,
@@ -137,8 +135,15 @@ Deno.serve(async (req) => {
           environment: env,
           ...(body.referralCode ? { referralCode: body.referralCode } : {}),
         },
-      },
-    });
+    };
+
+    if (discounts) {
+      sessionParams.discounts = discounts;
+    } else {
+      sessionParams.allow_promotion_codes = true;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return json({ url: session.url, sessionId: session.id });
   } catch (e) {
