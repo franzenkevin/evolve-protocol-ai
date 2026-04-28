@@ -1,41 +1,15 @@
-// Sync a coupon (from public.coupons) to Paddle as a Discount in BOTH environments.
-// Called by admin actions when creating, updating or deleting a coupon.
+// Sync a coupon (from public.coupons) to Stripe as a Coupon + PromotionCode.
+// Called by admin actions when creating, updating or archiving a coupon.
 import { createClient } from 'npm:@supabase/supabase-js@2';
-
-type PaddleEnv = 'sandbox' | 'live';
-const GATEWAY_BASE_URL = 'https://connector-gateway.lovable.dev/paddle';
-
-function getEnvVar(key: string): string {
-  const v = Deno.env.get(key);
-  if (!v) throw new Error(`${key} is not configured`);
-  return v;
-}
-
-async function gatewayFetch(env: PaddleEnv, path: string, init?: RequestInit): Promise<Response> {
-  const connectionApiKey = env === 'sandbox'
-    ? getEnvVar('PADDLE_SANDBOX_API_KEY')
-    : getEnvVar('PADDLE_LIVE_API_KEY');
-  const lovableApiKey = getEnvVar('LOVABLE_API_KEY');
-  return fetch(`${GATEWAY_BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Connection-Api-Key': connectionApiKey,
-      'Lovable-API-Key': lovableApiKey,
-      ...(init?.headers || {}),
-    },
-  });
-}
+import { getStripe } from '../_shared/stripe.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-type Action = 'upsert' | 'archive';
-
 interface Body {
-  action: Action;
+  action: 'upsert' | 'archive';
   code: string;
   description?: string | null;
   discount_percent?: number;
@@ -44,93 +18,71 @@ interface Body {
   active?: boolean;
 }
 
-const ENVS: PaddleEnv[] = ['sandbox', 'live'];
-
-async function findDiscountByCode(env: PaddleEnv, code: string) {
-  const res = await gatewayFetch(env, `/discounts?code=${encodeURIComponent(code)}&status=active,archived`);
-  if (!res.ok) return null;
-  const json = await res.json();
-  return json.data?.[0] ?? null;
+async function findPromotionByCode(code: string) {
+  const stripe = getStripe();
+  const list = await stripe.promotionCodes.list({ code, limit: 1 });
+  return list.data[0] || null;
 }
 
-async function upsertDiscount(env: PaddleEnv, body: Body) {
+async function upsertCoupon(body: Body) {
+  const stripe = getStripe();
   const code = body.code.toUpperCase();
-  const existing = await findDiscountByCode(env, code);
-
-  const payload: Record<string, unknown> = {
-    description: body.description || `Cupom ${code}`,
-    type: 'percentage',
-    amount: String(body.discount_percent ?? 0),
-    code,
-    enabled_for_checkout: body.active !== false,
-    recur: false,
-  };
-  if (body.max_uses) payload.usage_limit = body.max_uses;
-  if (body.valid_until) payload.expires_at = new Date(body.valid_until).toISOString();
+  const existing = await findPromotionByCode(code);
 
   if (existing) {
-    // PATCH — Paddle doesn't allow changing 'code' on update; remove it
-    const { code: _drop, ...patch } = payload;
-    if (body.active === false) (patch as any).status = 'archived';
-    else (patch as any).status = 'active';
-    const res = await gatewayFetch(env, `/discounts/${existing.id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(patch),
-    });
-    if (!res.ok) {
-      const txt = await res.text();
-      throw new Error(`Paddle PATCH failed (${env}): ${res.status} ${txt}`);
+    // Toggle active state
+    if (body.active === false) {
+      await stripe.promotionCodes.update(existing.id, { active: false });
+      return { id: existing.id, action: 'deactivated' };
     }
-    return { env, id: existing.id, action: 'updated' };
+    await stripe.promotionCodes.update(existing.id, { active: true });
+    return { id: existing.id, action: 'reactivated' };
   }
 
-  const res = await gatewayFetch(env, `/discounts`, {
-    method: 'POST',
-    body: JSON.stringify(payload),
+  // Create coupon + promotion code
+  const coupon = await stripe.coupons.create({
+    percent_off: body.discount_percent ?? 0,
+    duration: 'once',
+    name: body.description || `Cupom ${code}`,
+    max_redemptions: body.max_uses ?? undefined,
+    redeem_by: body.valid_until ? Math.floor(new Date(body.valid_until).getTime() / 1000) : undefined,
   });
-  if (!res.ok) {
-    const txt = await res.text();
-    throw new Error(`Paddle POST failed (${env}): ${res.status} ${txt}`);
-  }
-  const json = await res.json();
-  return { env, id: json.data?.id, action: 'created' };
+  const promo = await stripe.promotionCodes.create({
+    coupon: coupon.id,
+    code,
+    active: body.active !== false,
+  });
+  return { id: promo.id, coupon_id: coupon.id, action: 'created' };
 }
 
-async function archiveDiscount(env: PaddleEnv, code: string) {
-  const existing = await findDiscountByCode(env, code);
-  if (!existing) return { env, action: 'not_found' };
-  if (existing.status === 'archived') return { env, id: existing.id, action: 'already_archived' };
-  const res = await gatewayFetch(env, `/discounts/${existing.id}`, {
-    method: 'PATCH',
-    body: JSON.stringify({ status: 'archived' }),
-  });
-  if (!res.ok) {
-    const txt = await res.text();
-    throw new Error(`Paddle archive failed (${env}): ${res.status} ${txt}`);
-  }
-  return { env, id: existing.id, action: 'archived' };
+async function archiveCoupon(code: string) {
+  const stripe = getStripe();
+  const existing = await findPromotionByCode(code.toUpperCase());
+  if (!existing) return { action: 'not_found' };
+  if (!existing.active) return { id: existing.id, action: 'already_inactive' };
+  await stripe.promotionCodes.update(existing.id, { active: false });
+  return { id: existing.id, action: 'archived' };
 }
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    // Authn: must be a logged-in admin
     const auth = req.headers.get('Authorization');
     if (!auth) return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const anon = Deno.env.get('SUPABASE_ANON_KEY')!;
-    const userClient = createClient(supabaseUrl, anon, {
+    const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
       global: { headers: { Authorization: auth } },
     });
-    const { data: userData } = await userClient.auth.getUser();
-    if (!userData?.user) return new Response('Unauthorized', { status: 401, headers: corsHeaders });
+    const { data: u } = await userClient.auth.getUser();
+    if (!u?.user) return new Response('Unauthorized', { status: 401, headers: corsHeaders });
 
     const service = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
     const { data: roleRow } = await service
       .from('user_roles')
       .select('role')
-      .eq('user_id', userData.user.id)
+      .eq('user_id', u.user.id)
       .eq('role', 'admin')
       .maybeSingle();
     if (!roleRow) return new Response('Forbidden', { status: 403, headers: corsHeaders });
@@ -143,25 +95,14 @@ Deno.serve(async (req) => {
       });
     }
 
-    const results: any[] = [];
-    for (const env of ENVS) {
-      try {
-        if (body.action === 'archive') {
-          results.push(await archiveDiscount(env, body.code.toUpperCase()));
-        } else {
-          results.push(await upsertDiscount(env, body));
-        }
-      } catch (e) {
-        console.error(`[sync-coupon] ${env} error`, e);
-        results.push({ env, error: (e as Error).message });
-      }
-    }
+    const result =
+      body.action === 'archive' ? await archiveCoupon(body.code) : await upsertCoupon(body);
 
-    return new Response(JSON.stringify({ results }), {
+    return new Response(JSON.stringify({ result }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (e) {
-    console.error('[sync-coupon] fatal', e);
+    console.error('[sync-coupon] error', e);
     return new Response(JSON.stringify({ error: (e as Error).message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
