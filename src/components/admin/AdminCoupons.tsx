@@ -128,11 +128,11 @@ const AdminCoupons = () => {
               variant="ghost"
               size="icon"
               className="h-8 w-8"
-              title="Sincronizar com Paddle"
+              title="Sincronizar com Stripe"
               onClick={async () => {
                 try {
                   await resyncCoupon.mutateAsync(c);
-                  toast({ title: "Cupom sincronizado com Paddle" });
+                  toast({ title: "Cupom sincronizado com Stripe" });
                 } catch (e: any) {
                   toast({ title: "Erro ao sincronizar", description: e.message, variant: "destructive" });
                 }

@@ -833,8 +833,8 @@ export type Database = {
           amount_brl: number
           created_at: string
           id: string
-          paddle_transaction_id: string | null
           status: string
+          stripe_session_id: string | null
           updated_at: string
           used_at: string | null
           user_id: string
@@ -843,8 +843,8 @@ export type Database = {
           amount_brl?: number
           created_at?: string
           id?: string
-          paddle_transaction_id?: string | null
           status?: string
+          stripe_session_id?: string | null
           updated_at?: string
           used_at?: string | null
           user_id: string
@@ -853,8 +853,8 @@ export type Database = {
           amount_brl?: number
           created_at?: string
           id?: string
-          paddle_transaction_id?: string | null
           status?: string
+          stripe_session_id?: string | null
           updated_at?: string
           used_at?: string | null
           user_id?: string
@@ -1028,8 +1028,6 @@ export type Database = {
           environment: string | null
           id: string
           next_billing_date: string | null
-          paddle_customer_id: string | null
-          paddle_subscription_id: string | null
           payment_brand: string | null
           payment_last4: string | null
           payment_method: string | null
@@ -1038,6 +1036,9 @@ export type Database = {
           product_id: string | null
           start_date: string
           status: string
+          stripe_customer_id: string | null
+          stripe_session_id: string | null
+          stripe_subscription_id: string | null
           updated_at: string
           user_id: string
         }
@@ -1049,8 +1050,6 @@ export type Database = {
           environment?: string | null
           id?: string
           next_billing_date?: string | null
-          paddle_customer_id?: string | null
-          paddle_subscription_id?: string | null
           payment_brand?: string | null
           payment_last4?: string | null
           payment_method?: string | null
@@ -1059,6 +1058,9 @@ export type Database = {
           product_id?: string | null
           start_date?: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_session_id?: string | null
+          stripe_subscription_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1070,8 +1072,6 @@ export type Database = {
           environment?: string | null
           id?: string
           next_billing_date?: string | null
-          paddle_customer_id?: string | null
-          paddle_subscription_id?: string | null
           payment_brand?: string | null
           payment_last4?: string | null
           payment_method?: string | null
@@ -1080,6 +1080,9 @@ export type Database = {
           product_id?: string | null
           start_date?: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_session_id?: string | null
+          stripe_subscription_id?: string | null
           updated_at?: string
           user_id?: string
         }

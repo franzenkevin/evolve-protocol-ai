@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, FlaskConical, Syringe, ShieldCheck, Info, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 
 const EXAM_CHECKLIST = [
   // Bioquímica básica
@@ -87,13 +87,12 @@ const SERVICES: {
 
 const SectionExams = () => {
   const [checked, setChecked] = useState<Set<string>>(new Set());
-  const { openCheckout, loading } = usePaddleCheckout();
+  const { openCheckout, loading } = useStripeCheckout();
 
   const buy = (priceId: string) => {
     openCheckout({
       priceId,
       successUrl: `${window.location.origin}/checkout/success?type=exam`,
-      customData: { purchaseType: "exam" },
     });
   };
 
