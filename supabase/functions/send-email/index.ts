@@ -13,7 +13,7 @@ const SMTP_HOST = 'smtp.hostinger.com';
 const SMTP_PORT = 465;
 const SMTP_USER = Deno.env.get('HOSTINGER_SMTP_USER')!;
 const SMTP_PASSWORD = Deno.env.get('HOSTINGER_SMTP_PASSWORD')!;
-const FROM_NAME = 'Evoria';
+const FROM_NAME = 'Evoria Coach App';
 
 const BodySchema = z.object({
   to: z.string().email(),
