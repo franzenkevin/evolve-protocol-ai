@@ -135,6 +135,7 @@ Deno.serve(async (req) => {
           environment: env,
           ...(body.referralCode ? { referralCode: body.referralCode } : {}),
         },
+      },
     };
 
     if (discounts) {
