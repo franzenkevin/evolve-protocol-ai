@@ -10,10 +10,11 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, RefreshCw } from "lucide-react";
 import { usePlans, useCreatePlan, useUpdatePlan, useDeletePlan, type Plan } from "@/hooks/usePlans";
 import { useToast } from "@/hooks/use-toast";
 import { useLogAudit } from "@/hooks/useAuditLog";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminPlans = () => {
   const { data: plans = [], isLoading } = usePlans();
@@ -26,6 +27,24 @@ const AdminPlans = () => {
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState<Plan | null>(null);
   const [form, setForm] = useState({ code: "", name: "", price_brl: "", interval_months: "1" });
+  const [seeding, setSeeding] = useState(false);
+
+  const handleSeedStripe = async () => {
+    setSeeding(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-seed");
+      if (error) throw error;
+      toast({
+        title: "Stripe sincronizado",
+        description: `${data?.prices?.length ?? 0} preços e ${data?.promos?.length ?? 0} cupons OK (${data?.environment})`,
+      });
+      console.log("stripe-seed result", data);
+    } catch (err: any) {
+      toast({ title: "Erro ao sincronizar", description: err.message, variant: "destructive" });
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   const handleAdd = async () => {
     if (!form.code || !form.name || !form.price_brl) {
@@ -72,6 +91,16 @@ const AdminPlans = () => {
 
   return (
     <div className="space-y-3">
+      <Card className="p-3 flex items-center justify-between gap-3 border-primary/30 bg-primary/5">
+        <div>
+          <p className="text-sm font-medium text-foreground">Sincronizar com Stripe</p>
+          <p className="text-[11px] text-muted-foreground">Cria produtos, preços (mensal R$97, anual R$897, avulso R$19,90) e cupons LANCAMENTO/LANCAMENTOANUAL na sua conta Stripe.</p>
+        </div>
+        <Button size="sm" variant="secondary" onClick={handleSeedStripe} disabled={seeding} className="gap-1 shrink-0">
+          <RefreshCw size={14} className={seeding ? "animate-spin" : ""} />{seeding ? "Sincronizando..." : "Sincronizar"}
+        </Button>
+      </Card>
+
       <div className="flex justify-between items-center">
         <div>
           <p className="text-sm text-muted-foreground">{plans.length} planos cadastrados</p>

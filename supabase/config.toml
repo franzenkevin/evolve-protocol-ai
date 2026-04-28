@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.stripe-checkout]
 verify_jwt = false
+
+[functions.stripe-seed]
+verify_jwt = false
