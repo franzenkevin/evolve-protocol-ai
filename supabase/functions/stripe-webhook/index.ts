@@ -153,7 +153,7 @@ Deno.serve(async (req) => {
           await upsertSubscriptionFromStripe(sub, session.id);
           if (userId) await maybeSendMagicLink(userId);
           // Mark lead converted
-          if (session.customer_email) {
+          if (buyerEmail) {
             await getSupabase()
               .from('leads')
               .update({
@@ -161,7 +161,7 @@ Deno.serve(async (req) => {
                 converted_user_id: userId || null,
                 updated_at: new Date().toISOString(),
               })
-              .eq('email', session.customer_email)
+              .eq('email', buyerEmail.toLowerCase())
               .neq('status', 'converted');
           }
         }
