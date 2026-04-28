@@ -47,6 +47,9 @@ const CheckoutSuccess = () => {
   const { data: protocol, refetch: refetchProtocol } = useActiveProtocol();
   const createProtocol = useCreateProtocol();
   const qc = useQueryClient();
+  const sessionId = typeof window === "undefined"
+    ? null
+    : new URLSearchParams(window.location.search).get("session_id");
   const [pendingEmail, setPendingEmail] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
     return sessionStorage.getItem("pendingCheckoutEmail");
@@ -84,19 +87,20 @@ const CheckoutSuccess = () => {
     }
     const start = Date.now();
     let reconcileFired = false;
+    const reconcileDelay = sessionId ? 1500 : RECONCILE_AFTER_MS;
 
     const tick = async () => {
       qc.invalidateQueries({ queryKey: ["subscription"] });
       await refetch();
 
-      if (!reconcileFired && Date.now() - start > RECONCILE_AFTER_MS) {
+      if (!reconcileFired && Date.now() - start > reconcileDelay) {
         reconcileFired = true;
         const env =
           (import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN as string | undefined)?.startsWith("test_")
             ? "sandbox"
             : "live";
         supabase.functions
-          .invoke("reconcile-subscription", { body: { environment: env } })
+          .invoke("reconcile-subscription", { body: { environment: env, sessionId } })
           .then(() => {
             qc.invalidateQueries({ queryKey: ["subscription"] });
             refetch();
@@ -112,7 +116,7 @@ const CheckoutSuccess = () => {
 
     const id = setInterval(tick, POLL_INTERVAL_MS);
     return () => clearInterval(id);
-  }, [status, isActive, qc, refetch]);
+  }, [status, isActive, qc, refetch, sessionId]);
 
   useEffect(() => {
     if (!user) return;
