@@ -16,6 +16,15 @@ export function useStripeCheckout() {
 
   const openCheckout = async (options: CheckoutOptions) => {
     const t0 = performance.now();
+    const isEmbeddedPreview = (() => {
+      try {
+        return window.self !== window.top;
+      } catch {
+        return true;
+      }
+    })();
+    const popup = isEmbeddedPreview ? window.open("", "_blank", "noopener,noreferrer") : null;
+
     console.log("[checkout] start", { priceId: options.priceId, coupon: options.couponCode });
     setLoading(true);
     try {
@@ -33,12 +42,14 @@ export function useStripeCheckout() {
 
       if (error) {
         console.error("[checkout] invoke error", error);
+        popup?.close();
         toast.error(`Erro no checkout: ${error.message || "tente novamente"}`);
         return;
       }
 
       if (!data?.url) {
         console.error("[checkout] missing URL in response", data);
+        popup?.close();
         toast.error(data?.error || "Resposta inválida do servidor.");
         return;
       }
@@ -49,21 +60,29 @@ export function useStripeCheckout() {
         target = new URL(data.url);
       } catch (e) {
         console.error("[checkout] invalid URL", data.url, e);
+        popup?.close();
         toast.error("URL de checkout inválida.");
         return;
       }
 
       if (!target.hostname.endsWith("stripe.com")) {
         console.error("[checkout] suspicious host, refusing redirect", target.hostname);
+        popup?.close();
         toast.error("Destino de checkout inesperado.");
         return;
       }
 
       console.log("[checkout] redirecting →", target.toString());
+      if (popup && !popup.closed) {
+        popup.location.replace(target.toString());
+        return;
+      }
+
       // Use assign so back-button returns to landing
       window.location.assign(target.toString());
     } catch (e) {
       console.error("[checkout] unexpected error", e);
+      popup?.close();
       toast.error("Erro ao abrir checkout. Verifique sua conexão.");
     } finally {
       setLoading(false);
