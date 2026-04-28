@@ -31,6 +31,7 @@ const Profile = lazy(() => import("./pages/Profile"));
 const EditProfile = lazy(() => import("./pages/EditProfile"));
 const Plans = lazy(() => import("./pages/Plans"));
 const CheckoutSuccess = lazy(() => import("./pages/CheckoutSuccess"));
+const CreatePassword = lazy(() => import("./pages/CreatePassword"));
 const NewProtocol = lazy(() => import("./pages/NewProtocol"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Feedback = lazy(() => import("./pages/Feedback"));
@@ -97,6 +98,8 @@ const App = () => (
               <Route path="/feedback" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><Feedback /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
               <Route path="/plans" element={<ProtectedRoute><StudentGate><Plans /></StudentGate></ProtectedRoute>} />
               <Route path="/checkout/success" element={<CheckoutSuccess />} />
+              <Route path="/criar-senha" element={<CreatePassword />} />
+              <Route path="/create-password" element={<Navigate to="/criar-senha" replace />} />
               <Route path="/new-protocol" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><NewProtocol /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>

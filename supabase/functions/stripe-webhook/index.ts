@@ -23,24 +23,91 @@ function getWebhookSecret(): string {
   return v;
 }
 
-async function maybeSendMagicLink(userId: string) {
+function buildWelcomeEmail(firstName: string, actionUrl: string) {
+  const safeName = firstName || 'Atleta';
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><title>Bem-vindo à Evoria</title></head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#fafafa;">
+  <div style="max-width:560px;margin:0 auto;padding:32px 24px;">
+    <div style="text-align:center;margin-bottom:32px;">
+      <h1 style="color:#22c55e;font-size:28px;margin:0;font-weight:700;letter-spacing:-0.5px;">EVORIA</h1>
+    </div>
+    <div style="background:#171717;border:1px solid #262626;border-radius:16px;padding:32px;">
+      <h2 style="color:#fafafa;font-size:22px;margin:0 0 16px;font-weight:700;">Olá, ${safeName}! 🎉</h2>
+      <p style="color:#a3a3a3;font-size:15px;line-height:1.6;margin:0 0 16px;">
+        Pagamento confirmado! Seja muito bem-vindo(a) à <strong style="color:#22c55e;">Evoria</strong>.
+      </p>
+      <p style="color:#a3a3a3;font-size:15px;line-height:1.6;margin:0 0 24px;">
+        Para acessar seu app e começar seu protocolo personalizado, clique no botão abaixo e <strong style="color:#fafafa;">crie sua senha</strong>:
+      </p>
+      <div style="text-align:center;margin:32px 0;">
+        <a href="${actionUrl}" style="display:inline-block;background:#22c55e;color:#0a0a0a;padding:16px 32px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px;">
+          Criar minha senha e acessar
+        </a>
+      </div>
+      <p style="color:#737373;font-size:13px;line-height:1.6;margin:24px 0 0;">
+        Após criar sua senha, você responderá um quiz único de 5 a 8 minutos. Suas respostas montarão seu treino e dieta pelos próximos 60 dias.
+      </p>
+      <p style="color:#737373;font-size:13px;line-height:1.6;margin:16px 0 0;">
+        ⚠️ Este link expira em 1 hora. Se expirar, é só ir em <a href="https://evoriacoach.com/login" style="color:#22c55e;">evoriacoach.com</a> e clicar em "Esqueci minha senha".
+      </p>
+    </div>
+    <div style="text-align:center;margin-top:24px;">
+      <p style="color:#525252;font-size:12px;margin:0;">
+        Dúvidas? Responda este e-mail ou escreva para <a href="mailto:suporte@evoriacoach.com" style="color:#22c55e;">suporte@evoriacoach.com</a>
+      </p>
+      <p style="color:#525252;font-size:11px;margin:8px 0 0;">© Evoria · Todos os direitos reservados</p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+async function sendWelcomeEmail(userId: string) {
   try {
     const sb = getSupabase();
     const { data: u } = await sb.auth.admin.getUserById(userId);
     const user = u?.user;
     if (!user?.email) return;
-    const isGuest = (user.user_metadata as any)?.source === 'guest_checkout';
-    const alreadyConfirmed = !!user.email_confirmed_at;
-    if (!isGuest && alreadyConfirmed) return;
 
-    await sb.auth.admin.generateLink({
-      type: 'magiclink',
+    const siteUrl = Deno.env.get('SITE_URL') || 'https://evoriacoach.com';
+
+    // Generate recovery link (works for both new users and existing) → redirects to /criar-senha
+    const { data: linkData, error: linkErr } = await sb.auth.admin.generateLink({
+      type: 'recovery',
       email: user.email,
-      options: { redirectTo: `${Deno.env.get('SITE_URL') || ''}/welcome` },
+      options: { redirectTo: `${siteUrl}/criar-senha` },
     });
-    // Stripe will email the receipt; Supabase sends the magic link automatically when generateLink is called with email service configured.
+    if (linkErr || !linkData?.properties?.action_link) {
+      console.error('generateLink failed', linkErr);
+      return;
+    }
+
+    const actionUrl = linkData.properties.action_link;
+    const firstName = ((user.user_metadata as any)?.full_name || '').split(' ')[0] || 'Atleta';
+
+    // Call our SMTP send-email function
+    const sendUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`;
+    const resp = await fetch(sendUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+      },
+      body: JSON.stringify({
+        to: user.email,
+        subject: '🎉 Bem-vindo à Evoria — crie sua senha de acesso',
+        html: buildWelcomeEmail(firstName, actionUrl),
+      }),
+    });
+    if (!resp.ok) {
+      console.error('send-email failed', resp.status, await resp.text());
+    } else {
+      console.log('welcome email sent to', user.email);
+    }
   } catch (e) {
-    console.warn('magic link best-effort failed', e);
+    console.warn('sendWelcomeEmail best-effort failed', e);
   }
 }
 
@@ -151,7 +218,7 @@ Deno.serve(async (req) => {
             }
           }
           await upsertSubscriptionFromStripe(sub, session.id);
-          if (userId) await maybeSendMagicLink(userId);
+          if (userId) await sendWelcomeEmail(userId);
           // Mark lead converted
           if (buyerEmail) {
             await getSupabase()
