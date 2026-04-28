@@ -14,8 +14,9 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { email } = await req.json();
-    if (!email || typeof email !== 'string' || !email.includes('@')) {
+    const { email: rawEmail } = await req.json();
+    const email = String(rawEmail || '').trim().toLowerCase();
+    if (!email || !email.includes('@')) {
       return new Response(JSON.stringify({ error: 'invalid email' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -27,52 +28,44 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    // Procura usuário existente
-    const { data: list } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1 });
     let userId: string | null = null;
-    // listUsers não filtra por email — fazer lookup direto
-    const { data: existing } = await supabase
-      .from('profiles')
-      .select('user_id')
-      .limit(1)
-      .maybeSingle();
 
-    // Tenta achar via auth.users por email
-    const { data: byEmail, error: byEmailErr } = await supabase.rpc('get_user_id_by_email', { _email: email }).maybeSingle?.() ?? { data: null, error: null };
+    // Tenta criar; se já existir, busca via listUsers (paginação)
+    const { data: created, error: createErr } = await supabase.auth.admin.createUser({
+      email,
+      email_confirm: true,
+      user_metadata: { source: 'guest_checkout' },
+    });
 
-    if (byEmail?.user_id) {
-      userId = byEmail.user_id as string;
-    } else {
-      // Cria usuário sem senha (auto-confirma email pra que magic link funcione no retorno)
-      const { data: created, error: createErr } = await supabase.auth.admin.createUser({
-        email,
-        email_confirm: true,
-        user_metadata: { source: 'guest_checkout' },
-      });
-      if (createErr) {
-        // Se já existir, tenta buscar
-        if (createErr.message?.toLowerCase().includes('already')) {
-          // Lista todos e filtra (fallback)
-          const { data: all } = await supabase.auth.admin.listUsers({ page: 1, perPage: 200 });
-          const found = all?.users?.find((u: any) => u.email?.toLowerCase() === email.toLowerCase());
-          if (found) userId = found.id;
-        } else {
-          throw createErr;
-        }
-      } else {
-        userId = created.user!.id;
+    if (created?.user?.id) {
+      userId = created.user.id;
+    } else if (createErr && createErr.message?.toLowerCase().includes('already')) {
+      // Busca o usuário existente paginando
+      let page = 1;
+      while (page <= 10 && !userId) {
+        const { data: all } = await supabase.auth.admin.listUsers({ page, perPage: 200 });
+        const found = all?.users?.find((u: any) => u.email?.toLowerCase() === email);
+        if (found) userId = found.id;
+        if (!all?.users || all.users.length < 200) break;
+        page++;
       }
+    } else if (createErr) {
+      throw createErr;
     }
 
     if (!userId) throw new Error('could not create or find user');
 
-    // Salva como lead (se não existir)
-    await supabase.from('leads').upsert(
-      { email, status: 'guest_checkout', updated_at: new Date().toISOString() },
-      { onConflict: 'email' }
-    );
+    // Salva como lead (best-effort)
+    try {
+      await supabase.from('leads').upsert(
+        { email, status: 'guest_checkout', updated_at: new Date().toISOString() },
+        { onConflict: 'email' }
+      );
+    } catch (e) {
+      console.warn('lead upsert failed:', e);
+    }
 
-    return new Response(JSON.stringify({ userId }), {
+    return new Response(JSON.stringify({ userId, email }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
