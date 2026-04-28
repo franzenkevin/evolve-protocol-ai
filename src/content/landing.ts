@@ -141,30 +141,46 @@ export type FAQItem = {
 export const FAQ_CONTENT: FAQItem[] = [
   {
     q: "Preciso pagar antes de saber o que vou receber?",
-    a: "Não. O quiz e a avaliação por foto são gratuitos. Você só decide pagar depois de ver tudo que o app vai entregar pro seu objetivo.",
+    a: "Não. Você faz o quiz, o sistema gera seu protocolo completo e você decide se vale a pena. Só paga quando quiser liberar o acesso. Sem pressão.",
+  },
+  {
+    q: "Quanto custa?",
+    a: "No lançamento: R$29,90 no primeiro mês (depois R$97/mês) ou R$599 no anual (depois R$897). Cancela quando quiser — sem fidelidade, sem multa.",
+  },
+  {
+    q: "Funciona pra quem já treina faz anos?",
+    a: "Sim — e especialmente pra você. O sistema foi desenvolvido pra quem já tem disciplina mas não tem o protocolo certo. Se você treina consistentemente e o resultado não é proporcional ao esforço, é exatamente disso que se trata.",
   },
   {
     q: "Funciona pra iniciante?",
-    a: "Sim. O protocolo se ajusta ao seu nível atual — desde quem nunca pisou numa academia até atleta intermediário/avançado. A progressão respeita seu ponto de partida.",
+    a: "Também. O quiz identifica seu nível e o sistema estrutura o protocolo adequado — sem exigir que você já saiba se exercitar.",
   },
   {
     q: "Em quanto tempo vejo resultado?",
-    a: "Os primeiros sinais (energia, força, postura) aparecem em 2 a 4 semanas. A mudança visível geralmente acontece entre 8 e 12 semanas, com adesão ao plano.",
+    a: "Depende do seu ponto de partida e do objetivo. A maioria dos usuários relata mudanças visíveis entre 3 e 6 semanas seguindo o protocolo. O sistema ajusta a cada 60 dias conforme sua evolução registrada.",
   },
   {
     q: "E se eu treinar em casa, sem academia?",
-    a: "O treino se adapta ao seu equipamento — academia completa, garagem com halteres ou só peso corporal. A metodologia é a mesma, o caminho muda.",
+    a: "O quiz pergunta sobre equipamento disponível. O sistema estrutura o protocolo com o que você tem — academia completa, espaço em casa ou peso corporal.",
   },
   {
     q: "O protocolo é só pra hipertrofia?",
-    a: "Não. A metodologia atende hipertrofia, emagrecimento, recomposição e performance. Você define o objetivo no quiz e o protocolo é construído pra ele.",
+    a: "Não. O sistema cobre três objetivos: ganho de massa magra, redução de gordura corporal e performance. Você escolhe no quiz — e pode mudar depois.",
   },
   {
-    q: "Tem coach ou é só app?",
-    a: "Você tem um coach IA 24/7 dentro do app pra tirar dúvidas, ajustar exercício, sugerir substituição. Tudo dentro das regras definidas pelo treinador responsável.",
+    q: "Isso é diferente de usar um app grátis?",
+    a: "Sim. Apps como MyFitnessPal ou Hevy são ferramentas — você ainda precisa saber o que fazer. O EVORIA gera o protocolo por você, baseado no seu corpo, objetivo e rotina. É a diferença entre uma calculadora e um sistema que pensa por você.",
+  },
+  {
+    q: "Tem coach ou é só sistema?",
+    a: "O EVORIA é um sistema digital baseado na metodologia Kevin Franzen. O sistema faz o trabalho — disponível 24h, sem fila de espera. Para acompanhamento individual com o Kevin, existe a consultoria separada.",
+  },
+  {
+    q: "Minhas fotos ficam seguras?",
+    a: "Suas fotos são processadas pelo sistema para gerar a análise e não são compartilhadas, vendidas ou expostas publicamente. Política de privacidade completa disponível no rodapé.",
   },
   {
     q: "Posso cancelar quando quiser?",
-    a: "Sim, sem multa, sem letra miúda. Cancelou, segue até o fim do período pago e acabou.",
+    a: "Sim. Sem fidelidade. Sem multa. Sem burocracia. Cancela em 1 clique.",
   },
 ];

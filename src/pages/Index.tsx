@@ -178,17 +178,17 @@ const Index = () => {
             <span className="text-gradient">já te espera.</span>
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-lg mx-auto">
-            Pare de adiar. Faça o quiz, veja seu protocolo e decida se vale a pena. Você não paga
-            nada pra descobrir.
+            Pare de adiar. Faça o quiz, veja seu protocolo e decida se vale a pena. Você não paga nada pra descobrir.
           </p>
           <Link to={ctaPrimaryTo}>
             <Button size="lg" className="glow gap-2 h-14 px-10 text-base">
-              {ctaPrimary} <ArrowRight size={18} />
+              Começar agora <ArrowRight size={18} />
             </Button>
           </Link>
           <p className="text-xs text-muted-foreground mt-5">
             ✓ Tempo estimado: 5 a 8 minutos <br />
-            ✓ Pague só ao liberar o protocolo
+            ✓ Você vê o protocolo antes de pagar <br />
+            ✓ Cancela quando quiser
           </p>
         </div>
       </section>
@@ -197,10 +197,7 @@ const Index = () => {
       <section className="border-t border-border bg-card/20">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <p className="text-[10px] leading-relaxed text-muted-foreground/60 text-justify">
-            <strong>O EVORIA NÃO garante qualquer resultado específico.</strong> Os resultados dependem de inúmeros fatores fora do controle da plataforma, como genética, adesão do usuário ao protocolo, sono, estresse, condições hormonais, alimentação real, ambiente, lesões prévias e variabilidade biológica individual. As referências, exemplos, depoimentos e materiais de marketing têm caráter meramente ilustrativo e não constituem promessa contratual de resultado.
-          </p>
-          <p className="text-[10px] leading-relaxed text-muted-foreground/60 text-justify mt-3">
-            O EVORIA é uma plataforma totalmente automatizada que utiliza algoritmos próprios e modelos de inteligência artificial (IA) de terceiros para gerar protocolos de treino, dieta, cardio, mobilidade e recomendações de evolução. Os protocolos são gerados por software, sem intervenção humana individualizada em tempo real, salvo se contratado expressamente um pacote de acompanhamento humano em separado.
+            O EVORIA é uma plataforma digital de organização de hábitos físicos e alimentares. Os protocolos gerados pelo sistema têm caráter informativo e educativo, baseados em parâmetros inseridos pelo próprio usuário. A plataforma não realiza prescrição médica, nutricional ou de atividade física por profissional habilitado, e não substitui a avaliação de médico, nutricionista ou profissional de educação física. A análise por foto utiliza inteligência artificial para estimativa computacional, não constitui avaliação clínica ou diagnóstico de qualquer natureza. Resultados individuais variam conforme adesão ao protocolo, condições físicas, genética e outros fatores biológicos. O uso da plataforma é de exclusiva responsabilidade do usuário.
           </p>
         </div>
       </section>
