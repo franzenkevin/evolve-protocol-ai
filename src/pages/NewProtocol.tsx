@@ -50,7 +50,6 @@ const NewProtocol = () => {
     openCheckout({
       priceId: "hypertrophy_new_protocol_once",
       successUrl: `${window.location.origin}/checkout/success?type=new_protocol`,
-      customData: { purchaseType: "new_protocol" },
     });
   };
 

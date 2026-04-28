@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, FlaskConical, Syringe, ShieldCheck, Info, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 
 const EXAM_CHECKLIST = [
   // Bioquímica básica
