@@ -57,8 +57,18 @@ async function ensurePrice(opts: {
 
 async function ensurePromo(code: string, percentOff: number, name: string) {
   const stripe = getStripe();
-  const existing = await stripe.promotionCodes.list({ code, limit: 1 });
-  if (existing.data[0]) return { code, status: 'exists', id: existing.data[0].id };
+  // Look up active promotion codes with this code
+  const existing = await stripe.promotionCodes.list({ code, active: true, limit: 10 });
+  for (const pc of existing.data) {
+    const coupon = typeof pc.coupon === 'string'
+      ? await stripe.coupons.retrieve(pc.coupon)
+      : pc.coupon;
+    if (coupon && Math.abs((coupon.percent_off ?? 0) - percentOff) < 0.001) {
+      return { code, status: 'exists', id: pc.id, percent_off: coupon.percent_off };
+    }
+    // Divergent percent_off — deactivate so we can recreate with the new value
+    await stripe.promotionCodes.update(pc.id, { active: false });
+  }
 
   const coupon = await stripe.coupons.create({
     percent_off: percentOff,
@@ -70,7 +80,7 @@ async function ensurePromo(code: string, percentOff: number, name: string) {
     code,
     active: true,
   });
-  return { code, status: 'created', id: promo.id, coupon_id: coupon.id };
+  return { code, status: 'created', id: promo.id, coupon_id: coupon.id, percent_off: percentOff };
 }
 
 Deno.serve(async (req) => {
@@ -127,8 +137,8 @@ Deno.serve(async (req) => {
     }));
 
     // Launch coupons referenced by SectionPricing
-    results.promos.push(await ensurePromo('LANCAMENTO', 69, 'Lançamento mensal — 69% off'));
-    results.promos.push(await ensurePromo('LANCAMENTOANUAL', 33, 'Lançamento anual — 33% off'));
+    results.promos.push(await ensurePromo('LANCAMENTO', 69.2, 'Lançamento mensal — 69,2% off'));
+    results.promos.push(await ensurePromo('LANCAMENTOANUAL', 33.1, 'Lançamento anual — 33,1% off'));
 
     return json({ ok: true, ...results });
   } catch (e) {
