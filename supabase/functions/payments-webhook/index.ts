@@ -139,6 +139,23 @@ async function handleSubscriptionCreated(data: any, env: PaddleEnv) {
     console.error('welcome push error:', e);
   }
 
+  // 4) Magic link para guest checkout (cliente pagou sem ter conta criada antes)
+  try {
+    const isGuest = userInfo?.user?.user_metadata?.source === 'guest_checkout';
+    if (isGuest && email) {
+      const siteUrl = Deno.env.get('SITE_URL') || 'https://evolve-protocol-ai.lovable.app';
+      const { error: linkErr } = await supabase.auth.admin.generateLink({
+        type: 'magiclink',
+        email,
+        options: { redirectTo: `${siteUrl}/welcome?checkout=success` },
+      });
+      if (linkErr) console.error('magic link generation failed:', linkErr);
+      else console.log(`✅ magic link enviado para ${email}`);
+    }
+  } catch (e) {
+    console.error('magic link error:', e);
+  }
+
   console.log(`✅ subscription ${id} ativada para user ${userId} (${planCode})`);
 }
 
