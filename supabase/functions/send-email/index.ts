@@ -1,7 +1,11 @@
 // Sends emails via Hostinger SMTP using nodemailer.
 // Used for transactional emails (welcome, password setup, notifications).
-import { corsHeaders } from '@supabase/supabase-js/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 import nodemailer from 'npm:nodemailer@6.9.16';
 import { z } from 'npm:zod@3.23.8';
 
