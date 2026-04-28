@@ -34,7 +34,13 @@ async function ensurePrice(opts: {
     query: `metadata['external_id']:'${opts.productMetadataKey}'`,
     limit: 1,
   });
-  if (products.data[0]) productId = products.data[0].id;
+  if (products.data[0]) {
+    productId = products.data[0].id;
+    // Keep product name in sync if it changed
+    if (products.data[0].name !== opts.productName) {
+      await stripe.products.update(productId, { name: opts.productName });
+    }
+  }
   if (!productId) {
     const p = await stripe.products.create({
       name: opts.productName,
@@ -117,21 +123,21 @@ Deno.serve(async (req) => {
     };
 
     results.prices.push(await ensurePrice({
-      productName: 'Hypertrophy — Protocolo IA',
+      productName: 'Evoria app',
       productMetadataKey: 'hypertrophy_plan',
       lookupKey: 'hypertrophy_monthly',
       amount: 9700,
       recurring: 'month',
     }));
     results.prices.push(await ensurePrice({
-      productName: 'Hypertrophy — Protocolo IA',
+      productName: 'Evoria app',
       productMetadataKey: 'hypertrophy_plan',
       lookupKey: 'hypertrophy_annual',
       amount: 89700,
       recurring: 'year',
     }));
     results.prices.push(await ensurePrice({
-      productName: 'Novo protocolo (avulso)',
+      productName: 'Evoria app — Novo protocolo (avulso)',
       productMetadataKey: 'hypertrophy_new_protocol',
       lookupKey: 'hypertrophy_new_protocol_once',
       amount: 1990,
@@ -139,7 +145,7 @@ Deno.serve(async (req) => {
 
     // Launch coupons referenced by SectionPricing
     results.promos.push(await ensurePromo('LANCAMENTO', 69.2, 'Lançamento mensal — 69,2% off'));
-    results.promos.push(await ensurePromo('LANCAMENTOANUAL', 33.1, 'Lançamento anual — 33,1% off'));
+    results.promos.push(await ensurePromo('LANCAMENTOANUAL', 33.2, 'Lançamento anual — 33,2% off'));
 
     return json({ ok: true, ...results });
   } catch (e) {
