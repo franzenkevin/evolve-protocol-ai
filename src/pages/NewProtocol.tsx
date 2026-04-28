@@ -18,7 +18,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Loader2, Sparkles, RefreshCw, ShieldCheck, ArrowLeft, Stethoscope } from "lucide-react";
-import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import {
   useProtocolRegenStatus,
   useConsumeRegenCredit,
@@ -31,7 +31,7 @@ import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 const NewProtocol = () => {
   const navigate = useNavigate();
-  const { openCheckout, loading: checkoutLoading } = usePaddleCheckout();
+  const { openCheckout, loading: checkoutLoading } = useStripeCheckout();
   const { data: status, isLoading } = useProtocolRegenStatus();
   const { data: profile } = useProfile();
   const consume = useConsumeRegenCredit();
