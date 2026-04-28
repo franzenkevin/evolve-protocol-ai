@@ -91,6 +91,16 @@ const AdminPlans = () => {
 
   return (
     <div className="space-y-3">
+      <Card className="p-3 flex items-center justify-between gap-3 border-primary/30 bg-primary/5">
+        <div>
+          <p className="text-sm font-medium text-foreground">Sincronizar com Stripe</p>
+          <p className="text-[11px] text-muted-foreground">Cria produtos, preços (mensal R$97, anual R$897, avulso R$19,90) e cupons LANCAMENTO/LANCAMENTOANUAL na sua conta Stripe.</p>
+        </div>
+        <Button size="sm" variant="secondary" onClick={handleSeedStripe} disabled={seeding} className="gap-1 shrink-0">
+          <RefreshCw size={14} className={seeding ? "animate-spin" : ""} />{seeding ? "Sincronizando..." : "Sincronizar"}
+        </Button>
+      </Card>
+
       <div className="flex justify-between items-center">
         <div>
           <p className="text-sm text-muted-foreground">{plans.length} planos cadastrados</p>
