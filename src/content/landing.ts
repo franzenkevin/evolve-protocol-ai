@@ -38,28 +38,28 @@ export type FeatureContent = {
 
 export const FEATURES_CONTENT: FeatureContent[] = [
   {
-    eyebrow: "Treino sob medida",
+    eyebrow: "TREINO SOB MEDIDA",
     title: "Cada série calculada pra te levar adiante",
-    desc: "Divisão, exercícios, séries, reps, descanso e progressão definidos pela metodologia. Seu treino evolui semana a semana.",
+    desc: "Divisão, exercícios, séries, reps, descanso e progressão definidos pela metodologia. Seu programa avança semana a semana, sem estagnação.",
     image: mockTraining,
   },
   {
-    eyebrow: "Dieta inteligente",
-    title: "Macros precisos com a comida que você gosta",
-    desc: "Proteína, carbo e gordura no ponto certo do seu objetivo. Refeições montadas com seus alimentos preferidos — porque dieta que você odeia não dura.",
+    eyebrow: "ESTRUTURA ALIMENTAR",
+    title: "Organizado com a comida que você já come",
+    desc: "Macros no ponto certo do seu objetivo. Refeições organizadas com seus alimentos preferidos. Porque estrutura que você odeia não dura.",
     image: mockDiet,
     reverse: true,
   },
   {
-    eyebrow: "Avaliação por foto IA",
-    title: "Sua composição corporal lida em segundos",
-    desc: "Mande 4 fotos. A IA estima percentual de gordura, identifica desequilíbrios posturais e mapeia pontos fortes e a desenvolver. Tudo entra na receita do seu protocolo.",
+    eyebrow: "ANÁLISE POR FOTO IA",
+    title: "Seu ponto de partida lido em segundos",
+    desc: "Mande 4 fotos. O sistema processa composição corporal estimada, padrões posturais e prioridades pra seu protocolo. Tudo entra no cálculo.",
     image: mockAi,
   },
   {
-    eyebrow: "Progresso medido",
+    eyebrow: "PROGRESSO MEDIDO",
     title: "Você vê o resultado antes do espelho mostrar",
-    desc: "Peso, gordura, treinos completados, ranking semanal. Tudo num só lugar, para manter o foco quando a motivação some.",
+    desc: "Peso, composição, treinos completados, ranking semanal. Tudo num só lugar, pra manter o foco quando a motivação oscila.",
     image: mockProgress,
     reverse: true,
   },
@@ -110,20 +110,23 @@ export const RESULTS_CONTENT: ResultContent[] = [
 //  3) SOBRE VOCÊ (seção "Quem está por trás")
 // ============================================================
 export const ABOUT_CONTENT = {
-  eyebrow: "Quem está por trás",
+  eyebrow: "QUEM DESENVOLVEU A METODOLOGIA",
   firstName: "Kevin",
   lastName: "Franzen",
   photo: coachKevin,
   // Cada string é um parágrafo — adicione/remova quantos quiser
   paragraphs: [
-    "Sou treinador e atleta apaixonado por transformação real. Passei anos vendo gente boa desperdiçar tempo com plano genérico, dieta restritiva e promessa milagrosa.\n \nConstruí esse app pra entregar o melhor do meu conhecimento, assim como fazemos na minha consultoria individual — só que escalado, acessível, 24h e no seu bolso.",
-    "A metodologia une o que funciona na sala de musculação com o que a ciência confirma no laboratório. A IA acelera o cálculo. Mas a regra final é sempre minha.",
+    "10 anos acompanhando atletas e profissionais que treinavam com disciplina e não chegavam onde queriam.",
+    "Vi médicos, advogados e executivos com pouco tempo disponível, que investiram em 6-7x treinos por semana durante anos e continuarem no mesmo lugar. Não por falta de vontade. Por falta de protocolo real e sustentável.",
+    "Desenvolvi esse sistema pra colocar a mesma estrutura que aplico na minha consultoria individual, de forma automatizada e no fácil acesso a todos que querem resultado",
+    "A IA executa o cálculo. A metodologia é minha. As regras do sistema foram construídas na prática e validadas pela ciência.",
   ],
   // Pontos fortes (lista com check verde)
   bullets: [
-    "Anos formando atletas e amadores em busca de evolução real",
-    "Metodologia construída na prática e validada por base científica atual",
-    "IA usada como ferramenta, quem dita as regras do protocolo é o profissional",
+    "10+ anos de experiência com atletas e amantes do lifestyle",
+    "Consultoria com +100 alunos ativos com retenção acima da média do mercado",
+    "Metodologia construída na prática, referenciada em ciência",
+    "Evoria é Sistema, não chatbot genérico. A lógica do protocolo é humana.",
   ],
 };
 
