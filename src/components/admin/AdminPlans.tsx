@@ -27,6 +27,24 @@ const AdminPlans = () => {
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState<Plan | null>(null);
   const [form, setForm] = useState({ code: "", name: "", price_brl: "", interval_months: "1" });
+  const [seeding, setSeeding] = useState(false);
+
+  const handleSeedStripe = async () => {
+    setSeeding(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-seed");
+      if (error) throw error;
+      toast({
+        title: "Stripe sincronizado",
+        description: `${data?.prices?.length ?? 0} preços e ${data?.promos?.length ?? 0} cupons OK (${data?.environment})`,
+      });
+      console.log("stripe-seed result", data);
+    } catch (err: any) {
+      toast({ title: "Erro ao sincronizar", description: err.message, variant: "destructive" });
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   const handleAdd = async () => {
     if (!form.code || !form.name || !form.price_brl) {
