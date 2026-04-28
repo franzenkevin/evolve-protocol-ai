@@ -44,34 +44,28 @@ Deno.serve(async (req) => {
   try {
     // Auth: require valid JWT (called from other edge functions with service role, or from client)
     const authHeader = req.headers.get('Authorization');
-    const testHeader = req.headers.get('x-test-secret');
-    const TEST_SECRET = 'evoria-smtp-test-2026';
-    const isTestCall = testHeader === TEST_SECRET;
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
-    if (!isTestCall) {
-      if (!authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.replace('Bearer ', '');
+    const isServiceRole = token === Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+    if (!isServiceRole) {
+      const supabase = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_ANON_KEY')!,
+        { global: { headers: { Authorization: authHeader } } },
+      );
+      const { data: claims, error: claimsErr } = await supabase.auth.getClaims(token);
+      if (claimsErr || !claims?.claims) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), {
           status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
-      }
-
-      const token = authHeader.replace('Bearer ', '');
-      const isServiceRole = token === Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-
-      if (!isServiceRole) {
-        const supabase = createClient(
-          Deno.env.get('SUPABASE_URL')!,
-          Deno.env.get('SUPABASE_ANON_KEY')!,
-          { global: { headers: { Authorization: authHeader } } },
-        );
-        const { data: claims, error: claimsErr } = await supabase.auth.getClaims(token);
-        if (claimsErr || !claims?.claims) {
-          return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-            status: 401,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
-        }
       }
     }
 
