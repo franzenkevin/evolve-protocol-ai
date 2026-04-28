@@ -28,6 +28,7 @@ export const SectionPricing = () => {
     priceId: string,
     couponCode: string,
   ) => {
+    console.log("[pricing] button clicked", { plan, priceId, couponCode });
     setActivePlan(plan);
     try {
       await openCheckout({
@@ -35,6 +36,8 @@ export const SectionPricing = () => {
         couponCode,
         successUrl: `${window.location.origin}/checkout/success?plan=${plan}`,
       });
+    } catch (e) {
+      console.error("[pricing] handleCheckout failed", e);
     } finally {
       setActivePlan(null);
     }
