@@ -1,11 +1,8 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { CheckCircle2, ArrowRight, Sparkles, Loader2 } from "lucide-react";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
 
 const MONTHLY_BULLETS = [
   "Protocolo completo gerado pelo sistema",
@@ -23,28 +20,19 @@ const ANNUAL_BULLETS = [
 ];
 
 export const SectionPricing = () => {
-  const { user } = useAuth();
   const { openCheckout, loading } = useStripeCheckout();
-  const [emailMonthly, setEmailMonthly] = useState("");
-  const [emailAnnual, setEmailAnnual] = useState("");
   const [activePlan, setActivePlan] = useState<"monthly" | "annual" | null>(null);
 
   const handleCheckout = async (
     plan: "monthly" | "annual",
     priceId: string,
     couponCode: string,
-    email: string
   ) => {
-    if (!user && !email.trim()) {
-      toast.error("Informe seu e-mail pra continuar");
-      return;
-    }
     setActivePlan(plan);
     try {
       await openCheckout({
         priceId,
         couponCode,
-        guestEmail: user ? undefined : email.trim(),
         successUrl: `${window.location.origin}/checkout/success?plan=${plan}`,
       });
     } finally {
@@ -94,23 +82,11 @@ export const SectionPricing = () => {
               ))}
             </ul>
 
-            {!user && (
-              <Input
-                type="email"
-                placeholder="seu@email.com"
-                value={emailMonthly}
-                onChange={(e) => setEmailMonthly(e.target.value)}
-                className="mb-3 h-12"
-                disabled={isMonthlyLoading}
-              />
-            )}
             <Button
               size="lg"
               className="w-full gap-2 h-12 text-base"
               disabled={isMonthlyLoading || loading}
-              onClick={() =>
-                handleCheckout("monthly", "hypertrophy_monthly", "LANCAMENTO", emailMonthly)
-              }
+              onClick={() => handleCheckout("monthly", "hypertrophy_monthly", "LANCAMENTO")}
             >
               {isMonthlyLoading ? (
                 <Loader2 size={18} className="animate-spin" />
@@ -145,23 +121,11 @@ export const SectionPricing = () => {
               ))}
             </ul>
 
-            {!user && (
-              <Input
-                type="email"
-                placeholder="seu@email.com"
-                value={emailAnnual}
-                onChange={(e) => setEmailAnnual(e.target.value)}
-                className="mb-3 h-12"
-                disabled={isAnnualLoading}
-              />
-            )}
             <Button
               size="lg"
               className="w-full gap-2 h-12 text-base glow"
               disabled={isAnnualLoading || loading}
-              onClick={() =>
-                handleCheckout("annual", "hypertrophy_annual", "LANCAMENTOANUAL", emailAnnual)
-              }
+              onClick={() => handleCheckout("annual", "hypertrophy_annual", "LANCAMENTOANUAL")}
             >
               {isAnnualLoading ? (
                 <Loader2 size={18} className="animate-spin" />

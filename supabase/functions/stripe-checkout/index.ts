@@ -1,5 +1,5 @@
-// Creates a Stripe Checkout Session for either a logged-in user or a guest.
-// For guests: provisions an auth user silently (so post-payment we can magic-link them).
+// Creates a Stripe Checkout Session. Email is collected by Stripe.
+// User account is provisioned by the webhook AFTER successful payment.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getStripe, resolveStripePriceId, getStripeEnv, PLAN_CODE_FROM_LOOKUP } from '../_shared/stripe.ts';
 
@@ -16,12 +16,11 @@ function json(body: unknown, status = 200) {
 }
 
 interface Body {
-  priceId: string;            // human-readable lookup_key
+  priceId: string;
   successUrl?: string;
   cancelUrl?: string;
-  couponCode?: string;        // promotion_code "code" (e.g. LANCAMENTO)
+  couponCode?: string;
   referralCode?: string;
-  guestEmail?: string;        // when not logged in
 }
 
 Deno.serve(async (req) => {
@@ -30,57 +29,27 @@ Deno.serve(async (req) => {
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-    const service = createClient(supabaseUrl, serviceKey);
 
     const body = (await req.json()) as Body;
     if (!body.priceId) return json({ error: 'priceId required' }, 400);
 
-    // Identify user (optional — guest checkout supported)
+    // Optional: identify logged-in user (so we can attach to existing account)
     let userId: string | null = null;
     let userEmail: string | null = null;
     const auth = req.headers.get('Authorization');
     if (auth) {
-      const userClient = createClient(supabaseUrl, anonKey, {
-        global: { headers: { Authorization: auth } },
-      });
-      const { data: u } = await userClient.auth.getUser();
-      if (u?.user) {
-        userId = u.user.id;
-        userEmail = u.user.email ?? null;
-      }
-    }
-
-    // Guest flow: provision auth user from email
-    if (!userId) {
-      const email = body.guestEmail?.trim().toLowerCase();
-      if (!email) return json({ error: 'Email required for guest checkout' }, 400);
-
-      // Check if user already exists
-      const { data: existingList } = await service.auth.admin.listUsers({ page: 1, perPage: 200 });
-      const existing = existingList?.users?.find((u) => u.email?.toLowerCase() === email);
-      if (existing) {
-        userId = existing.id;
-        userEmail = email;
-      } else {
-        const { data: created, error: createErr } = await service.auth.admin.createUser({
-          email,
-          email_confirm: false,
-          user_metadata: { source: 'guest_checkout' },
+      try {
+        const userClient = createClient(supabaseUrl, anonKey, {
+          global: { headers: { Authorization: auth } },
         });
-        if (createErr || !created.user) {
-          console.error('createUser failed', createErr);
-          return json({ error: 'Could not create account' }, 500);
+        const { data: u } = await userClient.auth.getUser();
+        if (u?.user) {
+          userId = u.user.id;
+          userEmail = u.user.email ?? null;
         }
-        userId = created.user.id;
-        userEmail = email;
-
-        // Best-effort lead record
-        await service.from('leads').upsert(
-          { email, name: null, source: 'paywall_guest', status: 'new' },
-          { onConflict: 'email', ignoreDuplicates: true },
-        );
+      } catch (e) {
+        console.warn('auth lookup failed (continuing as guest)', e);
       }
     }
 
@@ -89,8 +58,8 @@ Deno.serve(async (req) => {
     const planCode = PLAN_CODE_FROM_LOOKUP[body.priceId] || 'monthly';
     const env = getStripeEnv();
 
-    // Resolve promo code if provided (Stripe needs the promotion_code object id)
-    let discounts: Stripe.Checkout.SessionCreateParams.Discount[] | undefined;
+    // Resolve promo code if provided
+    let discounts: any[] | undefined;
     if (body.couponCode) {
       try {
         const promos = await stripe.promotionCodes.list({
@@ -107,20 +76,19 @@ Deno.serve(async (req) => {
 
     const origin = req.headers.get('origin') || req.headers.get('referer')?.replace(/\/$/, '') || '';
     const successUrl =
-      body.successUrl || `${origin}/checkout/success?plan=${planCode}&session_id={CHECKOUT_SESSION_ID}`;
+      body.successUrl || `${origin}/checkout/success?plan=${planCode}`;
     const cancelUrl = body.cancelUrl || `${origin}/plans?canceled=1`;
 
-    const sessionParams: Stripe.Checkout.SessionCreateParams = {
+    const sessionParams: any = {
       mode: 'subscription',
       line_items: [{ price: stripePriceId, quantity: 1 }],
-      customer_email: userEmail || undefined,
       success_url: successUrl.includes('{CHECKOUT_SESSION_ID}')
         ? successUrl
         : `${successUrl}${successUrl.includes('?') ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl,
       locale: 'pt-BR',
       metadata: {
-        userId: userId!,
+        ...(userId ? { userId } : {}),
         priceId: body.priceId,
         planCode,
         environment: env,
@@ -129,7 +97,7 @@ Deno.serve(async (req) => {
       },
       subscription_data: {
         metadata: {
-          userId: userId!,
+          ...(userId ? { userId } : {}),
           priceId: body.priceId,
           planCode,
           environment: env,
@@ -137,6 +105,11 @@ Deno.serve(async (req) => {
         },
       },
     };
+
+    // If logged in, prefill email; otherwise let Stripe collect it
+    if (userEmail) {
+      sessionParams.customer_email = userEmail;
+    }
 
     if (discounts) {
       sessionParams.discounts = discounts;
@@ -152,6 +125,3 @@ Deno.serve(async (req) => {
     return json({ error: String((e as Error).message || e) }, 500);
   }
 });
-
-// Type-only import to satisfy Stripe namespace usage above without runtime cost
-import type Stripe from 'npm:stripe@17.5.0';
