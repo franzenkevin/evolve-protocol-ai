@@ -16,6 +16,8 @@ function json(body: unknown, status = 200) {
   });
 }
 
+const PRODUCT_DESCRIPTION = 'Evoria Coach App - seu software personalizado para te guiar ao corpo dos sonhos!';
+
 async function ensurePrice(opts: {
   productName: string;
   productMetadataKey: string;
@@ -25,40 +27,54 @@ async function ensurePrice(opts: {
 }) {
   const stripe = getStripe();
   // 1) Check existing price by lookup_key
-  const existing = await stripe.prices.list({ lookup_keys: [opts.lookupKey], limit: 1 });
-  if (existing.data[0]) return { lookup_key: opts.lookupKey, status: 'exists', id: existing.data[0].id };
+  const existing = await stripe.prices.list({ lookup_keys: [opts.lookupKey], limit: 1, expand: ['data.product'] });
+  let priceStatus: 'exists' | 'created' = 'exists';
+  let priceId: string | null = existing.data[0]?.id ?? null;
+  let productId: string | null = null;
+
+  if (existing.data[0]) {
+    const prod: any = existing.data[0].product;
+    productId = typeof prod === 'string' ? prod : prod?.id ?? null;
+  }
 
   // 2) Find or create product
-  let productId: string | null = null;
-  const products = await stripe.products.search({
-    query: `metadata['external_id']:'${opts.productMetadataKey}'`,
-    limit: 1,
-  });
-  if (products.data[0]) {
-    productId = products.data[0].id;
-    // Keep product name in sync if it changed
-    if (products.data[0].name !== opts.productName) {
-      await stripe.products.update(productId, { name: opts.productName });
-    }
+  if (!productId) {
+    const products = await stripe.products.search({
+      query: `metadata['external_id']:'${opts.productMetadataKey}'`,
+      limit: 1,
+    });
+    if (products.data[0]) productId = products.data[0].id;
   }
   if (!productId) {
     const p = await stripe.products.create({
       name: opts.productName,
+      description: PRODUCT_DESCRIPTION,
       metadata: { external_id: opts.productMetadataKey },
     });
     productId = p.id;
+  } else {
+    // Always sync name + description
+    await stripe.products.update(productId, {
+      name: opts.productName,
+      description: PRODUCT_DESCRIPTION,
+    });
   }
 
-  // 3) Create price
-  const price = await stripe.prices.create({
-    product: productId,
-    unit_amount: opts.amount,
-    currency: 'brl',
-    lookup_key: opts.lookupKey,
-    nickname: opts.lookupKey,
-    ...(opts.recurring ? { recurring: { interval: opts.recurring } } : {}),
-  });
-  return { lookup_key: opts.lookupKey, status: 'created', id: price.id, product: productId };
+  // 3) Create price if missing
+  if (!priceId) {
+    const price = await stripe.prices.create({
+      product: productId,
+      unit_amount: opts.amount,
+      currency: 'brl',
+      lookup_key: opts.lookupKey,
+      nickname: opts.lookupKey,
+      ...(opts.recurring ? { recurring: { interval: opts.recurring } } : {}),
+    });
+    priceId = price.id;
+    priceStatus = 'created';
+  }
+
+  return { lookup_key: opts.lookupKey, status: priceStatus, id: priceId, product: productId };
 }
 
 async function ensurePromo(code: string, percentOff: number, name: string) {
