@@ -112,9 +112,10 @@ export const SectionPricing = () => {
               <span className="text-base text-muted-foreground line-through">R$897</span>
               <span className="text-4xl font-heading font-bold text-foreground">R$599</span>
             </div>
-            <p className="text-xs text-muted-foreground mb-6">
+            <p className="text-xs text-muted-foreground mb-1">
               pagamento único — economia de R$298
             </p>
+            <p className="text-[10px] text-primary mb-6">Cartão de crédito à vista ou parcelado, ou Pix</p>
 
             <ul className="space-y-2.5 mb-6 flex-1">
               {ANNUAL_BULLETS.map((b) => (
