@@ -1,7 +1,7 @@
 // Creates a Stripe Checkout Session. Email is collected by Stripe.
 // User account is provisioned by the webhook AFTER successful payment.
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { getStripe, resolveStripePriceId, getStripeEnv, PLAN_CODE_FROM_LOOKUP } from '../_shared/stripe.ts';
+import { getStripe, resolveStripePrice, getStripeEnv, PLAN_CODE_FROM_LOOKUP } from '../_shared/stripe.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -54,7 +54,9 @@ Deno.serve(async (req) => {
     }
 
     const stripe = getStripe();
-    const stripePriceId = await resolveStripePriceId(body.priceId);
+    const resolvedPrice = await resolveStripePrice(body.priceId);
+    const stripePriceId = resolvedPrice.id;
+    const checkoutMode = resolvedPrice.mode; // 'subscription' or 'payment'
     const planCode = PLAN_CODE_FROM_LOOKUP[body.priceId] || 'monthly';
     const env = getStripeEnv();
 
@@ -122,32 +124,32 @@ Deno.serve(async (req) => {
       body.successUrl || `${origin}/checkout/success?plan=${planCode}`;
     const cancelUrl = body.cancelUrl || `${origin}/plans?canceled=1`;
 
+    const sharedMetadata = {
+      ...(userId ? { userId } : {}),
+      priceId: body.priceId,
+      planCode,
+      environment: env,
+      ...(body.referralCode ? { referralCode: body.referralCode } : {}),
+      ...(body.couponCode ? { couponCode: body.couponCode } : {}),
+    };
+
     const sessionParams: any = {
-      mode: 'subscription',
+      mode: checkoutMode,
       line_items: [{ price: stripePriceId, quantity: 1 }],
       success_url: successUrl.includes('{CHECKOUT_SESSION_ID}')
         ? successUrl
         : `${successUrl}${successUrl.includes('?') ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl,
       locale: 'pt-BR',
-      metadata: {
-        ...(userId ? { userId } : {}),
-        priceId: body.priceId,
-        planCode,
-        environment: env,
-        ...(body.referralCode ? { referralCode: body.referralCode } : {}),
-        ...(body.couponCode ? { couponCode: body.couponCode } : {}),
-      },
-      subscription_data: {
-        metadata: {
-          ...(userId ? { userId } : {}),
-          priceId: body.priceId,
-          planCode,
-          environment: env,
-          ...(body.referralCode ? { referralCode: body.referralCode } : {}),
-        },
-      },
+      metadata: sharedMetadata,
     };
+
+    if (checkoutMode === 'subscription') {
+      sessionParams.subscription_data = { metadata: sharedMetadata };
+    } else {
+      // One-time payment: attach metadata to the resulting PaymentIntent too.
+      sessionParams.payment_intent_data = { metadata: sharedMetadata };
+    }
 
     // If logged in, prefill email; otherwise let Stripe collect it
     if (userEmail) {
