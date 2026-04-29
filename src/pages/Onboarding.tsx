@@ -34,10 +34,18 @@ const CARDIO_DURATION = ["10-15 min", "15-20 min", "20-30 min", "30-45 min", "45
 const CARDIO_TIMING = ["Logo após o treino de musculação", "Em horário separado (manhã/noite)", "Em dias de descanso da musculação", "Tanto faz"];
 const CARDIO_TYPE = ["LISS (caminhada/bike leve, baixa intensidade)", "HIIT (alta intensidade intervalado)", "Moderado contínuo (corrida/bike)", "Tanto faz — escolha o melhor para meu objetivo"];
 
-const GOALS = ["Hipertrofia", "Emagrecimento", "Recomposição Corporal", "Saúde Geral"];
+const GOALS = [
+  "Hipertrofia (ganho de massa)",
+  "Definição (emagrecimento)",
+  "Saúde geral",
+];
 const ACTIVITY_LEVELS = ["Sedentário", "Levemente ativo", "Moderadamente ativo", "Muito ativo", "Extremamente ativo"];
 const EXPERIENCE_LEVELS = ["Iniciante (0-6 meses)", "Intermediário (6m-2 anos)", "Avançado (2+ anos)"];
-const GYM_TYPES = ["Academia completa", "Academia limitada", "Treino em casa"];
+const GYM_TYPES = [
+  "Academia completa com maquinário",
+  "Academia básica com barra e halteres",
+  "Treino em casa",
+];
 const TRAINING_DAYS = ["2", "3", "4", "5", "6"];
 const TRAINING_TIMES = ["Manhã (antes das 10h)", "Meio-dia (10h-14h)", "Tarde (14h-18h)", "Noite (após 18h)"];
 const NEAT_OPTIONS = ["Trabalho sentado", "Trabalho em pé", "Trabalho físico leve", "Trabalho físico pesado"];
