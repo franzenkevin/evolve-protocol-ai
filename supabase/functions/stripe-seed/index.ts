@@ -139,24 +139,30 @@ Deno.serve(async (req) => {
     };
 
     results.prices.push(await ensurePrice({
-      productName: 'Evoria app',
-      productMetadataKey: 'hypertrophy_plan',
+      productName: 'Evoria Coach App — Mensal',
+      productMetadataKey: 'hypertrophy_plan_monthly',
       lookupKey: 'hypertrophy_monthly',
       amount: 9700,
       recurring: 'month',
     }));
     results.prices.push(await ensurePrice({
-      productName: 'Evoria app',
-      productMetadataKey: 'hypertrophy_plan',
+      productName: 'Evoria Coach App — Anual',
+      productMetadataKey: 'hypertrophy_plan_annual',
       lookupKey: 'hypertrophy_annual',
       amount: 89700,
       recurring: 'year',
     }));
     results.prices.push(await ensurePrice({
-      productName: 'Evoria app — Novo protocolo (avulso)',
+      productName: 'Evoria Coach App — Novo Protocolo (60 dias)',
       productMetadataKey: 'hypertrophy_new_protocol',
       lookupKey: 'hypertrophy_new_protocol_once',
-      amount: 1990,
+      amount: 4990,
+    }));
+    results.prices.push(await ensurePrice({
+      productName: 'Evoria Coach App — Análise de Exames',
+      productMetadataKey: 'hypertrophy_exam_analysis',
+      lookupKey: 'hypertrophy_exam_analysis_once',
+      amount: 9990,
     }));
 
     // Launch coupons referenced by SectionPricing
