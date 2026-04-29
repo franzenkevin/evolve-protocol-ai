@@ -292,66 +292,61 @@ export type SetScheme = {
 };
 
 /**
- * INICIANTE — esquema fixo 10/8/falha
- * 1 aquecimento (50% × 15 reps, sem aproximar da falha)
- * Válida 1: carga máxima já usada → ALVO 10 reps (próximo da falha)
- * Válida 2: AUMENTA 10-20% da carga → ALVO 8 reps (próximo da falha)
- * Válida 3: MANTÉM a carga da V2 → FALHA TOTAL (a série mais importante)
+ * ESQUEMA PADRÃO — usado para TODOS os níveis (iniciante, intermediário e avançado).
+ * A diferença por nível fica no NÚMERO de séries válidas (2 ou 3) e na escolha
+ * de técnicas avançadas, não no formato do esquema.
+ *
+ * Estrutura:
+ *  - 2 aquecimentos (50% e 75%) — pode pular o de 50% se já estiver bem aquecido,
+ *    mas o IDEAL é fazer os dois.
+ *  - 1 a 3 séries válidas próximas da falha (RIR 1-2). A ÚLTIMA é SEMPRE falha total.
+ *  - Zona-alvo de reps escolhida pela IA por exercício (5-9 / 6-10 / 8-12 / 10-15 / 15-20).
  */
-export const SET_SCHEME_BEGINNER: SetScheme = {
-  repsLabel: "10/8/falha",
+export const SET_SCHEME_STANDARD: SetScheme = {
+  repsLabel: "8-12",
   warmups: [
-    { percent: 50, reps: "15", note: "Aquecimento — 50% da carga máxima já usada, SEM chegar próximo da falha" },
+    { percent: 50, reps: "12", note: "Aquecimento 1 — ativação leve. Pode pular se já estiver bem aquecido, mas o ideal é fazer." },
+    { percent: 75, reps: "5-8", note: "Aquecimento 2 — preparação neural (recomendado SEMPRE)" },
   ],
   validSets: [
-    { reps: "10", effort: "próximo da falha", note: "Válida 1 — sua carga máxima já usada, vai até 10 somente" },
-    { reps: "8", effort: "próximo da falha", note: "Válida 2 — AUMENTA 10-20% da carga, alvo 8 reps" },
-    { reps: "falha", effort: "FALHA TOTAL", note: "Válida 3 — MANTÉM a carga da V2, vai até falhar (não conseguir mais movimentar)" },
+    { reps: "8-12", effort: "RIR 1-2 (próximo da falha)", note: "Válida — RIR 1-2: pare quando faltariam 1 a 2 reps para falhar" },
+    { reps: "8-12", effort: "RIR 1-2 (próximo da falha)", note: "Válida — RIR 1-2 (mesma zona-alvo)" },
+    { reps: "falha", effort: "FALHA TOTAL", note: "Última válida — SEMPRE falha total (não consegue mais movimentar)" },
   ],
   description:
-    "Iniciante: 1 aquecimento 50%×15 + 10/8/falha (V1=10 com carga máxima atual, V2=8 com +10-20%, V3=falha total mantendo a carga da V2)",
-  progressionRule:
-    "Se na série de FALHA passar de 12 reps → AUMENTAR todos os pesos. Se ficar abaixo de 8 reps → DIMINUIR o peso. Entre 8 e 12 → progredir pelo menos 1 rep por semana até chegar em 12, depois subir carga. (Progressão contínua)",
-};
-
-/**
- * INTERMEDIÁRIO / AVANÇADO — 2 aquecimentos + 2 a 3 séries válidas (a última sempre falha total)
- * 1 aquecimento 50% + 1 aquecimento 75% + 2-3 válidas próximas da falha
- *
- * Zona-alvo de repetições é VARIÁVEL — escolhida pela IA conforme exercício/objetivo:
- *   - Compostos pesados / força: 5-9 reps (ex.: 3x6-9)
- *   - Hipertrofia clássica: 6-10 ou 8-12 reps (ex.: 3x6-10, 3x8-12)
- *   - Resistência muscular / isolados leves: 10-15 ou 15-20 reps
- *
- * Pode aplicar UMA técnica avançada (backoffset, cluster set, pico de contração ou bi-set sutil)
- */
-export const SET_SCHEME_ADVANCED: SetScheme = {
-  repsLabel: "8-12/8-12/falha",
-  warmups: [
-    { percent: 50, reps: "12", note: "Aquecimento 1 — ativação (sem aproximar da falha)" },
-    { percent: 75, reps: "5-8", note: "Aquecimento 2 — preparação neural" },
-  ],
-  validSets: [
-    { reps: "8-12", effort: "próximo da falha", note: "Válida 1 — RIR 1-2 (zona-alvo definida pela IA: 5-9, 6-10, 8-12, 10-15 ou 15-20)" },
-    { reps: "8-12", effort: "próximo da falha", note: "Válida 2 — RIR 1-2 (mesma zona-alvo)" },
-    { reps: "falha", effort: "FALHA TOTAL", note: "Última válida — SEMPRE falha total" },
-  ],
-  description:
-    "Intermediário/Avançado: 2 aquecimentos (50% + 75%) + 2 a 3 séries válidas (a ÚLTIMA é SEMPRE falha total). Zona-alvo de reps escolhida pela IA conforme exercício: 5-9 (força), 6-10 ou 8-12 (hipertrofia), 10-15 ou 15-20 (resistência/isolados). Pode aplicar 1 técnica avançada quando indicado.",
+    "Padrão (todos os níveis): 2 aquecimentos (50% + 75%) + 1 a 3 séries válidas (a ÚLTIMA é SEMPRE falha total). O número de válidas depende do protocolo/exercício. Zona-alvo escolhida pela IA: 5-9 (força), 6-10 ou 8-12 (hipertrofia), 10-15 ou 15-20 (resistência/isolados).",
   progressionRule:
     "Olhe SEMPRE a série de FALHA: passou do TOPO da zona-alvo → AUMENTAR carga. Ficou abaixo do PISO → DIMINUIR carga. Dentro da zona → progredir 1 rep/semana até chegar no topo, depois subir carga.",
 };
 
+// Compat: imports antigos.
+export const SET_SCHEME_BEGINNER = SET_SCHEME_STANDARD;
+export const SET_SCHEME_ADVANCED = SET_SCHEME_STANDARD;
+
 export function getSetScheme(experience: string | null | undefined): {
   scheme: SetScheme;
-  level: "beginner" | "advanced";
+  level: "beginner" | "intermediate" | "advanced";
 } {
   const exp = (experience || "").toLowerCase();
-  const isBeginner = exp.includes("iniciante");
-  return isBeginner
-    ? { scheme: SET_SCHEME_BEGINNER, level: "beginner" }
-    : { scheme: SET_SCHEME_ADVANCED, level: "advanced" };
+  const level: "beginner" | "intermediate" | "advanced" = exp.includes("iniciante")
+    ? "beginner"
+    : exp.includes("avançado") || exp.includes("avancado")
+      ? "advanced"
+      : "intermediate";
+
+  // Iniciante = 2 válidas (última na falha). Intermediário/avançado = 3 válidas (última na falha).
+  const validSets =
+    level === "beginner"
+      ? [
+          { reps: "8-12", effort: "RIR 1-2 (próximo da falha)", note: "Válida 1 — RIR 1-2: pare quando faltariam 1 a 2 reps" },
+          { reps: "falha", effort: "FALHA TOTAL", note: "Válida 2 — SEMPRE falha total" },
+        ]
+      : SET_SCHEME_STANDARD.validSets;
+
+  const scheme: SetScheme = { ...SET_SCHEME_STANDARD, validSets };
+  return { scheme, level };
 }
+
 
 // ============================================================================
 // TÉCNICAS AVANÇADAS — uso pontual e justificado pela IA
