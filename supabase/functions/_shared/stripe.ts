@@ -43,13 +43,15 @@ export const PRICE_AMOUNT_BRL: Record<string, number> = {
 };
 
 const PRODUCT_NAME_BY_LOOKUP: Record<string, string> = {
-  hypertrophy_monthly: 'EVORIA — Mensal',
-  hypertrophy_annual: 'EVORIA — Anual',
-  hypertrophy_new_protocol_once: 'EVORIA — Novo Protocolo (60 dias)',
-  hypertrophy_exam_analysis_once: 'EVORIA — Análise de Exames',
-  hypertrophy_hormone_60d_once: 'EVORIA — Análise + Protocolo Hormonal 60 dias',
-  hypertrophy_hormone_annual_once: 'EVORIA — Acompanhamento Hormonal Anual',
+  hypertrophy_monthly: 'Evoria Coach App — Mensal',
+  hypertrophy_annual: 'Evoria Coach App — Anual',
+  hypertrophy_new_protocol_once: 'Evoria Coach App — Novo Protocolo (60 dias)',
+  hypertrophy_exam_analysis_once: 'Evoria Coach App — Análise de Exames',
+  hypertrophy_hormone_60d_once: 'Evoria Coach App — Análise + Protocolo Hormonal 60 dias',
+  hypertrophy_hormone_annual_once: 'Evoria Coach App — Acompanhamento Hormonal Anual',
 };
+
+const PRODUCT_DESCRIPTION = 'Evoria Coach App - seu software personalizado para te guiar ao corpo dos sonhos!';
 
 const RECURRING_INTERVAL_BY_LOOKUP: Record<string, 'month' | 'year' | null> = {
   hypertrophy_monthly: 'month',
