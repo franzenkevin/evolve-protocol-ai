@@ -28,10 +28,10 @@ const PLANS = [
     code: "annual" as const,
     priceId: "hypertrophy_annual" as const,
     name: "Anual",
-    price: "R$ 997",
+    price: "R$ 897",
     period: "/ano",
-    badge: "ECONOMIZE 14%",
-    desc: "Equivale a R$ 83/mês",
+    badge: "ECONOMIZE 23%",
+    desc: "Equivale a R$ 75/mês",
   },
 ];
 
