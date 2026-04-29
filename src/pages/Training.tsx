@@ -805,8 +805,8 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                           )}
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          {/* Se reps já descreve múltiplas séries (ex: "10/8/falha", "8/8/8 cluster"), mostrar só reps. Senão, "Nx reps". */}
-                          {/[\/x]/i.test(String(ex.reps)) ? ex.reps : `${ex.sets}x${ex.reps}`} • Descanso: {ex.rest}
+                          {/* Se reps já descreve múltiplas séries (ex: "3 séries válidas...", "10/8/falha", "8/8/8 cluster"), mostrar só reps. Senão, "Nx reps". */}
+                          {/[\/x]|série|serie|valida|válida|falha/i.test(String(ex.reps)) ? ex.reps : `${ex.sets}x${ex.reps}`} • Descanso: {ex.rest}
                           {exTonnage > 0 && ` • ${exTonnage.toLocaleString("pt-BR")}kg`}
                         </p>
                       </div>
