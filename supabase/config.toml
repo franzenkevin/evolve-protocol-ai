@@ -1,16 +1,15 @@
 project_id = "wrxddctlyyiqgetiwdpu"
 
-[functions.sync-coupon]
-verify_jwt = true
-
-[functions.stripe-webhook]
-verify_jwt = false
-
-[functions.stripe-checkout]
-verify_jwt = false
-
-[functions.stripe-seed]
-verify_jwt = false
-
-[functions.process-email-queue]
-verify_jwt = true
+[functions]
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.process-email-queue]
+    verify_jwt = true
+  [functions.stripe-checkout]
+    verify_jwt = false
+  [functions.stripe-seed]
+    verify_jwt = false
+  [functions.stripe-webhook]
+    verify_jwt = false
+  [functions.sync-coupon]
+    verify_jwt = true
