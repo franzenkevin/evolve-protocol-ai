@@ -86,7 +86,7 @@ export async function resolveStripePrice(lookupKey: string): Promise<ResolvedPri
   if (!price && PRICE_AMOUNT_BRL[lookupKey] != null) {
     const productName = PRODUCT_NAME_BY_LOOKUP[lookupKey] || lookupKey;
     const interval = RECURRING_INTERVAL_BY_LOOKUP[lookupKey] ?? null;
-    const product = await stripe.products.create({ name: productName });
+    const product = await stripe.products.create({ name: productName, description: PRODUCT_DESCRIPTION });
     price = await stripe.prices.create({
       product: product.id,
       currency: 'brl',
