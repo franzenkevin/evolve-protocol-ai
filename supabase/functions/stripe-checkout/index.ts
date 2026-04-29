@@ -135,12 +135,13 @@ Deno.serve(async (req) => {
 
     const isAnnual = planCode === 'annual';
 
-    // Payment methods: cartão sempre. Pix + boleto somente no anual (Stripe BR só permite parcelamento e Pix
-    // em compras avista/recurring específicos — habilitamos Pix no anual).
+    // Métodos de pagamento:
+    // - Mensal (subscription): apenas cartão recorrente.
+    // - Anual (payment one-time): cartão (à vista ou parcelado até 12x sem juros) + Pix.
+    // - Demais avulsos (payment): apenas cartão.
     const paymentMethodTypes: string[] = ['card'];
     if (isAnnual && checkoutMode === 'payment') {
-      // Pix só funciona em modo "payment" (one-time). Para subscription anual, mantemos só cartão.
-      paymentMethodTypes.push('boleto');
+      paymentMethodTypes.push('pix');
     }
 
     const sessionParams: any = {
@@ -177,7 +178,7 @@ Deno.serve(async (req) => {
     if (checkoutMode === 'subscription') {
       sessionParams.subscription_data = { metadata: sharedMetadata };
     } else {
-      // Pagamento único: metadata + parcelamento (somente plano anual)
+      // Pagamento único: metadata + parcelamento sem juros (apenas no plano anual, até 12x)
       sessionParams.payment_intent_data = { metadata: sharedMetadata };
       if (isAnnual) {
         sessionParams.payment_method_options = {

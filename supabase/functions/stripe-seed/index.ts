@@ -28,13 +28,30 @@ async function ensurePrice(opts: {
   const stripe = getStripe();
   // 1) Check existing price by lookup_key
   const existing = await stripe.prices.list({ lookup_keys: [opts.lookupKey], limit: 1, expand: ['data.product'] });
-  let priceStatus: 'exists' | 'created' = 'exists';
+  let priceStatus: 'exists' | 'created' | 'replaced' = 'exists';
   let priceId: string | null = existing.data[0]?.id ?? null;
   let productId: string | null = null;
+  let needsReplace = false;
 
   if (existing.data[0]) {
     const prod: any = existing.data[0].product;
     productId = typeof prod === 'string' ? prod : prod?.id ?? null;
+
+    // Detect drift: amount changed OR recurring interval changed
+    const existingInterval = existing.data[0].recurring?.interval ?? null;
+    const desiredInterval = opts.recurring ?? null;
+    const amountChanged = existing.data[0].unit_amount !== opts.amount;
+    const intervalChanged = existingInterval !== desiredInterval;
+    if (amountChanged || intervalChanged) {
+      needsReplace = true;
+      // Deactivate old price + clear lookup_key so we can reuse it
+      try {
+        await stripe.prices.update(existing.data[0].id, { active: false, lookup_key: '' });
+      } catch (e) {
+        console.warn(`failed to deactivate old price ${existing.data[0].id}`, e);
+      }
+      priceId = null;
+    }
   }
 
   // 2) Find or create product
@@ -71,7 +88,7 @@ async function ensurePrice(opts: {
       ...(opts.recurring ? { recurring: { interval: opts.recurring } } : {}),
     });
     priceId = price.id;
-    priceStatus = 'created';
+    priceStatus = needsReplace ? 'replaced' : 'created';
   }
 
   return { lookup_key: opts.lookupKey, status: priceStatus, id: priceId, product: productId };
@@ -150,7 +167,8 @@ Deno.serve(async (req) => {
       productMetadataKey: 'hypertrophy_plan_annual',
       lookupKey: 'hypertrophy_annual',
       amount: 89700,
-      recurring: 'year',
+      // Anual é one-time (permite Pix + parcelamento até 12x sem juros).
+      // Renovação anual é tratada como nova compra após 12 meses.
     }));
     results.prices.push(await ensurePrice({
       productName: 'Evoria Coach App — Novo Protocolo (60 dias)',

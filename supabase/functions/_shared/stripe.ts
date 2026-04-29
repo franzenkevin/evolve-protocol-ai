@@ -55,7 +55,8 @@ const PRODUCT_DESCRIPTION = 'Evoria Coach App - seu software personalizado para 
 
 const RECURRING_INTERVAL_BY_LOOKUP: Record<string, 'month' | 'year' | null> = {
   hypertrophy_monthly: 'month',
-  hypertrophy_annual: 'year',
+  // Anual: pagamento único (one-time) para permitir pix + parcelamento até 12x sem juros.
+  hypertrophy_annual: null,
   hypertrophy_new_protocol_once: null,
   hypertrophy_exam_analysis_once: null,
   hypertrophy_hormone_60d_once: null,
