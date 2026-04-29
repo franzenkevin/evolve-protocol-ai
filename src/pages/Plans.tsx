@@ -14,24 +14,32 @@ import AssessmentTeaserCard from "@/components/AssessmentTeaserCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+// Cupom de lançamento aplicado automaticamente no checkout (precisa existir no Stripe).
+const LAUNCH_COUPON_MONTHLY = "LANCAMENTO";       // R$97 → R$29,90 (1º mês)
+const LAUNCH_COUPON_ANNUAL = "LANCAMENTOANUAL";   // R$897 → R$599 (anual)
+
 const PLANS = [
   {
     code: "monthly" as const,
     priceId: "hypertrophy_monthly" as const,
     name: "Mensal",
-    price: "R$ 97",
+    priceFull: "R$ 97",
+    priceLaunch: "R$ 29,90",
     period: "/mês",
-    badge: null,
-    desc: "Cancele a qualquer momento",
+    badge: "LANÇAMENTO",
+    desc: "no 1º mês, depois R$ 97/mês • Apenas no cartão de crédito",
+    launchCoupon: LAUNCH_COUPON_MONTHLY,
   },
   {
     code: "annual" as const,
     priceId: "hypertrophy_annual" as const,
     name: "Anual",
-    price: "R$ 897",
+    priceFull: "R$ 897",
+    priceLaunch: "R$ 599",
     period: "/ano",
-    badge: "ECONOMIZE 23%",
-    desc: "Equivale a R$ 75/mês",
+    badge: "MELHOR VALOR",
+    desc: "pagamento único — economia de R$ 298 • Cartão à vista, parcelado ou Pix",
+    launchCoupon: LAUNCH_COUPON_ANNUAL,
   },
 ];
 
