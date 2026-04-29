@@ -54,7 +54,9 @@ Deno.serve(async (req) => {
     }
 
     const stripe = getStripe();
-    const stripePriceId = await resolveStripePriceId(body.priceId);
+    const resolvedPrice = await resolveStripePrice(body.priceId);
+    const stripePriceId = resolvedPrice.id;
+    const checkoutMode = resolvedPrice.mode; // 'subscription' or 'payment'
     const planCode = PLAN_CODE_FROM_LOOKUP[body.priceId] || 'monthly';
     const env = getStripeEnv();
 
