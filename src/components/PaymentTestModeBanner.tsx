@@ -1,11 +1,8 @@
-// Detects test mode from Stripe publishable key prefix.
-// Note: we currently use the secret key on backend only; this banner shows in preview always.
-// Replace logic when a publishable key is available client-side.
+// Production mode: payments are LIVE via Stripe (BRL).
+// Banner is hidden by default. Set VITE_STRIPE_TEST=true to show it during dev.
 export function PaymentTestModeBanner() {
-  // In Lovable preview, payments are test by default. The badge stays visible
-  // until live keys are configured (set VITE_STRIPE_LIVE=true to hide).
-  const hideInLive = import.meta.env.VITE_STRIPE_LIVE === "true";
-  if (hideInLive) return null;
+  const showTest = import.meta.env.VITE_STRIPE_TEST === "true";
+  if (!showTest) return null;
   return (
     <div className="w-full bg-warning/15 border-b border-warning/30 px-4 py-2 text-center text-xs text-warning-foreground">
       🧪 Pagamentos em modo teste — use cartão{" "}
