@@ -764,6 +764,32 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
   }
 }`;
 
+    // ---- Normalização de objetivo (UI simplificada) → categoria interna usada pela metodologia ----
+    const rawGoal = String(profile.goal || "").toLowerCase();
+    let normalizedGoal = profile.goal || "Saúde geral";
+    if (rawGoal.includes("hipertrofia") || rawGoal.includes("ganho de massa")) {
+      normalizedGoal = "Hipertrofia";
+    } else if (rawGoal.includes("defini") || rawGoal.includes("emagre")) {
+      normalizedGoal = "Emagrecimento";
+    } else if (rawGoal.includes("saúde") || rawGoal.includes("saude")) {
+      normalizedGoal = "Saúde Geral";
+    }
+
+    // ---- Normalização de tipo de academia (UI simplificada) → categoria interna ----
+    const rawGym = String(profile.gym_type || "").toLowerCase();
+    let normalizedGym = profile.gym_type || "Academia completa";
+    let gymContext = "";
+    if (rawGym.includes("casa") || rawGym.includes("home")) {
+      normalizedGym = "Treino em casa";
+      gymContext = "Aluno treina EM CASA: usar peso corporal + elásticos. Aplicar a regra 'TREINO EM CASA' da metodologia (superior/inferior 2-4x ou fullbody). NÃO prescrever exercícios que dependam de máquina, polia, leg press, hack squat, smith, peck deck, cabos.";
+    } else if (rawGym.includes("básic") || rawGym.includes("basic") || rawGym.includes("limitada") || rawGym.includes("barra e halteres")) {
+      normalizedGym = "Academia limitada";
+      gymContext = "Aluno tem academia BÁSICA com BARRA + HALTERES + bancos (sem maquinário avançado, sem polias completas, sem peck deck, sem hack squat, sem cadeira extensora/flexora). Priorizar: supino com halteres/barra, agachamento livre/búlgaro, stiff, remada curvada, remada unilateral halteres, desenvolvimento halteres, elevação lateral, rosca direta/martelo, tríceps testa/francês, elevação pélvica com halter, panturrilha em pé com halter. EVITAR exercícios que dependam de máquina específica.";
+    } else {
+      normalizedGym = "Academia completa";
+      gymContext = "Aluno tem academia COMPLETA com maquinário (polias, leg press, hack squat, peck deck, cadeiras, smith, etc). Pode usar todo o banco de exercícios.";
+    }
+
     const userPrompt = `Gere um protocolo completo de treino e dieta para este aluno:
 
 ## DADOS DO ALUNO
@@ -772,11 +798,14 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
 - Idade: ${profile.age} anos
 - Peso: ${profile.weight}kg
 - Altura: ${profile.height}cm
-- Objetivo: ${profile.goal}
+- Objetivo (informado pelo aluno): ${profile.goal}
+- Objetivo (categoria interna p/ cálculos): ${normalizedGoal}
 - Nível de atividade: ${profile.activity_level}
 - NEAT (trabalho): ${profile.neat}
 - Experiência: ${profile.experience}
-- Tipo de academia: ${profile.gym_type}
+- Tipo de academia (informado pelo aluno): ${profile.gym_type}
+- Tipo de academia (categoria interna): ${normalizedGym}
+- Contexto da academia (RESPEITAR OBRIGATORIAMENTE): ${gymContext}
 - Lesões: ${profile.injuries || "Nenhuma"}
 - Atividades extras / contexto relevante: ${profile.extra_activities || "Nenhum"}
 - Dias de treino: ${profile.training_days}x/semana
@@ -810,7 +839,25 @@ INSTRUÇÃO FINAL: Antes de gerar o JSON, faça o checklist do COMITÊ DE 3 PROF
 3. **Nutricionista de performance flexível**: Os macros batem com o objetivo + composição corporal atual? As refeições usam alimentos PREFERIDOS? Há substituições viáveis? A frequência e o teto calórico das refeições livres estão calibrados ao objetivo? Há intolerância a respeitar (whey isolado, zero lactose etc)?
 4. **Consenso final**: cada item do JSON precisa ter pelo menos 1 menção curta no campo de notas conectando à AVALIAÇÃO CORPORAL ou às restrições do aluno.
 
-Só depois gere o JSON completo seguindo TODAS as regras da metodologia.`;
+Só depois gere o JSON completo seguindo TODAS as regras da metodologia.
+
+## ⚠️ REGRAS CRÍTICAS — RESPEITAR ESCOLHAS DO ALUNO (CHECKLIST FINAL OBRIGATÓRIO ANTES DE FECHAR O JSON)
+
+1. **DIVISÃO DE TREINO ESCOLHIDA**: Se o bloco "AJUSTES SOLICITADOS PELO ALUNO" cita uma "DIVISÃO ESCOLHIDA PELO ALUNO", a montagem do array "training" DEVE seguir EXATAMENTE essa variante (ordem dos focos por dia, número de inferiores/superiores, ênfases específicas). NÃO use a variante padrão ⭐ se o aluno escolheu outra. Antes de finalizar, releia o nome da variante escolhida e CONFIRME que cada day.muscleGroup/focus/splitCode bate com a estrutura dela.
+
+2. **HORÁRIOS DAS REFEIÇÕES (meal_schedule)**: O campo "time" de CADA refeição em diet.meals DEVE coincidir com os horários reais informados pelo aluno (campo meal_schedule acima). PROIBIDO usar 07:00/12:00/16:00/20:00 padrão se o aluno informou outros. Se o aluno informou "Café 09:30, Almoço 13:00, Lanche 16:30, Jantar 21:00" → use exatamente 09:30, 13:00, 16:30, 21:00 nos campos "time".
+
+3. **JEJUM INTERMITENTE**: Se intermittent_fasting=SIM e fasting_window foi informada (ex: "12h–20h"), TODAS as refeições (incluindo lanche e ceia) DEVEM ter "time" DENTRO dessa janela. Renomeie a primeira refeição para "Quebra de jejum". PROIBIDO ter qualquer refeição fora da janela. Antes de fechar o JSON, releia cada meal.time e CONFIRME que está dentro do intervalo.
+
+4. **TIPO DE ACADEMIA**: Releia o "Contexto da academia" acima e CONFIRME que NENHUM exercício prescrito viola a estrutura disponível (ex: leg press se estiver em casa; peck deck se for academia básica só com halteres).
+
+5. **ISOCALORIA DAS OPÇÕES (±5%) — CRÍTICO**: Para CADA refeição em diet.meals, as 3 entradas em "options" DEVEM ter:
+   - calorias totais dentro de **±5%** entre si
+   - proteína, carboidrato e gordura totais dentro de **±5%** entre si
+   - PROIBIDO ter Opção 1 com 600 kcal e Opção 2 com 850 kcal (variação > 5%).
+   - Antes de fechar o JSON, SOME os foods de cada option e VERIFIQUE. Se alguma option estiver fora da margem, AJUSTE as gramas dos foods (ex: aumentar/reduzir 10-30g do carbo ou proteína) até bater. Esse ajuste é OBRIGATÓRIO — não envie opções desbalanceadas.
+
+6. **CONFIRMAÇÕES PÓS-ANAMNESE**: Releia o bloco "AJUSTES SOLICITADOS PELO ALUNO NA CONFIRMAÇÃO" (se existir) e CONFIRME que cada justificativa do aluno (split, cardio, mealTimes) foi efetivamente aplicada no JSON. Se o aluno disse "prefiro almoçar 14h e jantar 22h" e você manteve 12h/20h, está ERRADO — refazer.`;
 
     console.log("Calling AI for protocol generation (fast mode)...");
 
