@@ -279,7 +279,7 @@ const Dashboard = () => {
 
         {/* Body Assessment */}
         {latestAssessment && (
-          <Card className={`p-4 card-gradient ${isFirstAssessmentView ? "border-primary glow animate-fade-in" : "border-border"}`}>
+          <Card id="body-assessment-card" className={`p-4 card-gradient scroll-mt-20 ${isFirstAssessmentView ? "border-primary glow animate-fade-in" : "border-border"}`}>
             {isFirstAssessmentView && (
               <Badge className="bg-primary text-primary-foreground text-[10px] mb-2">
                 Nova — leia sua análise completa
