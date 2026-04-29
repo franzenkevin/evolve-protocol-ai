@@ -124,32 +124,32 @@ Deno.serve(async (req) => {
       body.successUrl || `${origin}/checkout/success?plan=${planCode}`;
     const cancelUrl = body.cancelUrl || `${origin}/plans?canceled=1`;
 
+    const sharedMetadata = {
+      ...(userId ? { userId } : {}),
+      priceId: body.priceId,
+      planCode,
+      environment: env,
+      ...(body.referralCode ? { referralCode: body.referralCode } : {}),
+      ...(body.couponCode ? { couponCode: body.couponCode } : {}),
+    };
+
     const sessionParams: any = {
-      mode: 'subscription',
+      mode: checkoutMode,
       line_items: [{ price: stripePriceId, quantity: 1 }],
       success_url: successUrl.includes('{CHECKOUT_SESSION_ID}')
         ? successUrl
         : `${successUrl}${successUrl.includes('?') ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl,
       locale: 'pt-BR',
-      metadata: {
-        ...(userId ? { userId } : {}),
-        priceId: body.priceId,
-        planCode,
-        environment: env,
-        ...(body.referralCode ? { referralCode: body.referralCode } : {}),
-        ...(body.couponCode ? { couponCode: body.couponCode } : {}),
-      },
-      subscription_data: {
-        metadata: {
-          ...(userId ? { userId } : {}),
-          priceId: body.priceId,
-          planCode,
-          environment: env,
-          ...(body.referralCode ? { referralCode: body.referralCode } : {}),
-        },
-      },
+      metadata: sharedMetadata,
     };
+
+    if (checkoutMode === 'subscription') {
+      sessionParams.subscription_data = { metadata: sharedMetadata };
+    } else {
+      // One-time payment: attach metadata to the resulting PaymentIntent too.
+      sessionParams.payment_intent_data = { metadata: sharedMetadata };
+    }
 
     // If logged in, prefill email; otherwise let Stripe collect it
     if (userEmail) {
