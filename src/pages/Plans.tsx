@@ -222,17 +222,25 @@ export default function Plans() {
         </Card>
 
         {!isActive && (
-          <Card className="p-3 card-gradient border-border">
+          <Card className="p-3 card-gradient border-primary/30 bg-primary/5">
             <div className="flex items-center gap-2 mb-2">
               <Tag size={14} className="text-primary" />
-              <span className="text-xs font-semibold text-foreground">Cupom de indicação ou promoção</span>
+              <span className="text-xs font-semibold text-foreground">Cupom de indicação</span>
+              <Badge className="ml-auto bg-primary/20 text-primary border-primary/30 text-[9px]">
+                Desconto de lançamento já aplicado
+              </Badge>
             </div>
+            <p className="text-[10px] text-muted-foreground mb-2 leading-relaxed">
+              O desconto promocional <strong className="text-foreground">já está incluso</strong> nos preços abaixo.
+              Use este campo apenas se tiver um <strong className="text-foreground">cupom de indicação</strong> de outro aluno (10% extra).
+              Não é possível combinar com o desconto de lançamento — usar o cupom de indicação substitui o de lançamento.
+            </p>
             {appliedCoupon ? (
               <div className="flex items-center justify-between gap-2">
                 <div className="flex-1">
                   <p className="text-xs text-primary font-mono font-bold">{appliedCoupon.code}</p>
                   <p className="text-[10px] text-muted-foreground">
-                    {appliedCoupon.discount}% de desconto aplicado no checkout
+                    Cupom de indicação ativo: {appliedCoupon.discount}% de desconto (substitui o lançamento)
                   </p>
                 </div>
                 <Button
@@ -249,7 +257,7 @@ export default function Plans() {
                 <Input
                   value={couponInput}
                   onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                  placeholder="Digite o cupom"
+                  placeholder="Código de indicação"
                   className="h-9 text-sm uppercase"
                   maxLength={32}
                 />
@@ -270,6 +278,10 @@ export default function Plans() {
         <div className="grid grid-cols-1 gap-3">
           {PLANS.map((p) => {
             const isCurrent = isActive && subscription?.plan_type === p.code;
+            // Se aluno aplicou cupom de indicação, ele substitui o de lançamento (regra: 1 cupom por vez).
+            const useReferral = !!appliedCoupon && appliedCoupon.type === "referral";
+            const useManualPromo = !!appliedCoupon && appliedCoupon.type === "promo";
+            const showLaunchPrice = !appliedCoupon;
             return (
               <Card
                 key={p.code}
@@ -288,17 +300,37 @@ export default function Plans() {
                     </Badge>
                   )}
                 </div>
-                <p className="text-2xl font-bold text-foreground mb-3">
-                  {p.price}
-                  <span className="text-sm font-normal text-muted-foreground">{p.period}</span>
-                </p>
+                {showLaunchPrice ? (
+                  <div className="mb-3">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-sm text-muted-foreground line-through">{p.priceFull}</span>
+                      <span className="text-2xl font-bold text-foreground">{p.priceLaunch}</span>
+                      <span className="text-sm font-normal text-muted-foreground">{p.period}</span>
+                    </div>
+                    <p className="text-[10px] text-primary mt-0.5">Desconto de lançamento aplicado automaticamente</p>
+                  </div>
+                ) : (
+                  <div className="mb-3">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold text-foreground">{p.priceFull}</span>
+                      <span className="text-sm font-normal text-muted-foreground">{p.period}</span>
+                    </div>
+                    <p className="text-[10px] text-primary mt-0.5">
+                      {useReferral ? `Cupom de indicação ${appliedCoupon?.code} (-${appliedCoupon?.discount}%) será aplicado no checkout`
+                        : `Cupom ${appliedCoupon?.code} (-${appliedCoupon?.discount}%) será aplicado no checkout`}
+                    </p>
+                  </div>
+                )}
                 <Button
                   className="w-full glow"
                   disabled={checkoutLoading || isCurrent}
                   onClick={() => openCheckout({
                     priceId: p.priceId,
-                    referralCode: appliedCoupon?.type === "referral" ? appliedCoupon.code : undefined,
-                    couponCode: appliedCoupon?.type === "promo" ? appliedCoupon.code : undefined,
+                    // Prioridade: cupom manual (referral ou promo) > cupom de lançamento automático
+                    referralCode: useReferral ? appliedCoupon!.code : undefined,
+                    couponCode: useManualPromo
+                      ? appliedCoupon!.code
+                      : (!appliedCoupon ? p.launchCoupon : undefined),
                   })}
                 >
                   {checkoutLoading ? (
@@ -311,6 +343,11 @@ export default function Plans() {
                     `Assinar ${p.name}`
                   )}
                 </Button>
+                <p className="text-[10px] text-muted-foreground text-center mt-2">
+                  {p.code === "monthly"
+                    ? "Pagamento apenas no cartão de crédito"
+                    : "Cartão de crédito (à vista ou parcelado) ou Pix"}
+                </p>
               </Card>
             );
           })}
