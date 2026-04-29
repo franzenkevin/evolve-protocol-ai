@@ -1,7 +1,7 @@
 // Creates a Stripe Checkout Session. Email is collected by Stripe.
 // User account is provisioned by the webhook AFTER successful payment.
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { getStripe, resolveStripePriceId, getStripeEnv, PLAN_CODE_FROM_LOOKUP } from '../_shared/stripe.ts';
+import { getStripe, resolveStripePrice, getStripeEnv, PLAN_CODE_FROM_LOOKUP } from '../_shared/stripe.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
