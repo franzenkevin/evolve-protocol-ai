@@ -44,13 +44,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signUp = async (email: string, password: string, name: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { full_name: name },
+        emailRedirectTo: `${window.location.origin}/`,
       },
     });
+
+    // Supabase retorna sucesso mesmo se o email já existir (proteção de privacidade).
+    // Detectamos pelo identities vazio: usuário existente sem nova identidade criada.
+    if (!error && data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      return { error: { message: "Este e-mail já está cadastrado. Faça login ou recupere sua senha.", code: "email_exists" } as any };
+    }
+
+    // Mensagens em PT-BR para erros comuns
+    if (error) {
+      const msg = (error.message || "").toLowerCase();
+      if (msg.includes("already registered") || msg.includes("already been registered") || msg.includes("user already")) {
+        return { error: { ...error, message: "Este e-mail já está cadastrado. Faça login ou recupere sua senha." } };
+      }
+    }
+
     return { error };
   };
 
