@@ -16,7 +16,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { Dumbbell, Bell, Star, Send, Eye, CheckCircle, BookOpen, ArrowRight } from "lucide-react";
+import { Dumbbell, Star, Send, Eye, CheckCircle, BookOpen, ArrowRight } from "lucide-react";
+import HeaderNotifications from "@/components/HeaderNotifications";
 import { toast } from "sonner";
 
 const today = new Date().toISOString().split("T")[0];
@@ -41,7 +42,30 @@ const Dashboard = () => {
 
   const [starRating, setStarRating] = useState(0);
   const [ratingNotes, setRatingNotes] = useState("");
-  const [showAssessment, setShowAssessment] = useState(false);
+  // No primeiro acesso (logo após tutorial), abrir avaliação corporal expandida em destaque.
+  const assessmentSeenKey = user ? `hypertrophy:assessment:seen:${user.id}` : null;
+  const tourDoneKey = user ? `hypertrophy:tour:done:${user.id}` : null;
+  const isFirstAssessmentView =
+    !!assessmentSeenKey &&
+    typeof window !== "undefined" &&
+    localStorage.getItem(assessmentSeenKey) !== "1";
+  const tourDone =
+    !!tourDoneKey &&
+    typeof window !== "undefined" &&
+    localStorage.getItem(tourDoneKey) === "1";
+  const [showAssessment, setShowAssessment] = useState(isFirstAssessmentView && tourDone);
+
+  // Quando o tour fechar pela primeira vez, abrir a avaliação expandida automaticamente.
+  useEffect(() => {
+    if (!tour.open && tourDone && isFirstAssessmentView) {
+      setShowAssessment(true);
+      // Marca como visto após pequeno delay (usuário viu o destaque)
+      const t = setTimeout(() => {
+        if (assessmentSeenKey) localStorage.setItem(assessmentSeenKey, "1");
+      }, 4000);
+      return () => clearTimeout(t);
+    }
+  }, [tour.open, tourDone, isFirstAssessmentView, assessmentSeenKey]);
 
   // Sync today's rating when loaded
   useEffect(() => {
@@ -111,10 +135,7 @@ const Dashboard = () => {
             <p className="text-muted-foreground text-sm">Bem-vindo de volta</p>
             <h1 className="text-2xl font-heading font-bold text-foreground">{name}</h1>
           </div>
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell size={20} />
-            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary" />
-          </Button>
+          <HeaderNotifications onOpenTour={tour.restart} />
         </div>
 
         {/* Protocol summary with days left */}
@@ -258,10 +279,24 @@ const Dashboard = () => {
 
         {/* Body Assessment */}
         {latestAssessment && (
-          <Card className="p-4 card-gradient border-border">
+          <Card id="body-assessment-card" className={`p-4 card-gradient scroll-mt-20 ${isFirstAssessmentView ? "border-primary glow animate-fade-in" : "border-border"}`}>
+            {isFirstAssessmentView && (
+              <Badge className="bg-primary text-primary-foreground text-[10px] mb-2">
+                Nova — leia sua análise completa
+              </Badge>
+            )}
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-heading font-semibold text-foreground text-sm">Última Avaliação Corporal</h3>
-              <Button variant="ghost" size="sm" className="text-xs gap-1 text-primary" onClick={() => setShowAssessment(!showAssessment)}>
+              <h3 className="font-heading font-semibold text-foreground text-sm">Sua Avaliação Corporal Completa</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs gap-1 text-primary"
+                onClick={() => {
+                  const next = !showAssessment;
+                  setShowAssessment(next);
+                  if (next && assessmentSeenKey) localStorage.setItem(assessmentSeenKey, "1");
+                }}
+              >
                 <Eye size={12} />{showAssessment ? "Ocultar" : "Ver detalhes"}
               </Button>
             </div>

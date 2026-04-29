@@ -71,7 +71,7 @@ const STEPS: Step[] = [
     bullets: [
       "Pergunte: 'posso trocar agachamento por leg press?'",
       "Peça correção: 'minha lombar dói no terra'",
-      "Sem limite de mensagens",
+      "Disponível 24h, treinada com toda a metodologia",
     ],
   },
   {

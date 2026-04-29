@@ -130,6 +130,9 @@ const Chat = () => {
                 <p className="text-[11px] text-muted-foreground/80 mt-2 max-w-xs mx-auto">
                   Sou instruída com muita informação para te guiar.
                 </p>
+                <p className="text-[11px] text-primary/90 mt-2 max-w-xs mx-auto font-medium">
+                  Você tem até 30 mensagens por dia.
+                </p>
               </div>
             )}
             {messages.map((msg, i) => (
