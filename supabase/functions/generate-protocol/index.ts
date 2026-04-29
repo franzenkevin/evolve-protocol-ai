@@ -529,10 +529,13 @@ Regras de prescrição:
 Para CADA exercício prescrito (treino, mobilidade e cardio), incluir o campo "videoQuery" — uma string curta otimizada para busca no YouTube em português que retorne um bom tutorial de execução. Formato: "[nome do exercício] execução correta" ou "[nome do exercício] como fazer".
 
 ### NOTA DE DINÂMICA OBRIGATÓRIA:
-Para CADA dia de treino, gerar um campo "dynamicNotes" curto (2-3 frases) explicando:
-- A LÓGICA da ordem dos exercícios (por que esse antes daquele)
-- A dinâmica de execução (aquecimento → válidas próximas da falha → última à falha)
-- NÃO explicar tecnicamente cada exercício, só a dinâmica geral do treino
+Para CADA dia de treino, gerar um campo "dynamicNotes" (3-5 frases) que SEMPRE inclua, nesta ordem:
+1. **Lógica da ordem dos exercícios** (por que esse antes daquele — ex: "compostos pesados primeiro, depois isolados").
+2. **Dinâmica geral**: 2 aquecimentos (50% e 75%) → séries válidas próximas da falha → ÚLTIMA válida sempre na falha total.
+3. **Explicação do RIR**: "RIR = Reps In Reserve (repetições que sobrariam até falhar). RIR 1-2 significa parar quando faltariam 1 ou 2 reps para você não conseguir mais. A última série de cada exercício é SEMPRE RIR 0 = falha total."
+4. **Número de séries válidas é por exercício**: avisar que "a quantidade de séries válidas (1, 2 ou 3) varia por exercício conforme o protocolo — siga exatamente o que está prescrito em cada card; não some nem tire."
+5. **Aquecimento flexível**: avisar que "se já estiver bem aquecido (ex: já fez exercícios pesados do mesmo grupo logo antes), você PODE pular o aquecimento de 50% e ir direto pro de 75%. O ideal é fazer os dois, mas pular o de 50% quando o músculo já está pronto não compromete o treino."
+6. NÃO explicar tecnicamente cada exercício — apenas a dinâmica geral do treino.
 
 ## DIETA
 
