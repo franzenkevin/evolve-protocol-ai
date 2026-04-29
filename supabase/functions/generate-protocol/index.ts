@@ -404,43 +404,42 @@ Exemplos: Supino reto 3 séries → 3.0 peito + 1.5 deltoide frontal + 1.5 tríc
 
 ANTES DE FINALIZAR: faça internamente a SOMA semanal por músculo (incluindo os 0.5 dos acessórios) e CONFIRME que TODOS os músculos estão dentro da faixa min-max do sexo do aluno. Se algum músculo ficou abaixo do mínimo, ADICIONE série/exercício. Se passou do máximo, REMOVA.
 
-## ESQUEMA DE SÉRIES POR NÍVEL DE EXPERIÊNCIA (METODOLOGIA OFICIAL — NÃO INVENTAR)
+## ESQUEMA DE SÉRIES — PADRÃO ÚNICO PARA TODOS OS NÍVEIS (METODOLOGIA OFICIAL — NÃO INVENTAR)
 
-**INICIANTE — esquema fixo 10/8/falha:**
-Cada exercício segue ESTA estrutura exata (3 séries válidas):
-1. **1 aquecimento** — 50% da carga MÁXIMA já usada no aparelho, 15 reps, SEM chegar próximo da falha
-2. **Válida 1** — carga máxima já usada, ALVO 10 reps (próximo da falha). VAI ATÉ 10 SOMENTE.
-3. **Válida 2** — AUMENTA 10-20% da carga, ALVO 8 reps (próximo da falha)
-4. **Válida 3** — MANTÉM a carga da Válida 2, vai ATÉ A FALHA TOTAL (não consegue mais movimentar)
+⚠️ NÃO existe mais o esquema antigo "10/8/falha" para iniciantes. TODOS os níveis (iniciante, intermediário, avançado) seguem o MESMO formato; o que muda é o NÚMERO de séries válidas e o uso de técnicas avançadas.
 
-→ No JSON do exercício: \`"sets": 3, "reps": "10/8/falha"\` (formato exato, NÃO inventar variações).
+**Estrutura padrão de cada exercício:**
+1. **Aquecimento 1** — 50% da carga, 12 reps (ativação leve, longe da falha). PODE ser pulado SE o aluno já estiver bem aquecido (ex: já fez exercícios pesados do mesmo grupo antes), mas o IDEAL é fazer.
+2. **Aquecimento 2** — 75% da carga, 5-8 reps (preparação neural, recomendado SEMPRE).
+3. **Séries válidas** — próximas da falha (RIR 1-2 — ver definição abaixo). A ÚLTIMA é SEMPRE falha total.
 
-Exercícios totais: 4-5 por sessão.
+**Quantidade de séries válidas (depende do exercício e do nível):**
+- **INICIANTE**: predominantemente 1 a 2 válidas por exercício. Foco em aprender execução com pouca falha acumulada.
+- **INTERMEDIÁRIO**: 2 a 3 válidas por exercício.
+- **AVANÇADO**: 2 a 3 válidas por exercício, com mais técnicas avançadas pontuais.
+- O número EXATO é decisão do treinador por exercício/objetivo (compostos pesados podem ter mais válidas; isolados de finalização menos).
 
-**INTERMEDIÁRIO + AVANÇADO — 2 aquecimentos + 2 a 3 válidas (última SEMPRE falha):**
-Cada exercício:
-1. **Aquecimento 1** — 50% da carga, 12 reps
-2. **Aquecimento 2** — 75% da carga, 5-8 reps (preparação neural)
-3. **2 ou 3 séries válidas** — próximas da falha (RIR 1-2), zona alvo 8-12 reps. A ÚLTIMA é SEMPRE falha total.
+**FORMATO OBRIGATÓRIO do campo "reps" (escolher exatamente um destes padrões legíveis):**
+- 1 série válida: \`"reps": "1 série válida de 8-12 reps"\`
+- 1 série até falha: \`"reps": "1 série válida até a falha (8-12 reps)"\`
+- 2 séries válidas: \`"reps": "2 séries válidas de 8-12 reps (última na falha)"\`
+- 3 séries válidas: \`"reps": "3 séries válidas de 8-12 reps (última na falha)"\`
+- Outras zonas: substitua "8-12" pela zona apropriada — 5-9 (força/composto pesado), 6-10 ou 8-12 (hipertrofia), 10-15 ou 15-20 (resistência/isolados leves).
+- Para EXERCÍCIOS COM TÉCNICA, acrescentar a técnica entre parênteses no final:
+  - Cluster: \`"reps": "2 séries válidas de 8/8/8 reps (cluster set)"\`
+  - Back-off: \`"reps": "3 séries válidas de 8-12 reps (última na falha) + back-off"\`
+  - Pico de contração: \`"reps": "3 séries válidas de 8-12 reps (última na falha, pico 2s)"\`
+  - Bi-set: \`"reps": "3 séries válidas de 8-12 reps (última na falha, bi-set com [Nome do exercício parceiro])"\`
 
-→ No JSON do exercício: \`"sets": 3, "reps": "8-12/8-12/falha"\` OU \`"sets": 2, "reps": "8-12/falha"\` — texto curto e claro, sem parênteses explicativos.
+⚠️ REGRAS CRÍTICAS DE FORMATAÇÃO:
+- O campo "reps" agora é uma FRASE LEGÍVEL para o aluno leigo (ex: "2 séries válidas de 8-12 reps"). PROIBIDO usar formatos antigos do tipo "10/8/falha", "8-12/8-12/falha", "3x6-10".
+- O campo "sets" deve bater com o número de séries válidas declarado no "reps" (ex: reps "2 séries válidas..." → sets: 2). Aquecimentos NÃO contam em "sets".
 
-Para EXERCÍCIOS COM TÉCNICA, use formato dedicado no campo "reps":
-- Cluster set: \`"reps": "8/8/8 cluster"\` (NÃO escrever "3x" antes — o número de blocos já está claro)
-- Back-off: \`"reps": "8-12/8-12/falha + back-off"\`
-- Pico de contração: \`"reps": "8-12/8-12/falha (pico 2s)"\`
-- Bi-set: \`"reps": "8-12/8-12/falha (bi-set com X)"\` e citar o exercício parceiro
-
-⚠️ REGRA CRÍTICA DE FORMATAÇÃO DO CAMPO "reps":
-- NUNCA prefixe com "Nx" quando o reps já lista múltiplas séries separadas por "/" (ex: "10/8/falha", "8/8/8 cluster"). O usuário é LEIGO — vai achar que precisa fazer 3 vezes os 3 valores.
-- O campo "sets" é apenas metadado para contagem de volume. A UI esconde o "Nx" automaticamente quando o reps já descreve cada série.
-- Para UMA série apenas, use \`"reps": "8-12"\` ou \`"reps": "falha"\`.
-
-Exercícios totais: Intermediário 5-7/sessão | Avançado 6-8/sessão.
+Exercícios totais: Iniciante 4-5/sessão | Intermediário 5-7/sessão | Avançado 6-8/sessão.
 
 ## REGRA DE PROGRESSÃO CONTÍNUA (incluir SEMPRE em dynamicNotes do dia):
 
-"Na série de FALHA: se passou de 12 reps → SUBA carga na próxima sessão. Se ficou abaixo de 8 reps → REDUZA carga. Se ficou entre 8 e 12 → progrida pelo menos 1 rep por semana até chegar em 12, depois suba a carga."
+"Na série de FALHA: se passou do TOPO da zona-alvo de reps → SUBA carga na próxima sessão. Se ficou abaixo do PISO → REDUZA carga. Se ficou dentro da zona → progrida pelo menos 1 rep por semana até chegar no topo, depois suba a carga."
 
 ## TÉCNICAS AVANÇADAS (uso PARCIMONIOSO — não em todos os exercícios)
 
