@@ -276,10 +276,24 @@ const Dashboard = () => {
 
         {/* Body Assessment */}
         {latestAssessment && (
-          <Card className="p-4 card-gradient border-border">
+          <Card className={`p-4 card-gradient ${isFirstAssessmentView ? "border-primary glow animate-fade-in" : "border-border"}`}>
+            {isFirstAssessmentView && (
+              <Badge className="bg-primary text-primary-foreground text-[10px] mb-2">
+                Nova — leia sua análise completa
+              </Badge>
+            )}
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-heading font-semibold text-foreground text-sm">Última Avaliação Corporal</h3>
-              <Button variant="ghost" size="sm" className="text-xs gap-1 text-primary" onClick={() => setShowAssessment(!showAssessment)}>
+              <h3 className="font-heading font-semibold text-foreground text-sm">Sua Avaliação Corporal Completa</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs gap-1 text-primary"
+                onClick={() => {
+                  const next = !showAssessment;
+                  setShowAssessment(next);
+                  if (next && assessmentSeenKey) localStorage.setItem(assessmentSeenKey, "1");
+                }}
+              >
                 <Eye size={12} />{showAssessment ? "Ocultar" : "Ver detalhes"}
               </Button>
             </div>
