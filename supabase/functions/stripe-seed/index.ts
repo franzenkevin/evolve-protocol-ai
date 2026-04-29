@@ -150,7 +150,8 @@ Deno.serve(async (req) => {
       productMetadataKey: 'hypertrophy_plan_annual',
       lookupKey: 'hypertrophy_annual',
       amount: 89700,
-      recurring: 'year',
+      // Anual é one-time (permite Pix + parcelamento até 12x sem juros).
+      // Renovação anual é tratada como nova compra após 12 meses.
     }));
     results.prices.push(await ensurePrice({
       productName: 'Evoria Coach App — Novo Protocolo (60 dias)',
