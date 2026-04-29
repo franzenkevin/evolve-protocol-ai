@@ -17,12 +17,12 @@ const corsHeaders = {
 }
 
 const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: 'Confirm your email',
-  invite: "You've been invited",
-  magiclink: 'Your login link',
-  recovery: 'Reset your password',
-  email_change: 'Confirm your new email',
-  reauthentication: 'Your verification code',
+  signup: 'Confirme seu e-mail — Evoria Coach',
+  invite: 'Você foi convidado(a) — Evoria Coach',
+  magiclink: 'Seu link de acesso — Evoria Coach',
+  recovery: 'Redefinir sua senha — Evoria Coach',
+  email_change: 'Confirme seu novo e-mail — Evoria Coach',
+  reauthentication: 'Seu código de verificação — Evoria Coach',
 }
 
 // Template mapping
