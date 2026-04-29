@@ -133,8 +133,19 @@ Deno.serve(async (req) => {
       ...(body.couponCode ? { couponCode: body.couponCode } : {}),
     };
 
+    const isAnnual = planCode === 'annual';
+
+    // Payment methods: cartão sempre. Pix + boleto somente no anual (Stripe BR só permite parcelamento e Pix
+    // em compras avista/recurring específicos — habilitamos Pix no anual).
+    const paymentMethodTypes: string[] = ['card'];
+    if (isAnnual && checkoutMode === 'payment') {
+      // Pix só funciona em modo "payment" (one-time). Para subscription anual, mantemos só cartão.
+      paymentMethodTypes.push('boleto');
+    }
+
     const sessionParams: any = {
       mode: checkoutMode,
+      payment_method_types: paymentMethodTypes,
       line_items: [{ price: stripePriceId, quantity: 1 }],
       success_url: successUrl.includes('{CHECKOUT_SESSION_ID}')
         ? successUrl
@@ -142,13 +153,39 @@ Deno.serve(async (req) => {
       cancel_url: cancelUrl,
       locale: 'pt-BR',
       metadata: sharedMetadata,
+      // Coleta dados fiscais para emissão de nota (CPF/CNPJ via tax_id, endereço completo, nome)
+      billing_address_collection: 'required',
+      phone_number_collection: { enabled: true },
+      tax_id_collection: { enabled: true },
+      custom_fields: [
+        {
+          key: 'cpf',
+          label: { type: 'custom', custom: 'CPF (para emissão de nota fiscal)' },
+          type: 'text',
+          text: { minimum_length: 11, maximum_length: 18 },
+          optional: false,
+        },
+        {
+          key: 'confirm_email',
+          label: { type: 'custom', custom: 'Confirme seu e-mail' },
+          type: 'text',
+          optional: false,
+        },
+      ],
     };
 
     if (checkoutMode === 'subscription') {
       sessionParams.subscription_data = { metadata: sharedMetadata };
     } else {
-      // One-time payment: attach metadata to the resulting PaymentIntent too.
+      // Pagamento único: metadata + parcelamento (somente plano anual)
       sessionParams.payment_intent_data = { metadata: sharedMetadata };
+      if (isAnnual) {
+        sessionParams.payment_method_options = {
+          card: {
+            installments: { enabled: true },
+          },
+        };
+      }
     }
 
     // If logged in, prefill email; otherwise let Stripe collect it
