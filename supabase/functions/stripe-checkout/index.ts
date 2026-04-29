@@ -137,10 +137,10 @@ Deno.serve(async (req) => {
 
     // Métodos de pagamento:
     // - Mensal (subscription): apenas cartão recorrente.
-    // - Anual (payment one-time): cartão (à vista ou parcelado até 12x sem juros) + Pix.
-    // - Demais avulsos (payment): apenas cartão.
+    // - Demais (payment one-time: anual, exames, novo protocolo, hormonal):
+    //   cartão (à vista ou parcelado até 12x sem juros) + Pix. Sem boleto.
     const paymentMethodTypes: string[] = ['card'];
-    if (isAnnual && checkoutMode === 'payment') {
+    if (checkoutMode === 'payment') {
       paymentMethodTypes.push('pix');
     }
 
@@ -178,15 +178,13 @@ Deno.serve(async (req) => {
     if (checkoutMode === 'subscription') {
       sessionParams.subscription_data = { metadata: sharedMetadata };
     } else {
-      // Pagamento único: metadata + parcelamento sem juros (apenas no plano anual, até 12x)
+      // Pagamento único: metadata + parcelamento sem juros até 12x para todos os one-time.
       sessionParams.payment_intent_data = { metadata: sharedMetadata };
-      if (isAnnual) {
-        sessionParams.payment_method_options = {
-          card: {
-            installments: { enabled: true },
-          },
-        };
-      }
+      sessionParams.payment_method_options = {
+        card: {
+          installments: { enabled: true },
+        },
+      };
     }
 
     // If logged in, prefill email; otherwise let Stripe collect it
