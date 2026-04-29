@@ -41,7 +41,25 @@ const Dashboard = () => {
 
   const [starRating, setStarRating] = useState(0);
   const [ratingNotes, setRatingNotes] = useState("");
-  const [showAssessment, setShowAssessment] = useState(false);
+  // No primeiro acesso (logo após tutorial), abrir avaliação corporal expandida em destaque.
+  const assessmentSeenKey = user ? `hypertrophy:assessment:seen:${user.id}` : null;
+  const tourDoneKey = user ? `hypertrophy:tour:done:${user.id}` : null;
+  const isFirstAssessmentView =
+    !!assessmentSeenKey &&
+    typeof window !== "undefined" &&
+    localStorage.getItem(assessmentSeenKey) !== "1";
+  const tourDone =
+    !!tourDoneKey &&
+    typeof window !== "undefined" &&
+    localStorage.getItem(tourDoneKey) === "1";
+  const [showAssessment, setShowAssessment] = useState(isFirstAssessmentView && tourDone);
+
+  // Quando o tour fechar pela primeira vez, abrir a avaliação expandida automaticamente.
+  useEffect(() => {
+    if (!tour.open && tourDone && isFirstAssessmentView) {
+      setShowAssessment(true);
+    }
+  }, [tour.open, tourDone, isFirstAssessmentView]);
 
   // Sync today's rating when loaded
   useEffect(() => {
