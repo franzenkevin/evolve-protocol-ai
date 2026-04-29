@@ -135,10 +135,7 @@ const Dashboard = () => {
             <p className="text-muted-foreground text-sm">Bem-vindo de volta</p>
             <h1 className="text-2xl font-heading font-bold text-foreground">{name}</h1>
           </div>
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell size={20} />
-            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary" />
-          </Button>
+          <HeaderNotifications onOpenTour={tour.restart} />
         </div>
 
         {/* Protocol summary with days left */}
