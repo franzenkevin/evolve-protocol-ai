@@ -72,9 +72,10 @@ export const SectionPricing = () => {
               <span className="text-base text-muted-foreground line-through">R$97</span>
               <span className="text-4xl font-heading font-bold text-foreground">R$29,90</span>
             </div>
-            <p className="text-xs text-muted-foreground mb-6">
+            <p className="text-xs text-muted-foreground mb-1">
               no primeiro mês, depois R$97/mês
             </p>
+            <p className="text-[10px] text-primary mb-6">Apenas no cartão de crédito</p>
 
             <ul className="space-y-2.5 mb-6 flex-1">
               {MONTHLY_BULLETS.map((b) => (
