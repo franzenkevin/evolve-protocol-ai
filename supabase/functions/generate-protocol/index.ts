@@ -706,12 +706,12 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
       "muscleGroup": "Push (Peito + Ombros + Tríceps)",
       "weekday": "Segunda",
       "splitCode": "A",
-      "dynamicNotes": "Comece pelo composto pesado, depois isole. ESQUEMA: aquecimento 50%×15 + V1 (10 reps com sua carga máxima) + V2 (+10-20% de carga, 8 reps) + V3 (mesma carga da V2, FALHA TOTAL). PROGRESSÃO: na falha passou de 12 → sobe carga; abaixo de 8 → reduz; entre 8-12 → +1 rep/semana até chegar em 12.",
+      "dynamicNotes": "Ordem: começa pelo composto pesado (supino) e termina nos isolados. Dinâmica: 2 aquecimentos (50% × 12 reps + 75% × 5-8 reps) → séries válidas próximas da falha → ÚLTIMA válida SEMPRE na falha total. RIR = Reps In Reserve (reps que sobrariam até falhar); RIR 1-2 = pare quando faltariam 1 a 2 reps; a última série é sempre RIR 0 (falha). A quantidade de séries válidas (1, 2 ou 3) varia por exercício — siga o que está prescrito em cada card. Aquecimento flexível: se já estiver bem aquecido pode pular o de 50% e ir direto pro de 75%, mas o ideal é fazer os dois. PROGRESSÃO: na falha passou do TOPO da zona-alvo → sobe carga; abaixo do PISO → reduz; dentro da zona → +1 rep/semana até o topo, depois sobe a carga.",
       "mobility": [
         { "name": "Alongamento peitoral na parede", "type": "alongamento", "duration": "2x 30s cada lado", "target": "Ombros protraídos / hipercifose", "videoQuery": "Alongamento peitoral na parede execução" }
       ],
       "exercises": [
-        { "id": "0-0", "name": "Supino reto barra", "sets": 3, "reps": "10/8/falha", "rest": "90s", "technique": "standard", "primaryMuscle": "peito", "accessoryMuscle": "deltoide_frontal", "videoQuery": "Supino reto barra execução correta", "done": false }
+        { "id": "0-0", "name": "Supino reto barra", "sets": 3, "reps": "3 séries válidas de 8-12 reps (última na falha)", "rest": "90s", "technique": "standard", "primaryMuscle": "peito", "accessoryMuscle": "deltoide_frontal", "videoQuery": "Supino reto barra execução correta", "done": false }
       ],
       "cardio": null
     }
