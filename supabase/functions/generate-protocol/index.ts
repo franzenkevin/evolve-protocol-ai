@@ -424,7 +424,19 @@ ANTES DE FINALIZAR: faça internamente a SOMA semanal por músculo (incluindo os
 - 1 série até falha: \`"reps": "1 série válida até a falha (8-12 reps)"\`
 - 2 séries válidas: \`"reps": "2 séries válidas de 8-12 reps (última na falha)"\`
 - 3 séries válidas: \`"reps": "3 séries válidas de 8-12 reps (última na falha)"\`
-- Outras zonas: substitua "8-12" pela zona apropriada — 5-9 (força/composto pesado), 6-10 ou 8-12 (hipertrofia), 10-15 ou 15-20 (resistência/isolados leves).
+- ⚠️ ZONAS DE REPS PERMITIDAS (APENAS estas 4 faixas — PROIBIDO usar qualquer outra como 6-8, 12-15, 15-20, 4-6 etc.):
+  • **5-9 reps** — força/compostos pesados (agachamento livre, levantamento terra, supino reto barra, desenvolvimento militar). Indicada para AVANÇADOS e INTERMEDIÁRIOS em ciclos de força; raramente para iniciantes.
+  • **6-10 reps** — hipertrofia mecânica (compostos médios e máquinas pesadas). Boa para INTERMEDIÁRIOS e AVANÇADOS em fase de força-hipertrofia.
+  • **8-12 reps** — hipertrofia clássica (faixa padrão para a MAIORIA dos exercícios e dos alunos, especialmente INICIANTES).
+  • **10-15 reps** — hipertrofia metabólica/isolados (elevação lateral, panturrilha, bíceps/tríceps de finalização, glúteo isolado, posteriores, abdômen).
+- PERIODIZAÇÃO POR NÍVEL/OBJETIVO (aplicar com critério técnico — Schoenfeld, Israetel, Helms):
+  • INICIANTE: predominantemente **8-12** e **10-15**. Evitar 5-9 (técnica ainda imatura para cargas máximas).
+  • INTERMEDIÁRIO: mix das 4 zonas — compostos pesados em **6-10** ou **5-9**, principais em **8-12**, isolados em **10-15**.
+  • AVANÇADO: as 4 zonas conforme ondulação do ciclo, incluindo **5-9** em compostos.
+  • OBJETIVO HIPERTROFIA: priorizar **8-12** e **6-10**, com **10-15** em isolados e **5-9** pontual em compostos.
+  • OBJETIVO DEFINIÇÃO/EMAGRECIMENTO: priorizar **8-12** e **10-15** (densidade metabólica), manter **6-10** em compostos para preservar massa.
+  • OBJETIVO SAÚDE GERAL: priorizar **8-12** e **10-15**, evitar **5-9**.
+- Dentro de um mesmo treino, VARIE as zonas entre os exercícios (não usar 8-12 em todos). Entre ciclos (v2, v3) alterne a zona dominante para o mesmo exercício.
 - Para EXERCÍCIOS COM TÉCNICA, acrescentar a técnica entre parênteses no final:
   - Cluster: \`"reps": "2 séries válidas de 8/8/8 reps (cluster set)"\`
   - Back-off: \`"reps": "3 séries válidas de 8-12 reps (última na falha) + back-off"\`
@@ -433,6 +445,7 @@ ANTES DE FINALIZAR: faça internamente a SOMA semanal por músculo (incluindo os
 
 ⚠️ REGRAS CRÍTICAS DE FORMATAÇÃO:
 - O campo "reps" agora é uma FRASE LEGÍVEL para o aluno leigo (ex: "2 séries válidas de 8-12 reps"). PROIBIDO usar formatos antigos do tipo "10/8/falha", "8-12/8-12/falha", "3x6-10".
+- A zona de reps DEVE ser EXATAMENTE uma destas 4: **5-9**, **6-10**, **8-12** ou **10-15**. PROIBIDO inventar outras (ex: 6-8, 12-15, 15-20, 4-6, 8-10).
 - O campo "sets" deve bater com o número de séries válidas declarado no "reps" (ex: reps "2 séries válidas..." → sets: 2). Aquecimentos NÃO contam em "sets".
 
 Exercícios totais: Iniciante 4-5/sessão | Intermediário 5-7/sessão | Avançado 6-8/sessão.
