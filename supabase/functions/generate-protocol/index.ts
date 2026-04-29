@@ -445,6 +445,7 @@ ANTES DE FINALIZAR: faça internamente a SOMA semanal por músculo (incluindo os
 
 ⚠️ REGRAS CRÍTICAS DE FORMATAÇÃO:
 - O campo "reps" agora é uma FRASE LEGÍVEL para o aluno leigo (ex: "2 séries válidas de 8-12 reps"). PROIBIDO usar formatos antigos do tipo "10/8/falha", "8-12/8-12/falha", "3x6-10".
+- A zona de reps DEVE ser EXATAMENTE uma destas 4: **5-9**, **6-10**, **8-12** ou **10-15**. PROIBIDO inventar outras (ex: 6-8, 12-15, 15-20, 4-6, 8-10).
 - O campo "sets" deve bater com o número de séries válidas declarado no "reps" (ex: reps "2 séries válidas..." → sets: 2). Aquecimentos NÃO contam em "sets".
 
 Exercícios totais: Iniciante 4-5/sessão | Intermediário 5-7/sessão | Avançado 6-8/sessão.
