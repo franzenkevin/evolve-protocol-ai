@@ -798,11 +798,14 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
 - Idade: ${profile.age} anos
 - Peso: ${profile.weight}kg
 - Altura: ${profile.height}cm
-- Objetivo: ${profile.goal}
+- Objetivo (informado pelo aluno): ${profile.goal}
+- Objetivo (categoria interna p/ cálculos): ${normalizedGoal}
 - Nível de atividade: ${profile.activity_level}
 - NEAT (trabalho): ${profile.neat}
 - Experiência: ${profile.experience}
-- Tipo de academia: ${profile.gym_type}
+- Tipo de academia (informado pelo aluno): ${profile.gym_type}
+- Tipo de academia (categoria interna): ${normalizedGym}
+- Contexto da academia (RESPEITAR OBRIGATORIAMENTE): ${gymContext}
 - Lesões: ${profile.injuries || "Nenhuma"}
 - Atividades extras / contexto relevante: ${profile.extra_activities || "Nenhum"}
 - Dias de treino: ${profile.training_days}x/semana
