@@ -2,7 +2,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-const APP_BUILD_ID = "2026-04-29T19:45Z";
+const APP_BUILD_ID = "2026-04-29T22:30Z";
 const BUILD_STORAGE_KEY = "app-build-id";
 const RELOAD_FLAG = `app-build-reloaded-${APP_BUILD_ID}`;
 
