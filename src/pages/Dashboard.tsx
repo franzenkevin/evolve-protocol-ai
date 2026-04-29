@@ -58,8 +58,13 @@ const Dashboard = () => {
   useEffect(() => {
     if (!tour.open && tourDone && isFirstAssessmentView) {
       setShowAssessment(true);
+      // Marca como visto após pequeno delay (usuário viu o destaque)
+      const t = setTimeout(() => {
+        if (assessmentSeenKey) localStorage.setItem(assessmentSeenKey, "1");
+      }, 4000);
+      return () => clearTimeout(t);
     }
-  }, [tour.open, tourDone, isFirstAssessmentView]);
+  }, [tour.open, tourDone, isFirstAssessmentView, assessmentSeenKey]);
 
   // Sync today's rating when loaded
   useEffect(() => {
