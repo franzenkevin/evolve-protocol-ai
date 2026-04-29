@@ -764,6 +764,32 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
   }
 }`;
 
+    // ---- Normalização de objetivo (UI simplificada) → categoria interna usada pela metodologia ----
+    const rawGoal = String(profile.goal || "").toLowerCase();
+    let normalizedGoal = profile.goal || "Saúde geral";
+    if (rawGoal.includes("hipertrofia") || rawGoal.includes("ganho de massa")) {
+      normalizedGoal = "Hipertrofia";
+    } else if (rawGoal.includes("defini") || rawGoal.includes("emagre")) {
+      normalizedGoal = "Emagrecimento";
+    } else if (rawGoal.includes("saúde") || rawGoal.includes("saude")) {
+      normalizedGoal = "Saúde Geral";
+    }
+
+    // ---- Normalização de tipo de academia (UI simplificada) → categoria interna ----
+    const rawGym = String(profile.gym_type || "").toLowerCase();
+    let normalizedGym = profile.gym_type || "Academia completa";
+    let gymContext = "";
+    if (rawGym.includes("casa") || rawGym.includes("home")) {
+      normalizedGym = "Treino em casa";
+      gymContext = "Aluno treina EM CASA: usar peso corporal + elásticos. Aplicar a regra 'TREINO EM CASA' da metodologia (superior/inferior 2-4x ou fullbody). NÃO prescrever exercícios que dependam de máquina, polia, leg press, hack squat, smith, peck deck, cabos.";
+    } else if (rawGym.includes("básic") || rawGym.includes("basic") || rawGym.includes("limitada") || rawGym.includes("barra e halteres")) {
+      normalizedGym = "Academia limitada";
+      gymContext = "Aluno tem academia BÁSICA com BARRA + HALTERES + bancos (sem maquinário avançado, sem polias completas, sem peck deck, sem hack squat, sem cadeira extensora/flexora). Priorizar: supino com halteres/barra, agachamento livre/búlgaro, stiff, remada curvada, remada unilateral halteres, desenvolvimento halteres, elevação lateral, rosca direta/martelo, tríceps testa/francês, elevação pélvica com halter, panturrilha em pé com halter. EVITAR exercícios que dependam de máquina específica.";
+    } else {
+      normalizedGym = "Academia completa";
+      gymContext = "Aluno tem academia COMPLETA com maquinário (polias, leg press, hack squat, peck deck, cadeiras, smith, etc). Pode usar todo o banco de exercícios.";
+    }
+
     const userPrompt = `Gere um protocolo completo de treino e dieta para este aluno:
 
 ## DADOS DO ALUNO
