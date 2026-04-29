@@ -58,19 +58,62 @@ Deno.serve(async (req) => {
     const planCode = PLAN_CODE_FROM_LOOKUP[body.priceId] || 'monthly';
     const env = getStripeEnv();
 
-    // Resolve promo code if provided
+    // Resolve promo/coupon code: priority is manual couponCode, then referralCode (auto-created if missing).
     let discounts: any[] | undefined;
-    if (body.couponCode) {
+
+    async function resolvePromotionCode(code: string): Promise<string | null> {
       try {
-        const promos = await stripe.promotionCodes.list({
-          code: body.couponCode,
-          active: true,
-          limit: 1,
-        });
-        const promo = promos.data[0];
-        if (promo) discounts = [{ promotion_code: promo.id }];
+        const list = await stripe.promotionCodes.list({ code, active: true, limit: 1 });
+        return list.data[0]?.id ?? null;
       } catch (e) {
         console.warn('promotion_code lookup failed', e);
+        return null;
+      }
+    }
+
+    if (body.couponCode) {
+      const promoId = await resolvePromotionCode(body.couponCode);
+      if (promoId) discounts = [{ promotion_code: promoId }];
+      else console.warn(`couponCode "${body.couponCode}" not found in Stripe — checkout will proceed without discount`);
+    } else if (body.referralCode) {
+      // Validate referral exists in our DB
+      const serviceClient = createClient(
+        supabaseUrl,
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      );
+      const { data: ref } = await serviceClient
+        .from('referrals')
+        .select('referral_code, user_id')
+        .eq('referral_code', body.referralCode.toUpperCase())
+        .maybeSingle();
+
+      if (ref) {
+        const refCode = ref.referral_code;
+        // Try to find existing promotion_code with same code; create if missing
+        let promoId = await resolvePromotionCode(refCode);
+        if (!promoId) {
+          try {
+            const coupon = await stripe.coupons.create({
+              percent_off: 10,
+              duration: 'once',
+              name: `Indicação ${refCode}`,
+              metadata: { type: 'referral', referrer_user_id: ref.user_id },
+            });
+            const promo = await stripe.promotionCodes.create({
+              coupon: coupon.id,
+              code: refCode,
+              active: true,
+              metadata: { type: 'referral', referrer_user_id: ref.user_id },
+            });
+            promoId = promo.id;
+            console.log(`auto-created referral promotion_code in Stripe: ${refCode}`);
+          } catch (e) {
+            console.error('failed to auto-create referral promotion_code', e);
+          }
+        }
+        if (promoId) discounts = [{ promotion_code: promoId }];
+      } else {
+        console.warn(`referralCode "${body.referralCode}" not found in DB`);
       }
     }
 
