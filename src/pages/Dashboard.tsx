@@ -16,7 +16,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { Dumbbell, Bell, Star, Send, Eye, CheckCircle, BookOpen, ArrowRight } from "lucide-react";
+import { Dumbbell, Star, Send, Eye, CheckCircle, BookOpen, ArrowRight } from "lucide-react";
+import HeaderNotifications from "@/components/HeaderNotifications";
 import { toast } from "sonner";
 
 const today = new Date().toISOString().split("T")[0];
