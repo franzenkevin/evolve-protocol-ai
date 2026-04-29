@@ -56,11 +56,17 @@ const Signup = () => {
     setLoading(false);
 
     if (signUpError) {
+      const isExisting = signUpError.code === "email_exists" || /já está cadastrado/i.test(signUpError.message || "");
       toast({
-        title: "Erro ao cadastrar",
-        description: signUpError.message,
+        title: isExisting ? "E-mail já cadastrado" : "Erro ao cadastrar",
+        description: isExisting
+          ? "Já existe uma conta com este e-mail. Vá para o login ou recupere sua senha."
+          : signUpError.message,
         variant: "destructive",
       });
+      if (isExisting) {
+        setTimeout(() => navigate(`/login?email=${encodeURIComponent(email)}`), 1500);
+      }
       return;
     }
 
