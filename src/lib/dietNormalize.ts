@@ -327,7 +327,7 @@ export function normalizeTrainingDay(day: any, dayIndex: number): NormalizedTrai
         id: ex?.id ?? `${dayIndex}-${ei}`,
         name: ex?.name ?? "Exercício",
         sets: ex?.sets ?? 3,
-        reps: ex?.reps ?? "10/8/falha",
+        reps: ex?.reps ?? "3 séries válidas de 8-12 reps (última na falha)",
         rest: ex?.rest ?? "60s",
         technique: ex?.technique ?? "standard",
         videoQuery: ex?.videoQuery || `${ex?.name || ""} execução correta`,
