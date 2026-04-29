@@ -29,41 +29,55 @@ function getWebhookSecret(): string {
   return v;
 }
 
+const LOGO_URL = 'https://evoriacoach.com/logo-email.png';
+const SITE_URL = 'https://evoriacoach.com';
+
 function buildWelcomeEmail(firstName: string, actionUrl: string) {
   const safeName = firstName || 'Atleta';
+  const year = new Date().getFullYear();
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head><meta charset="utf-8"><title>Bem-vindo à Evoria Coach App</title></head>
-<body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#fafafa;">
-  <div style="max-width:560px;margin:0 auto;padding:32px 24px;">
-    <div style="text-align:center;margin-bottom:32px;">
-      <h1 style="color:#22c55e;font-size:28px;margin:0;font-weight:700;letter-spacing:-0.5px;">EVORIA COACH APP</h1>
+<body style="margin:0;padding:24px 0;background:#0a0a0a;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#e5e5e5;">
+  <div style="max-width:560px;margin:0 auto;background:#0f0f0f;border:1px solid #1f1f1f;border-radius:16px;overflow:hidden;">
+    <!-- Header -->
+    <div style="background:#000;padding:24px;text-align:center;border-bottom:1px solid #1f1f1f;">
+      <a href="${SITE_URL}"><img src="${LOGO_URL}" width="140" alt="Evoria Coach" style="display:block;margin:0 auto;" /></a>
     </div>
-    <div style="background:#171717;border:1px solid #262626;border-radius:16px;padding:32px;">
-      <h2 style="color:#fafafa;font-size:22px;margin:0 0 16px;font-weight:700;">Olá, ${safeName}! 🎉</h2>
-      <p style="color:#a3a3a3;font-size:15px;line-height:1.6;margin:0 0 16px;">
-        Pagamento confirmado! Seja muito bem-vindo(a) à <strong style="color:#22c55e;">Evoria Coach App</strong>.
+    <!-- Content -->
+    <div style="padding:32px 28px;">
+      <h2 style="color:#fff;font-size:24px;margin:0 0 16px;font-weight:700;">Olá, ${safeName}! 🎉</h2>
+      <p style="color:#d1d5db;font-size:15px;line-height:1.6;margin:0 0 16px;">
+        Pagamento confirmado! Bem-vindo(a) à <strong style="color:#22c55e;">Evoria Coach App</strong> — seu acesso está liberado.
       </p>
-      <p style="color:#a3a3a3;font-size:15px;line-height:1.6;margin:0 0 24px;">
-        Para acessar seu app e começar seu protocolo personalizado, clique no botão abaixo e <strong style="color:#fafafa;">crie sua senha</strong>:
+      <p style="color:#d1d5db;font-size:15px;line-height:1.6;margin:0 0 24px;">
+        Para começar, clique abaixo e <strong style="color:#fff;">crie sua senha</strong>:
       </p>
-      <div style="text-align:center;margin:32px 0;">
-        <a href="${actionUrl}" style="display:inline-block;background:#22c55e;color:#0a0a0a;padding:16px 32px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px;">
+      <div style="text-align:center;margin:24px 0;">
+        <a href="${actionUrl}" style="display:inline-block;background:#22c55e;color:#0a0a0a;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px;">
           Criar minha senha e acessar
         </a>
       </div>
-      <p style="color:#737373;font-size:13px;line-height:1.6;margin:24px 0 0;">
-        Após criar sua senha, você responderá um quiz único de 5 a 8 minutos. Suas respostas montarão seu treino e dieta pelos próximos 60 dias.
+      <p style="color:#d1d5db;font-size:14px;line-height:1.6;margin:24px 0 0;">
+        <strong style="color:#fff;">Próximos passos:</strong><br>
+        1. Faça o tutorial inicial para conhecer o app.<br>
+        2. Confira sua avaliação corporal completa gerada pela IA.<br>
+        3. Comece seu protocolo personalizado de treino e dieta.
       </p>
-      <p style="color:#737373;font-size:13px;line-height:1.6;margin:16px 0 0;">
-        ⚠️ Este link expira em 1 hora. Se expirar, é só ir em <a href="https://evoriacoach.com/login" style="color:#22c55e;">evoriacoach.com</a> e clicar em "Esqueci minha senha".
+      <p style="color:#6b7280;font-size:12px;line-height:1.5;margin:24px 0 0;">
+        ⚠️ Este link expira em 1 hora. Se expirar, acesse <a href="${SITE_URL}/login" style="color:#22c55e;">evoriacoach.com</a> e clique em "Esqueci minha senha".
       </p>
     </div>
-    <div style="text-align:center;margin-top:24px;">
-      <p style="color:#525252;font-size:12px;margin:0;">
-        Dúvidas? Responda este e-mail ou escreva para <a href="mailto:suporte@evoriacoach.com" style="color:#22c55e;">suporte@evoriacoach.com</a>
+    <!-- Footer -->
+    <div style="padding:24px;text-align:center;background:#000;border-top:1px solid #1f1f1f;">
+      <img src="${LOGO_URL}" width="100" alt="Evoria Coach" style="display:block;margin:0 auto 12px;opacity:0.85;" />
+      <p style="color:#9ca3af;font-size:13px;margin:0 0 8px;line-height:1.5;">
+        Evoria Coach App — seu software personalizado para te guiar ao corpo dos sonhos.
       </p>
-      <p style="color:#525252;font-size:11px;margin:8px 0 0;">© Evoria Coach App · Todos os direitos reservados</p>
+      <p style="color:#6b7280;font-size:11px;margin:0 0 4px;">
+        Dúvidas? <a href="mailto:suporte@evoriacoach.com" style="color:#22c55e;text-decoration:none;">suporte@evoriacoach.com</a>
+      </p>
+      <p style="color:#6b7280;font-size:11px;margin:0;">© ${year} Evoria Coach · <a href="${SITE_URL}" style="color:#22c55e;text-decoration:none;">evoriacoach.com</a></p>
     </div>
   </div>
 </body>
