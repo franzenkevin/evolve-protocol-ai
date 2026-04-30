@@ -70,11 +70,21 @@ serve(async (req) => {
       });
     }
 
-    let success = 0;
-    let failed = 0;
-    const errors: Array<{ user_id: string; error: string }> = [];
+    // Run heavy work in background to avoid 150s edge timeout.
+    // Return immediately; progress is logged in admin_audit_log.
+    const jobStartedAt = new Date().toISOString();
+    await admin.from("admin_audit_log").insert({
+      admin_id: user.id,
+      action: "bulk_regenerate_protocols_started",
+      metadata: { reason, total: targets.length, started_at: jobStartedAt },
+    });
 
-    for (const uid of targets) {
+    const work = async () => {
+      let success = 0;
+      let failed = 0;
+      const errors: Array<{ user_id: string; error: string }> = [];
+
+      for (const uid of targets) {
       try {
         const { data: profile } = await admin
           .from("profiles")
