@@ -6,9 +6,9 @@ export const SectionFeatures = () => (
       <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">
         TUDO NO APP
       </p>
-      <h2 className="text-3xl md:text-5xl font-heading font-bold text-foreground leading-tight">
+      <h2 className="md:text-5xl font-heading font-bold text-foreground leading-tight text-2xl">
         Mais do que um plano. <br />
-        <span className="text-gradient">Um sistema que evolui com você.</span>
+        <span className="text-gradient">Um sistema que evolui e te acompanha no processo.</span>
       </h2>
     </div>
 

@@ -13,9 +13,8 @@ export const SectionResults = () => {
           <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">
             Resultados reais
           </p>
-          <h2 className="text-3xl md:text-5xl font-heading font-bold text-foreground leading-tight">
-            Quem confiou no processo, <br />
-            <span className="text-gradient">virou outra pessoa.</span>
+          <h2 className="md:text-5xl font-heading font-bold text-foreground leading-tight text-2xl">
+            Pessoas que decidiram parar de improvisar e seguir um plano feito pra durar.
           </h2>
           <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
             Histórias de quem decidiu parar de improvisar e seguir um plano feito pra durar.

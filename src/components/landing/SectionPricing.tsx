@@ -110,10 +110,10 @@ export const SectionPricing = () => {
             <h3 className="text-2xl font-heading font-bold text-foreground mb-3">Anual</h3>
             <div className="flex items-baseline gap-2 mb-1">
               <span className="text-base text-muted-foreground line-through">R$897</span>
-              <span className="text-4xl font-heading font-bold text-foreground">R$599</span>
+              <span className="text-4xl font-heading font-bold text-foreground">12x de R$49</span>
             </div>
             <p className="text-xs text-muted-foreground mb-1">
-              pagamento único — economia de R$298
+              pagamento único com a economia de R$298
             </p>
             <p className="text-[10px] text-primary mb-6">Cartão de crédito à vista ou parcelado, ou Pix</p>
 
@@ -136,17 +136,17 @@ export const SectionPricing = () => {
                 <Loader2 size={18} className="animate-spin" />
               ) : (
                 <>
-                  Começar por R$599 <ArrowRight size={18} />
+                  Começar anual <ArrowRight size={18} />
                 </>
               )}
             </Button>
           </Card>
         </div>
 
-        <p className="text-center text-sm text-muted-foreground mt-8 max-w-2xl mx-auto">
-          Por dia: <strong className="text-foreground">menos de R$1</strong>. Por mês:{" "}
-          <strong className="text-foreground">menos que uma pizza</strong>. Por resultado:{" "}
-          <strong className="text-foreground">você decide.</strong>
+        <p className="text-center text-sm text-muted-foreground mt-8 max-w-2xl mx-auto whitespace-pre-line">
+          Por dia: <strong className="text-foreground">menos de R$1</strong>.{"\n"}
+          Por mês: <strong className="text-foreground">menos que uma pizza</strong>.{"\n"}
+          Por resultado: <strong className="text-foreground">você decide.</strong>
         </p>
       </div>
     </section>

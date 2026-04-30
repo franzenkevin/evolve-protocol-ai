@@ -5,7 +5,7 @@ const GOALS = [
   {
     icon: Dumbbell,
     title: "Hipertrofia",
-    desc: "Volume, intensidade e recuperação calculados pelo sistema. Sem chutar série e repetição. Sem plateau por falta de progressão.",
+    desc: "Periodização pra quem quer render mais dentro e fora da academia. Mais força, mais resistência e saúde.",
     tag: "GANHO DE MASSA",
   },
   {
@@ -16,9 +16,9 @@ const GOALS = [
   },
   {
     icon: Zap,
-    title: "Performance",
+    title: "Recomposição",
     desc: "Periodização pra quem quer render mais — dentro e fora da academia. Mais força, mais resistência, mais explosão.",
-    tag: "CONDICIONAMENTO",
+    tag: "SAÚDE GERAL",
   },
 ];
 
