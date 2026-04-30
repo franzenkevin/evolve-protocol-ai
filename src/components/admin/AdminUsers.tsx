@@ -461,6 +461,22 @@ const AdminUsers = () => {
                   {action.isPending ? "Liberando..." : "Conceder regeneração grátis"}
                 </Button>
               </div>
+
+              <div className="border-t border-border pt-4 space-y-2">
+                <Label className="flex items-center gap-1.5"><RefreshCw size={12} />Reajustar protocolo agora</Label>
+                <p className="text-[10px] text-muted-foreground">
+                  Roda a IA novamente só para este aluno aplicando as últimas regras (jejum, horários, dieta). O protocolo atual é arquivado e um novo de 60 dias é criado.
+                </p>
+                <Button
+                  onClick={() => editing && regenerateProtocol(editing.user_id, editing.full_name)}
+                  disabled={!editing || regeneratingId === editing?.user_id}
+                  variant="outline"
+                  className="w-full gap-1"
+                >
+                  <RefreshCw size={14} className={regeneratingId === editing?.user_id ? "animate-spin" : ""} />
+                  {regeneratingId === editing?.user_id ? "Reajustando..." : "Reajustar protocolo deste aluno"}
+                </Button>
+              </div>
             </TabsContent>
 
             <TabsContent value="subscription" className="space-y-3 mt-3">
