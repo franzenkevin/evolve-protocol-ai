@@ -127,7 +127,7 @@ Essa solicitação SOBRESCREVE a priorização automática por pontos fracos. Ad
     // descartamos para evitar que o prompt gere divisões inválidas.
     const VALID_SPLIT_VARIANTS: Record<"male" | "female", Record<number, string[]>> = {
       female: {
-        2: ["FB-FB com ênfase inferior (2x)"],
+        2: ["FB-A + FB-B com ênfase inferior (2x — DOIS fullbodies DIFERENTES)"],
         3: [
           "FB-FB-FB com ênfase inferior (3x)",
           "Inf(quad)-Sup-Inf(post+glúteo) (3x)",
@@ -144,7 +144,7 @@ Essa solicitação SOBRESCREVE a priorização automática por pontos fracos. Ad
         7: ["5x + 2 complementos"],
       },
       male: {
-        2: ["FB-FB (Full Body 2x)"],
+        2: ["FB-A + FB-B (2x — DOIS fullbodies DIFERENTES)"],
         3: ["Push-Pull-Legs (PPL 3x)", "FB-FB-FB (Full Body 3x)"],
         4: ["Upper-Lower (4x)", "Push-Pull-Legs-Upper (4x)"],
         5: [
@@ -306,7 +306,7 @@ A maioria dos alunos receberá uma base semelhante (hipertrofia + nutrição esp
 
 ### MULHERES
 
-**2x na semana** — **FB-FB com ênfase inferior** ⭐ (única opção): A=Full Body com ênfase em inferiores (glúteo+quad+posterior) + 1-2 superiores, B=igual com variação. NÃO em dias seguidos.
+**2x na semana** — **FB-A + FB-B com ênfase inferior** ⭐ (única opção): DOIS fullbodies DIFERENTES — A=Full Body ênfase QUADRÍCEPS + GLÚTEO MÉDIO (ex: agachamento + cadeira extensora + elevação pélvica + 1 push + 1 pull + core), B=Full Body ênfase POSTERIOR + GLÚTEO MÁXIMO (ex: stiff + mesa flexora + hip thrust + 1 push diferente + 1 pull diferente + core). **OBRIGATÓRIO**: exercícios, padrões e ênfase precisam ser distintos entre A e B — NUNCA repetir o mesmo treino. NÃO em dias seguidos.
 
 **3x na semana** — DUAS opções:
 1. **FB-FB-FB com ênfase inferior** ⭐ padrão: A/B/C todos Full Body com forte ênfase em inferiores (glúteo + quadríceps em A, posterior+glúteo em B, glúteo médio+quad em C). NÃO em dias seguidos.
@@ -326,7 +326,7 @@ A maioria dos alunos receberá uma base semelhante (hipertrofia + nutrição esp
 
 ### HOMENS
 
-**2x na semana** — **FB-FB** ⭐ (única opção): compostos pesados em ambos (1 quad, 1 push, 1 pull, 1 posterior, 1 core). DEVE ter pelo menos 2 dias de descanso entre eles.
+**2x na semana** — **FB-A + FB-B** ⭐ (única opção): DOIS fullbodies DIFERENTES com compostos pesados. A=agachamento/quad como principal + push horizontal (supino) + pull vertical (puxada/barra) + posterior auxiliar + core. B=terra/posterior como principal + push vertical (desenvolvimento) + pull horizontal (remada) + quad auxiliar + core. **OBRIGATÓRIO**: variar exercício principal, padrão de empurrar/puxar e ênfase entre A e B — NUNCA repetir o mesmo treino duas vezes na semana. DEVE ter pelo menos 2 dias de descanso entre eles.
 
 **3x na semana** — DUAS opções:
 1. **Push-Pull-Legs (PPL)** ⭐ padrão: A=Push (peito+ombro+tríceps), B=Pull (costas+bíceps), C=Legs (perna completa).

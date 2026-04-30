@@ -59,12 +59,15 @@ export type SplitVariant = {
 export const SPLITS_WOMEN: Record<number, SplitVariant[]> = {
   2: [
     {
-      name: "FB-FB com ênfase inferior (2x)",
+      name: "FB-A + FB-B com ênfase inferior (2x — DOIS fullbodies DIFERENTES)",
       days: [
-        { code: "A", focus: "Full Body — ênfase em inferiores (glúteo + quadríceps + posterior) + 1-2 superiores" },
-        { code: "B", focus: "Full Body — ênfase em inferiores (glúteo + posterior + quadríceps) + 1-2 superiores" },
+        { code: "A", focus: "Full Body A — ênfase QUADRÍCEPS + GLÚTEO MÉDIO; inclui 1 push, 1 pull e core. Exercícios DIFERENTES do dia B." },
+        { code: "B", focus: "Full Body B — ênfase POSTERIOR + GLÚTEO MÁXIMO; inclui 1 push, 1 pull e core. Exercícios DIFERENTES do dia A." },
       ],
-      schedulingRules: ["NÃO pode em dias seguidos — exigir descanso entre eles"],
+      schedulingRules: [
+        "NÃO pode em dias seguidos — exigir descanso entre eles",
+        "OBRIGATÓRIO: A e B devem ser fullbodies DIFERENTES (variar exercícios, padrões e ênfases). NUNCA repetir o mesmo treino duas vezes na semana.",
+      ],
       defaultChoice: true,
     },
   ],
@@ -177,12 +180,15 @@ export const SPLITS_WOMEN: Record<number, SplitVariant[]> = {
 export const SPLITS_MEN: Record<number, SplitVariant[]> = {
   2: [
     {
-      name: "FB-FB (Full Body 2x)",
+      name: "FB-A + FB-B (2x — DOIS fullbodies DIFERENTES)",
       days: [
-        { code: "A", focus: "Full Body — compostos pesados (1 quad, 1 push, 1 pull, 1 posterior, 1 core)" },
-        { code: "B", focus: "Full Body — compostos pesados (1 quad, 1 push, 1 pull, 1 posterior, 1 core)" },
+        { code: "A", focus: "Full Body A — agachamento/quad como principal + 1 push horizontal (supino) + 1 pull vertical (puxada/barra) + 1 posterior auxiliar + core. Exercícios DIFERENTES do dia B." },
+        { code: "B", focus: "Full Body B — levantamento terra/posterior como principal + 1 push vertical (desenvolvimento) + 1 pull horizontal (remada) + 1 quad auxiliar + core. Exercícios DIFERENTES do dia A." },
       ],
-      schedulingRules: ["DEVE ter pelo menos 2 dias de descanso entre eles"],
+      schedulingRules: [
+        "DEVE ter pelo menos 2 dias de descanso entre eles",
+        "OBRIGATÓRIO: A e B devem ser fullbodies DIFERENTES — variar exercício principal, padrão de empurrar/puxar e ênfase. NUNCA repetir o mesmo treino duas vezes na semana.",
+      ],
       defaultChoice: true,
     },
   ],
