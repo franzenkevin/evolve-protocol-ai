@@ -350,6 +350,17 @@ const AdminUsers = () => {
                 )}
                 <p className="text-[10px] text-muted-foreground truncate">{p.user_id}</p>
               </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="shrink-0 gap-1"
+                onClick={() => regenerateProtocol(p.user_id, p.full_name)}
+                disabled={regeneratingId === p.user_id}
+                title="Reajustar protocolo deste aluno"
+              >
+                <RefreshCw size={12} className={regeneratingId === p.user_id ? "animate-spin" : ""} />
+                {regeneratingId === p.user_id ? "..." : "Reajustar"}
+              </Button>
               <Button size="sm" variant="outline" className="shrink-0 gap-1" onClick={() => openEditor(p as Profile)}>
                 <Pencil size={12} />Editar
               </Button>
