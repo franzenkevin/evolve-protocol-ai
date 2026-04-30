@@ -5,7 +5,7 @@ const GOALS = [
   {
     icon: Dumbbell,
     title: "Hipertrofia",
-    desc: "Volume, intensidade e recuperação calculados pelo sistema. Sem chutar série e repetição. Sem plateau por falta de progressão.",
+    desc: "Periodização pra quem quer render mais dentro e fora da academia. Mais força, mais resistência e saúde.",
     tag: "GANHO DE MASSA",
   },
   {
@@ -16,9 +16,9 @@ const GOALS = [
   },
   {
     icon: Zap,
-    title: "Performance",
+    title: "Recomposição",
     desc: "Periodização pra quem quer render mais — dentro e fora da academia. Mais força, mais resistência, mais explosão.",
-    tag: "CONDICIONAMENTO",
+    tag: "SAÚDE GERAL",
   },
 ];
 
@@ -26,7 +26,7 @@ export const SectionGoals = () => (
   <section className="max-w-5xl mx-auto px-4 py-20">
     <div className="text-center mb-12">
       <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">Protocolo completo</p>
-      <h2 className="text-3xl md:text-5xl font-heading font-bold text-foreground leading-tight">
+      <h2 className="md:text-5xl font-heading font-bold text-foreground leading-tight text-2xl">
         Você diz onde quer chegar. <br />
         <span className="text-gradient">O sistema traça o caminho mais curto.</span>
       </h2>

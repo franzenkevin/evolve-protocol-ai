@@ -40,7 +40,7 @@ export const FEATURES_CONTENT: FeatureContent[] = [
   {
     eyebrow: "TREINO SOB MEDIDA",
     title: "Cada série calculada pra te levar adiante",
-    desc: "Divisão, exercícios, séries, reps, descanso e progressão definidos pela metodologia. Seu programa avança semana a semana, sem estagnação.",
+    desc: "O sistema processa composição corporal estimada, padrões posturais e prioridades. Tudo entra no cálculo para o melhor plano.",
     image: mockTraining,
   },
   {
@@ -116,7 +116,7 @@ export const ABOUT_CONTENT = {
   photo: coachKevin,
   // Cada string é um parágrafo — adicione/remova quantos quiser
   paragraphs: [
-    "10 anos acompanhando atletas e profissionais que treinavam com disciplina e não chegavam onde queriam.",
+    "A IA executa o cálculo, com base nos meus ensinamentos. As regras do sistema foram construídas na minha prática e ainda por cima validadas pela ciência.",
     "Vi médicos, advogados e executivos com pouco tempo disponível, que investiram em 6-7x treinos por semana durante anos e continuarem no mesmo lugar. Não por falta de vontade. Por falta de protocolo real e sustentável.",
     "Desenvolvi esse sistema pra colocar a mesma estrutura que aplico na minha consultoria individual, de forma automatizada e no fácil acesso a todos que querem resultado",
     "A IA executa o cálculo. A metodologia é minha. As regras do sistema foram construídas na prática e validadas pela ciência.",

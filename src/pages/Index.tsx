@@ -33,7 +33,7 @@ const HOW_IT_WORKS = [
   {
     icon: Camera,
     title: "2. Análise por foto IA",
-    desc: "4 fotos processadas pelo sistema em segundos. O algoritmo estima composição corporal, identifica padrões posturais e define as prioridades do seu protocolo.",
+    desc: "4 fotos processadas pelo sistema em segundos. O algoritmo estima composição corporal, identifica padrões posturais e define as prioridades em cima disso.",
   },
   {
     icon: Rocket,
@@ -103,11 +103,13 @@ const Index = () => {
             <Sparkles size={12} /> METODOLOGIA FRANZEN • AGORA EM SISTEMA DIGITAL
           </p>
           <h1 className="md:text-7xl font-heading font-bold text-foreground mb-5 leading-[1.05] tracking-tight text-2xl">
-            Você treina há anos. O problema nunca foi o esforço. <br className="hidden md:block" />
+            Você treina há tempo.<br />
+            O problema nunca foi o esforço. <br className="hidden md:block" />
             <span className="text-gradient">Foi o protocolo.</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl md:max-w-2xl">
-            O mesmo sistema que uso com meus clientes da consultoria, agora estruturado em IA, adaptado pro seu corpo, disponível <strong className="text-foreground">por menos de R$1 por dia.</strong>
+            A mesma metodologia que uso com meus clientes da consultoria, agora estruturado em software.<br />
+            Tudo isso menos de R$1 por dia durante o período de lançamento.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
             <Link to={ctaPrimaryTo}>
@@ -144,7 +146,7 @@ const Index = () => {
       <section className="max-w-5xl mx-auto px-4 py-20 border-t border-border">
         <div className="text-center mb-12">
           <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">Como funciona</p>
-          <h2 className="text-3xl md:text-5xl font-heading font-bold text-foreground leading-tight">
+          <h2 className="md:text-5xl font-heading font-bold text-foreground leading-tight text-2xl">
             Do quiz ao protocolo <br />
             <span className="text-gradient">em menos de 10 minutos.</span>
           </h2>
@@ -180,7 +182,8 @@ const Index = () => {
             <span className="text-gradient">já te espera.</span>
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-lg mx-auto">
-            Pare de adiar. Faça o quiz, veja seu protocolo e decida se vale a pena. Você não paga nada pra descobrir.
+            Pare de adiar. Faça o quiz, veja seu protocolo e decida se vale a pena.<br />
+            Você não paga nada pra descobrir.
           </p>
           <Link to={ctaPrimaryTo}>
             <Button size="lg" className="glow gap-2 h-14 px-10 text-base">
