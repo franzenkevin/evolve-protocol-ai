@@ -46,8 +46,10 @@ import {
   Ban,
   Mail,
   Gift,
+  RefreshCw,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import BulkRegenerateCard from "./BulkRegenerateCard";
 
 type Profile = {
