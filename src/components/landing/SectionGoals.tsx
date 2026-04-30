@@ -26,7 +26,7 @@ export const SectionGoals = () => (
   <section className="max-w-5xl mx-auto px-4 py-20">
     <div className="text-center mb-12">
       <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">Protocolo completo</p>
-      <h2 className="text-3xl md:text-5xl font-heading font-bold text-foreground leading-tight">
+      <h2 className="md:text-5xl font-heading font-bold text-foreground leading-tight text-2xl">
         Você diz onde quer chegar. <br />
         <span className="text-gradient">O sistema traça o caminho mais curto.</span>
       </h2>

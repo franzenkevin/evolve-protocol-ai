@@ -17,7 +17,7 @@ export const SectionResults = () => {
             Pessoas que decidiram parar de improvisar e seguir um plano feito pra durar.
           </h2>
           <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-            Histórias de quem decidiu parar de improvisar e seguir um plano feito pra durar.
+            Pessoas que decidiram parar de improvisar e seguir um plano feito pra durar.
           </p>
         </div>
 

@@ -53,7 +53,7 @@ export const SectionPricing = () => {
           <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">
             Investimento
           </p>
-          <h2 className="text-3xl md:text-5xl font-heading font-bold text-foreground leading-tight">
+          <h2 className="md:text-5xl font-heading font-bold text-foreground leading-tight text-2xl">
             Quanto custa ter um protocolo real?
           </h2>
           <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
