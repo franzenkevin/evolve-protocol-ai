@@ -66,13 +66,13 @@ export default function BulkRegenerateCard() {
       );
       if (error) throw error;
       setLastResult({
-        success: data?.success ?? 0,
-        failed: data?.failed ?? 0,
+        success: 0,
+        failed: 0,
         total: data?.total ?? 0,
       });
       toast({
-        title: "Reajuste concluído",
-        description: `${data?.success ?? 0}/${data?.total ?? 0} protocolos regerados com sucesso.`,
+        title: "Reajuste iniciado",
+        description: `Processando ${data?.total ?? 0} aluno(s) em background. Acompanhe na aba Auditoria.`,
       });
     } catch (e: any) {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
