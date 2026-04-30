@@ -144,7 +144,7 @@ Essa solicitação SOBRESCREVE a priorização automática por pontos fracos. Ad
         7: ["5x + 2 complementos"],
       },
       male: {
-        2: ["FB-FB (Full Body 2x)"],
+        2: ["FB-A + FB-B (2x — DOIS fullbodies DIFERENTES)"],
         3: ["Push-Pull-Legs (PPL 3x)", "FB-FB-FB (Full Body 3x)"],
         4: ["Upper-Lower (4x)", "Push-Pull-Legs-Upper (4x)"],
         5: [
