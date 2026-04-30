@@ -306,7 +306,7 @@ A maioria dos alunos receberá uma base semelhante (hipertrofia + nutrição esp
 
 ### MULHERES
 
-**2x na semana** — **FB-FB com ênfase inferior** ⭐ (única opção): A=Full Body com ênfase em inferiores (glúteo+quad+posterior) + 1-2 superiores, B=igual com variação. NÃO em dias seguidos.
+**2x na semana** — **FB-A + FB-B com ênfase inferior** ⭐ (única opção): DOIS fullbodies DIFERENTES — A=Full Body ênfase QUADRÍCEPS + GLÚTEO MÉDIO (ex: agachamento + cadeira extensora + elevação pélvica + 1 push + 1 pull + core), B=Full Body ênfase POSTERIOR + GLÚTEO MÁXIMO (ex: stiff + mesa flexora + hip thrust + 1 push diferente + 1 pull diferente + core). **OBRIGATÓRIO**: exercícios, padrões e ênfase precisam ser distintos entre A e B — NUNCA repetir o mesmo treino. NÃO em dias seguidos.
 
 **3x na semana** — DUAS opções:
 1. **FB-FB-FB com ênfase inferior** ⭐ padrão: A/B/C todos Full Body com forte ênfase em inferiores (glúteo + quadríceps em A, posterior+glúteo em B, glúteo médio+quad em C). NÃO em dias seguidos.
