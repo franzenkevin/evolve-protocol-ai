@@ -13,7 +13,7 @@ export const SectionFAQ = () => (
         <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">
           Dúvidas?
         </p>
-        <h2 className="text-3xl md:text-5xl font-heading font-bold text-foreground leading-tight">
+        <h2 className="md:text-5xl font-heading font-bold text-foreground leading-tight text-2xl">
           Antes que <span className="text-gradient">você pergunte.</span>
         </h2>
       </div>
