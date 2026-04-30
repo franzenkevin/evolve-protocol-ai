@@ -59,12 +59,15 @@ export type SplitVariant = {
 export const SPLITS_WOMEN: Record<number, SplitVariant[]> = {
   2: [
     {
-      name: "FB-FB com ênfase inferior (2x)",
+      name: "FB-A + FB-B com ênfase inferior (2x — DOIS fullbodies DIFERENTES)",
       days: [
-        { code: "A", focus: "Full Body — ênfase em inferiores (glúteo + quadríceps + posterior) + 1-2 superiores" },
-        { code: "B", focus: "Full Body — ênfase em inferiores (glúteo + posterior + quadríceps) + 1-2 superiores" },
+        { code: "A", focus: "Full Body A — ênfase QUADRÍCEPS + GLÚTEO MÉDIO; inclui 1 push, 1 pull e core. Exercícios DIFERENTES do dia B." },
+        { code: "B", focus: "Full Body B — ênfase POSTERIOR + GLÚTEO MÁXIMO; inclui 1 push, 1 pull e core. Exercícios DIFERENTES do dia A." },
       ],
-      schedulingRules: ["NÃO pode em dias seguidos — exigir descanso entre eles"],
+      schedulingRules: [
+        "NÃO pode em dias seguidos — exigir descanso entre eles",
+        "OBRIGATÓRIO: A e B devem ser fullbodies DIFERENTES (variar exercícios, padrões e ênfases). NUNCA repetir o mesmo treino duas vezes na semana.",
+      ],
       defaultChoice: true,
     },
   ],
