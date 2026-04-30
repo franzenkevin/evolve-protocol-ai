@@ -127,7 +127,7 @@ Essa solicitação SOBRESCREVE a priorização automática por pontos fracos. Ad
     // descartamos para evitar que o prompt gere divisões inválidas.
     const VALID_SPLIT_VARIANTS: Record<"male" | "female", Record<number, string[]>> = {
       female: {
-        2: ["FB-FB com ênfase inferior (2x)"],
+        2: ["FB-A + FB-B com ênfase inferior (2x — DOIS fullbodies DIFERENTES)"],
         3: [
           "FB-FB-FB com ênfase inferior (3x)",
           "Inf(quad)-Sup-Inf(post+glúteo) (3x)",
