@@ -35,6 +35,7 @@ const CreatePassword = lazy(() => import("./pages/CreatePassword"));
 const NewProtocol = lazy(() => import("./pages/NewProtocol"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Feedback = lazy(() => import("./pages/Feedback"));
+const MilestoneCheckin = lazy(() => import("./pages/MilestoneCheckin"));
 const Support = lazy(() => import("./pages/Support"));
 const Install = lazy(() => import("./pages/Install"));
 import InstallPrompt from "./components/InstallPrompt";
@@ -96,6 +97,7 @@ const App = () => (
               <Route path="/profile/edit" element={<ProtectedRoute><StudentGate><SubscriptionGate><EditProfile /></SubscriptionGate></StudentGate></ProtectedRoute>} />
               <Route path="/support" element={<ProtectedRoute><StudentGate><SubscriptionGate><Support /></SubscriptionGate></StudentGate></ProtectedRoute>} />
               <Route path="/feedback" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><Feedback /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
+              <Route path="/checkin/:milestone" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><MilestoneCheckin /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
               <Route path="/plans" element={<ProtectedRoute><StudentGate><Plans /></StudentGate></ProtectedRoute>} />
               <Route path="/checkout/success" element={<CheckoutSuccess />} />
               <Route path="/criar-senha" element={<CreatePassword />} />
