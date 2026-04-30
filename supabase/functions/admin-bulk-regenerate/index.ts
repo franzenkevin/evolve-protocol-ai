@@ -43,21 +43,29 @@ serve(async (req) => {
     const reason: string =
       (body?.reason || "Reajuste global pós-correções (jejum/horários/dieta)").toString();
     const limit: number | null = typeof body?.limit === "number" ? body.limit : null;
+    const explicitTargets: string[] | null = Array.isArray(body?.target_user_ids)
+      ? body.target_user_ids.filter((x: unknown) => typeof x === "string")
+      : null;
 
-    // Find users with ACTIVE protocols (latest first, dedup per user)
-    const { data: activeProtocols, error: protoErr } = await admin
-      .from("protocols")
-      .select("id, user_id, version, created_at")
-      .eq("status", "active")
-      .order("created_at", { ascending: false });
-    if (protoErr) throw protoErr;
+    let userIds: string[] = [];
 
-    const seen = new Set<string>();
-    const userIds: string[] = [];
-    for (const p of activeProtocols || []) {
-      if (!seen.has(p.user_id)) {
-        seen.add(p.user_id);
-        userIds.push(p.user_id);
+    if (explicitTargets && explicitTargets.length > 0) {
+      userIds = explicitTargets;
+    } else {
+      // Find users with ACTIVE protocols (latest first, dedup per user)
+      const { data: activeProtocols, error: protoErr } = await admin
+        .from("protocols")
+        .select("id, user_id, version, created_at")
+        .eq("status", "active")
+        .order("created_at", { ascending: false });
+      if (protoErr) throw protoErr;
+
+      const seen = new Set<string>();
+      for (const p of activeProtocols || []) {
+        if (!seen.has(p.user_id)) {
+          seen.add(p.user_id);
+          userIds.push(p.user_id);
+        }
       }
     }
     const targets = limit ? userIds.slice(0, limit) : userIds;
