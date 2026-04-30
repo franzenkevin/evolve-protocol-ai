@@ -255,6 +255,29 @@ const AdminUsers = () => {
     }
   };
 
+  const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
+
+  const regenerateProtocol = async (userId: string, name?: string | null) => {
+    setRegeneratingId(userId);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-bulk-regenerate", {
+        body: {
+          target_user_ids: [userId],
+          reason: `Reajuste individual via admin (${name || userId})`,
+        },
+      });
+      if (error) throw error;
+      toast({
+        title: "Reajuste iniciado",
+        description: `Protocolo de ${name || "usuário"} sendo regerado em background. Veja resultado na aba Auditoria em ~30s.`,
+      });
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    } finally {
+      setRegeneratingId(null);
+    }
+  };
+
   const deleteUser = async () => {
     if (!confirmDelete) return;
     const target = confirmDelete;
