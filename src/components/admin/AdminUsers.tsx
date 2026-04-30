@@ -46,8 +46,10 @@ import {
   Ban,
   Mail,
   Gift,
+  RefreshCw,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import BulkRegenerateCard from "./BulkRegenerateCard";
 
 type Profile = {
@@ -253,6 +255,29 @@ const AdminUsers = () => {
     }
   };
 
+  const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
+
+  const regenerateProtocol = async (userId: string, name?: string | null) => {
+    setRegeneratingId(userId);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-bulk-regenerate", {
+        body: {
+          target_user_ids: [userId],
+          reason: `Reajuste individual via admin (${name || userId})`,
+        },
+      });
+      if (error) throw error;
+      toast({
+        title: "Reajuste iniciado",
+        description: `Protocolo de ${name || "usuário"} sendo regerado em background. Veja resultado na aba Auditoria em ~30s.`,
+      });
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    } finally {
+      setRegeneratingId(null);
+    }
+  };
+
   const deleteUser = async () => {
     if (!confirmDelete) return;
     const target = confirmDelete;
@@ -325,6 +350,17 @@ const AdminUsers = () => {
                 )}
                 <p className="text-[10px] text-muted-foreground truncate">{p.user_id}</p>
               </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="shrink-0 gap-1"
+                onClick={() => regenerateProtocol(p.user_id, p.full_name)}
+                disabled={regeneratingId === p.user_id}
+                title="Reajustar protocolo deste aluno"
+              >
+                <RefreshCw size={12} className={regeneratingId === p.user_id ? "animate-spin" : ""} />
+                {regeneratingId === p.user_id ? "..." : "Reajustar"}
+              </Button>
               <Button size="sm" variant="outline" className="shrink-0 gap-1" onClick={() => openEditor(p as Profile)}>
                 <Pencil size={12} />Editar
               </Button>
@@ -423,6 +459,22 @@ const AdminUsers = () => {
                 </p>
                 <Button onClick={grantRegen} disabled={action.isPending} variant="outline" className="w-full">
                   {action.isPending ? "Liberando..." : "Conceder regeneração grátis"}
+                </Button>
+              </div>
+
+              <div className="border-t border-border pt-4 space-y-2">
+                <Label className="flex items-center gap-1.5"><RefreshCw size={12} />Reajustar protocolo agora</Label>
+                <p className="text-[10px] text-muted-foreground">
+                  Roda a IA novamente só para este aluno aplicando as últimas regras (jejum, horários, dieta). O protocolo atual é arquivado e um novo de 60 dias é criado.
+                </p>
+                <Button
+                  onClick={() => editing && regenerateProtocol(editing.user_id, editing.full_name)}
+                  disabled={!editing || regeneratingId === editing?.user_id}
+                  variant="outline"
+                  className="w-full gap-1"
+                >
+                  <RefreshCw size={14} className={regeneratingId === editing?.user_id ? "animate-spin" : ""} />
+                  {regeneratingId === editing?.user_id ? "Reajustando..." : "Reajustar protocolo deste aluno"}
                 </Button>
               </div>
             </TabsContent>
