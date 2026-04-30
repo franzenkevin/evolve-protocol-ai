@@ -326,7 +326,7 @@ A maioria dos alunos receberá uma base semelhante (hipertrofia + nutrição esp
 
 ### HOMENS
 
-**2x na semana** — **FB-FB** ⭐ (única opção): compostos pesados em ambos (1 quad, 1 push, 1 pull, 1 posterior, 1 core). DEVE ter pelo menos 2 dias de descanso entre eles.
+**2x na semana** — **FB-A + FB-B** ⭐ (única opção): DOIS fullbodies DIFERENTES com compostos pesados. A=agachamento/quad como principal + push horizontal (supino) + pull vertical (puxada/barra) + posterior auxiliar + core. B=terra/posterior como principal + push vertical (desenvolvimento) + pull horizontal (remada) + quad auxiliar + core. **OBRIGATÓRIO**: variar exercício principal, padrão de empurrar/puxar e ênfase entre A e B — NUNCA repetir o mesmo treino duas vezes na semana. DEVE ter pelo menos 2 dias de descanso entre eles.
 
 **3x na semana** — DUAS opções:
 1. **Push-Pull-Legs (PPL)** ⭐ padrão: A=Push (peito+ombro+tríceps), B=Pull (costas+bíceps), C=Legs (perna completa).
