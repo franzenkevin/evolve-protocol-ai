@@ -915,6 +915,48 @@ export type Database = {
         }
         Relationships: []
       }
+      protocol_milestone_feedbacks: {
+        Row: {
+          ai_analysis: Json | null
+          created_at: string
+          diet_notes: string | null
+          id: string
+          milestone_day: number
+          protocol_id: string | null
+          requests_notes: string | null
+          routine_changes_notes: string | null
+          training_notes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          created_at?: string
+          diet_notes?: string | null
+          id?: string
+          milestone_day: number
+          protocol_id?: string | null
+          requests_notes?: string | null
+          routine_changes_notes?: string | null
+          training_notes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_analysis?: Json | null
+          created_at?: string
+          diet_notes?: string | null
+          id?: string
+          milestone_day?: number
+          protocol_id?: string | null
+          requests_notes?: string | null
+          routine_changes_notes?: string | null
+          training_notes?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       protocol_regenerations: {
         Row: {
           amount_brl: number
