@@ -70,11 +70,21 @@ serve(async (req) => {
       });
     }
 
-    let success = 0;
-    let failed = 0;
-    const errors: Array<{ user_id: string; error: string }> = [];
+    // Run heavy work in background to avoid 150s edge timeout.
+    // Return immediately; progress is logged in admin_audit_log.
+    const jobStartedAt = new Date().toISOString();
+    await admin.from("admin_audit_log").insert({
+      admin_id: user.id,
+      action: "bulk_regenerate_protocols_started",
+      metadata: { reason, total: targets.length, started_at: jobStartedAt },
+    });
 
-    for (const uid of targets) {
+    const work = async () => {
+      let success = 0;
+      let failed = 0;
+      const errors: Array<{ user_id: string; error: string }> = [];
+
+      for (const uid of targets) {
       try {
         const { data: profile } = await admin
           .from("profiles")
@@ -164,15 +174,29 @@ serve(async (req) => {
         failed++;
         errors.push({ user_id: uid, error: e?.message || String(e) });
       }
+      }
+
+      await admin.from("admin_audit_log").insert({
+        admin_id: user.id,
+        action: "bulk_regenerate_protocols",
+        metadata: { reason, total: targets.length, success, failed, errors: errors.slice(0, 20), started_at: jobStartedAt, finished_at: new Date().toISOString() },
+      });
+    };
+
+    // @ts-ignore EdgeRuntime is provided by Supabase edge runtime
+    if (typeof EdgeRuntime !== "undefined" && EdgeRuntime?.waitUntil) {
+      // @ts-ignore
+      EdgeRuntime.waitUntil(work());
+    } else {
+      // Fallback: fire-and-forget
+      work().catch((e) => console.error("bulk regen background error", e));
     }
 
-    await admin.from("admin_audit_log").insert({
-      admin_id: user.id,
-      action: "bulk_regenerate_protocols",
-      metadata: { reason, total: targets.length, success, failed, errors: errors.slice(0, 20) },
+    return jsonResp({
+      queued: true,
+      total: targets.length,
+      message: "Reajuste iniciado em background. Acompanhe pelo log de auditoria.",
     });
-
-    return jsonResp({ total: targets.length, success, failed, errors: errors.slice(0, 20) });
   } catch (e: any) {
     console.error("admin-bulk-regenerate error", e);
     return jsonResp({ error: e?.message || "Internal error" }, 500);
