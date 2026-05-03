@@ -63,6 +63,18 @@ const SectionPlan = () => {
           </>
         )}
       </Card>
+
+      {sub && ["active", "trialing", "past_due"].includes(sub.status || "") && (
+        <button
+          type="button"
+          onClick={openPortal}
+          disabled={loadingPortal}
+          className="w-full flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors px-1 py-1 disabled:opacity-50"
+        >
+          {loadingPortal ? <Loader2 size={11} className="animate-spin" /> : <Settings size={11} />}
+          <span>Gerenciar assinatura</span>
+        </button>
+      )}
     </div>
   );
 };
