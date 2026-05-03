@@ -182,10 +182,17 @@ Deno.serve(async (req) => {
     };
 
     if (checkoutMode === 'subscription') {
-      sessionParams.subscription_data = { metadata: sharedMetadata };
+      sessionParams.subscription_data = {
+        metadata: sharedMetadata,
+        description: 'Evoria Coach App',
+      };
     } else {
-      // Pagamento único: metadata + parcelamento sem juros até 12x para todos os one-time.
-      sessionParams.payment_intent_data = { metadata: sharedMetadata };
+      // Pagamento único: metadata + parcelamento sem juros até 12x + descritor da fatura
+      sessionParams.payment_intent_data = {
+        metadata: sharedMetadata,
+        statement_descriptor_suffix: 'EVORIACOACH',
+        description: 'Evoria Coach App',
+      };
       sessionParams.payment_method_options = {
         card: {
           installments: { enabled: true },
