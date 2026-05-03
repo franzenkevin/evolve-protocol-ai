@@ -264,8 +264,80 @@ Deno.serve(async (req) => {
         const sub = event.data.object as Stripe.Subscription;
         await getSupabase()
           .from('subscriptions')
-          .update({ status: 'canceled', updated_at: new Date().toISOString() })
+          .update({
+            status: 'canceled',
+            cancel_at_period_end: false,
+            updated_at: new Date().toISOString(),
+          })
           .eq('stripe_subscription_id', sub.id);
+        break;
+      }
+      case 'invoice.payment_succeeded': {
+        // Renewal confirmed → refresh subscription period
+        const invoice = event.data.object as Stripe.Invoice;
+        const subId = typeof invoice.subscription === 'string'
+          ? invoice.subscription
+          : invoice.subscription?.id;
+        if (subId) {
+          const sub = await stripe.subscriptions.retrieve(subId);
+          await upsertSubscriptionFromStripe(sub);
+        }
+        break;
+      }
+      case 'invoice.payment_failed': {
+        // Payment failed → mark past_due so app can prompt the user
+        const invoice = event.data.object as Stripe.Invoice;
+        const subId = typeof invoice.subscription === 'string'
+          ? invoice.subscription
+          : invoice.subscription?.id;
+        if (subId) {
+          await getSupabase()
+            .from('subscriptions')
+            .update({ status: 'past_due', updated_at: new Date().toISOString() })
+            .eq('stripe_subscription_id', subId);
+        }
+        break;
+      }
+      case 'charge.refunded': {
+        // Full or partial refund issued
+        const charge = event.data.object as Stripe.Charge;
+        const isFullRefund = charge.amount_refunded >= charge.amount;
+        const customerId = typeof charge.customer === 'string'
+          ? charge.customer
+          : charge.customer?.id;
+        if (customerId && isFullRefund) {
+          await getSupabase()
+            .from('subscriptions')
+            .update({ status: 'refunded', updated_at: new Date().toISOString() })
+            .eq('stripe_customer_id', customerId);
+        }
+        console.log('charge refunded', { charge: charge.id, full: isFullRefund });
+        break;
+      }
+      case 'charge.dispute.created': {
+        // Chargeback opened by customer's bank
+        const dispute = event.data.object as Stripe.Dispute;
+        const chargeId = typeof dispute.charge === 'string' ? dispute.charge : dispute.charge.id;
+        try {
+          const charge = await stripe.charges.retrieve(chargeId);
+          const customerId = typeof charge.customer === 'string'
+            ? charge.customer
+            : charge.customer?.id;
+          if (customerId) {
+            await getSupabase()
+              .from('subscriptions')
+              .update({ status: 'disputed', updated_at: new Date().toISOString() })
+              .eq('stripe_customer_id', customerId);
+          }
+        } catch (e) {
+          console.error('dispute lookup failed', e);
+        }
+        console.warn('🚨 chargeback opened', { dispute: dispute.id, reason: dispute.reason, amount: dispute.amount });
+        break;
+      }
+      case 'charge.dispute.closed': {
+        const dispute = event.data.object as Stripe.Dispute;
+        console.log('dispute closed', { dispute: dispute.id, status: dispute.status });
         break;
       }
       default:
