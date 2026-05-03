@@ -2,6 +2,7 @@ import { ReactNode, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Home, Dumbbell, UtensilsCrossed, MessageCircle, TrendingUp, FlaskConical, Menu } from "lucide-react";
 import AppSidebar from "@/components/sidebar/AppSidebar";
+import PaymentStatusBanner from "@/components/PaymentStatusBanner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
