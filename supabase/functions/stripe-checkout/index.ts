@@ -138,26 +138,7 @@ Deno.serve(async (req) => {
     // Métodos de pagamento:
     // - Mensal (subscription): cartão (inclui Apple Pay / Google Pay automaticamente via wallets do navegador)
     // - One-time (anual, exames, hormonal): cartão + Pix + wallets (Apple/Google Pay)
-    const paymentMethodTypes: string[] = ['card'];
-    if (checkoutMode === 'payment') {
-      try {
-        const paymentMethods = await stripe.paymentMethods.list({
-          customer: undefined,
-          type: 'card',
-          limit: 1,
-        });
-        void paymentMethods;
-        const configuredMethods = await stripe.paymentMethodConfigurations.list({ limit: 25 });
-        const pixEnabled = configuredMethods.data.some((config: any) => {
-          const display = config?.display_preference?.overrides?.pix?.value;
-          const available = config?.available_payment_method_types;
-          return display === 'on' || (Array.isArray(available) && available.includes('pix'));
-        });
-        if (pixEnabled) paymentMethodTypes.push('pix');
-      } catch (e) {
-        console.warn('could not verify pix availability, falling back to card only', e);
-      }
-    }
+    const paymentMethodTypes: string[] = checkoutMode === 'payment' ? ['card', 'pix'] : ['card'];
 
     const sessionParams: any = {
       mode: checkoutMode,
