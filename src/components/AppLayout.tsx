@@ -46,7 +46,10 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
         </div>
       </header>
 
-      <main className="flex-1 overflow-auto pb-20">{children}</main>
+      <main className="flex-1 overflow-auto pb-20">
+        <PaymentStatusBanner />
+        {children}
+      </main>
 
       {/* Bottom nav */}
       <nav className="fixed bottom-0 left-0 right-0 glass border-t border-border z-50 safe-area-bottom">
