@@ -84,7 +84,7 @@ function buildWelcomeEmail(firstName: string, actionUrl: string) {
 </html>`;
 }
 
-async function sendWelcomeEmail(userId: string) {
+async function sendWelcomeEmail(userId: string, fallbackName?: string | null) {
   try {
     const sb = getSupabase();
     const { data: u } = await sb.auth.admin.getUserById(userId);
