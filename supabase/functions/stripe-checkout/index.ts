@@ -136,9 +136,8 @@ Deno.serve(async (req) => {
     const isAnnual = planCode === 'annual';
 
     // Métodos de pagamento:
-    // - Mensal (subscription): apenas cartão recorrente.
-    // - Demais (payment one-time: anual, exames, novo protocolo, hormonal):
-    //   cartão (à vista ou parcelado até 12x sem juros) + Pix. Sem boleto.
+    // - Mensal (subscription): cartão (inclui Apple Pay / Google Pay automaticamente via wallets do navegador)
+    // - One-time (anual, exames, hormonal): cartão + Pix + wallets (Apple/Google Pay)
     const paymentMethodTypes: string[] = ['card'];
     if (checkoutMode === 'payment') {
       paymentMethodTypes.push('pix');
