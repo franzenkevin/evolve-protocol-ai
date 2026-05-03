@@ -201,6 +201,7 @@ Deno.serve(async (req) => {
         // Provision user account from Stripe-collected email if not yet linked
         const buyerEmail =
           session.customer_details?.email || session.customer_email || null;
+        const buyerName = session.customer_details?.name || null;
         if (!userId && buyerEmail) {
           const sb = getSupabase();
           const email = buyerEmail.toLowerCase();
@@ -212,7 +213,7 @@ Deno.serve(async (req) => {
             const { data: created, error: cErr } = await sb.auth.admin.createUser({
               email,
               email_confirm: false,
-              user_metadata: { source: 'guest_checkout' },
+              user_metadata: { source: 'guest_checkout', full_name: buyerName || undefined },
             });
             if (cErr) {
               console.error('post-payment createUser failed', cErr);
@@ -220,8 +221,22 @@ Deno.serve(async (req) => {
               userId = created.user.id;
             }
           }
+          // Save name to profile + auth metadata if we have it
+          if (userId && buyerName) {
+            try {
+              await sb.auth.admin.updateUserById(userId, {
+                user_metadata: { full_name: buyerName },
+              });
+              await sb.from('profiles').upsert(
+                { user_id: userId, full_name: buyerName },
+                { onConflict: 'user_id' },
+              );
+            } catch (e) {
+              console.warn('failed to save buyer name', e);
+            }
+          }
           await sb.from('leads').upsert(
-            { email, name: null, source: 'paywall_guest', status: 'converted', converted_user_id: userId || null },
+            { email, name: buyerName, source: 'paywall_guest', status: 'converted', converted_user_id: userId || null },
             { onConflict: 'email' },
           );
         }
@@ -239,7 +254,7 @@ Deno.serve(async (req) => {
             }
           }
           await upsertSubscriptionFromStripe(sub, session.id);
-          if (userId) await sendWelcomeEmail(userId);
+          if (userId) await sendWelcomeEmail(userId, buyerName);
           // Mark lead converted
           if (buyerEmail) {
             await getSupabase()
