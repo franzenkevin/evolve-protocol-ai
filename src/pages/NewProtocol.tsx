@@ -16,7 +16,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2, Sparkles, RefreshCw, ShieldCheck, ArrowLeft, Stethoscope } from "lucide-react";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import {
@@ -36,6 +36,9 @@ const NewProtocol = () => {
   const { data: profile } = useProfile();
   const consume = useConsumeRegenCredit();
   const qc = useQueryClient();
+  const checkoutCompleted =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("checkout") === "success";
   const [confirming, setConfirming] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [reanalysis, setReanalysis] = useState({
@@ -49,9 +52,30 @@ const NewProtocol = () => {
   const handlePay = () => {
     openCheckout({
       priceId: "hypertrophy_new_protocol_once",
-      successUrl: `${window.location.origin}/checkout/success?type=new_protocol`,
+      successUrl: `${window.location.origin}/new-protocol?checkout=success`,
     });
   };
+
+  useEffect(() => {
+    if (!checkoutCompleted) return;
+    if (status?.availableCredit || (status && !status.canPurchase)) {
+      navigate("/new-protocol", { replace: true });
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      qc.invalidateQueries({ queryKey: ["protocol-regen"] });
+    }, 2000);
+
+    const stopPolling = window.setTimeout(() => {
+      window.clearInterval(interval);
+    }, 20000);
+
+    return () => {
+      window.clearInterval(interval);
+      window.clearTimeout(stopPolling);
+    };
+  }, [checkoutCompleted, navigate, qc, status]);
 
   const handleGenerate = async () => {
     if (!status?.availableCredit) return;
@@ -94,6 +118,7 @@ const NewProtocol = () => {
 
   const hasCredit = !!status?.availableCredit;
   const blockedThisYear = status && !status.canPurchase && !hasCredit;
+  const confirmingPayment = checkoutCompleted && !hasCredit && !blockedThisYear;
 
   return (
     <AppLayout>
@@ -224,9 +249,16 @@ const NewProtocol = () => {
           </Card>
         )}
 
-        {isLoading ? (
+        {isLoading || confirmingPayment ? (
           <Card className="p-6 flex justify-center">
-            <Loader2 className="animate-spin text-primary" />
+            <div className="flex flex-col items-center gap-3 text-center">
+              <Loader2 className="animate-spin text-primary" />
+              {confirmingPayment && (
+                <p className="text-xs text-muted-foreground max-w-xs">
+                  Pagamento recebido. Estamos liberando sua regeneração para você refazer o processo.
+                </p>
+              )}
+            </div>
           </Card>
         ) : hasCredit ? (
           <Card className="p-4 border-primary bg-primary/5">
