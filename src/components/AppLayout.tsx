@@ -2,6 +2,7 @@ import { ReactNode, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Home, Dumbbell, UtensilsCrossed, MessageCircle, TrendingUp, FlaskConical, Menu } from "lucide-react";
 import AppSidebar from "@/components/sidebar/AppSidebar";
+import PaymentStatusBanner from "@/components/PaymentStatusBanner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -45,7 +46,10 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
         </div>
       </header>
 
-      <main className="flex-1 overflow-auto pb-20">{children}</main>
+      <main className="flex-1 overflow-auto pb-20">
+        <PaymentStatusBanner />
+        {children}
+      </main>
 
       {/* Bottom nav */}
       <nav className="fixed bottom-0 left-0 right-0 glass border-t border-border z-50 safe-area-bottom">
