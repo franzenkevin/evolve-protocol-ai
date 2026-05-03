@@ -20,7 +20,9 @@ import {
   Receipt,
   Activity,
   Sparkles,
+  ShoppingBag,
 } from "lucide-react";
+import AdminPurchases from "@/components/admin/AdminPurchases";
 import AdminAIHealth from "@/components/admin/AdminAIHealth";
 import AdminMetrics from "@/components/admin/AdminMetrics";
 import AdminSales from "@/components/admin/AdminSales";
