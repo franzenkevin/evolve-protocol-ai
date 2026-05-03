@@ -21,6 +21,7 @@ const BodySchema = z.object({
   html: z.string().min(1),
   text: z.string().optional(),
   replyTo: z.string().email().optional(),
+  bcc: z.union([z.string().email(), z.array(z.string().email())]).optional(),
 });
 
 let _transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
