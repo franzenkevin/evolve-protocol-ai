@@ -352,6 +352,17 @@ Deno.serve(async (req) => {
               .neq('status', 'converted');
           }
         }
+
+        // One-time payments (exames, hormonal, novo protocolo) — não geram assinatura
+        if (session.mode === 'payment') {
+          const purchasedPriceId = (session.metadata?.priceId as string) || '';
+          if (buyerEmail && EXAM_PRODUCT_LABELS[purchasedPriceId]) {
+            await sendExamInstructionsEmail(buyerEmail, buyerName, purchasedPriceId);
+          } else if (userId) {
+            // Outros one-time (ex.: novo protocolo) — welcome simples
+            await sendWelcomeEmail(userId, buyerName);
+          }
+        }
         break;
       }
       case 'customer.subscription.created':
