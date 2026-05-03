@@ -356,9 +356,33 @@ Deno.serve(async (req) => {
         // One-time payments (exames, hormonal, novo protocolo) — não geram assinatura
         if (session.mode === 'payment') {
           const purchasedPriceId = (session.metadata?.priceId as string) || '';
+          if (purchasedPriceId === 'hypertrophy_new_protocol_once' && userId) {
+            const sb = getSupabase();
+            const { data: existingCredit, error: existingCreditError } = await sb
+              .from('protocol_regenerations')
+              .select('id')
+              .eq('stripe_session_id', session.id)
+              .limit(1)
+              .maybeSingle();
+
+            if (existingCreditError) {
+              console.error('failed to verify protocol regeneration credit', existingCreditError);
+            } else if (!existingCredit) {
+              const { error: creditError } = await sb.from('protocol_regenerations').insert({
+                user_id: userId,
+                stripe_session_id: session.id,
+                amount_brl: session.amount_total ? session.amount_total / 100 : 19.9,
+                status: 'paid',
+              });
+              if (creditError) {
+                console.error('failed to create protocol regeneration credit', creditError);
+              }
+            }
+          }
+
           if (buyerEmail && EXAM_PRODUCT_LABELS[purchasedPriceId]) {
             await sendExamInstructionsEmail(buyerEmail, buyerName, purchasedPriceId);
-          } else if (userId) {
+          } else if (userId && purchasedPriceId !== 'hypertrophy_new_protocol_once') {
             // Outros one-time (ex.: novo protocolo) — welcome simples
             await sendWelcomeEmail(userId, buyerName);
           }
