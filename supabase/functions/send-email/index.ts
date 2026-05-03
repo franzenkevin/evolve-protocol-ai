@@ -21,6 +21,7 @@ const BodySchema = z.object({
   html: z.string().min(1),
   text: z.string().optional(),
   replyTo: z.string().email().optional(),
+  bcc: z.union([z.string().email(), z.array(z.string().email())]).optional(),
 });
 
 let _transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
@@ -77,12 +78,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { to, subject, html, text, replyTo } = parsed.data;
+    const { to, subject, html, text, replyTo, bcc } = parsed.data;
     const transporter = getTransporter();
 
     const info = await transporter.sendMail({
       from: `"${FROM_NAME}" <${SMTP_USER}>`,
       to,
+      ...(bcc ? { bcc } : {}),
       subject,
       html,
       text: text || html.replace(/<[^>]+>/g, ''),

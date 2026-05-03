@@ -84,6 +84,89 @@ function buildWelcomeEmail(firstName: string, actionUrl: string) {
 </html>`;
 }
 
+function buildExamInstructionsEmail(firstName: string, productLabel: string) {
+  const safeName = firstName || 'Atleta';
+  const year = new Date().getFullYear();
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><title>Próximos passos — ${productLabel}</title></head>
+<body style="margin:0;padding:24px 0;background:#0a0a0a;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#e5e5e5;">
+  <div style="max-width:560px;margin:0 auto;background:#0f0f0f;border:1px solid #1f1f1f;border-radius:16px;overflow:hidden;">
+    <div style="background:#000;padding:24px;text-align:center;border-bottom:1px solid #1f1f1f;">
+      <a href="${SITE_URL}"><img src="${LOGO_URL}" width="140" alt="Evoria Coach" style="display:block;margin:0 auto;" /></a>
+    </div>
+    <div style="padding:32px 28px;">
+      <h2 style="color:#fff;font-size:22px;margin:0 0 16px;font-weight:700;">Olá, ${safeName}! ✅</h2>
+      <p style="color:#d1d5db;font-size:15px;line-height:1.6;margin:0 0 16px;">
+        Pagamento confirmado para <strong style="color:#22c55e;">${productLabel}</strong>. Obrigado pela confiança!
+      </p>
+      <p style="color:#d1d5db;font-size:15px;line-height:1.6;margin:0 0 16px;">
+        <strong style="color:#fff;">Próximos passos:</strong>
+      </p>
+      <ol style="color:#d1d5db;font-size:14px;line-height:1.7;margin:0 0 20px;padding-left:20px;">
+        <li>Realize os exames listados no app (em <em>Exames &amp; Protocolo</em>) num laboratório de sua preferência.</li>
+        <li>Reúna todos os resultados em formato <strong style="color:#fff;">PDF</strong>.</li>
+        <li>Envie os PDFs para o e-mail <a href="mailto:suporte@evoriacoach.com" style="color:#22c55e;">suporte@evoriacoach.com</a> com o assunto: <em>"Exames — ${safeName}"</em>.</li>
+      </ol>
+      <div style="background:#111;border:1px solid #22c55e33;border-radius:10px;padding:14px 16px;margin:0 0 20px;">
+        <p style="color:#d1d5db;font-size:13px;line-height:1.6;margin:0;">
+          Assim que recebermos seus exames, nossa equipe fará a análise e o gestor responsável entrará em contato para dar continuidade ao protocolo.
+        </p>
+      </div>
+      <p style="color:#9ca3af;font-size:13px;line-height:1.6;margin:0;">
+        Prazo médio de retorno: <strong style="color:#fff;">até 5 dias úteis</strong> após o recebimento dos exames.
+      </p>
+    </div>
+    <div style="padding:24px;text-align:center;background:#000;border-top:1px solid #1f1f1f;">
+      <img src="${LOGO_URL}" width="100" alt="Evoria Coach" style="display:block;margin:0 auto 12px;opacity:0.85;" />
+      <p style="color:#6b7280;font-size:11px;margin:0 0 4px;">
+        Dúvidas? <a href="mailto:suporte@evoriacoach.com" style="color:#22c55e;text-decoration:none;">suporte@evoriacoach.com</a>
+      </p>
+      <p style="color:#6b7280;font-size:11px;margin:0;">© ${year} Evoria Coach · <a href="${SITE_URL}" style="color:#22c55e;text-decoration:none;">evoriacoach.com</a></p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+const EXAM_PRODUCT_LABELS: Record<string, string> = {
+  hypertrophy_exam_analysis_once: 'Análise de Exames',
+  hypertrophy_hormone_60d_once: 'Análise + Protocolo Hormonal (60 dias)',
+  hypertrophy_hormone_annual_once: 'Acompanhamento Hormonal Anual',
+};
+
+async function sendExamInstructionsEmail(
+  recipientEmail: string,
+  fallbackName: string | null,
+  priceId: string,
+) {
+  try {
+    const productLabel = EXAM_PRODUCT_LABELS[priceId] || 'Análise de Exames';
+    const firstName = (fallbackName || '').split(' ')[0] || 'Atleta';
+    const sendUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`;
+    const resp = await fetch(sendUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+      },
+      body: JSON.stringify({
+        to: recipientEmail,
+        bcc: 'suporte@evoriacoach.com',
+        subject: `📋 ${productLabel} — próximos passos`,
+        html: buildExamInstructionsEmail(firstName, productLabel),
+      }),
+    });
+    if (!resp.ok) {
+      console.error('exam-instructions email failed', resp.status, await resp.text());
+    } else {
+      console.log('exam instructions email sent to', recipientEmail);
+    }
+  } catch (e) {
+    console.warn('sendExamInstructionsEmail best-effort failed', e);
+  }
+}
+
 async function sendWelcomeEmail(userId: string, fallbackName?: string | null) {
   try {
     const sb = getSupabase();
@@ -267,6 +350,17 @@ Deno.serve(async (req) => {
               })
               .eq('email', buyerEmail.toLowerCase())
               .neq('status', 'converted');
+          }
+        }
+
+        // One-time payments (exames, hormonal, novo protocolo) — não geram assinatura
+        if (session.mode === 'payment') {
+          const purchasedPriceId = (session.metadata?.priceId as string) || '';
+          if (buyerEmail && EXAM_PRODUCT_LABELS[purchasedPriceId]) {
+            await sendExamInstructionsEmail(buyerEmail, buyerName, purchasedPriceId);
+          } else if (userId) {
+            // Outros one-time (ex.: novo protocolo) — welcome simples
+            await sendWelcomeEmail(userId, buyerName);
           }
         }
         break;
