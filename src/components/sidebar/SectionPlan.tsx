@@ -1,9 +1,28 @@
+import { useState } from "react";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Card } from "@/components/ui/card";
-import { CreditCard, Calendar, Crown } from "lucide-react";
+import { CreditCard, Calendar, Crown, Loader2, Settings } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const SectionPlan = () => {
   const { data: sub } = useSubscription();
+  const [loadingPortal, setLoadingPortal] = useState(false);
+
+  const openPortal = async () => {
+    setLoadingPortal(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("customer-portal");
+      if (error) throw error;
+      const url = (data as any)?.url;
+      if (!url) throw new Error("URL não retornada");
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (e: any) {
+      toast.error(e?.message || "Não foi possível abrir o portal");
+    } finally {
+      setLoadingPortal(false);
+    }
+  };
 
   const planLabel = sub?.plan_type === "annual" ? "Anual" : "Mensal";
   const statusLabel = sub?.status === "active" ? "Ativo" : sub?.status || "Sem plano";
@@ -44,6 +63,18 @@ const SectionPlan = () => {
           </>
         )}
       </Card>
+
+      {sub && ["active", "trialing", "past_due"].includes(sub.status || "") && (
+        <button
+          type="button"
+          onClick={openPortal}
+          disabled={loadingPortal}
+          className="w-full flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors px-1 py-1 disabled:opacity-50"
+        >
+          {loadingPortal ? <Loader2 size={11} className="animate-spin" /> : <Settings size={11} />}
+          <span>Gerenciar assinatura</span>
+        </button>
+      )}
     </div>
   );
 };
