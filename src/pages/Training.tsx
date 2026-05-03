@@ -589,41 +589,41 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
               </div>
 
               {profile?.experience === "iniciante" ? (
-                <div className="space-y-2.5">
-                  <div className="flex gap-2.5">
-                    <div className="w-6 h-6 rounded-full bg-muted text-foreground flex items-center justify-center text-[10px] font-bold shrink-0">A</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-foreground">Aquecimento — 50% da carga máx. já usada</p>
-                      <p className="text-[11px] text-muted-foreground">15 reps controladas. SEM chegar perto da falha. Só preparar o músculo.</p>
+                <div className="space-y-3 sm:space-y-3.5">
+                  <div className="flex gap-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted text-foreground flex items-center justify-center text-xs font-bold shrink-0">A</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground leading-snug">Aquecimento — 50% da carga máx. já usada</p>
+                      <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed mt-0.5">15 reps controladas. SEM chegar perto da falha. Só preparar o músculo.</p>
                     </div>
                   </div>
-                  <div className="flex gap-2.5">
-                    <div className="w-6 h-6 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">1</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-foreground">Válida 1 — carga máxima já usada</p>
-                      <p className="text-[11px] text-muted-foreground">Vai até 10 reps, próximo da falha (RIR 1-2).</p>
+                  <div className="flex gap-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/15 text-primary flex items-center justify-center text-xs font-bold shrink-0">1</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground leading-snug">Válida 1 — carga máxima já usada</p>
+                      <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed mt-0.5">Vai até 10 reps, próximo da falha (RIR 1-2).</p>
                     </div>
                   </div>
-                  <div className="flex gap-2.5">
-                    <div className="w-6 h-6 rounded-full bg-primary/25 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">2</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-foreground">Válida 2 — sobe 10–20% da carga</p>
-                      <p className="text-[11px] text-muted-foreground">Alvo de 8 reps, próximo da falha.</p>
+                  <div className="flex gap-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/25 text-primary flex items-center justify-center text-xs font-bold shrink-0">2</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground leading-snug">Válida 2 — sobe 10–20% da carga</p>
+                      <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed mt-0.5">Alvo de 8 reps, próximo da falha.</p>
                     </div>
                   </div>
-                  <div className="flex gap-2.5">
-                    <div className="w-6 h-6 rounded-full bg-primary/40 text-primary-foreground flex items-center justify-center text-[10px] font-bold shrink-0">3</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-foreground">Válida 3 — MESMA carga da V2, FALHA TOTAL</p>
-                      <p className="text-[11px] text-muted-foreground">A série mais importante. Só pare quando o músculo travar.</p>
+                  <div className="flex gap-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/40 text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">3</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground leading-snug">Válida 3 — MESMA carga da V2, FALHA TOTAL</p>
+                      <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed mt-0.5">A série mais importante. Só pare quando o músculo travar.</p>
                     </div>
                   </div>
 
-                  <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
-                    <p className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
-                      <TrendingUp size={11} className="text-success" /> Como progredir na próxima sessão
+                  <div className="mt-3 pt-3 border-t border-border/40 space-y-2">
+                    <p className="text-xs sm:text-sm font-semibold text-foreground flex items-center gap-1.5">
+                      <TrendingUp size={13} className="text-success" /> Como progredir na próxima sessão
                     </p>
-                    <ul className="text-[11px] text-muted-foreground space-y-1 pl-4 list-disc marker:text-primary/60">
+                    <ul className="text-xs sm:text-[13px] text-muted-foreground space-y-1.5 pl-4 list-disc marker:text-primary/60 leading-relaxed">
                       <li>Passou de <span className="text-foreground font-medium">10 reps</span> na V3 (falha) → <span className="text-success font-medium">aumenta carga</span></li>
                       <li>Ficou abaixo de <span className="text-foreground font-medium">6 reps</span> na V3 → <span className="text-warning font-medium">reduz carga</span></li>
                       <li>Entre 7-10 reps → mantém e sobe 1 rep por semana</li>
@@ -631,50 +631,50 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                   </div>
                 </div>
               ) : (
-                <div className="space-y-2.5">
-                  <div className="flex gap-2.5">
-                    <div className="w-6 h-6 rounded-full bg-muted text-foreground flex items-center justify-center text-[10px] font-bold shrink-0">A1</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-foreground">Aquecimento 1 — 50% da carga (12 reps)</p>
-                      <p className="text-[11px] text-muted-foreground">Movimento controlado, ativação muscular. Pode pular se já estiver bem aquecido.</p>
+                <div className="space-y-3 sm:space-y-3.5">
+                  <div className="flex gap-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted text-foreground flex items-center justify-center text-xs font-bold shrink-0">A1</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground leading-snug">Aquecimento 1 — 50% da carga (12 reps)</p>
+                      <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed mt-0.5">Movimento controlado, ativação muscular. Pode pular se já estiver bem aquecido.</p>
                     </div>
                   </div>
-                  <div className="flex gap-2.5">
-                    <div className="w-6 h-6 rounded-full bg-muted text-foreground flex items-center justify-center text-[10px] font-bold shrink-0">A2</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-foreground">Aquecimento 2 — 75% da carga (5–8 reps)</p>
-                      <p className="text-[11px] text-muted-foreground">Preparação neural. Ainda longe da falha.</p>
+                  <div className="flex gap-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted text-foreground flex items-center justify-center text-xs font-bold shrink-0">A2</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground leading-snug">Aquecimento 2 — 75% da carga (5–8 reps)</p>
+                      <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed mt-0.5">Preparação neural. Ainda longe da falha.</p>
                     </div>
                   </div>
-                  <div className="flex gap-2.5">
-                    <div className="w-6 h-6 rounded-full bg-primary/25 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">V</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-semibold text-foreground">
+                  <div className="flex gap-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/25 text-primary flex items-center justify-center text-xs font-bold shrink-0">V</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground leading-snug">
                         {profile?.experience === "avancado" || profile?.experience === "avançado"
                           ? "3 séries válidas (RIR 1-2)"
                           : "2 a 3 séries válidas (RIR 1-2)"}
                       </p>
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed mt-0.5">
                         Próximo da falha. A <span className="text-foreground font-medium">última é SEMPRE falha total (RIR 0)</span>.
                         {" "}Quantidade de válidas (1, 2 ou 3) varia por exercício — siga o card.
                       </p>
                     </div>
                   </div>
 
-                  <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
-                    <p className="text-[11px] font-semibold text-foreground">Zona-alvo de repetições</p>
-                    <ul className="text-[11px] text-muted-foreground space-y-1 pl-4 list-disc marker:text-primary/60">
+                  <div className="mt-3 pt-3 border-t border-border/40 space-y-2">
+                    <p className="text-xs sm:text-sm font-semibold text-foreground">Zona-alvo de repetições</p>
+                    <ul className="text-xs sm:text-[13px] text-muted-foreground space-y-1.5 pl-4 list-disc marker:text-primary/60 leading-relaxed">
                       <li>Compostos pesados / força: <span className="text-foreground font-medium">5–9 reps</span></li>
                       <li>Hipertrofia clássica: <span className="text-foreground font-medium">6–10 ou 8–12 reps</span></li>
                       <li>Isolados / resistência: <span className="text-foreground font-medium">10–15 ou 15–20 reps</span></li>
                     </ul>
                   </div>
 
-                  <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
-                    <p className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
-                      <TrendingUp size={11} className="text-success" /> Progressão contínua (olhe a SÉRIE DE FALHA)
+                  <div className="mt-3 pt-3 border-t border-border/40 space-y-2">
+                    <p className="text-xs sm:text-sm font-semibold text-foreground flex items-center gap-1.5">
+                      <TrendingUp size={13} className="text-success" /> Progressão contínua (olhe a SÉRIE DE FALHA)
                     </p>
-                    <ul className="text-[11px] text-muted-foreground space-y-1 pl-4 list-disc marker:text-primary/60">
+                    <ul className="text-xs sm:text-[13px] text-muted-foreground space-y-1.5 pl-4 list-disc marker:text-primary/60 leading-relaxed">
                       <li>Passou do <span className="text-foreground font-medium">topo da zona-alvo</span> → <span className="text-success font-medium">aumenta carga</span></li>
                       <li>Abaixo do <span className="text-foreground font-medium">piso da zona</span> → <span className="text-warning font-medium">reduz carga</span></li>
                       <li>Dentro da zona → +1 rep por semana até bater o topo</li>
@@ -682,9 +682,9 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                   </div>
 
                   {(profile?.experience === "avancado" || profile?.experience === "avançado") && (
-                    <div className="mt-3 pt-3 border-t border-border/40 space-y-1">
-                      <p className="text-[11px] font-semibold text-foreground">Volume e ciclo</p>
-                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
+                      <p className="text-xs sm:text-sm font-semibold text-foreground">Volume e ciclo</p>
+                      <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
                         Ciclo com volume <span className="text-foreground font-medium">mediano</span> para permitir progressão gradual de carga sem acumular fadiga em excesso.
                       </p>
                     </div>
@@ -693,8 +693,8 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
               )}
 
               <div className="mt-3 pt-3 border-t border-border/40 flex items-start gap-2">
-                <Info size={12} className="text-primary mt-0.5 shrink-0" />
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                <Info size={13} className="text-primary mt-0.5 shrink-0" />
+                <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
                   Siga a <span className="text-foreground font-medium">ordem dos exercícios</span> abaixo. Respeite o descanso entre séries indicado em cada exercício para manter a intensidade.
                 </p>
               </div>
