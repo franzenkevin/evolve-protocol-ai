@@ -588,9 +588,7 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                 )}
               </div>
 
-              {day.dynamicNotes ? (
-                <p className="text-xs text-muted-foreground leading-relaxed">{day.dynamicNotes}</p>
-              ) : profile?.experience === "iniciante" ? (
+              {profile?.experience === "iniciante" ? (
                 <div className="space-y-2.5">
                   <div className="flex gap-2.5">
                     <div className="w-6 h-6 rounded-full bg-muted text-foreground flex items-center justify-center text-[10px] font-bold shrink-0">A</div>
@@ -638,7 +636,7 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                     <div className="w-6 h-6 rounded-full bg-muted text-foreground flex items-center justify-center text-[10px] font-bold shrink-0">A1</div>
                     <div className="flex-1">
                       <p className="text-xs font-semibold text-foreground">Aquecimento 1 — 50% da carga (12 reps)</p>
-                      <p className="text-[11px] text-muted-foreground">Movimento controlado, ativação muscular.</p>
+                      <p className="text-[11px] text-muted-foreground">Movimento controlado, ativação muscular. Pode pular se já estiver bem aquecido.</p>
                     </div>
                   </div>
                   <div className="flex gap-2.5">
@@ -651,8 +649,15 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                   <div className="flex gap-2.5">
                     <div className="w-6 h-6 rounded-full bg-primary/25 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">V</div>
                     <div className="flex-1">
-                      <p className="text-xs font-semibold text-foreground">2 a 3 séries válidas (RIR 1-2)</p>
-                      <p className="text-[11px] text-muted-foreground">Próximo da falha. A <span className="text-foreground font-medium">última é SEMPRE falha total</span>.</p>
+                      <p className="text-xs font-semibold text-foreground">
+                        {profile?.experience === "avancado" || profile?.experience === "avançado"
+                          ? "3 séries válidas (RIR 1-2)"
+                          : "2 a 3 séries válidas (RIR 1-2)"}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Próximo da falha. A <span className="text-foreground font-medium">última é SEMPRE falha total (RIR 0)</span>.
+                        {" "}Quantidade de válidas (1, 2 ou 3) varia por exercício — siga o card.
+                      </p>
                     </div>
                   </div>
 
@@ -675,6 +680,15 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                       <li>Dentro da zona → +1 rep por semana até bater o topo</li>
                     </ul>
                   </div>
+
+                  {(profile?.experience === "avancado" || profile?.experience === "avançado") && (
+                    <div className="mt-3 pt-3 border-t border-border/40 space-y-1">
+                      <p className="text-[11px] font-semibold text-foreground">Volume e ciclo</p>
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        Ciclo com volume <span className="text-foreground font-medium">mediano</span> para permitir progressão gradual de carga sem acumular fadiga em excesso.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 
