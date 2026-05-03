@@ -105,7 +105,8 @@ async function sendWelcomeEmail(userId: string, fallbackName?: string | null) {
     }
 
     const actionUrl = linkData.properties.action_link;
-    const firstName = ((user.user_metadata as any)?.full_name || '').split(' ')[0] || 'Atleta';
+    const fullName = (user.user_metadata as any)?.full_name || fallbackName || '';
+    const firstName = (fullName || '').split(' ')[0] || 'Atleta';
 
     // Call our SMTP send-email function
     const sendUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`;
