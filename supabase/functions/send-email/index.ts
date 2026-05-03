@@ -78,12 +78,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { to, subject, html, text, replyTo } = parsed.data;
+    const { to, subject, html, text, replyTo, bcc } = parsed.data;
     const transporter = getTransporter();
 
     const info = await transporter.sendMail({
       from: `"${FROM_NAME}" <${SMTP_USER}>`,
       to,
+      ...(bcc ? { bcc } : {}),
       subject,
       html,
       text: text || html.replace(/<[^>]+>/g, ''),
