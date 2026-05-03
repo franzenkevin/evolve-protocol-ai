@@ -201,7 +201,8 @@ Deno.serve(async (req) => {
         // Provision user account from Stripe-collected email if not yet linked
         const buyerEmail =
           session.customer_details?.email || session.customer_email || null;
-        const buyerName = session.customer_details?.name || null;
+        const customFullName = session.custom_fields?.find((f: any) => f.key === 'full_name')?.text?.value || null;
+        const buyerName = customFullName || session.customer_details?.name || null;
         if (!userId && buyerEmail) {
           const sb = getSupabase();
           const email = buyerEmail.toLowerCase();

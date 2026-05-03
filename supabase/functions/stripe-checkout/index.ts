@@ -159,6 +159,13 @@ Deno.serve(async (req) => {
       tax_id_collection: { enabled: true },
       custom_fields: [
         {
+          key: 'full_name',
+          label: { type: 'custom', custom: 'Nome completo (como no documento)' },
+          type: 'text',
+          text: { minimum_length: 3, maximum_length: 100 },
+          optional: false,
+        },
+        {
           key: 'cpf',
           label: { type: 'custom', custom: 'CPF (para emissão de nota fiscal)' },
           type: 'text',
