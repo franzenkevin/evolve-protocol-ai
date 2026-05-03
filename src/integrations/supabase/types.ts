@@ -1029,6 +1029,60 @@ export type Database = {
         }
         Relationships: []
       }
+      purchases: {
+        Row: {
+          amount_brl: number
+          buyer_email: string
+          buyer_name: string | null
+          category: string | null
+          created_at: string
+          currency: string
+          id: string
+          metadata: Json
+          product_id: string
+          product_label: string | null
+          status: string
+          stripe_payment_intent: string | null
+          stripe_session_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_brl?: number
+          buyer_email: string
+          buyer_name?: string | null
+          category?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          metadata?: Json
+          product_id: string
+          product_label?: string | null
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_brl?: number
+          buyer_email?: string
+          buyer_name?: string | null
+          category?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          metadata?: Json
+          product_id?: string
+          product_label?: string | null
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       push_subscriptions: {
         Row: {
           auth: string

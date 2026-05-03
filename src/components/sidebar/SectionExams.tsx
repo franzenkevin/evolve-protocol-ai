@@ -153,6 +153,11 @@ const SectionExams = () => {
 
       <div className="space-y-2">
         <p className="text-[10px] text-muted-foreground px-1 uppercase tracking-wider font-semibold">Planos de acompanhamento</p>
+        <Card className="p-2.5 bg-primary/5 border-primary/20">
+          <p className="text-[11px] text-foreground leading-relaxed">
+            <strong className="text-primary">Atendimento humano:</strong> ao contratar qualquer um dos planos abaixo, um profissional capacitado da Evoria entrará em contato direto com você por e-mail/WhatsApp para conduzir o processo.
+          </p>
+        </Card>
         {SERVICES.map(({ icon: Icon, title, desc, price, priceId }) => (
           <Card key={title} className="p-3 card-gradient border-border">
             <div className="flex items-start gap-2">
