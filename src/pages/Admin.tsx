@@ -75,6 +75,7 @@ const Admin = () => {
             <TabsTrigger value="sales" className="gap-1"><CreditCard size={14} />Vendas</TabsTrigger>
             <TabsTrigger value="renewals" className="gap-1"><Calendar size={14} />Renovações</TabsTrigger>
             <TabsTrigger value="refunds" className="gap-1"><Receipt size={14} />Reembolsos</TabsTrigger>
+            <TabsTrigger value="purchases" className="gap-1"><ShoppingBag size={14} />Compras</TabsTrigger>
             <TabsTrigger value="leads" className="gap-1"><Megaphone size={14} />Leads</TabsTrigger>
             <TabsTrigger value="meetings" className="gap-1"><Video size={14} />Reuniões</TabsTrigger>
             <TabsTrigger value="plans" className="gap-1"><DollarSign size={14} />Planos</TabsTrigger>
