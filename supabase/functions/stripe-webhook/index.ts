@@ -135,6 +135,113 @@ const EXAM_PRODUCT_LABELS: Record<string, string> = {
   hypertrophy_hormone_annual_once: 'Acompanhamento Hormonal Anual',
 };
 
+const PRODUCT_LABELS: Record<string, string> = {
+  ...EXAM_PRODUCT_LABELS,
+  hypertrophy_new_protocol_once: 'Regeneração de Protocolo',
+};
+
+function productCategory(priceId: string): string {
+  if (EXAM_PRODUCT_LABELS[priceId]) return 'exam';
+  if (priceId === 'hypertrophy_new_protocol_once') return 'protocol_regeneration';
+  return 'other';
+}
+
+function buildPurchaseConfirmationEmail(
+  firstName: string,
+  productLabel: string,
+  amountBrl: number,
+) {
+  const safeName = firstName || 'Atleta';
+  const year = new Date().getFullYear();
+  const priceFmt = amountBrl
+    ? amountBrl.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    : '';
+  return `<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Pagamento confirmado — ${productLabel}</title></head>
+<body style="margin:0;padding:24px 0;background:#0a0a0a;font-family:'Inter',sans-serif;color:#e5e5e5;">
+  <div style="max-width:560px;margin:0 auto;background:#0f0f0f;border:1px solid #1f1f1f;border-radius:16px;overflow:hidden;">
+    <div style="background:#000;padding:24px;text-align:center;border-bottom:1px solid #1f1f1f;">
+      <a href="${SITE_URL}"><img src="${LOGO_URL}" width="140" alt="Evoria Coach" /></a>
+    </div>
+    <div style="padding:32px 28px;">
+      <h2 style="color:#fff;font-size:22px;margin:0 0 16px;">Pagamento confirmado ✅</h2>
+      <p style="color:#d1d5db;font-size:15px;line-height:1.6;margin:0 0 16px;">Olá, ${safeName}!</p>
+      <p style="color:#d1d5db;font-size:15px;line-height:1.6;margin:0 0 16px;">
+        Recebemos seu pagamento de <strong style="color:#22c55e;">${productLabel}</strong>${priceFmt ? ` — <strong>${priceFmt}</strong>` : ''}.
+      </p>
+      <p style="color:#d1d5db;font-size:14px;line-height:1.6;margin:0 0 16px;">
+        Guarde este e-mail como comprovante. Em caso de dúvidas, responda diretamente para
+        <a href="mailto:suporte@evoriacoach.com" style="color:#22c55e;">suporte@evoriacoach.com</a>.
+      </p>
+    </div>
+    <div style="padding:20px;text-align:center;background:#000;border-top:1px solid #1f1f1f;">
+      <p style="color:#6b7280;font-size:11px;margin:0;">© ${year} Evoria Coach</p>
+    </div>
+  </div>
+</body></html>`;
+}
+
+async function sendPurchaseConfirmationEmail(
+  recipientEmail: string,
+  fallbackName: string | null,
+  productLabel: string,
+  amountBrl: number,
+) {
+  try {
+    const firstName = (fallbackName || '').split(' ')[0] || 'Atleta';
+    const sendUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`;
+    const resp = await fetch(sendUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+      },
+      body: JSON.stringify({
+        to: recipientEmail,
+        bcc: 'suporte@evoriacoach.com',
+        subject: `✅ Pagamento confirmado — ${productLabel}`,
+        html: buildPurchaseConfirmationEmail(firstName, productLabel, amountBrl),
+      }),
+    });
+    if (!resp.ok) console.error('purchase-confirmation email failed', resp.status, await resp.text());
+  } catch (e) {
+    console.warn('sendPurchaseConfirmationEmail best-effort failed', e);
+  }
+}
+
+async function recordPurchase(args: {
+  userId: string | null;
+  buyerEmail: string;
+  buyerName: string | null;
+  priceId: string;
+  productLabel: string;
+  amountBrl: number;
+  sessionId: string;
+  paymentIntent: string | null;
+}) {
+  try {
+    const sb = getSupabase();
+    await sb.from('purchases').upsert(
+      {
+        user_id: args.userId,
+        buyer_email: args.buyerEmail.toLowerCase(),
+        buyer_name: args.buyerName,
+        product_id: args.priceId,
+        product_label: args.productLabel,
+        amount_brl: args.amountBrl,
+        currency: 'brl',
+        stripe_session_id: args.sessionId,
+        stripe_payment_intent: args.paymentIntent,
+        status: 'paid',
+        category: productCategory(args.priceId),
+      },
+      { onConflict: 'stripe_session_id' },
+    );
+  } catch (e) {
+    console.error('recordPurchase failed', e);
+  }
+}
+
 async function sendExamInstructionsEmail(
   recipientEmail: string,
   fallbackName: string | null,
