@@ -487,10 +487,33 @@ Deno.serve(async (req) => {
             }
           }
 
-          if (buyerEmail && EXAM_PRODUCT_LABELS[purchasedPriceId]) {
-            await sendExamInstructionsEmail(buyerEmail, buyerName, purchasedPriceId);
-          } else if (userId && purchasedPriceId !== 'hypertrophy_new_protocol_once') {
-            // Outros one-time (ex.: novo protocolo) — welcome simples
+          const amountBrl = session.amount_total ? session.amount_total / 100 : 0;
+          const productLabel = PRODUCT_LABELS[purchasedPriceId] || 'Compra Evoria Coach';
+          const paymentIntent =
+            typeof session.payment_intent === 'string'
+              ? session.payment_intent
+              : session.payment_intent?.id || null;
+
+          if (buyerEmail) {
+            await recordPurchase({
+              userId: userId || null,
+              buyerEmail,
+              buyerName,
+              priceId: purchasedPriceId || 'unknown',
+              productLabel,
+              amountBrl,
+              sessionId: session.id,
+              paymentIntent,
+            });
+
+            await sendPurchaseConfirmationEmail(buyerEmail, buyerName, productLabel, amountBrl);
+
+            if (EXAM_PRODUCT_LABELS[purchasedPriceId]) {
+              await sendExamInstructionsEmail(buyerEmail, buyerName, purchasedPriceId);
+            }
+          }
+
+          if (userId && purchasedPriceId !== 'hypertrophy_new_protocol_once') {
             await sendWelcomeEmail(userId, buyerName);
           }
         }
