@@ -93,6 +93,7 @@ const Admin = () => {
           <TabsContent value="sales" className="mt-4"><AdminSales /></TabsContent>
           <TabsContent value="renewals" className="mt-4"><AdminRenewals /></TabsContent>
           <TabsContent value="refunds" className="mt-4"><AdminRefunds /></TabsContent>
+          <TabsContent value="purchases" className="mt-4"><AdminPurchases /></TabsContent>
           <TabsContent value="leads" className="mt-4"><AdminLeads /></TabsContent>
           <TabsContent value="meetings" className="mt-4"><AdminMeetings /></TabsContent>
           <TabsContent value="plans" className="mt-4"><AdminPlans /></TabsContent>
