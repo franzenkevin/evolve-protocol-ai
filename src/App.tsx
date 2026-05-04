@@ -39,6 +39,7 @@ const MilestoneCheckin = lazy(() => import("./pages/MilestoneCheckin"));
 const Support = lazy(() => import("./pages/Support"));
 const Install = lazy(() => import("./pages/Install"));
 import InstallPrompt from "./components/InstallPrompt";
+import { UpdateAvailableBanner } from "./components/UpdateAvailableBanner";
 import { CURRENT_TERMS_VERSION } from "@/lib/terms";
 
 const queryClient = new QueryClient();
@@ -107,6 +108,7 @@ const App = () => (
             </Routes>
           </Suspense>
           <InstallPrompt />
+          <UpdateAvailableBanner />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
