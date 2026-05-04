@@ -576,13 +576,13 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
 
             {/* Dinâmica do treino — visual, organizada por nível */}
             <Card className="p-4 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-              <div className="flex items-center gap-2 mb-3">
-                <Flame size={16} className="text-primary" />
-                <h3 className="font-heading font-semibold text-sm text-foreground">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <Flame size={16} className="text-primary shrink-0" />
+                <h3 className="font-heading font-semibold text-sm text-foreground min-w-0">
                   Dinâmica do treino
                 </h3>
                 {profile?.experience && (
-                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-primary/30 text-primary capitalize ml-auto">
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-primary/30 text-primary capitalize ml-auto shrink-0">
                     {profile.experience}
                   </Badge>
                 )}
