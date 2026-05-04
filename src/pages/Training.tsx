@@ -831,7 +831,6 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                         <ChevronDown size={16} className="text-muted-foreground" />
                       )}
                       </div>
-                      )}
                     </button>
 
                     {/* Expanded: Set tracking */}
