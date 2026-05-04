@@ -956,7 +956,7 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                         )}
 
                         {/* Sets table header */}
-                        <div className="grid grid-cols-[60px_1fr_1fr_40px] gap-2 text-xs text-muted-foreground font-medium px-1">
+                        <div className="grid grid-cols-[52px_minmax(0,1fr)_minmax(0,1fr)_36px] sm:grid-cols-[60px_minmax(0,1fr)_minmax(0,1fr)_40px] gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-muted-foreground font-medium px-1">
                           <span>Série</span>
                           <span>Carga (kg)</span>
                           <span>Reps</span>
