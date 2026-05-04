@@ -178,6 +178,31 @@ export default function Plans() {
         {/* Teaser da avaliação postural — só pra quem fez o quiz e ainda não pagou */}
         {isPostQuiz && <AssessmentTeaserCard />}
 
+        {/* Plano ativo MAS sem protocolo gerado — caminho explícito para gerar agora */}
+        {isActive && !protocol && (
+          <Card className="p-5 border-primary/40 bg-primary/10 animate-fade-in space-y-3">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                <Zap size={20} className="text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-base font-heading font-bold text-foreground">
+                  Você já tem plano ativo, {firstName}!
+                </p>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  Seu pagamento está confirmado, mas o protocolo ainda não foi gerado.
+                  Clique abaixo para gerarmos seu treino + dieta agora.
+                </p>
+              </div>
+            </div>
+            <Button asChild size="lg" className="w-full glow gap-2 h-12">
+              <Link to="/checkout/success">
+                Gerar meu protocolo agora <ArrowRight size={18} />
+              </Link>
+            </Button>
+          </Card>
+        )}
+
         {isActive && (
           <Card className="p-4 card-gradient border-primary/30">
             <div className="flex items-center justify-between mb-2">
