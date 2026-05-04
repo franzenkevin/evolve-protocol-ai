@@ -576,13 +576,13 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
 
             {/* Dinâmica do treino — visual, organizada por nível */}
             <Card className="p-4 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-              <div className="flex items-center gap-2 mb-3">
-                <Flame size={16} className="text-primary" />
-                <h3 className="font-heading font-semibold text-sm text-foreground">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <Flame size={16} className="text-primary shrink-0" />
+                <h3 className="font-heading font-semibold text-sm text-foreground min-w-0">
                   Dinâmica do treino
                 </h3>
                 {profile?.experience && (
-                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-primary/30 text-primary capitalize ml-auto">
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-primary/30 text-primary capitalize ml-auto shrink-0">
                     {profile.experience}
                   </Badge>
                 )}
@@ -796,10 +796,10 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                       className="w-full p-4 flex items-center gap-3 text-left"
                       onClick={() => setExpandedExercise(isExpanded ? null : ex.id)}
                     >
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p
-                            className={`font-medium text-sm ${allValidDone ? "text-primary" : "text-foreground"}`}
+                            className={`font-medium text-sm break-words ${allValidDone ? "text-primary" : "text-foreground"}`}
                           >
                             {swappedNames[ex.id] || ex.name}
                           </p>
@@ -818,17 +818,19 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                             <Minus size={14} className="text-muted-foreground" />
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-muted-foreground leading-snug break-words mt-0.5">
                           {/* Se reps já descreve múltiplas séries (ex: "3 séries válidas...", "10/8/falha", "8/8/8 cluster"), mostrar só reps. Senão, "Nx reps". */}
                           {/[\/x]|série|serie|valida|válida|falha/i.test(String(ex.reps)) ? ex.reps : `${ex.sets}x${ex.reps}`} • Descanso: {ex.rest}
                           {exTonnage > 0 && ` • ${exTonnage.toLocaleString("pt-BR")}kg`}
                         </p>
                       </div>
+                      <div className="shrink-0">
                       {isExpanded ? (
                         <ChevronUp size={16} className="text-muted-foreground" />
                       ) : (
                         <ChevronDown size={16} className="text-muted-foreground" />
                       )}
+                      </div>
                     </button>
 
                     {/* Expanded: Set tracking */}
@@ -956,7 +958,7 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                         )}
 
                         {/* Sets table header */}
-                        <div className="grid grid-cols-[60px_1fr_1fr_40px] gap-2 text-xs text-muted-foreground font-medium px-1">
+                        <div className="grid grid-cols-[52px_minmax(0,1fr)_minmax(0,1fr)_36px] sm:grid-cols-[60px_minmax(0,1fr)_minmax(0,1fr)_40px] gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-muted-foreground font-medium px-1">
                           <span>Série</span>
                           <span>Carga (kg)</span>
                           <span>Reps</span>
@@ -971,7 +973,7 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                           return (
                           <div
                             key={si}
-                            className={`grid grid-cols-[60px_1fr_1fr_40px] gap-2 items-center ${
+                            className={`grid grid-cols-[52px_minmax(0,1fr)_minmax(0,1fr)_36px] sm:grid-cols-[60px_minmax(0,1fr)_minmax(0,1fr)_40px] gap-1.5 sm:gap-2 items-center ${
                               set.completed ? "opacity-60" : ""
                             }`}
                           >
