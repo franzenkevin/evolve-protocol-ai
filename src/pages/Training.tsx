@@ -796,10 +796,10 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                       className="w-full p-4 flex items-center gap-3 text-left"
                       onClick={() => setExpandedExercise(isExpanded ? null : ex.id)}
                     >
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p
-                            className={`font-medium text-sm ${allValidDone ? "text-primary" : "text-foreground"}`}
+                            className={`font-medium text-sm break-words ${allValidDone ? "text-primary" : "text-foreground"}`}
                           >
                             {swappedNames[ex.id] || ex.name}
                           </p>
@@ -818,16 +818,19 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                             <Minus size={14} className="text-muted-foreground" />
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-muted-foreground leading-snug break-words mt-0.5">
                           {/* Se reps já descreve múltiplas séries (ex: "3 séries válidas...", "10/8/falha", "8/8/8 cluster"), mostrar só reps. Senão, "Nx reps". */}
                           {/[\/x]|série|serie|valida|válida|falha/i.test(String(ex.reps)) ? ex.reps : `${ex.sets}x${ex.reps}`} • Descanso: {ex.rest}
                           {exTonnage > 0 && ` • ${exTonnage.toLocaleString("pt-BR")}kg`}
                         </p>
                       </div>
+                      <div className="shrink-0">
                       {isExpanded ? (
                         <ChevronUp size={16} className="text-muted-foreground" />
                       ) : (
                         <ChevronDown size={16} className="text-muted-foreground" />
+                      )}
+                      </div>
                       )}
                     </button>
 
