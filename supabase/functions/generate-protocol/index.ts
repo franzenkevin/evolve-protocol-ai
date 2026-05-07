@@ -353,8 +353,9 @@ A maioria dos alunos receberá uma base semelhante (hipertrofia + nutrição esp
 
 **MULHERES — REGRAS ESPECÍFICAS**:
 - **Peito**: NO MÁXIMO **1 exercício de peito por semana**. Não há necessidade de mais.
-- **Ênfase nos superiores**: SEMPRE **ombro (lateral + posterior) + costas** > peito + braços.
-- **Ênfase nos inferiores**: protocolo COMPLETO, mas com **PRIORIDADE em GLÚTEO MÉDIO** (abdução, clamshell, hip thrust com rotação externa) e nos pontos fracos identificados na avaliação corporal.
+- **Ênfase nos superiores (formato V para ilusão de cintura fina)**: SEMPRE priorizar **COSTAS (largura — puxada aberta, remada aberta) + OMBRO (lateral + posterior)** > peito + braços. Trabalho TÉCNICO e bem executado, **SEM exagerar no volume** (ficar no meio-baixo da faixa). O objetivo é dar amplitude/aspecto V que afina visualmente a cintura, não construir massa exagerada.
+- **Ênfase nos inferiores**: protocolo COMPLETO, com **PRIORIDADE em GLÚTEO MÉDIO** (abdução em pé/sentada, clamshell, hip thrust com rotação externa, agachamento sumô com mini-band) — a maioria das mulheres tem déficit de glúteo médio, que é essencial para o formato arredondado do quadril. Combinar com glúteo máximo (hip thrust, elevação pélvica) e posterior.
+- **SEMPRE individualizar**: cruzar essas ênfases com os pontos fracos detectados na avaliação corporal e os objetivos específicos do aluno — as regras acima são o piso, a individualidade ajusta para cima.
 
 **HOMENS — REGRAS ESPECÍFICAS (anti-overtraining)**:
 - Homens TENDEM A TREINAR DEMAIS. Prescreva o **NECESSÁRIO**, não o exagerado.
@@ -366,9 +367,14 @@ A maioria dos alunos receberá uma base semelhante (hipertrofia + nutrição esp
 - Indicar exercícios com **peso do corpo** (flexão, agachamento, afundo, prancha, ponte, dips de cadeira) e **uso de elásticos** (mini-band para abdução, faixa elástica para puxadas e remadas).
 - Citar nas instructions/dynamicNotes que o aluno deve usar elásticos de tensões variadas para progressão.
 
+**SÉRIES VÁLIDAS POR NÍVEL — REGRA DE PROGRESSÃO (CRÍTICO)**:
+- **INICIANTE**: 2 séries válidas por exercício (última na falha). 100% formato standard, sem técnicas avançadas.
+- **INTERMEDIÁRIO**: também começa com **2 séries válidas** (última na falha). NÃO prescreva 3 séries de cara — deixe espaço para progressão futura. Pode introduzir 1 técnica avançada em 1 exercício pontual quando justificável.
+- **AVANÇADO**: 3 séries válidas (última na falha) OU 2 válidas + técnica avançada (drop, rest-pause, cluster). Pode usar técnicas em até 30-40% dos exercícios.
+- **PROGRESSÃO ENTRE CICLOS**: a evolução natural é dominar 2 válidas → adicionar a 3ª série OU adicionar técnica avançada. NUNCA começar intermediário com 3 séries direto, isso queima o espaço de progresso.
+
 **TÉCNICAS AVANÇADAS — USO PONTUAL**:
-- São para **APENAS ALGUNS EXERCÍCIOS** (não em todos) e **APENAS para alunos AVANÇADOS**.
-- INICIANTE: 100% standard. INTERMEDIÁRIO: 1-2 exercícios/treino com técnica. AVANÇADO: até 30-40%.
+- INICIANTE: 0 técnicas. INTERMEDIÁRIO: no máximo 1 exercício/treino com técnica (e somente quando o aluno já domina o standard). AVANÇADO: até 30-40% dos exercícios.
 
 **PERIODIZAÇÃO ONDULATÓRIA (METODOLOGIA OFICIAL)**:
 - Usamos periodização ondulatória dentro do ciclo de 60 dias (não linear).

@@ -11,10 +11,15 @@ type: feature
 
 **Regras universais**:
 - Abdômen 2x/semana distribuído nos dias de treino, APENAS reto + prancha (NUNCA oblíquo — aumenta cintura)
-- Mulher: máx 1 exercício de peito/semana; ênfase ombro (lateral+posterior)+costas; inferiores com prioridade glúteo médio
+- Mulher: máx 1 exercício de peito/semana; ênfase superiores em **costas (largura) + ombro (lateral+posterior) para formato V e ilusão de cintura fina**, mas TÉCNICO e SEM exagerar volume (meio-baixo da faixa); inferiores com **prioridade GLÚTEO MÉDIO** (abdução, clamshell, hip thrust com rotação externa, sumô com mini-band — déficit comum); sempre cruzar com individualidade do aluno
 - Homem: anti-overtraining — preferir meio-baixo da faixa para iniciante/intermediário; mensagem em dynamicNotes
 - Treino em casa: superior/inferior ou fullbody, peso do corpo + elásticos
-- Técnicas avançadas: apenas em ALGUNS exercícios, apenas para AVANÇADOS
+
+**Séries válidas por nível (REGRA DE PROGRESSÃO)**:
+- Iniciante: 2 válidas (última na falha), 0 técnicas avançadas
+- **Intermediário: também 2 válidas (última na falha)** — NUNCA começar com 3, deixar espaço para progredir; pode 1 técnica pontual quando justificável
+- Avançado: 3 válidas (última na falha) OU 2 + técnica avançada (drop/rest-pause/cluster); técnicas em até 30-40% dos exercícios
+- Progressão natural: dominar 2 válidas → adicionar 3ª série OU técnica avançada
 
 **Periodização ondulatória (oficial)**:
 - v1=mediano → v2=alto → v3=baixo (deload) → oscilar
@@ -26,10 +31,6 @@ type: feature
 - Variante escolhida é enviada como `confirmations.split.chosenVariant` para edge function
 
 **Volume counting rule**: 1 série = 1.0 principal + 0.5 acessório. Aquecimentos NÃO contam. Backoffset NÃO conta. Cluster set conta como 1.
-
-**Set schemes**:
-- Iniciante: 1 aquec 50% + 10/8/falha
-- Inter/Avançado: 2 aquec (50% + 75%) + 2-3 válidas (última SEMPRE falha)
 
 **Cardio integrado**: mesma tela dos treinos (campo cardio por dia + cardioPlan). Se cardio_enabled=false, omitir.
 

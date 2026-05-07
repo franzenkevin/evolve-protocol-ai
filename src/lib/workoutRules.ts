@@ -340,14 +340,18 @@ export function getSetScheme(experience: string | null | undefined): {
       ? "advanced"
       : "intermediate";
 
-  // Iniciante = 2 válidas (última na falha). Intermediário/avançado = 3 válidas (última na falha).
+  // REGRA DE PROGRESSÃO DE SÉRIES VÁLIDAS:
+  // - Iniciante: 2 válidas (última na falha)
+  // - Intermediário: 2 válidas (última na falha) — começa com 2 para ter espaço de progresso
+  // - Avançado: 3 válidas (última na falha) OU 2 válidas + técnica avançada
+  // Após dominar 2 válidas, o próximo passo é adicionar a 3ª série OU uma técnica avançada (drop, rest-pause, cluster).
   const validSets =
-    level === "beginner"
-      ? [
+    level === "advanced"
+      ? SET_SCHEME_STANDARD.validSets
+      : [
           { reps: "8-12", effort: "RIR 1-2 (próximo da falha)", note: "Válida 1 — RIR 1-2: pare quando faltariam 1 a 2 reps" },
           { reps: "falha", effort: "FALHA TOTAL", note: "Válida 2 — SEMPRE falha total" },
-        ]
-      : SET_SCHEME_STANDARD.validSets;
+        ];
 
   const scheme: SetScheme = { ...SET_SCHEME_STANDARD, validSets };
   return { scheme, level };
