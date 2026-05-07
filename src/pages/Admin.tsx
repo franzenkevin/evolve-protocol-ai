@@ -109,6 +109,8 @@ const Admin = () => {
           <TabsContent value="foods" className="mt-4"><AdminFoods /></TabsContent>
           <TabsContent value="journal" className="mt-4"><AdminJournal /></TabsContent>
           <TabsContent value="users" className="mt-4"><AdminUsers /></TabsContent>
+          <TabsContent value="challenges" className="mt-4"><AdminChallenges /></TabsContent>
+          <TabsContent value="ranking" className="mt-4"><AdminRanking /></TabsContent>
           <TabsContent value="audit" className="mt-4"><AdminAuditLog /></TabsContent>
         </Tabs>
       </div>
