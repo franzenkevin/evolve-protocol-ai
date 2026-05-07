@@ -40,6 +40,8 @@ import AdminFoods from "@/components/admin/AdminFoods";
 import AdminExercises from "@/components/admin/AdminExercises";
 import AdminMobility from "@/components/admin/AdminMobility";
 import AdminJournal from "@/components/admin/AdminJournal";
+import AdminChallenges from "@/components/admin/AdminChallenges";
+import AdminRanking from "@/components/admin/AdminRanking";
 
 const Admin = () => {
   const { signOut } = useAuth();
