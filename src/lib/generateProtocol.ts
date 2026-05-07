@@ -318,7 +318,9 @@ const FOOD_DB: Record<string, FoodItem> = {
   "Tilápia": { name: "Tilápia grelhada", amount: "150g", protein: 35, carbs: 0, fat: 3, calories: 170 },
   "Atum": { name: "Atum em lata (drenado)", amount: "120g (1 lata)", protein: 30, carbs: 0, fat: 1, calories: 130 },
   // OVO — em unidade
-  "Ovo": { name: "Ovos inteiros", amount: "3 unidades (150g)", protein: 18, carbs: 2, fat: 15, calories: 210 },
+  // Ovos: SEMPRE em unidades (TACO), nunca em gramas, independente do preparo
+  "Ovo": { name: "Ovo inteiro", amount: "2 unidades", protein: 13, carbs: 1, fat: 11, calories: 156 },
+  "Clara de ovo": { name: "Clara de ovo", amount: "3 unidades", protein: 11, carbs: 1, fat: 0, calories: 51 },
 
   // Dairy
   "Queijo": { name: "Queijo branco", amount: "30g", protein: 6, carbs: 1, fat: 5, calories: 70 },
@@ -368,8 +370,9 @@ const FOOD_DB: Record<string, FoodItem> = {
   "Chocolate": { name: "Chocolate 70%", amount: "25g", protein: 2, carbs: 12, fat: 9, calories: 135 },
 
   // Supplements
-  "Whey Protein": { name: "Whey Protein", amount: "1 scoop (30g)", protein: 25, carbs: 3, fat: 1, calories: 120 },
-  "Creatina": { name: "Creatina", amount: "5g", protein: 0, carbs: 0, fat: 0, calories: 0 },
+  "Whey Protein": { name: "Whey Protein Elite Soldiers", amount: "1 scoop (30g)", protein: 25, carbs: 3, fat: 1, calories: 120 },
+  "Whey Isolado": { name: "Whey Protein Isolado Soldiers", amount: "1 scoop (30g)", protein: 27, carbs: 1, fat: 0, calories: 115 },
+  "Creatina": { name: "Creatina Soldiers", amount: "6g", protein: 0, carbs: 0, fat: 0, calories: 0 },
 };
 
 function getFood(name: string): FoodItem {
@@ -592,7 +595,9 @@ function generateDiet(p: Profile) {
         ],
       });
     } else if (isSnack) {
+      const lactoseIntolerantSnack = allergies.some(a => a.toLowerCase().includes("lactose"));
       const hasWhey = supplements.includes("Whey Protein") && !allergies.some(a => a.toLowerCase().includes("soro do leite"));
+      const wheyKey = lactoseIntolerantSnack ? "Whey Isolado" : "Whey Protein";
       const fruit = fruits.length > 2 ? fruits[2] : pick(fruits);
       const fruit2 = fruits.length > 3 ? fruits[3] : pick(fruits);
       const carbSnack = pick(carbBreakfast);
@@ -608,10 +613,10 @@ function generateDiet(p: Profile) {
       const grainPick = grainOptions.length > 0 ? grainOptions[0] : null;
 
       if (hasWhey) {
-        opt1.push(getFood("Whey Protein"), getFood(fruit));
+        opt1.push(getFood(wheyKey), getFood(fruit));
         if (grainPick) opt1.push(getFood(grainPick));
         opt2.push(getFood(carbSnack), getFood(protSnackItem), getFood(fruit));
-        opt3.push(getFood("Whey Protein"), getFood(fruit2));
+        opt3.push(getFood(wheyKey), getFood(fruit2));
         const dairySnack = dairy.length > 0 ? pick(dairy) : null;
         if (dairySnack) opt3.push(getFood(dairySnack));
       } else {
@@ -640,23 +645,24 @@ function generateDiet(p: Profile) {
         ],
         substitutions: [
           { category: "Carboidrato", options: carbBreakfast },
-          { category: "Proteína", options: [...protSnack, ...(hasWhey ? ["Whey Protein"] : [])] },
+          { category: "Proteína", options: [...protSnack, ...(hasWhey ? [wheyKey] : [])] },
           { category: "Fruta", options: fruits },
         ],
       });
     }
   }
 
-  // Add supplement notes with correct dosages
-  const notes: string[] = [];
-  if (supplements.includes("Creatina")) {
-    const creatinaDose = sex === "F" ? "5g" : "7g";
-    notes.push(`Creatina: ${creatinaDose} por dia, pode tomar a qualquer hora com água.`);
-  }
-  if (supplements.includes("Vitamina C")) notes.push("Vitamina C: 1g por dia.");
-  if (supplements.includes("Vitamina D")) notes.push("Vitamina D: 6000UI por dia, junto com refeição com gordura.");
+  // Suplementação padrão Soldiers (sempre incluir as bases)
+  const lactoseIntolerant = allergies.some(a => a.toLowerCase().includes("lactose"));
+  const wheyName = lactoseIntolerant ? "Whey Protein Isolado Soldiers" : "Whey Protein Elite Soldiers";
+  const notes: string[] = [
+    "Multivitamínico Soldiers: 1 dose por dia, junto com refeição.",
+    "Vitamina D Soldiers: 4000 UI por dia, junto com refeição com gordura.",
+    "Vitamina C Soldiers: 1g por dia.",
+    "Creatina Soldiers: 6g por dia, pode tomar a qualquer hora com água.",
+  ];
   if (supplements.includes("Ômega 3")) notes.push("Ômega 3: 1-2g EPA+DHA por dia, junto com refeição.");
-  if (supplements.includes("Whey Protein")) notes.push("Whey Protein: usado como complemento proteico na dieta. Dose conforme necessidade de encaixe de macros.");
+  if (supplements.includes("Whey Protein")) notes.push(`${wheyName}: usado como complemento proteico na dieta. Dose conforme necessidade de encaixe de macros.`);
 
   return {
     totalCalories: tdee,
