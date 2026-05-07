@@ -318,7 +318,9 @@ const FOOD_DB: Record<string, FoodItem> = {
   "Tilápia": { name: "Tilápia grelhada", amount: "150g", protein: 35, carbs: 0, fat: 3, calories: 170 },
   "Atum": { name: "Atum em lata (drenado)", amount: "120g (1 lata)", protein: 30, carbs: 0, fat: 1, calories: 130 },
   // OVO — em unidade
-  "Ovo": { name: "Ovos inteiros", amount: "3 unidades (150g)", protein: 18, carbs: 2, fat: 15, calories: 210 },
+  // Ovos: SEMPRE em unidades (TACO), nunca em gramas, independente do preparo
+  "Ovo": { name: "Ovo inteiro", amount: "2 unidades", protein: 13, carbs: 1, fat: 11, calories: 156 },
+  "Clara de ovo": { name: "Clara de ovo", amount: "3 unidades", protein: 11, carbs: 1, fat: 0, calories: 51 },
 
   // Dairy
   "Queijo": { name: "Queijo branco", amount: "30g", protein: 6, carbs: 1, fat: 5, calories: 70 },
