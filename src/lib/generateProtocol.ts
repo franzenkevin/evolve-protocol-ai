@@ -613,10 +613,10 @@ function generateDiet(p: Profile) {
       const grainPick = grainOptions.length > 0 ? grainOptions[0] : null;
 
       if (hasWhey) {
-        opt1.push(getFood("Whey Protein"), getFood(fruit));
+        opt1.push(getFood(wheyKey), getFood(fruit));
         if (grainPick) opt1.push(getFood(grainPick));
         opt2.push(getFood(carbSnack), getFood(protSnackItem), getFood(fruit));
-        opt3.push(getFood("Whey Protein"), getFood(fruit2));
+        opt3.push(getFood(wheyKey), getFood(fruit2));
         const dairySnack = dairy.length > 0 ? pick(dairy) : null;
         if (dairySnack) opt3.push(getFood(dairySnack));
       } else {
