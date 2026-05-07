@@ -21,6 +21,8 @@ import {
   Activity,
   Sparkles,
   ShoppingBag,
+  Trophy,
+  Target,
 } from "lucide-react";
 import AdminPurchases from "@/components/admin/AdminPurchases";
 import AdminAIHealth from "@/components/admin/AdminAIHealth";
@@ -38,6 +40,8 @@ import AdminFoods from "@/components/admin/AdminFoods";
 import AdminExercises from "@/components/admin/AdminExercises";
 import AdminMobility from "@/components/admin/AdminMobility";
 import AdminJournal from "@/components/admin/AdminJournal";
+import AdminChallenges from "@/components/admin/AdminChallenges";
+import AdminRanking from "@/components/admin/AdminRanking";
 
 const Admin = () => {
   const { signOut } = useAuth();
@@ -85,6 +89,8 @@ const Admin = () => {
             <TabsTrigger value="foods" className="gap-1"><UtensilsCrossed size={14} />Alimentos</TabsTrigger>
             <TabsTrigger value="journal" className="gap-1"><Newspaper size={14} />Journal</TabsTrigger>
             <TabsTrigger value="users" className="gap-1"><UserCog size={14} />Usuários</TabsTrigger>
+            <TabsTrigger value="challenges" className="gap-1"><Target size={14} />Desafios</TabsTrigger>
+            <TabsTrigger value="ranking" className="gap-1"><Trophy size={14} />Ranking</TabsTrigger>
             <TabsTrigger value="audit" className="gap-1"><ScrollText size={14} />Auditoria</TabsTrigger>
           </TabsList>
 
@@ -103,6 +109,8 @@ const Admin = () => {
           <TabsContent value="foods" className="mt-4"><AdminFoods /></TabsContent>
           <TabsContent value="journal" className="mt-4"><AdminJournal /></TabsContent>
           <TabsContent value="users" className="mt-4"><AdminUsers /></TabsContent>
+          <TabsContent value="challenges" className="mt-4"><AdminChallenges /></TabsContent>
+          <TabsContent value="ranking" className="mt-4"><AdminRanking /></TabsContent>
           <TabsContent value="audit" className="mt-4"><AdminAuditLog /></TabsContent>
         </Tabs>
       </div>

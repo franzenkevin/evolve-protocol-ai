@@ -708,6 +708,42 @@ export type Database = {
         }
         Relationships: []
       }
+      monthly_challenges: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          month_start: string
+          reward_points: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          month_start?: string
+          reward_points?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          month_start?: string
+          reward_points?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       onboarding_drafts: {
         Row: {
           created_at: string
