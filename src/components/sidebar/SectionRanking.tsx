@@ -68,9 +68,9 @@ const SectionRanking = () => {
         <div className="flex items-center gap-2 mb-2">
           <Flame size={14} className="text-warning" />
           <p className="text-[10px] text-muted-foreground leading-tight">
-            +1 ponto por check-in,<br />
-            +2 por treino registrado.<br />
-            Top 3 ganha medalha 🏆
+            +1 treino • +1 dieta/dia<br />
+            +3 check semanal • +10 mensal/60d<br />
+            +10 a cada 7 dias seguidos de treino+dieta
           </p>
         </div>
 
