@@ -645,7 +645,7 @@ function generateDiet(p: Profile) {
         ],
         substitutions: [
           { category: "Carboidrato", options: carbBreakfast },
-          { category: "Proteína", options: [...protSnack, ...(hasWhey ? ["Whey Protein"] : [])] },
+          { category: "Proteína", options: [...protSnack, ...(hasWhey ? [wheyKey] : [])] },
           { category: "Fruta", options: fruits },
         ],
       });
