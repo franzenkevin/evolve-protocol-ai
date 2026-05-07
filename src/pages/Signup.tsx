@@ -145,7 +145,7 @@ const Signup = () => {
         <div className="flex flex-col items-center mb-8">
           <img src={logo} alt="EVORIA" className="w-20 h-20 mb-4" />
           <h1 className="text-3xl font-heading font-bold text-foreground">Criar Conta</h1>
-          <p className="text-muted-foreground mt-1">Comece sua transformação</p>
+          <p className="text-muted-foreground mt-1">Crie sua conta agora pra liberar o quiz e ao final se você gostar da prévia, decida se vai começar essa transformação.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
