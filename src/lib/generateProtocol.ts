@@ -595,7 +595,9 @@ function generateDiet(p: Profile) {
         ],
       });
     } else if (isSnack) {
+      const lactoseIntolerantSnack = allergies.some(a => a.toLowerCase().includes("lactose"));
       const hasWhey = supplements.includes("Whey Protein") && !allergies.some(a => a.toLowerCase().includes("soro do leite"));
+      const wheyKey = lactoseIntolerantSnack ? "Whey Isolado" : "Whey Protein";
       const fruit = fruits.length > 2 ? fruits[2] : pick(fruits);
       const fruit2 = fruits.length > 3 ? fruits[3] : pick(fruits);
       const carbSnack = pick(carbBreakfast);
