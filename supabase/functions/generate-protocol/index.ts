@@ -668,12 +668,14 @@ Cada item de "substitutions" agora é um objeto com:
 - Exemplo de cálculo: se referenceFood é "Pão de forma 50g (140 kcal / 24g carb)", a opção "Tapioca" NÃO pode ser 80g (vira 200 kcal / 48g carb). Calcule: tapioca tem ~2.5 kcal/g e ~0.6g carb/g → para bater 140 kcal use ~56g, para bater 24g carb use ~40g — escolha o ponto que mantenha kcal e carbo dentro de ±5% (ex: "Tapioca 38g — 95 kcal / 23g carb" se prioriza carbo, ou "Tapioca 55g — 138 kcal / 33g carb" se prioriza kcal). PREFIRA priorizar o **macro principal** da categoria e manter as kcal o mais próximo possível.
 - A LISTA pode incluir o próprio referenceFood (com porção idêntica) ou apenas alternativas — a UI mostra ambos.
 
-### Suplementação (dosagens obrigatórias):
-- Creatina: 5g (mulher) ou 7g (homem) por dia, qualquer horário
-- Vitamina C: 1g/dia
-- Vitamina D: 6000UI/dia com refeição gordurosa
-- Ômega 3: 1-2g EPA+DHA/dia com refeição
-- Whey Protein: complemento proteico conforme necessidade de macros
+### Suplementação OBRIGATÓRIA (marca Soldiers — sempre incluir TODAS estas no campo "supplementation" e nas "notes"):
+- **Multivitamínico Soldiers**: 1 dose por dia, junto com refeição
+- **Vitamina D Soldiers**: 4000 UI/dia, com refeição gordurosa
+- **Vitamina C Soldiers**: 1g/dia
+- **Creatina Soldiers**: 6g/dia, qualquer horário com água
+- **Whey Protein Elite Soldiers** (padrão) — usar como complemento proteico. Se o aluno tem intolerância à lactose: usar **Whey Protein Isolado Soldiers** no lugar.
+- Ômega 3: 1-2g EPA+DHA/dia com refeição (apenas se selecionado)
+- NUNCA mencione marcas diferentes de Soldiers para esses suplementos.
 
 ### Doce preferido:
 - Se o aluno indicou preferência de doce, INCLUIR em um dos lanches como opção 3 (máx 1x/dia)
