@@ -21,6 +21,8 @@ import {
   Activity,
   Sparkles,
   ShoppingBag,
+  Trophy,
+  Target,
 } from "lucide-react";
 import AdminPurchases from "@/components/admin/AdminPurchases";
 import AdminAIHealth from "@/components/admin/AdminAIHealth";
