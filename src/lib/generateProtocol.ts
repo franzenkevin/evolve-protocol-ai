@@ -370,8 +370,9 @@ const FOOD_DB: Record<string, FoodItem> = {
   "Chocolate": { name: "Chocolate 70%", amount: "25g", protein: 2, carbs: 12, fat: 9, calories: 135 },
 
   // Supplements
-  "Whey Protein": { name: "Whey Protein", amount: "1 scoop (30g)", protein: 25, carbs: 3, fat: 1, calories: 120 },
-  "Creatina": { name: "Creatina", amount: "5g", protein: 0, carbs: 0, fat: 0, calories: 0 },
+  "Whey Protein": { name: "Whey Protein Elite Soldiers", amount: "1 scoop (30g)", protein: 25, carbs: 3, fat: 1, calories: 120 },
+  "Whey Isolado": { name: "Whey Protein Isolado Soldiers", amount: "1 scoop (30g)", protein: 27, carbs: 1, fat: 0, calories: 115 },
+  "Creatina": { name: "Creatina Soldiers", amount: "6g", protein: 0, carbs: 0, fat: 0, calories: 0 },
 };
 
 function getFood(name: string): FoodItem {
