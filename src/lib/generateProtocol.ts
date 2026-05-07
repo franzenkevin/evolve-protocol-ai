@@ -650,16 +650,17 @@ function generateDiet(p: Profile) {
     }
   }
 
-  // Add supplement notes with correct dosages
-  const notes: string[] = [];
-  if (supplements.includes("Creatina")) {
-    const creatinaDose = sex === "F" ? "5g" : "7g";
-    notes.push(`Creatina: ${creatinaDose} por dia, pode tomar a qualquer hora com água.`);
-  }
-  if (supplements.includes("Vitamina C")) notes.push("Vitamina C: 1g por dia.");
-  if (supplements.includes("Vitamina D")) notes.push("Vitamina D: 6000UI por dia, junto com refeição com gordura.");
+  // Suplementação padrão Soldiers (sempre incluir as bases)
+  const lactoseIntolerant = allergies.some(a => a.toLowerCase().includes("lactose"));
+  const wheyName = lactoseIntolerant ? "Whey Protein Isolado Soldiers" : "Whey Protein Elite Soldiers";
+  const notes: string[] = [
+    "Multivitamínico Soldiers: 1 dose por dia, junto com refeição.",
+    "Vitamina D Soldiers: 4000 UI por dia, junto com refeição com gordura.",
+    "Vitamina C Soldiers: 1g por dia.",
+    "Creatina Soldiers: 6g por dia, pode tomar a qualquer hora com água.",
+  ];
   if (supplements.includes("Ômega 3")) notes.push("Ômega 3: 1-2g EPA+DHA por dia, junto com refeição.");
-  if (supplements.includes("Whey Protein")) notes.push("Whey Protein: usado como complemento proteico na dieta. Dose conforme necessidade de encaixe de macros.");
+  if (supplements.includes("Whey Protein")) notes.push(`${wheyName}: usado como complemento proteico na dieta. Dose conforme necessidade de encaixe de macros.`);
 
   return {
     totalCalories: tdee,
