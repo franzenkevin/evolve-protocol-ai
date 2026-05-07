@@ -764,9 +764,9 @@ Responda EXCLUSIVAMENTE com JSON válido (sem markdown, sem \`\`\`):
         ]
       }
     ],
-    "notes": ["Creatina: 7g por dia, pode tomar a qualquer hora com água."],
+    "notes": ["Multivitamínico Soldiers: 1 dose/dia com refeição.", "Vitamina D Soldiers: 4000 UI/dia com refeição gordurosa.", "Vitamina C Soldiers: 1g/dia.", "Creatina Soldiers: 6g/dia, qualquer horário com água."],
     "carbFrontLoading": "Método carb front loading: maioria dos carboidratos nas 2 refeições antes do treino...",
-    "supplementation": ["Whey Isolado 30g pós-treino (lactose <1%)", "Creatina 5g/dia"],
+    "supplementation": ["Multivitamínico Soldiers", "Vitamina D Soldiers 4000 UI", "Vitamina C Soldiers 1g", "Creatina Soldiers 6g", "Whey Protein Elite Soldiers 30g pós-treino (ou Whey Protein Isolado Soldiers se intolerante à lactose)"],
     "freeMealsGuide": {
       "frequenciaEscolhida": "Uma por semana",
       "frequenciaRecomendada": "Uma por semana",
