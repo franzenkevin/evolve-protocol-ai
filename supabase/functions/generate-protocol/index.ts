@@ -580,8 +580,9 @@ Para CADA dia de treino, gerar um campo "dynamicNotes" (3-5 frases) que SEMPRE i
 
 **1. UNIDADES — REGRA MISTA (gramas + unidade quando o peso é padronizado):**
 
-Use **UNIDADE** (com gramas entre parênteses) APENAS para alimentos com peso padrão conhecido:
-- Ovos: "3 unidades (150g)" ou "2 unidades (100g)"
+**OVOS — REGRA ABSOLUTA**: SEMPRE em UNIDADES, NUNCA em gramas, independente do modo de preparo (cozido, mexido, frito, poché, omelete). Use exatamente "X unidade(s)" — ex: "2 unidades" (ovo inteiro) ou "3 unidades" (clara de ovo). Macros conforme tabela TACO (1 ovo inteiro ≈ P6 C0,5 G5,5 78kcal; 1 clara ≈ P3,5 C0,3 G0 17kcal). PROIBIDO escrever "150g" para ovo.
+
+Use **UNIDADE** (com gramas entre parênteses) para outros alimentos com peso padrão conhecido:
 - Pão francês: "1 unidade (50g)" ou "2 unidades (100g)"
 - Pão de forma: "2 fatias (50g)"
 - Pão de hambúrguer: "1 unidade (60g)"
