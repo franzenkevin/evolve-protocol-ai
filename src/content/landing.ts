@@ -40,20 +40,20 @@ export const FEATURES_CONTENT: FeatureContent[] = [
   {
     eyebrow: "TREINO SOB MEDIDA",
     title: "Cada série calculada pra te levar adiante",
-    desc: "O sistema processa composição corporal estimada, padrões posturais e prioridades. Tudo entra no cálculo para o melhor plano.",
+    desc: "O sistema processa composição corporal estimada e prioridades do seu objetivo. Cada variável entra no cálculo do seu plano.",
     image: mockTraining,
   },
   {
     eyebrow: "ESTRUTURA ALIMENTAR",
     title: "Organizado com a comida que você já come",
-    desc: "Macros no ponto certo do seu objetivo. Refeições organizadas com seus alimentos preferidos. Porque estrutura que você odeia não dura.",
+    desc: "Macros sugeridos com base no seu objetivo. Refeições montadas com os alimentos que você já consome. Porque estrutura que você odeia, você abandona.",
     image: mockDiet,
     reverse: true,
   },
   {
     eyebrow: "ANÁLISE POR FOTO IA",
     title: "Seu ponto de partida lido em segundos",
-    desc: "Mande 4 fotos. O sistema processa composição corporal estimada, padrões posturais e prioridades pra seu protocolo. Tudo entra no cálculo.",
+    desc: "Você envia 4 fotos. O sistema estima sua composição corporal e define as prioridades do seu plano. Estimativa visual com IA, não avaliação clínica ou diagnóstico.",
     image: mockAi,
   },
   {
