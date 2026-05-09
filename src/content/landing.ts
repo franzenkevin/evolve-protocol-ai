@@ -16,14 +16,14 @@
  */
 
 // ---------- IMAGENS USADAS ----------
-import mockTraining from "@/assets/mockup-training.png";
-import mockDiet from "@/assets/mockup-diet.png";
-import mockProgress from "@/assets/mockup-progress.png";
-import mockAi from "@/assets/mockup-ai.png";
-import coachKevin from "@/assets/coach-kevin.jpg";
-import transformation1 from "@/assets/transformation-1.jpg";
-import transformation2 from "@/assets/transformation-2.jpg";
-import transformation3 from "@/assets/transformation-3.jpg";
+import mockTraining from "@/assets/mockup-training.webp";
+import mockDiet from "@/assets/mockup-diet.webp";
+import mockProgress from "@/assets/mockup-progress.webp";
+import mockAi from "@/assets/mockup-ai.webp";
+import coachKevin from "@/assets/coach-kevin.webp";
+import transformation1 from "@/assets/transformation-1.webp";
+import transformation2 from "@/assets/transformation-2.webp";
+import transformation3 from "@/assets/transformation-3.webp";
 
 // ============================================================
 //  1) MOCKUPS DO APP (seção "Tudo no app")

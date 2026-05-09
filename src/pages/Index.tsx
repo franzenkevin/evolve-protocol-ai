@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import heroAthlete from "@/assets/hero-athlete.jpg";
+import heroAthlete from "@/assets/hero-athlete.webp";
 import logo from "@/assets/logo.png";
 import {
   ArrowRight,
@@ -86,7 +86,7 @@ const Index = () => {
           className="absolute inset-0 w-full h-full object-cover opacity-40"
           width={1920}
           height={1080}
-          fetchPriority="high"
+          {...({ fetchpriority: "high" } as any)}
         />
         <div
           className="absolute inset-0"
