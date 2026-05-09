@@ -38,9 +38,9 @@ export const SectionFeatures = () => (
               src={f.image}
               alt={f.title}
               loading={i === 0 ? "eager" : "lazy"}
-              width={1024}
-              height={1024}
-              className="w-full max-w-sm mx-auto drop-shadow-2xl"
+              width={885}
+              height={1535}
+              className="w-full max-w-[280px] md:max-w-xs mx-auto drop-shadow-2xl rounded-2xl"
             />
           </div>
         </div>
