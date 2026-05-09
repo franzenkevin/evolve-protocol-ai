@@ -39,27 +39,27 @@ export type FeatureContent = {
 export const FEATURES_CONTENT: FeatureContent[] = [
   {
     eyebrow: "TREINO SOB MEDIDA",
-    title: "Cada série calculada pra te levar adiante",
-    desc: "O sistema processa composição corporal estimada e prioridades do seu objetivo. Cada variável entra no cálculo do seu plano.",
+    title: "Volume, descanso e progressão organizados com lógica.",
+    desc: "A EVORIA estrutura variáveis do treino com base no seu objetivo, experiência e dados informados, para reduzir tentativa e erro.",
     image: mockTraining,
   },
   {
     eyebrow: "ESTRUTURA ALIMENTAR",
-    title: "Organizado com a comida que você já come",
-    desc: "Macros sugeridos com base no seu objetivo. Refeições montadas com os alimentos que você já consome. Porque estrutura que você odeia, você abandona.",
+    title: "Estrutura alimentar com a comida que você já consome",
+    desc: "Macros e referências alimentares sugeridas com base nas informações fornecidas por você. A ideia é organizar escolhas dentro da sua rotina porque uma estrutura que você odeia, você abandona.",
     image: mockDiet,
     reverse: true,
   },
   {
-    eyebrow: "ANÁLISE POR FOTO IA",
+    eyebrow: "LEITURA CORPORAL POR IA",
     title: "Seu ponto de partida lido em segundos",
-    desc: "Você envia 4 fotos. O sistema estima sua composição corporal e define as prioridades do seu plano. Estimativa visual com IA, não avaliação clínica ou diagnóstico.",
+    desc: "Você envia 4 fotos para ajudar o sistema a organizar uma leitura visual do seu momento físico. Essa estimativa é computacional e não constitui avaliação clínica, diagnóstico ou laudo profissional.",
     image: mockAi,
   },
   {
     eyebrow: "PROGRESSO MEDIDO",
     title: "Você vê o resultado antes do espelho mostrar",
-    desc: "Peso, composição, treinos completados, ranking semanal. Tudo num só lugar, pra manter o foco quando a motivação oscila.",
+    desc: "Peso, composição, treinos concluídos e evolução em um só lugar para manter clareza quando a motivação oscila.",
     image: mockProgress,
     reverse: true,
   },
@@ -116,7 +116,7 @@ export const ABOUT_CONTENT = {
   photo: coachKevin,
   // Cada string é um parágrafo — adicione/remova quantos quiser
   paragraphs: [
-    "A IA executa o cálculo. A metodologia é minha. As regras do sistema foram construídas em mais de 10 anos de prática direta com alunos e validadas pela ciência.",
+    "A tecnologia organiza. A metodologia orienta. As regras do sistema foram construídas em mais de 10 anos de prática direta com alunos e validadas pela ciência.",
     "Vi médicos, advogados e executivos com pouco tempo disponível investirem em 6 a 7 treinos por semana durante anos e continuarem no mesmo lugar. Não por falta de vontade. Por falta de protocolo real e sustentável.",
     "Desenvolvi esse sistema pra entregar a mesma estrutura que aplico na consultoria individual, de forma automatizada e com acesso direto, pra todo mundo que quer resultado e não tem espaço na agenda pra mais um compromisso semanal.",
   ],
@@ -139,8 +139,24 @@ export type FAQItem = {
 
 export const FAQ_CONTENT: FAQItem[] = [
   {
+    q: "A EVORIA substitui profissional de saúde ou educação física?",
+    a: "Não. A EVORIA é uma plataforma digital de organização de rotina física e alimentar. Para condições clínicas, lesões, restrições específicas ou necessidade de acompanhamento individual, procure um profissional habilitado.",
+  },
+  {
+    q: "Posso usar se tenho lesão ou condição clínica?",
+    a: "Em casos de lesões, condições clínicas, restrições importantes ou necessidade de supervisão individual, procure um profissional habilitado antes de iniciar qualquer rotina.",
+  },
+  {
+    q: "Como minhas fotos são usadas?",
+    a: "As fotos ajudam o sistema a organizar uma leitura visual do seu ponto de partida. Elas não são usadas em divulgação sem autorização específica e seguem as regras de privacidade e exclusão previstas na política da plataforma.",
+  },
+  {
+    q: "Depois do primeiro mês, quanto custa?",
+    a: "O primeiro mês sai por R$29,90. Depois, o plano mensal segue por R$97/mês, com cancelamento conforme as regras informadas no checkout.",
+  },
+  {
     q: "Preciso pagar antes de saber o que vou receber?",
-    a: "Não. Você faz o quiz, o sistema gera seu protocolo completo e você decide se vale a pena. Só paga quando quiser liberar o acesso. Sem pressão.",
+    a: "Não. Você faz o quiz, o sistema organiza sua estrutura inicial e você decide se vale a pena liberar o acesso completo. Sem pressão.",
   },
   {
     q: "Quanto custa?",

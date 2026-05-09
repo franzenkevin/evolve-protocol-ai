@@ -5,10 +5,10 @@ import { CheckCircle2, ArrowRight, Sparkles, Loader2 } from "lucide-react";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 
 const MONTHLY_BULLETS = [
-  "Protocolo completo gerado pelo sistema",
+  "Estrutura completa organizada pelo sistema",
   "Programa de treino semana a semana",
-  "Organização de refeições personalizada",
-  "Análise por foto IA",
+  "Estrutura alimentar baseada na sua rotina",
+  "Leitura corporal por IA",
   "Acompanhamento de progresso",
   "Chatbot com a metodologia",
   "7 dias de garantia total",
@@ -54,7 +54,7 @@ export const SectionPricing = () => {
             Investimento
           </p>
           <h2 className="md:text-5xl font-heading font-bold text-foreground leading-tight text-2xl">
-            Quanto custa ter um protocolo real?
+            Quanto custa parar de improvisar?
           </h2>
           <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
             Menos que uma sessão de personal. Sem agenda, sem deslocamento, disponível 24h.
