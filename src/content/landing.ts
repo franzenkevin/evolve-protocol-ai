@@ -116,15 +116,14 @@ export const ABOUT_CONTENT = {
   photo: coachKevin,
   // Cada string é um parágrafo — adicione/remova quantos quiser
   paragraphs: [
-    "A IA executa o cálculo, com base nos meus ensinamentos. As regras do sistema foram construídas na minha prática e ainda por cima validadas pela ciência.",
-    "Vi médicos, advogados e executivos com pouco tempo disponível, que investiram em 6-7x treinos por semana durante anos e continuarem no mesmo lugar. Não por falta de vontade. Por falta de protocolo real e sustentável.",
-    "Desenvolvi esse sistema pra colocar a mesma estrutura que aplico na minha consultoria individual, de forma automatizada e no fácil acesso a todos que querem resultado",
-    "A IA executa o cálculo. A metodologia é minha. As regras do sistema foram construídas na prática e validadas pela ciência.",
+    "A IA executa o cálculo. A metodologia é minha. As regras do sistema foram construídas em mais de 10 anos de prática direta com alunos e validadas pela ciência.",
+    "Vi médicos, advogados e executivos com pouco tempo disponível investirem em 6 a 7 treinos por semana durante anos e continuarem no mesmo lugar. Não por falta de vontade. Por falta de protocolo real e sustentável.",
+    "Desenvolvi esse sistema pra entregar a mesma estrutura que aplico na consultoria individual, de forma automatizada e com acesso direto, pra todo mundo que quer resultado e não tem espaço na agenda pra mais um compromisso semanal.",
   ],
   // Pontos fortes (lista com check verde)
   bullets: [
-    "10+ anos de experiência com atletas e amantes do lifestyle",
-    "Consultoria com +100 alunos ativos com retenção acima da média do mercado",
+    "10+ anos atendendo atletas e profissionais que vivem o lifestyle",
+    "+100 alunos ativos hoje, com retenção acima da média do mercado",
     "Metodologia construída na prática, referenciada em ciência",
     "Evoria é Sistema, não chatbot genérico. A lógica do protocolo é humana.",
   ],
