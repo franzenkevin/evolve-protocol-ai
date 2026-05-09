@@ -150,7 +150,22 @@ export default function HeaderNotifications({ onOpenTour }: HeaderNotificationsP
     }
   }
 
-  if (!tourDone) {
+  // Pedido de feedback do protocolo (qualquer protocolo ativo sem feedback ainda)
+  if (protocol && !protocolFeedback) {
+    items.push({
+      id: `protocol-feedback-${protocol.id}`,
+      icon: MessageCircleHeart,
+      title: "O que achou do protocolo que recebeu?",
+      body: "Ajude-nos a sempre estar otimizando o processo. Leva menos de 1 minuto.",
+      cta: "Avaliar protocolo",
+      highlight: true,
+      action: () => {
+        navigate("/dashboard");
+        refresh();
+      },
+    });
+  }
+
     items.push({
       id: "tutorial",
       icon: GraduationCap,
