@@ -17,6 +17,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { SectionGoals } from "@/components/landing/SectionGoals";
+import { SectionDifference } from "@/components/landing/SectionDifference";
 import { SectionFeatures } from "@/components/landing/SectionFeatures";
 import { SectionResults } from "@/components/landing/SectionResults";
 import { SectionAbout } from "@/components/landing/SectionAbout";
@@ -177,6 +178,7 @@ const Index = () => {
         </div>
       </section>
 
+      <SectionDifference />
       <SectionGoals />
       <SectionFeatures />
       <SectionResults />
