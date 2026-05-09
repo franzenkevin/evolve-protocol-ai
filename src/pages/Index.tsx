@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import heroAthlete from "@/assets/hero-athlete.jpg";
+import heroAthlete from "@/assets/hero-athlete.webp";
 import logo from "@/assets/logo.png";
 import {
   ArrowRight,
