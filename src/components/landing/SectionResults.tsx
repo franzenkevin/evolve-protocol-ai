@@ -55,6 +55,9 @@ export const SectionResults = () => {
           <h2 className="md:text-4xl font-heading font-bold text-foreground leading-tight text-2xl">
             <span className="text-gradient">Resultados de alunos que seguem o método</span>
           </h2>
+          <p className="text-sm text-muted-foreground mt-3 max-w-md mx-auto">
+            Resultados de alunos da consultoria 1:1 usando a mesma metodologia que agora está no Evoria.
+          </p>
         </div>
 
         <div

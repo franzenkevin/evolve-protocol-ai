@@ -33,13 +33,13 @@ const HOW_IT_WORKS = [
   },
   {
     icon: Camera,
-    title: "2. Análise por foto IA",
-    desc: "4 fotos processadas em segundos. O sistema estima composição corporal e define as prioridades do seu plano. Estimativa visual com IA, não avaliação clínica.",
+    title: "2. Leitura corporal por IA",
+    desc: "4 fotos processadas em segundos. O sistema estima composição corporal e define as prioridades.",
   },
   {
     icon: Rocket,
-    title: "3. Seu protocolo ativo",
-    desc: "Treino estruturado semana a semana. Refeições montadas com os alimentos que você já consome. Tudo no sistema. Tudo hoje.",
+    title: "3. Sua estrutura ativa",
+    desc: "Treino, organização alimentar e progresso reunidos em um só sistema para você ter uma direção clara.",
   },
 ];
 
@@ -101,16 +101,16 @@ const Index = () => {
             <img src={logo} alt="EVORIA" className="w-16 h-16 mb-6" />
           </div>
 <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-primary mb-5 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5">
-            <Sparkles size={12} /> METODOLOGIA FRANZEN • AGORA EM SISTEMA
+            <Sparkles size={12} /> MÉTODO FRANZEN • ESTRUTURADO EM SISTEMA
           </p>
           <h1 className="md:text-7xl font-heading font-bold text-foreground mb-5 leading-[1.05] tracking-tight text-2xl">
             Você treina há tempo.<br />
             O problema nunca foi o esforço. <br className="hidden md:block" />
-            <span className="text-gradient">Foi o protocolo.</span>
+            <span className="text-gradient">Foi a falta de estrutura.</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl md:max-w-2xl">
-            A mesma estrutura que aplico na consultoria 1:1.<br />
-            Sem fila de espera. Sem agenda. Pronto antes do seu próximo treino.
+            A lógica por trás da metodologia que aplico há anos, agora organizada em uma experiência mais prática, acessível e autônoma.<br />
+            Com entrega antes do teu próximo treino.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
             <Link to={ctaPrimaryTo}>
@@ -128,13 +128,13 @@ const Index = () => {
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 mt-6 justify-center md:justify-start text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Quiz de 5 a 8 minutos. Protocolo pronto hoje.
+              <CheckCircle2 size={14} className="text-primary" /> Quiz de 5 a 8 minutos. Estrutura pronta hoje.
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Você vê o plano completo antes de pagar qualquer coisa.
+              <CheckCircle2 size={14} className="text-primary" /> Você entende a estrutura antes de liberar o acesso completo.
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Refeições montadas com os alimentos que você já come.
+              <CheckCircle2 size={14} className="text-primary" /> Organização alimentar com alimentos da sua rotina.
             </span>
             <span className="flex items-center gap-1.5">
               <CheckCircle2 size={14} className="text-primary" /> 7 dias de garantia. Cancela quando quiser.
@@ -199,9 +199,7 @@ const Index = () => {
             <span className="text-gradient">já te espera.</span>
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-lg mx-auto">
-            Pare de adiar. Faça o quiz, veja seu protocolo e decida se vale a pena.
-            <br /><br />
-            Você não paga nada pra descobrir.
+            Faça o quiz, entenda sua estrutura inicial e decida se a EVORIA faz sentido para você.
           </p>
           <Link to={ctaPrimaryTo}>
             <Button size="lg" className="glow gap-2 h-14 px-10 text-base">
@@ -210,7 +208,7 @@ const Index = () => {
           </Link>
           <p className="text-xs text-muted-foreground mt-5">
             ✓ Tempo estimado: 5 a 8 minutos <br />
-            ✓ Você vê o protocolo antes de pagar <br />
+            ✓ Você entende a estrutura antes de liberar o acesso <br />
             ✓ Cancela quando quiser
           </p>
         </div>
@@ -220,7 +218,7 @@ const Index = () => {
       <section className="border-t border-border bg-card/20">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <p className="text-[10px] leading-relaxed text-muted-foreground/60 text-justify">
-            O EVORIA não substitui acompanhamento de médico, nutricionista ou profissional de educação física habilitado. Para condições clínicas ou metas específicas que exijam supervisão profissional, procure um profissional habilitado. O EVORIA é uma plataforma digital de organização de hábitos físicos e alimentares. Os protocolos gerados pelo sistema têm caráter informativo e educativo, baseados em parâmetros inseridos pelo próprio usuário. A plataforma não realiza prescrição médica, nutricional ou de atividade física por profissional habilitado, e não substitui a avaliação de médico, nutricionista ou profissional de educação física. A análise por foto utiliza inteligência artificial para estimativa computacional, não constitui avaliação clínica ou diagnóstico de qualquer natureza. Resultados individuais variam conforme adesão ao protocolo, condições físicas, genética e outros fatores biológicos. O uso da plataforma é de exclusiva responsabilidade do usuário.
+            A EVORIA é uma plataforma digital de organização de rotina física, alimentar e acompanhamento de progresso baseada nas informações fornecidas pelo usuário. O uso da plataforma não substitui acompanhamento individual de médico, nutricionista, profissional de educação física ou outro profissional habilitado, especialmente em condições clínicas, lesões, restrições específicas ou objetivos que exijam supervisão profissional. As leituras visuais por foto são estimativas computacionais e não constituem diagnóstico, avaliação clínica ou laudo profissional. Resultados variam conforme adesão, rotina, individualidade e execução.
           </p>
         </div>
       </section>

@@ -5,7 +5,7 @@ const GOALS = [
   {
     icon: Dumbbell,
     title: "Hipertrofia",
-    desc: "Estrutura progressiva pra quem quer crescer com consistência. Mais músculo, mais força, mais saúde sustentável.",
+    desc: "Estrutura progressiva para quem quer ganhar massa com consistência, força e rotina sustentável.",
     tag: "GANHO DE MASSA",
   },
   {
@@ -17,7 +17,7 @@ const GOALS = [
   {
     icon: Zap,
     title: "Recomposição",
-    desc: "Estrutura pensada pra quem quer ganhar músculo e perder gordura ao mesmo tempo. Treino e alimentação alinhados pro mesmo resultado.",
+    desc: "Treino e organização alimentar alinhados para quem quer recompor o seu físico e ganhar performance no dia a dia.",
     tag: "SAÚDE GERAL",
   },
 ];
@@ -28,7 +28,7 @@ export const SectionGoals = () => (
       <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">Protocolo completo</p>
       <h2 className="md:text-5xl font-heading font-bold text-foreground leading-tight text-2xl">
         Você diz onde quer chegar. <br />
-        <span className="text-gradient">O sistema traça o caminho mais curto.</span>
+        <span className="text-gradient">O sistema organiza o caminho mais claro.</span>
       </h2>
     </div>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
