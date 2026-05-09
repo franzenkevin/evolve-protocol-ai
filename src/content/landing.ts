@@ -159,9 +159,6 @@ export const FAQ_CONTENT: FAQItem[] = [
     a: "Não. Você faz o quiz, o sistema organiza sua estrutura inicial e você decide se vale a pena liberar o acesso completo. Sem pressão.",
   },
   {
-    q: "Depois do primeiro mês, quanto custa?",
-    a: "O primeiro mês sai por R$29,90. Depois, o plano mensal segue por R$97/mês, com cancelamento conforme as regras informadas no checkout.",
-  },
   {
     q: "Funciona pra quem já treina faz anos?",
     a: "Sim — e especialmente pra você. O sistema foi desenvolvido pra quem já tem disciplina mas não tem o protocolo certo. Se você treina consistentemente e o resultado não é proporcional ao esforço, é exatamente disso que se trata.",
