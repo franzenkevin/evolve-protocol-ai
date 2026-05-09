@@ -44,6 +44,8 @@ import AdminMobility from "@/components/admin/AdminMobility";
 import AdminJournal from "@/components/admin/AdminJournal";
 import AdminChallenges from "@/components/admin/AdminChallenges";
 import AdminRanking from "@/components/admin/AdminRanking";
+import AdminProtocolFeedback from "@/components/admin/AdminProtocolFeedback";
+import AdminTestimonials from "@/components/admin/AdminTestimonials";
 
 const Admin = () => {
   const { signOut } = useAuth();
