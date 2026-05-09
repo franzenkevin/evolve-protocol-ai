@@ -95,6 +95,8 @@ const Admin = () => {
             <TabsTrigger value="users" className="gap-1"><UserCog size={14} />Usuários</TabsTrigger>
             <TabsTrigger value="challenges" className="gap-1"><Target size={14} />Desafios</TabsTrigger>
             <TabsTrigger value="ranking" className="gap-1"><Trophy size={14} />Ranking</TabsTrigger>
+            <TabsTrigger value="protocol-feedback" className="gap-1"><Heart size={14} />Feedback Protocolo</TabsTrigger>
+            <TabsTrigger value="app-feedback" className="gap-1"><MessageSquare size={14} />Feedback do App</TabsTrigger>
             <TabsTrigger value="audit" className="gap-1"><ScrollText size={14} />Auditoria</TabsTrigger>
           </TabsList>
 
