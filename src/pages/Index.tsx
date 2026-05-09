@@ -142,6 +142,21 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Faixa de oferta */}
+      <section className="border-t border-border bg-primary/5">
+        <div className="max-w-5xl mx-auto px-4 py-6 text-center">
+          <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-primary mb-2">
+            LANÇAMENTO • PRIMEIROS USUÁRIOS
+          </p>
+          <p className="text-lg md:text-2xl font-heading font-bold text-foreground leading-snug">
+            Menos de R$1 por dia no primeiro mês.
+          </p>
+          <p className="text-sm md:text-base text-muted-foreground mt-1">
+            R$29,90 hoje. Cancela quando quiser.
+          </p>
+        </div>
+      </section>
+
       {/* Como funciona */}
       <section className="max-w-5xl mx-auto px-4 py-20 border-t border-border">
         <div className="text-center mb-12">
