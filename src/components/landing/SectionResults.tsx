@@ -1,10 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import transformation1 from "@/assets/transformation-1.webp";
-import transformation2 from "@/assets/transformation-2.webp";
-import transformation3 from "@/assets/transformation-3.webp";
+import t1 from "@/assets/transformation-1.webp";
+import t2 from "@/assets/transformation-2.webp";
+import t3 from "@/assets/transformation-3.webp";
+import t4 from "@/assets/transformation-4.webp";
+import t5 from "@/assets/transformation-5.webp";
+import t6 from "@/assets/transformation-6.webp";
+import t7 from "@/assets/transformation-7.webp";
+import t8 from "@/assets/transformation-8.webp";
+import t9 from "@/assets/transformation-9.webp";
+import t10 from "@/assets/transformation-10.webp";
 
-// Adicione novas fotos aqui (até 10). Basta importar e colocar no array.
-const PHOTOS = [transformation1, transformation2, transformation3];
+// Ordem intercalada por gênero e objetivo
+const PHOTOS = [t1, t2, t3, t4, t5, t6, t7, t8, t9, t10];
 
 const AUTOPLAY_MS = 2000;
 
