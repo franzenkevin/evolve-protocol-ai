@@ -166,6 +166,7 @@ export default function HeaderNotifications({ onOpenTour }: HeaderNotificationsP
     });
   }
 
+  if (!tourDone) {
     items.push({
       id: "tutorial",
       icon: GraduationCap,
