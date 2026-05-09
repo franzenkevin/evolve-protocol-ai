@@ -49,6 +49,8 @@ export default function HeaderNotifications({ onOpenTour }: HeaderNotificationsP
   const navigate = useNavigate();
   const { data: assessments = [] } = useBodyAssessments();
   const { data: milestone } = useProtocolMilestone();
+  const { data: protocol } = useActiveProtocol();
+  const { data: protocolFeedback } = useProtocolFeedbackForProtocol(protocol?.id);
   const [tick, setTick] = useState(0);
 
   const refresh = () => setTick((t) => t + 1);
