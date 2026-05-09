@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, GraduationCap, Sparkles, Check, Calendar, Trophy, Flame } from "lucide-react";
+import { Bell, GraduationCap, Sparkles, Check, Calendar, Trophy, Flame, MessageCircleHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -10,6 +10,8 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useBodyAssessments } from "@/hooks/useBodyAssessments";
 import { useProtocolMilestone } from "@/hooks/useProtocolMilestone";
+import { useActiveProtocol } from "@/hooks/useProtocol";
+import { useProtocolFeedbackForProtocol } from "@/hooks/useProtocolFeedback";
 
 interface NotifItem {
   id: string;
