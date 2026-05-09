@@ -13,6 +13,10 @@ const isPreviewHost =
   window.location.hostname.includes("id-preview--") ||
   window.location.hostname.includes("lovableproject.com");
 
+window.addEventListener("vite:preloadError", () => {
+  window.location.reload();
+});
+
 // ---------------------------------------------------------------------------
 // Aggressive cache & service-worker eviction for returning visitors.
 // Runs BEFORE React renders so users never see the stale UI.
