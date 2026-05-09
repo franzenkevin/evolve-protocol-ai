@@ -23,6 +23,8 @@ import {
   ShoppingBag,
   Trophy,
   Target,
+  Heart,
+  MessageSquare,
 } from "lucide-react";
 import AdminPurchases from "@/components/admin/AdminPurchases";
 import AdminAIHealth from "@/components/admin/AdminAIHealth";
