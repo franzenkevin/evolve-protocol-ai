@@ -160,11 +160,11 @@ export const FAQ_CONTENT: FAQItem[] = [
   },
   {
     q: "Funciona pra quem já treina faz anos?",
-    a: "Sim — e especialmente pra você. O sistema foi desenvolvido pra quem já tem disciplina mas não tem o protocolo certo. Se você treina consistentemente e o resultado não é proporcional ao esforço, é exatamente disso que se trata.",
+    a: "Sim. Especialmente pra você. O sistema foi desenvolvido pra quem já tem disciplina mas não tem o protocolo certo. Se você treina consistentemente e o resultado não é proporcional ao esforço, é exatamente disso que se trata.",
   },
   {
     q: "Funciona pra iniciante?",
-    a: "Também. O quiz identifica seu nível e o sistema estrutura o protocolo adequado — sem exigir que você já saiba se exercitar.",
+    a: "Também. O quiz identifica seu nível e o sistema estrutura o protocolo adequado, sem exigir que você já saiba se exercitar.",
   },
   {
     q: "Em quanto tempo vejo resultado?",
@@ -172,19 +172,19 @@ export const FAQ_CONTENT: FAQItem[] = [
   },
   {
     q: "E se eu treinar em casa, sem academia?",
-    a: "O quiz pergunta sobre equipamento disponível. O sistema estrutura o protocolo com o que você tem — academia completa, espaço em casa ou peso corporal.",
+    a: "O quiz pergunta sobre equipamento disponível. O sistema estrutura o protocolo com o que você tem: academia completa, espaço em casa ou peso corporal.",
   },
   {
     q: "O protocolo é só pra hipertrofia?",
-    a: "Não. O sistema cobre três objetivos: ganho de massa magra, redução de gordura corporal e performance. Você escolhe no quiz — e pode mudar depois.",
+    a: "Não. O sistema cobre três objetivos: ganho de massa magra, redução de gordura corporal e performance. Você escolhe no quiz e pode mudar depois.",
   },
   {
     q: "Isso é diferente de usar um app grátis?",
-    a: "Sim. Apps como MyFitnessPal ou Hevy são ferramentas — você ainda precisa saber o que fazer. O EVORIA gera o protocolo por você, baseado no seu corpo, objetivo e rotina. É a diferença entre uma calculadora e um sistema que pensa por você.",
+    a: "Sim. Apps como MyFitnessPal ou Hevy são ferramentas. Você ainda precisa saber o que fazer. O EVORIA gera o protocolo por você, baseado no seu corpo, objetivo e rotina. É a diferença entre uma calculadora e um sistema que pensa por você.",
   },
   {
     q: "Tem coach ou é só sistema?",
-    a: "O EVORIA é um sistema digital baseado na metodologia Kevin Franzen. O sistema faz o trabalho — disponível 24h, sem fila de espera. Para acompanhamento individual com o Kevin, existe a consultoria separada.",
+    a: "O EVORIA é um sistema digital baseado na metodologia Kevin Franzen. O sistema faz o trabalho, disponível 24h, sem fila de espera. Para acompanhamento individual com o Kevin, existe a consultoria separada.",
   },
   {
     q: "Minhas fotos ficam seguras?",
