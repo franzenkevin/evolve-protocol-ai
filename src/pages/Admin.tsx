@@ -117,6 +117,8 @@ const Admin = () => {
           <TabsContent value="users" className="mt-4"><AdminUsers /></TabsContent>
           <TabsContent value="challenges" className="mt-4"><AdminChallenges /></TabsContent>
           <TabsContent value="ranking" className="mt-4"><AdminRanking /></TabsContent>
+          <TabsContent value="protocol-feedback" className="mt-4"><AdminProtocolFeedback /></TabsContent>
+          <TabsContent value="app-feedback" className="mt-4"><AdminTestimonials /></TabsContent>
           <TabsContent value="audit" className="mt-4"><AdminAuditLog /></TabsContent>
         </Tabs>
       </div>
