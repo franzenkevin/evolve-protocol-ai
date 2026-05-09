@@ -1,82 +1,96 @@
-import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { RESULTS_CONTENT } from "@/content/landing";
+import { useEffect, useRef, useState } from "react";
+import transformation1 from "@/assets/transformation-1.webp";
+import transformation2 from "@/assets/transformation-2.webp";
+import transformation3 from "@/assets/transformation-3.webp";
+
+// Adicione novas fotos aqui (até 10). Basta importar e colocar no array.
+const PHOTOS = [transformation1, transformation2, transformation3];
+
+const AUTOPLAY_MS = 2000;
 
 export const SectionResults = () => {
-  // Mostra "antes" ou "depois" em cada card individualmente
-  const [view, setView] = useState<Record<number, "before" | "after">>({});
+  const [index, setIndex] = useState(0);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const startX = useRef<number | null>(null);
+  const pausedRef = useRef(false);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (pausedRef.current) return;
+      setIndex((i) => (i + 1) % PHOTOS.length);
+    }, AUTOPLAY_MS);
+    return () => clearInterval(id);
+  }, []);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    pausedRef.current = true;
+    startX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (startX.current === null) return;
+    const dx = e.changedTouches[0].clientX - startX.current;
+    if (Math.abs(dx) > 40) {
+      setIndex((i) =>
+        dx < 0 ? (i + 1) % PHOTOS.length : (i - 1 + PHOTOS.length) % PHOTOS.length
+      );
+    }
+    startX.current = null;
+    setTimeout(() => (pausedRef.current = false), 1500);
+  };
 
   return (
     <section className="py-20 border-t border-border bg-card/30">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-12">
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="text-center mb-10">
           <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">
             Resultados reais
           </p>
-          <h2 className="md:text-5xl font-heading font-bold text-foreground leading-tight text-2xl">
-            Quem confiou no processo, <br />
-            <span className="text-gradient">virou outra pessoa.</span>
+          <h2 className="md:text-4xl font-heading font-bold text-foreground leading-tight text-2xl">
+            <span className="text-gradient">Resultados de alunos que seguem o método</span>
           </h2>
-          <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-            Resultados de alunos da consultoria 1:1 — usando a mesma metodologia que agora está no Evoria.
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {RESULTS_CONTENT.map((r, i) => {
-            const current = view[i] ?? "before";
-            const showBefore = current === "before";
-            return (
-              <Card key={r.name} className="overflow-hidden card-gradient border-border">
-                <div className="relative aspect-square overflow-hidden">
-                  <img
-                    src={showBefore ? r.before : r.after}
-                    alt={`${showBefore ? "Antes" : "Depois"} — ${r.name}`}
-                    loading="lazy"
-                    width={1024}
-                    height={1024}
-                    className="w-full h-full object-cover transition-opacity duration-300"
-                  />
-                  <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px] font-bold tracking-wider uppercase px-2 py-1 rounded">
-                    {r.goal}
-                  </div>
+        <div
+          className="relative mx-auto max-w-md overflow-hidden rounded-2xl border border-border bg-background shadow-[0_0_60px_-20px_hsl(var(--primary)/0.4)]"
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+          onMouseEnter={() => (pausedRef.current = true)}
+          onMouseLeave={() => (pausedRef.current = false)}
+        >
+          <div
+            ref={trackRef}
+            className="flex transition-transform duration-700 ease-out"
+            style={{ transform: `translateX(-${index * 100}%)` }}
+          >
+            {PHOTOS.map((src, i) => (
+              <div key={i} className="min-w-full aspect-square">
+                <img
+                  src={src}
+                  alt={`Resultado ${i + 1}`}
+                  loading="lazy"
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                />
+              </div>
+            ))}
+          </div>
 
-                  {/* Toggle Antes / Depois */}
-                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex bg-background/80 backdrop-blur-sm rounded-full p-1 border border-border">
-                    {(["before", "after"] as const).map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => setView((v) => ({ ...v, [i]: opt }))}
-                        className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full transition-colors ${
-                          current === opt
-                            ? "bg-primary text-primary-foreground"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        {opt === "before" ? "Antes" : "Depois"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="p-5">
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <p className="font-heading font-bold text-foreground">{r.name}</p>
-                    <span className="text-[9px] font-bold tracking-wider uppercase text-primary border border-primary/40 bg-primary/5 px-2 py-0.5 rounded">
-                      Consultoria 1:1
-                    </span>
-                  </div>
-                  <p className="text-sm text-primary font-semibold mb-3">{r.detail}</p>
-                  <p className="text-sm text-muted-foreground italic leading-relaxed">
-                    "{r.quote}"
-                  </p>
-                </div>
-              </Card>
-            );
-          })}
+          {/* Dots */}
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 bg-background/70 backdrop-blur-sm rounded-full px-2 py-1.5 border border-border">
+            {PHOTOS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setIndex(i)}
+                aria-label={`Ir para foto ${i + 1}`}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === index ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/40"
+                }`}
+              />
+            ))}
+          </div>
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-8">
+        <p className="text-center text-xs text-muted-foreground mt-6">
           * Resultados individuais variam conforme adesão ao protocolo.
         </p>
       </div>
