@@ -75,7 +75,7 @@ export const SectionPricing = () => {
             <p className="text-xs text-muted-foreground mb-1">
               no primeiro mês, depois R$97/mês
             </p>
-            <p className="text-[10px] text-primary mb-6">Apenas no cartão de crédito</p>
+            <p className="text-[10px] text-primary mb-6">Pagamento mensal apenas no cartão de crédito</p>
 
             <ul className="space-y-2.5 mb-6 flex-1">
               {MONTHLY_BULLETS.map((b) => (
