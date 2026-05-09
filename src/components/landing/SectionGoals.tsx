@@ -5,19 +5,19 @@ const GOALS = [
   {
     icon: Dumbbell,
     title: "Hipertrofia",
-    desc: "Periodização pra quem quer render mais dentro e fora da academia. Mais força, mais resistência e saúde.",
+    desc: "Estrutura progressiva pra quem quer crescer com consistência. Mais músculo, mais força, mais saúde sustentável.",
     tag: "GANHO DE MASSA",
   },
   {
     icon: Flame,
     title: "Emagrecimento",
-    desc: "Déficit calórico inteligente. Programa de treino que preserva músculo. Organização alimentar que cabe na sua rotina sem te deixar com fome o dia todo.",
+    desc: "Organização calórica baseada no seu objetivo. Treino estruturado pra preservar músculo enquanto você perde gordura. Refeições que cabem na sua rotina sem te deixar com fome o dia todo.",
     tag: "DEFINIÇÃO",
   },
   {
     icon: Zap,
     title: "Recomposição",
-    desc: "Periodização pra quem quer render mais — dentro e fora da academia. Mais força, mais resistência, mais explosão.",
+    desc: "Estrutura pensada pra quem quer ganhar músculo e perder gordura ao mesmo tempo. Treino e alimentação alinhados pro mesmo resultado.",
     tag: "SAÚDE GERAL",
   },
 ];

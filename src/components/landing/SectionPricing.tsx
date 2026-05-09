@@ -75,7 +75,7 @@ export const SectionPricing = () => {
             <p className="text-xs text-muted-foreground mb-1">
               no primeiro mês, depois R$97/mês
             </p>
-            <p className="text-[10px] text-primary mb-6">Apenas no cartão de crédito</p>
+            <p className="text-[10px] text-primary mb-6">Pagamento mensal apenas no cartão de crédito</p>
 
             <ul className="space-y-2.5 mb-6 flex-1">
               {MONTHLY_BULLETS.map((b) => (
@@ -109,13 +109,15 @@ export const SectionPricing = () => {
             </div>
             <h3 className="text-2xl font-heading font-bold text-foreground mb-3">Anual</h3>
             <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-base text-muted-foreground line-through">R$897</span>
               <span className="text-4xl font-heading font-bold text-foreground">12x de R$49</span>
             </div>
             <p className="text-xs text-muted-foreground mb-1">
-              pagamento único com a economia de R$298
+              ou R$588 à vista no Pix
             </p>
-            <p className="text-[10px] text-primary mb-6">Cartão de crédito à vista ou parcelado, ou Pix</p>
+            <p className="text-xs text-foreground mb-1">
+              Você economiza <strong className="text-primary">R$508</strong> em relação ao plano mensal.
+            </p>
+            <p className="text-[10px] text-primary mb-6">Cartão de crédito à vista, parcelado, ou Pix</p>
 
             <ul className="space-y-2.5 mb-6 flex-1">
               {ANNUAL_BULLETS.map((b) => (

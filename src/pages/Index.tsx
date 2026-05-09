@@ -33,12 +33,12 @@ const HOW_IT_WORKS = [
   {
     icon: Camera,
     title: "2. Análise por foto IA",
-    desc: "4 fotos processadas pelo sistema em segundos. O algoritmo estima composição corporal, identifica padrões posturais e define as prioridades em cima disso.",
+    desc: "4 fotos processadas em segundos. O sistema estima composição corporal e define as prioridades do seu plano. Estimativa visual com IA, não avaliação clínica.",
   },
   {
     icon: Rocket,
     title: "3. Seu protocolo ativo",
-    desc: "Programa de exercícios estruturado semana a semana. Organização de refeições com seus alimentos. Tudo no app. Tudo hoje.",
+    desc: "Treino estruturado semana a semana. Refeições montadas com os alimentos que você já consome. Tudo no sistema. Tudo hoje.",
   },
 ];
 
@@ -100,7 +100,7 @@ const Index = () => {
             <img src={logo} alt="EVORIA" className="w-16 h-16 mb-6" />
           </div>
 <p className="inline-flex items-center gap-2 text-xs font-semibold tracking-wider uppercase text-primary mb-5 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5">
-            <Sparkles size={12} /> METODOLOGIA FRANZEN • AGORA EM SISTEMA DIGITAL
+            <Sparkles size={12} /> METODOLOGIA FRANZEN • AGORA EM SISTEMA
           </p>
           <h1 className="md:text-7xl font-heading font-bold text-foreground mb-5 leading-[1.05] tracking-tight text-2xl">
             Você treina há tempo.<br />
@@ -108,8 +108,8 @@ const Index = () => {
             <span className="text-gradient">Foi o protocolo.</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl md:max-w-2xl">
-            A mesma metodologia que uso com meus clientes da consultoria, agora estruturado em software.<br />
-            Tudo isso menos de R$1 por dia durante o período de lançamento.
+            A mesma estrutura que aplico na consultoria 1:1.<br />
+            Sem fila de espera. Sem agenda. Pronto antes do seu próximo treino.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
             <Link to={ctaPrimaryTo}>
@@ -130,15 +130,30 @@ const Index = () => {
               <CheckCircle2 size={14} className="text-primary" /> Quiz de 5 a 8 minutos. Protocolo pronto hoje.
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Você vê o protocolo antes de pagar qualquer coisa
+              <CheckCircle2 size={14} className="text-primary" /> Você vê o plano completo antes de pagar qualquer coisa.
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> Estrutura alimentar com os alimentos que você já come
+              <CheckCircle2 size={14} className="text-primary" /> Refeições montadas com os alimentos que você já come.
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 size={14} className="text-primary" /> 7 dias de garantia é só cancelar se não gostar
+              <CheckCircle2 size={14} className="text-primary" /> 7 dias de garantia. Cancela quando quiser.
             </span>
           </div>
+        </div>
+      </section>
+
+      {/* Faixa de oferta */}
+      <section className="border-t border-border bg-primary/5">
+        <div className="max-w-5xl mx-auto px-4 py-6 text-center">
+          <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-primary mb-2">
+            LANÇAMENTO • PRIMEIROS USUÁRIOS
+          </p>
+          <p className="text-lg md:text-2xl font-heading font-bold text-foreground leading-snug">
+            Menos de R$1 por dia no primeiro mês.
+          </p>
+          <p className="text-sm md:text-base text-muted-foreground mt-1">
+            R$29,90 hoje. Cancela quando quiser.
+          </p>
         </div>
       </section>
 
@@ -182,7 +197,8 @@ const Index = () => {
             <span className="text-gradient">já te espera.</span>
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-lg mx-auto">
-            Pare de adiar. Faça o quiz, veja seu protocolo e decida se vale a pena.<br />
+            Pare de adiar. Faça o quiz, veja seu protocolo e decida se vale a pena.
+            <br /><br />
             Você não paga nada pra descobrir.
           </p>
           <Link to={ctaPrimaryTo}>
@@ -202,7 +218,7 @@ const Index = () => {
       <section className="border-t border-border bg-card/20">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <p className="text-[10px] leading-relaxed text-muted-foreground/60 text-justify">
-            O EVORIA é uma plataforma digital de organização de hábitos físicos e alimentares. Os protocolos gerados pelo sistema têm caráter informativo e educativo, baseados em parâmetros inseridos pelo próprio usuário. A plataforma não realiza prescrição médica, nutricional ou de atividade física por profissional habilitado, e não substitui a avaliação de médico, nutricionista ou profissional de educação física. A análise por foto utiliza inteligência artificial para estimativa computacional, não constitui avaliação clínica ou diagnóstico de qualquer natureza. Resultados individuais variam conforme adesão ao protocolo, condições físicas, genética e outros fatores biológicos. O uso da plataforma é de exclusiva responsabilidade do usuário.
+            O EVORIA não substitui acompanhamento de médico, nutricionista ou profissional de educação física habilitado. Para condições clínicas ou metas específicas que exijam supervisão profissional, procure um profissional habilitado. O EVORIA é uma plataforma digital de organização de hábitos físicos e alimentares. Os protocolos gerados pelo sistema têm caráter informativo e educativo, baseados em parâmetros inseridos pelo próprio usuário. A plataforma não realiza prescrição médica, nutricional ou de atividade física por profissional habilitado, e não substitui a avaliação de médico, nutricionista ou profissional de educação física. A análise por foto utiliza inteligência artificial para estimativa computacional, não constitui avaliação clínica ou diagnóstico de qualquer natureza. Resultados individuais variam conforme adesão ao protocolo, condições físicas, genética e outros fatores biológicos. O uso da plataforma é de exclusiva responsabilidade do usuário.
           </p>
         </div>
       </section>

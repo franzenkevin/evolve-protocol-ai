@@ -4,7 +4,7 @@ export const SectionFeatures = () => (
   <section className="py-20 border-t border-border">
     <div className="max-w-5xl mx-auto px-4 mb-16 text-center">
       <p className="text-xs font-semibold tracking-wider uppercase text-primary mb-2">
-        TUDO NO APP
+        TUDO NO SISTEMA
       </p>
       <h2 className="md:text-5xl font-heading font-bold text-foreground leading-tight text-2xl">
         Mais do que um plano. <br />
