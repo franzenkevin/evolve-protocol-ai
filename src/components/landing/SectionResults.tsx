@@ -18,7 +18,7 @@ export const SectionResults = () => {
             <span className="text-gradient">virou outra pessoa.</span>
           </h2>
           <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-            Pessoas que decidiram parar de improvisar e seguir um plano feito pra durar.
+            Resultados de alunos da consultoria 1:1 — usando a mesma metodologia que agora está no Evoria.
           </p>
         </div>
 
@@ -60,7 +60,12 @@ export const SectionResults = () => {
                 </div>
 
                 <div className="p-5">
-                  <p className="font-heading font-bold text-foreground">{r.name}</p>
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <p className="font-heading font-bold text-foreground">{r.name}</p>
+                    <span className="text-[9px] font-bold tracking-wider uppercase text-primary border border-primary/40 bg-primary/5 px-2 py-0.5 rounded">
+                      Consultoria 1:1
+                    </span>
+                  </div>
                   <p className="text-sm text-primary font-semibold mb-3">{r.detail}</p>
                   <p className="text-sm text-muted-foreground italic leading-relaxed">
                     "{r.quote}"
