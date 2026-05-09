@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, GraduationCap, Sparkles, Check, Calendar, Trophy, Flame } from "lucide-react";
+import { Bell, GraduationCap, Sparkles, Check, Calendar, Trophy, Flame, MessageCircleHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -10,6 +10,8 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useBodyAssessments } from "@/hooks/useBodyAssessments";
 import { useProtocolMilestone } from "@/hooks/useProtocolMilestone";
+import { useActiveProtocol } from "@/hooks/useProtocol";
+import { useProtocolFeedbackForProtocol } from "@/hooks/useProtocolFeedback";
 
 interface NotifItem {
   id: string;
@@ -47,6 +49,8 @@ export default function HeaderNotifications({ onOpenTour }: HeaderNotificationsP
   const navigate = useNavigate();
   const { data: assessments = [] } = useBodyAssessments();
   const { data: milestone } = useProtocolMilestone();
+  const { data: protocol } = useActiveProtocol();
+  const { data: protocolFeedback } = useProtocolFeedbackForProtocol(protocol?.id);
   const [tick, setTick] = useState(0);
 
   const refresh = () => setTick((t) => t + 1);
@@ -144,6 +148,22 @@ export default function HeaderNotifications({ onOpenTour }: HeaderNotificationsP
         },
       });
     }
+  }
+
+  // Pedido de feedback do protocolo (qualquer protocolo ativo sem feedback ainda)
+  if (protocol && !protocolFeedback) {
+    items.push({
+      id: `protocol-feedback-${protocol.id}`,
+      icon: MessageCircleHeart,
+      title: "O que achou do protocolo que recebeu?",
+      body: "Ajude-nos a sempre estar otimizando o processo. Leva menos de 1 minuto.",
+      cta: "Avaliar protocolo",
+      highlight: true,
+      action: () => {
+        navigate("/dashboard");
+        refresh();
+      },
+    });
   }
 
   if (!tourDone) {

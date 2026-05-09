@@ -23,6 +23,8 @@ import {
   ShoppingBag,
   Trophy,
   Target,
+  Heart,
+  MessageSquare,
 } from "lucide-react";
 import AdminPurchases from "@/components/admin/AdminPurchases";
 import AdminAIHealth from "@/components/admin/AdminAIHealth";
@@ -42,6 +44,8 @@ import AdminMobility from "@/components/admin/AdminMobility";
 import AdminJournal from "@/components/admin/AdminJournal";
 import AdminChallenges from "@/components/admin/AdminChallenges";
 import AdminRanking from "@/components/admin/AdminRanking";
+import AdminProtocolFeedback from "@/components/admin/AdminProtocolFeedback";
+import AdminTestimonials from "@/components/admin/AdminTestimonials";
 
 const Admin = () => {
   const { signOut } = useAuth();
@@ -91,6 +95,8 @@ const Admin = () => {
             <TabsTrigger value="users" className="gap-1"><UserCog size={14} />Usuários</TabsTrigger>
             <TabsTrigger value="challenges" className="gap-1"><Target size={14} />Desafios</TabsTrigger>
             <TabsTrigger value="ranking" className="gap-1"><Trophy size={14} />Ranking</TabsTrigger>
+            <TabsTrigger value="protocol-feedback" className="gap-1"><Heart size={14} />Feedback Protocolo</TabsTrigger>
+            <TabsTrigger value="app-feedback" className="gap-1"><MessageSquare size={14} />Feedback do App</TabsTrigger>
             <TabsTrigger value="audit" className="gap-1"><ScrollText size={14} />Auditoria</TabsTrigger>
           </TabsList>
 
@@ -111,6 +117,8 @@ const Admin = () => {
           <TabsContent value="users" className="mt-4"><AdminUsers /></TabsContent>
           <TabsContent value="challenges" className="mt-4"><AdminChallenges /></TabsContent>
           <TabsContent value="ranking" className="mt-4"><AdminRanking /></TabsContent>
+          <TabsContent value="protocol-feedback" className="mt-4"><AdminProtocolFeedback /></TabsContent>
+          <TabsContent value="app-feedback" className="mt-4"><AdminTestimonials /></TabsContent>
           <TabsContent value="audit" className="mt-4"><AdminAuditLog /></TabsContent>
         </Tabs>
       </div>

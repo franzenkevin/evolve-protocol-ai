@@ -951,6 +951,48 @@ export type Database = {
         }
         Relationships: []
       }
+      protocol_feedback: {
+        Row: {
+          admin_email_sent_at: string | null
+          admin_email_subject: string | null
+          admin_notes: string | null
+          created_at: string
+          id: string
+          protocol_id: string | null
+          protocol_version: number | null
+          rating: number
+          text: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_email_sent_at?: string | null
+          admin_email_subject?: string | null
+          admin_notes?: string | null
+          created_at?: string
+          id?: string
+          protocol_id?: string | null
+          protocol_version?: number | null
+          rating: number
+          text?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_email_sent_at?: string | null
+          admin_email_subject?: string | null
+          admin_notes?: string | null
+          created_at?: string
+          id?: string
+          protocol_id?: string | null
+          protocol_version?: number | null
+          rating?: number
+          text?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       protocol_milestone_feedbacks: {
         Row: {
           ai_analysis: Json | null
