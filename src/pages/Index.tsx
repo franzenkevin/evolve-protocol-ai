@@ -178,6 +178,7 @@ const Index = () => {
         </div>
       </section>
 
+      <SectionDifference />
       <SectionGoals />
       <SectionFeatures />
       <SectionResults />
