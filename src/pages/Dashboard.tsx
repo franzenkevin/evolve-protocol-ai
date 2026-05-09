@@ -192,6 +192,9 @@ const Dashboard = () => {
           />
         )}
 
+        {/* Protocol feedback prompt */}
+        <ProtocolFeedbackPrompt />
+
         {/* Today's training or rest day */}
         {isRestDay ? (
           <Card className="p-4 card-gradient border-border">
