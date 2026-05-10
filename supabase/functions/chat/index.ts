@@ -47,20 +47,20 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const token = authHeader.replace("Bearer ", "");
-    let userId: string | null = null;
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
-      if (payload?.sub && (!payload.exp || payload.exp * 1000 > Date.now())) {
-        userId = payload.sub;
-      }
-    } catch (_) { /* invalid */ }
-    if (!userId) {
+    // Verify JWT signature via Supabase Auth (do NOT trust manually-decoded payloads —
+    // an attacker could forge `sub` to bypass per-user rate limits).
+    const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: authHeader } },
+      auth: { persistSession: false },
+    });
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const userId: string = userData.user.id;
 
     // Rate limit por usuário
     const { data: rl, error: rlErr } = await admin.rpc("check_ai_rate_limit", {

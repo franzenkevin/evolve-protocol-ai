@@ -84,14 +84,10 @@ export default function Plans() {
         toast.success(`Cupom ${code} aplicado! 10% de desconto.`);
         return;
       }
-      // 2) Try promo coupon
-      const { data: cp } = await supabase
-        .from("coupons")
-        .select("code, discount_percent, active, valid_until")
-        .eq("code", code)
-        .eq("active", true)
-        .maybeSingle();
-      if (cp && (!cp.valid_until || new Date(cp.valid_until) > new Date())) {
+      // 2) Try promo coupon via secure RPC (no broad table read)
+      const { data: cpRows } = await supabase.rpc("validate_coupon", { _code: code });
+      const cp = Array.isArray(cpRows) ? cpRows[0] : cpRows;
+      if (cp) {
         setAppliedCoupon({ code, type: "promo", discount: cp.discount_percent });
         toast.success(`Cupom ${code} aplicado! ${cp.discount_percent}% de desconto.`);
         return;
