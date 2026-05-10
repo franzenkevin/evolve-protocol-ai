@@ -134,12 +134,20 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Optional direct-send mode: { userId, title, body, url }
+    // Optional direct-send mode: { userId, title, body, url } — service-role only
     let directBody: { userId?: string; title?: string; body?: string; url?: string } | null = null;
     if (req.method === "POST") {
       try { directBody = await req.json(); } catch { /* no body */ }
     }
     if (directBody?.userId && directBody.title && directBody.body) {
+      const authHeader = req.headers.get("Authorization") || "";
+      const token = authHeader.replace(/^Bearer\s+/i, "");
+      if (token !== Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       const { data: userSubs, error: subErr } = await supabase
         .from("push_subscriptions")
         .select("*")
