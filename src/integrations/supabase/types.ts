@@ -1586,6 +1586,14 @@ export type Database = {
           read_ct: number
         }[]
       }
+      validate_coupon: {
+        Args: { _code: string }
+        Returns: {
+          code: string
+          discount_percent: number
+          valid_until: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "user"
