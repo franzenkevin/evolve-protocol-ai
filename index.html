@@ -28,24 +28,52 @@
   <body>
     <div id="root"></div>
     <script>
-      // Force-update legacy clients: unregister any existing SW and clear caches once per build
+      // Auto-update: força clientes antigos a buscar a versão mais recente.
+      // Funciona mesmo quando o index.html veio do cache do navegador.
       (function () {
         try {
           var BUILD = '2026-05-10T22:00Z';
-          var seen = localStorage.getItem('evoria_build');
+          var RELOAD_KEY = 'evoria_force_reload_done';
+
+          // Sempre tenta desregistrar SWs legados (não interfere no sw-push.js)
           if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function (regs) {
-              regs.forEach(function (r) { r.unregister(); });
+              regs.forEach(function (r) {
+                var url = (r.active && r.active.scriptURL) || '';
+                if (url.indexOf('sw-push.js') === -1) r.unregister();
+              });
             }).catch(function () {});
           }
-          if (seen !== BUILD) {
+
+          function clearAllCaches() {
             if (window.caches && caches.keys) {
-              caches.keys().then(function (keys) {
+              return caches.keys().then(function (keys) {
                 return Promise.all(keys.map(function (k) { return caches.delete(k); }));
               }).catch(function () {});
             }
-            localStorage.setItem('evoria_build', BUILD);
+            return Promise.resolve();
           }
+
+          // Compara o BUILD embutido neste HTML com o /version.json servido pela rede.
+          // Se diferentes => este index.html está em cache antigo. Limpa tudo e recarrega.
+          fetch('/version.json?t=' + Date.now(), { cache: 'no-store' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (data) {
+              if (!data || !data.buildId) return;
+              if (data.buildId !== BUILD) {
+                // Evita loop: só recarrega uma vez por sessão
+                if (sessionStorage.getItem(RELOAD_KEY) === data.buildId) return;
+                sessionStorage.setItem(RELOAD_KEY, data.buildId);
+                clearAllCaches().finally(function () {
+                  // location.reload(true) é deprecado mas força bypass em browsers antigos
+                  window.location.replace(window.location.pathname + '?v=' + Date.now() + window.location.hash);
+                });
+              } else {
+                sessionStorage.removeItem(RELOAD_KEY);
+                localStorage.setItem('evoria_build', BUILD);
+              }
+            })
+            .catch(function () {});
         } catch (e) {}
       })();
     </script>
