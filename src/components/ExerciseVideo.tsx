@@ -2,11 +2,35 @@ import { useEffect, useState } from "react";
 import { ExternalLink, Youtube } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface ExerciseVideoProps {
   exerciseName: string;
   videoUrl?: string | null;
   videoQuery?: string | null;
+}
+
+// Mapa nome→video_url da biblioteca de exercícios.
+// Sempre que o admin atualiza o vídeo de um exercício, todos os alunos
+// passam a ver o vídeo novo automaticamente (sem regenerar protocolo).
+function useExerciseVideoMap() {
+  return useQuery({
+    queryKey: ["exercise-video-map"],
+    staleTime: 1000 * 60 * 5,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("exercises")
+        .select("name, video_url");
+      if (error) throw error;
+      const map: Record<string, string> = {};
+      (data || []).forEach((e: any) => {
+        if (e?.name && e?.video_url) {
+          map[String(e.name).trim().toLowerCase()] = e.video_url;
+        }
+      });
+      return map;
+    },
+  });
 }
 
 /**
@@ -16,25 +40,34 @@ interface ExerciseVideoProps {
  */
 const ExerciseVideo = ({ exerciseName, videoUrl, videoQuery }: ExerciseVideoProps) => {
   const [showEmbed, setShowEmbed] = useState(false);
-  const [resolvedUrl, setResolvedUrl] = useState<string | null>(videoUrl || null);
+  const { data: videoMap } = useExerciseVideoMap();
+
+  // Prioriza o vídeo cadastrado no admin (sempre fresco) sobre o que veio no protocolo
+  const libraryVideo = videoMap?.[exerciseName.trim().toLowerCase()] || null;
+  const effectiveVideoUrl = libraryVideo || videoUrl || null;
+
+  const [resolvedUrl, setResolvedUrl] = useState<string | null>(effectiveVideoUrl);
 
   // Bucket exercise-videos é privado: URLs antigas /object/public/ precisam virar signed URL
   useEffect(() => {
-    if (!videoUrl) {
+    if (!effectiveVideoUrl) {
       setResolvedUrl(null);
       return;
     }
-    const legacyMatch = videoUrl.match(/\/storage\/v1\/object\/public\/exercise-videos\/(.+?)(\?|$)/);
-    if (legacyMatch) {
-      const path = legacyMatch[1];
+    const legacyMatch = effectiveVideoUrl.match(/\/storage\/v1\/object\/public\/exercise-videos\/(.+?)(\?|$)/);
+    const signedMatch = effectiveVideoUrl.match(/\/storage\/v1\/object\/sign\/exercise-videos\/(.+?)(\?|$)/);
+    const match = legacyMatch || signedMatch;
+    if (match) {
+      const path = match[1];
       supabase.storage
         .from("exercise-videos")
         .createSignedUrl(path, 60 * 60 * 24 * 7)
-        .then(({ data }) => setResolvedUrl(data?.signedUrl || videoUrl));
+        .then(({ data }) => setResolvedUrl(data?.signedUrl || effectiveVideoUrl));
     } else {
-      setResolvedUrl(videoUrl);
+      setResolvedUrl(effectiveVideoUrl);
     }
-  }, [videoUrl]);
+  }, [effectiveVideoUrl]);
+
 
   const query = videoQuery || `${exerciseName} execução correta`;
   const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
