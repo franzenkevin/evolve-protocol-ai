@@ -10,13 +10,32 @@ interface ExerciseVideoProps {
   videoQuery?: string | null;
 }
 
+// Normaliza nome para comparar (sem acento, sem pontuação, lowercase)
+function normName(s: string): string {
+  return (s || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Garante que a URL é absoluta (alguns vídeos foram salvos sem https://)
+function normalizeUrl(url: string): string {
+  if (!url) return url;
+  if (/^https?:\/\//i.test(url)) return url;
+  if (/^(www\.)?(youtube\.com|youtu\.be)/i.test(url)) return `https://${url}`;
+  if (/^\/\//.test(url)) return `https:${url}`;
+  return url;
+}
+
 // Mapa nome→video_url da biblioteca de exercícios.
-// Sempre que o admin atualiza o vídeo de um exercício, todos os alunos
-// passam a ver o vídeo novo automaticamente (sem regenerar protocolo).
 function useExerciseVideoMap() {
   return useQuery({
     queryKey: ["exercise-video-map"],
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 2,
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("exercises")
@@ -25,7 +44,7 @@ function useExerciseVideoMap() {
       const map: Record<string, string> = {};
       (data || []).forEach((e: any) => {
         if (e?.name && e?.video_url) {
-          map[String(e.name).trim().toLowerCase()] = e.video_url;
+          map[normName(e.name)] = normalizeUrl(String(e.video_url));
         }
       });
       return map;
@@ -33,22 +52,33 @@ function useExerciseVideoMap() {
   });
 }
 
-/**
- * Renders an embedded execution video for an exercise.
- * - If a direct YouTube/Vimeo URL or GIF is provided, embed it.
- * - Otherwise show a "Watch on YouTube" link using the search query.
- */
+// Lookup tolerante: tenta exato, sem qualificadores, e por substring
+function lookupVideo(map: Record<string, string> | undefined, name: string): string | null {
+  if (!map) return null;
+  const n = normName(name);
+  if (map[n]) return map[n];
+  const stripped = n
+    .replace(/\b(com|na|no|de|da|do)\s+(barra|halteres|halter|smith|maquina|polia|cabo|cabos|corda|ez)\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (stripped && map[stripped]) return map[stripped];
+  for (const key of Object.keys(map)) {
+    if (key.length >= 6 && (n.includes(key) || key.includes(n))) {
+      return map[key];
+    }
+  }
+  return null;
+}
+
 const ExerciseVideo = ({ exerciseName, videoUrl, videoQuery }: ExerciseVideoProps) => {
   const [showEmbed, setShowEmbed] = useState(false);
   const { data: videoMap } = useExerciseVideoMap();
 
-  // Prioriza o vídeo cadastrado no admin (sempre fresco) sobre o que veio no protocolo
-  const libraryVideo = videoMap?.[exerciseName.trim().toLowerCase()] || null;
-  const effectiveVideoUrl = libraryVideo || videoUrl || null;
+  const libraryVideo = lookupVideo(videoMap, exerciseName);
+  const effectiveVideoUrl = libraryVideo || (videoUrl ? normalizeUrl(videoUrl) : null);
 
   const [resolvedUrl, setResolvedUrl] = useState<string | null>(effectiveVideoUrl);
 
-  // Bucket exercise-videos é privado: URLs antigas /object/public/ precisam virar signed URL
   useEffect(() => {
     if (!effectiveVideoUrl) {
       setResolvedUrl(null);
@@ -70,8 +100,10 @@ const ExerciseVideo = ({ exerciseName, videoUrl, videoQuery }: ExerciseVideoProp
 
 
   const query = videoQuery || `${exerciseName} execução correta`;
-  const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-  // Embedded search loops the first result on YouTube — works without API key
+  // Se temos a URL real, "Abrir no YouTube" leva direto pro vídeo
+  const youtubeSearchUrl = resolvedUrl && /youtube\.com|youtu\.be/i.test(resolvedUrl)
+    ? resolvedUrl
+    : `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
   const youtubeEmbedUrl = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(query)}`;
 
   // If a direct media URL is provided, render it
