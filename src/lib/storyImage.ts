@@ -15,10 +15,7 @@ const W = 1080;
 const H = 1920;
 
 const COLORS = {
-  bgTop: "#090B11",
-  bgBottom: "#0F121B",
-  card: "rgba(29,36,43,0.55)",
-  cardBorder: "rgba(0,196,179,0.25)",
+  bg: "#000000",
   primary: "#00C4B3",
   text: "#F3F1EC",
   muted: "#8B93A7",
