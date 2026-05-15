@@ -15,10 +15,7 @@ const W = 1080;
 const H = 1920;
 
 const COLORS = {
-  bgTop: "#090B11",
-  bgBottom: "#0F121B",
-  card: "rgba(29,36,43,0.55)",
-  cardBorder: "rgba(0,196,179,0.25)",
+  bg: "#000000",
   primary: "#00C4B3",
   text: "#F3F1EC",
   muted: "#8B93A7",
@@ -93,135 +90,65 @@ export const renderStoryToCanvas = async (
 
   await ensureFonts();
 
-  // --- Background gradient ---
-  const bg = ctx.createLinearGradient(0, 0, 0, H);
-  bg.addColorStop(0, COLORS.bgTop);
-  bg.addColorStop(1, COLORS.bgBottom);
-  ctx.fillStyle = bg;
+  // --- Pure black background ---
+  ctx.fillStyle = COLORS.bg;
   ctx.fillRect(0, 0, W, H);
 
-  // --- Optional user photo as background (top 60%) ---
+  // --- Optional user photo (full canvas, cover) ---
   if (data.userPhoto) {
     try {
       const photo = await loadImage(data.userPhoto);
-      ctx.save();
-      roundRect(ctx, 0, 0, W, Math.round(H * 0.62), 0);
-      ctx.clip();
-      drawCoverImage(ctx, photo, 0, 0, W, Math.round(H * 0.62));
-      // dark overlay for legibility
-      const overlay = ctx.createLinearGradient(0, 0, 0, Math.round(H * 0.62));
-      overlay.addColorStop(0, "rgba(9,11,17,0.55)");
-      overlay.addColorStop(1, "rgba(9,11,17,0.95)");
+      drawCoverImage(ctx, photo, 0, 0, W, H);
+      // bottom gradient for text legibility
+      const overlay = ctx.createLinearGradient(0, H * 0.45, 0, H);
+      overlay.addColorStop(0, "rgba(0,0,0,0)");
+      overlay.addColorStop(0.55, "rgba(0,0,0,0.75)");
+      overlay.addColorStop(1, "rgba(0,0,0,0.95)");
       ctx.fillStyle = overlay;
-      ctx.fillRect(0, 0, W, Math.round(H * 0.62));
-      ctx.restore();
+      ctx.fillRect(0, 0, W, H);
     } catch {
       /* ignore photo errors */
     }
-  } else {
-    // Subtle teal radial accent
-    const radial = ctx.createRadialGradient(W / 2, H * 0.25, 50, W / 2, H * 0.25, 700);
-    radial.addColorStop(0, "rgba(0,196,179,0.18)");
-    radial.addColorStop(1, "rgba(0,196,179,0)");
-    ctx.fillStyle = radial;
-    ctx.fillRect(0, 0, W, H);
   }
 
-  // --- Logo (top center) ---
-  try {
-    const logo = await loadImage(logoUrl);
-    const logoH = 90;
-    const logoW = (logo.naturalWidth / logo.naturalHeight) * logoH;
-    ctx.drawImage(logo, (W - logoW) / 2, 110, logoW, logoH);
-  } catch {
-    /* ignore */
-  }
-
-  // --- "TREINO CONCLUÍDO" eyebrow ---
-  ctx.fillStyle = COLORS.primary;
-  ctx.font = '600 44px "Space Grotesk", system-ui, sans-serif';
-  ctx.textAlign = "center";
-  ctx.letterSpacing = "8px" as any;
-  ctx.fillText("TREINO CONCLUÍDO", W / 2, 760);
-
-  // teal underline
-  ctx.fillStyle = COLORS.primary;
-  ctx.fillRect(W / 2 - 60, 790, 120, 4);
-
-  // --- Workout name ---
-  ctx.fillStyle = COLORS.text;
-  ctx.font = '700 72px "Space Grotesk", system-ui, sans-serif';
-  ctx.textAlign = "center";
-  const lines = wrapText(ctx, data.workoutName, W - 160, 72);
-  let y = 900;
-  for (const line of lines.slice(0, 2)) {
-    ctx.fillText(line, W / 2, y);
-    y += 86;
-  }
-
-  // --- Metric cards ---
-  const cardsTop = Math.min(y + 60, 1180);
+  // --- Bottom content block ---
   const padX = 80;
-  const gap = 30;
-  const colW = (W - padX * 2 - gap) / 2;
-  const cardH = 240;
 
-  // Volume + Sets row
-  drawMetricCard(ctx, padX, cardsTop, colW, cardH,
-    formatVolume(data.totalVolume), "VOLUME TOTAL");
-  drawMetricCard(ctx, padX + colW + gap, cardsTop, colW, cardH,
-    String(data.totalSets), "SÉRIES");
-
-  // Duration full-width
-  if (data.durationMin && data.durationMin > 0) {
-    drawMetricCard(ctx, padX, cardsTop + cardH + gap, W - padX * 2, 200,
-      `${data.durationMin} MIN`, "DURAÇÃO");
+  // Workout name (above the volume)
+  ctx.fillStyle = COLORS.muted;
+  ctx.font = '500 36px "Inter", system-ui, sans-serif';
+  ctx.textAlign = "center";
+  const nameLines = wrapText(ctx, data.workoutName, W - padX * 2, 36);
+  let nameY = H - 560;
+  for (const line of nameLines.slice(0, 2)) {
+    ctx.fillText(line, W / 2, nameY);
+    nameY += 48;
   }
+
+  // Volume — the hero number
+  const volume = formatVolume(data.totalVolume);
+  ctx.fillStyle = COLORS.text;
+  let size = 280;
+  ctx.font = `700 ${size}px "Space Grotesk", system-ui, sans-serif`;
+  while (ctx.measureText(volume).width > W - padX * 2 && size > 120) {
+    size -= 10;
+    ctx.font = `700 ${size}px "Space Grotesk", system-ui, sans-serif`;
+  }
+  ctx.textAlign = "center";
+  ctx.fillText(volume, W / 2, H - 280);
+
+  // "VOLUME TOTAL" label under the number
+  ctx.fillStyle = COLORS.primary;
+  ctx.font = '600 32px "Inter", system-ui, sans-serif';
+  ctx.fillText("VOLUME TOTAL", W / 2, H - 220);
 
   // --- Footer ---
   ctx.fillStyle = COLORS.muted;
-  ctx.font = '500 32px "Inter", system-ui, sans-serif';
+  ctx.font = '400 30px "Inter", system-ui, sans-serif';
   ctx.textAlign = "center";
   ctx.fillText("evoriacoach.com", W / 2, H - 110);
 };
 
-const drawMetricCard = (
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  value: string,
-  label: string,
-) => {
-  // glassy card
-  ctx.fillStyle = COLORS.card;
-  roundRect(ctx, x, y, w, h, 28);
-  ctx.fill();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = COLORS.cardBorder;
-  roundRect(ctx, x, y, w, h, 28);
-  ctx.stroke();
-
-  // value
-  ctx.fillStyle = COLORS.primary;
-  // auto-shrink large numbers
-  let size = 130;
-  ctx.font = `700 ${size}px "Space Grotesk", system-ui, sans-serif`;
-  while (ctx.measureText(value).width > w - 60 && size > 60) {
-    size -= 8;
-    ctx.font = `700 ${size}px "Space Grotesk", system-ui, sans-serif`;
-  }
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(value, x + w / 2, y + h / 2 - 18);
-
-  // label
-  ctx.fillStyle = COLORS.muted;
-  ctx.font = '600 28px "Inter", system-ui, sans-serif';
-  ctx.fillText(label, x + w / 2, y + h - 38);
-  ctx.textBaseline = "alphabetic";
-};
 
 const wrapText = (
   ctx: CanvasRenderingContext2D,
