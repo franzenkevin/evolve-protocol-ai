@@ -1191,6 +1191,16 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
         onOpenChange={setShowMobilityDrawer}
         suggestedRegion={day?.muscleGroup}
       />
+      <ShareWorkoutDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        data={{
+          workoutName: workoutShareName,
+          totalVolume: totalTonnage,
+          totalSets: totalCompletedSets,
+          durationMin,
+        }}
+      />
     </AppLayout>
   );
 };
