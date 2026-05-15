@@ -279,6 +279,8 @@ const Training = () => {
       );
       toast.success("Treino finalizado! 💪");
       setShowFeedback(true);
+      // Offer to share the workout achievement
+      setShowShareDialog(true);
     } catch {
       toast.error("Erro ao finalizar treino");
     }
