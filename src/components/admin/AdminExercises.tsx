@@ -202,6 +202,98 @@ const AdminExercises = () => {
             ))}
           </SelectContent>
         </Select>
+  // Diagnóstico da biblioteca de vídeos — calculado a partir dos dados já carregados
+  const videoHealth = useMemo(() => {
+    const total = exercises.length;
+    const withVideo = exercises.filter((e) => !!e.video_url).length;
+    const invalid = exercises.filter((e) => e.video_url && !isValidVideoUrl(e.video_url));
+    const map: Record<string, string> = {};
+    exercises.forEach((e) => {
+      if (e.name && e.video_url) map[normName(e.name)] = String(e.video_url);
+    });
+    const samples = ["Cadeira extensora", "Mesa flexora", "Supino reto com barra"];
+    const matched = samples.filter((s) => map[normName(s)]);
+    const coverage = total > 0 ? Math.round((withVideo / total) * 100) : 0;
+    const ok = total > 0 && invalid.length === 0 && matched.length === samples.length;
+    return { total, withVideo, invalid, coverage, samples, matched, ok };
+  }, [exercises]);
+
+  return (
+    <div className="space-y-3">
+      {!isLoading && exercises.length > 0 && (
+        <Card
+          className={`p-3 border-l-4 ${
+            videoHealth.ok
+              ? "border-l-primary"
+              : videoHealth.invalid.length > 0
+              ? "border-l-destructive"
+              : "border-l-amber-500"
+          }`}
+        >
+          <div className="flex items-start gap-2">
+            {videoHealth.ok ? (
+              <CheckCircle2 size={16} className="text-primary mt-0.5 shrink-0" />
+            ) : (
+              <AlertTriangle size={16} className="text-amber-500 mt-0.5 shrink-0" />
+            )}
+            <div className="flex-1 text-xs space-y-1">
+              <p className="font-semibold text-foreground text-sm">
+                Diagnóstico da biblioteca de vídeos
+              </p>
+              <p className="text-muted-foreground">
+                {videoHealth.withVideo} de {videoHealth.total} exercícios com vídeo (
+                {videoHealth.coverage}% de cobertura)
+              </p>
+              <p className="text-muted-foreground">
+                Lookup tolerante: {videoHealth.matched.length}/{videoHealth.samples.length}{" "}
+                amostras encontradas
+                {videoHealth.matched.length < videoHealth.samples.length && (
+                  <span className="text-amber-500">
+                    {" "}
+                    (faltando:{" "}
+                    {videoHealth.samples
+                      .filter((s) => !videoHealth.matched.includes(s))
+                      .join(", ")}
+                    )
+                  </span>
+                )}
+              </p>
+              {videoHealth.invalid.length > 0 && (
+                <p className="text-destructive">
+                  {videoHealth.invalid.length} URL(s) de vídeo inválida(s):{" "}
+                  {videoHealth.invalid
+                    .slice(0, 3)
+                    .map((e) => e.name)
+                    .join(", ")}
+                  {videoHealth.invalid.length > 3 ? "…" : ""}
+                </p>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
+
+      <div className="flex flex-wrap gap-2 items-center">
+        <div className="relative flex-1 min-w-[180px]">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar por nome, categoria ou equipamento..."
+            className="pl-9"
+          />
+        </div>
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas categorias</SelectItem>
+            {categories.map((c) => (
+              <SelectItem key={c} value={c}>{c}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Button size="sm" className="gap-1" onClick={openCreate}>
           <Plus size={14} /> Adicionar
         </Button>
