@@ -4,7 +4,8 @@ import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const CURRENT_BUILD = typeof __APP_BUILD_ID__ !== "undefined" ? __APP_BUILD_ID__ : "dev";
-const CHECK_INTERVAL_MS = 60_000; // 1 min
+// Verifica nova versão a cada 180 minutos (3 horas), além de focus/visibilitychange.
+const CHECK_INTERVAL_MS = 180 * 60_000;
 
 const isPreview =
   typeof window !== "undefined" &&

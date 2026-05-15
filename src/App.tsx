@@ -71,6 +71,7 @@ const Feedback = lazyWithRecovery(() => import("./pages/Feedback"));
 const MilestoneCheckin = lazyWithRecovery(() => import("./pages/MilestoneCheckin"));
 const Support = lazyWithRecovery(() => import("./pages/Support"));
 const Install = lazyWithRecovery(() => import("./pages/Install"));
+const Diagnostics = lazyWithRecovery(() => import("./pages/Diagnostics"));
 import InstallPrompt from "./components/InstallPrompt";
 import { UpdateAvailableBanner } from "./components/UpdateAvailableBanner";
 import { CURRENT_TERMS_VERSION } from "@/lib/terms";
@@ -126,6 +127,8 @@ const App = () => (
               <Route path="/terms" element={<Terms />} />
               <Route path="/instalar" element={<Install />} />
               <Route path="/install" element={<Navigate to="/instalar" replace />} />
+              <Route path="/diagnostics" element={<Diagnostics />} />
+              <Route path="/diagnostico" element={<Navigate to="/diagnostics" replace />} />
               <Route path="/accept-terms" element={<ProtectedRoute><AcceptTerms /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><StudentGate><SubscriptionGate><Profile /></SubscriptionGate></StudentGate></ProtectedRoute>} />
               <Route path="/profile/edit" element={<ProtectedRoute><StudentGate><SubscriptionGate><EditProfile /></SubscriptionGate></StudentGate></ProtectedRoute>} />
