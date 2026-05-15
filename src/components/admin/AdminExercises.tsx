@@ -38,7 +38,30 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useLogAudit } from "@/hooks/useAuditLog";
 import VideoUploader from "@/components/admin/VideoUploader";
-import { Plus, Pencil, Trash2, Search, Dumbbell } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Dumbbell, CheckCircle2, AlertTriangle } from "lucide-react";
+
+// Normaliza nome para o lookup (igual ao usado em ExerciseVideo)
+function normName(s: string): string {
+  return (s || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isValidVideoUrl(u: string | null | undefined): boolean {
+  if (!u) return false;
+  try {
+    const url = new URL(/^https?:\/\//i.test(u) ? u : `https://${u}`);
+    return /youtube\.com|youtu\.be|vimeo\.com|\.mp4|\.webm|\.gif|exercise-videos/i.test(
+      url.hostname + url.pathname,
+    );
+  } catch {
+    return false;
+  }
+}
 
 const DIFFICULTIES = ["iniciante", "intermediario", "avancado"];
 const PATTERNS = ["empurrar", "puxar", "agachar", "dobrar_quadril", "core", "isolado", "cardio"];
