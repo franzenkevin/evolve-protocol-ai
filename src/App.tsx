@@ -127,6 +127,8 @@ const App = () => (
               <Route path="/terms" element={<Terms />} />
               <Route path="/instalar" element={<Install />} />
               <Route path="/install" element={<Navigate to="/instalar" replace />} />
+              <Route path="/diagnostics" element={<Diagnostics />} />
+              <Route path="/diagnostico" element={<Navigate to="/diagnostics" replace />} />
               <Route path="/accept-terms" element={<ProtectedRoute><AcceptTerms /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><StudentGate><SubscriptionGate><Profile /></SubscriptionGate></StudentGate></ProtectedRoute>} />
               <Route path="/profile/edit" element={<ProtectedRoute><StudentGate><SubscriptionGate><EditProfile /></SubscriptionGate></StudentGate></ProtectedRoute>} />
