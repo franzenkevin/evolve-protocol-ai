@@ -149,43 +149,6 @@ export const renderStoryToCanvas = async (
   ctx.fillText("evoriacoach.com", W / 2, H - 110);
 };
 
-const drawMetricCard = (
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  value: string,
-  label: string,
-) => {
-  // glassy card
-  ctx.fillStyle = COLORS.card;
-  roundRect(ctx, x, y, w, h, 28);
-  ctx.fill();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = COLORS.cardBorder;
-  roundRect(ctx, x, y, w, h, 28);
-  ctx.stroke();
-
-  // value
-  ctx.fillStyle = COLORS.primary;
-  // auto-shrink large numbers
-  let size = 130;
-  ctx.font = `700 ${size}px "Space Grotesk", system-ui, sans-serif`;
-  while (ctx.measureText(value).width > w - 60 && size > 60) {
-    size -= 8;
-    ctx.font = `700 ${size}px "Space Grotesk", system-ui, sans-serif`;
-  }
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(value, x + w / 2, y + h / 2 - 18);
-
-  // label
-  ctx.fillStyle = COLORS.muted;
-  ctx.font = '600 28px "Inter", system-ui, sans-serif';
-  ctx.fillText(label, x + w / 2, y + h - 38);
-  ctx.textBaseline = "alphabetic";
-};
 
 const wrapText = (
   ctx: CanvasRenderingContext2D,
