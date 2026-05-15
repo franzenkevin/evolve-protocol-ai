@@ -32,6 +32,8 @@ import {
 import ExerciseVideo from "@/components/ExerciseVideo";
 import MobilityDrawer from "@/components/MobilityDrawer";
 import CardioCard from "@/components/CardioCard";
+import ShareWorkoutDialog from "@/components/ShareWorkoutDialog";
+import { Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import { useActiveProtocol } from "@/hooks/useProtocol";
