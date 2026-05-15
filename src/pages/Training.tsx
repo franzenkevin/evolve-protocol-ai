@@ -32,6 +32,8 @@ import {
 import ExerciseVideo from "@/components/ExerciseVideo";
 import MobilityDrawer from "@/components/MobilityDrawer";
 import CardioCard from "@/components/CardioCard";
+import ShareWorkoutDialog from "@/components/ShareWorkoutDialog";
+import { Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import { useActiveProtocol } from "@/hooks/useProtocol";
@@ -140,6 +142,7 @@ const Training = () => {
   const [swapping, setSwapping] = useState<string | null>(null);
   const [swappedNames, setSwappedNames] = useState<Record<string, string>>({});
   const [showMobilityDrawer, setShowMobilityDrawer] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const ai = useAIExplanation();
 
   const training = useMemo(
@@ -276,6 +279,8 @@ const Training = () => {
       );
       toast.success("Treino finalizado! 💪");
       setShowFeedback(true);
+      // Offer to share the workout achievement
+      setShowShareDialog(true);
     } catch {
       toast.error("Erro ao finalizar treino");
     }
@@ -366,6 +371,43 @@ const Training = () => {
     }
     return total;
   }, [day?.exercises, exerciseSets]);
+
+  // Total completed valid sets (for share card)
+  const totalCompletedSets = useMemo(() => {
+    if (!day?.exercises) return 0;
+    let n = 0;
+    for (const ex of day.exercises) {
+      const sets = exerciseSets[ex.id] || [];
+      for (const s of sets) if (s.type === "valid" && s.completed) n++;
+    }
+    return n;
+  }, [day?.exercises, exerciseSets]);
+
+  // Track workout start time in localStorage (set on first completed set of the day)
+  const startKey = `evoria-workout-start-${sessionDate}-${selectedDay}`;
+  useEffect(() => {
+    if (selectedDay < 0) return;
+    if (totalCompletedSets > 0 && !localStorage.getItem(startKey)) {
+      localStorage.setItem(startKey, String(Date.now()));
+    }
+  }, [totalCompletedSets, startKey, selectedDay]);
+
+  const durationMin = useMemo(() => {
+    const raw = localStorage.getItem(startKey);
+    if (!raw) return null;
+    const start = parseInt(raw, 10);
+    if (!start || Number.isNaN(start)) return null;
+    const mins = Math.max(1, Math.round((Date.now() - start) / 60000));
+    return mins > 360 ? null : mins; // ignore if > 6h (likely stale)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startKey, totalCompletedSets, showShareDialog]);
+
+  const workoutShareName = useMemo(() => {
+    const muscle = day?.muscleGroup || day?.name || "";
+    const wd = day?.weekday ? `${day.weekday}` : "";
+    if (muscle && wd) return `${wd} — ${muscle}`;
+    return muscle || wd || "Treino do dia";
+  }, [day?.muscleGroup, day?.name, day?.weekday]);
 
   // Check if all exercises are completed
   const isWorkoutComplete = useMemo(() => {
@@ -1080,6 +1122,16 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                   {saveLog.isPending ? <Loader2 size={14} className="mr-2 animate-spin" /> : <CheckCircle2 size={14} className="mr-2" />}
                   Finalizar treino
                 </Button>
+                {(isWorkoutComplete || totalCompletedSets > 0) && (
+                  <Button
+                    variant="outline"
+                    className="w-full mt-2 gap-2"
+                    onClick={() => setShowShareDialog(true)}
+                  >
+                    <Share2 size={14} />
+                    Compartilhar nos Stories
+                  </Button>
+                )}
                 {existingFeedback && (
                   <p className="text-[10px] text-muted-foreground text-center mt-2">
                     Feedback já registrado: {existingFeedback.rating}/5 ⭐
@@ -1138,6 +1190,16 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
         open={showMobilityDrawer}
         onOpenChange={setShowMobilityDrawer}
         suggestedRegion={day?.muscleGroup}
+      />
+      <ShareWorkoutDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        data={{
+          workoutName: workoutShareName,
+          totalVolume: totalTonnage,
+          totalSets: totalCompletedSets,
+          durationMin,
+        }}
       />
     </AppLayout>
   );

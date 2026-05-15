@@ -1,81 +1,92 @@
+# Compartilhar treino nos Stories
 
-# Pop-up automático "Instalar como App" para usuários leigos
+Ao finalizar um treino, o aluno gera uma arte 1080x1920 com seus dados e compartilha direto no Instagram Stories via deep link nativo (com fallback para download).
 
-## Objetivo
-Usuário leigo abre o site no celular e **automaticamente** vê um aviso bonito ensinando a instalar como app — sem precisar saber que isso existe.
+## Como vai funcionar (fluxo do usuário)
 
-## O que será criado
+1. Aluno termina o último exercício em `/training` → aparece um botão **"Compartilhar treino"** (e também no card de resumo após salvar).
+2. Abre um modal com:
+   - **Preview da arte** (1080x1920, escala reduzida) gerada em tempo real
+   - Botão opcional **"Adicionar minha foto"** (input file `accept="image/*" capture="user"` — abre câmera ou galeria)
+   - Botão principal **"Compartilhar nos Stories"**
+   - Botão secundário **"Baixar imagem"** (fallback)
+3. Toque em compartilhar:
+   - **Mobile com Instagram instalado**: tenta `instagram-stories://share?...` (iOS/Android) com a imagem como `backgroundImage` via Web Share API + fallback de deep link
+   - **Sem Instagram / desktop**: dispara `navigator.share()` com o PNG, ou faz download direto
 
-### 1. Componente `InstallPrompt` (banner flutuante)
-Banner discreto que aparece **fixo no rodapé** do celular quando:
-- Usuário está em dispositivo móvel (iOS ou Android)
-- App ainda **não está instalado** (não está em modo standalone)
-- Usuário **ainda não dispensou** o aviso (controle via localStorage)
-- Já passou pelo menos **15 segundos** na primeira visita (não atrapalha)
+## Conteúdo da arte (estilo Dark Premium)
 
-Visual: card com ícone do app, texto "📱 Instale o EVORIA na tela inicial" + 2 botões: **"Instalar"** (primário) e **"Agora não"** (dispensa).
+Layout vertical 1080x1920, fundo `#090B11` com gradiente sutil para `#0F121B`:
 
-### 2. Modal de instruções (passo a passo visual)
-Quando o usuário toca em **"Instalar"** no banner:
+```
+┌─────────────────────┐
+│   [logo Evoria]     │ ← topo, 80px, branco
+│                     │
+│   [foto opcional    │ ← se enviada: ocupa 60% com overlay
+│    do usuário ou    │   escuro 70% e blur leve nas bordas
+│    pattern teal]    │
+│                     │
+│  TREINO CONCLUÍDO   │ ← Space Grotesk 56px, teal #00C4B3
+│                     │
+│  Treino A           │ ← nome do dia, 64px, branco
+│  Peito e Tríceps    │
+│                     │
+│  ┌──────┬──────┐    │
+│  │4.250 │  18  │    │ ← cards de métrica
+│  │  KG  │SÉRIES│    │   teal accent, 96px números
+│  └──────┴──────┘    │
+│  ┌─────────────┐    │
+│  │   52 MIN    │    │
+│  └─────────────┘    │
+│                     │
+│   evoriacoach.com   │ ← rodapé pequeno, muted
+└─────────────────────┘
+```
 
-**Android**: dispara o instalador nativo do navegador (`beforeinstallprompt`) — instala com 1 toque.
+Tipografia: **Space Grotesk** (números/títulos) + **Inter** (labels), carregadas via Google Fonts antes do render.
 
-**iOS**: abre um modal sobre a tela com tutorial visual ilustrado:
-- Passo 1: ícone Compartilhar 􀈂 → "Toque no botão de compartilhar"
-- Passo 2: ícone Adicionar 􀈎 → "Role e toque em 'Adicionar à Tela de Início'"  
-- Passo 3: ícone OK ✓ → "Toque em Adicionar e pronto!"
+## Arquivos a criar/editar
 
-Usa setas animadas pra indicar onde tocar. Botão "Já instalei" fecha tudo permanentemente.
-
-### 3. Lógica de exibição inteligente
-- Não aparece em **rotas internas críticas** (checkout, paywall, onboarding em andamento)
-- Aparece em rotas públicas e no dashboard
-- Se usuário dispensar 3 vezes → para de mostrar permanentemente
-- Se dispensar 1 vez → reaparece após 7 dias
-- Após **instalado** (detecta `appinstalled` event) → nunca mais aparece
-
-### 4. Detecção de Instagram/Facebook in-app browser
-Quando usuário clica num link do Instagram/WhatsApp/Facebook, o site abre no **navegador interno do app**, onde **não dá pra instalar PWA**. Nesse caso, o banner mostra mensagem diferente:
-> "Para instalar, abra no Safari/Chrome — toque no menu (•••) → 'Abrir no navegador'"
-
-### 5. Atualizar página `/install` existente
-- Adicionar um vídeo curto/GIF demonstrativo (placeholder pra você adicionar depois)
-- Garantir que continua acessível pelo menu do app
-
-## Onde vai aparecer
-
-| Local | Banner aparece? |
-|---|---|
-| Landing page (`/`) | ✅ Sim |
-| Quiz/Onboarding | ❌ Não (atrapalha) |
-| Paywall | ❌ Não |
-| Dashboard, Treino, Dieta | ✅ Sim |
-| Checkout em andamento | ❌ Não |
-| Já instalado | ❌ Nunca |
-
-## Arquivos que serão criados/editados
-
-**Criar:**
-- `src/components/InstallPrompt.tsx` — banner flutuante
-- `src/components/InstallInstructionsModal.tsx` — modal com tutorial iOS
-- `src/hooks/useInstallPrompt.ts` — lógica de detecção e estado
+**Novos:**
+- `src/lib/storyImage.ts` — função `generateStoryImage(data): Promise<Blob>` que monta o PNG via `<canvas>` 1080x1920. Recebe `{ workoutName, totalVolume, totalSets, durationMin, userPhoto?, logoUrl }`.
+- `src/lib/shareToInstagram.ts` — função `shareStory(blob)`:
+  1. Tenta `navigator.share({ files: [new File([blob], 'treino.png', { type: 'image/png' })] })` (cobre Instagram, WhatsApp, etc no menu nativo do iOS/Android)
+  2. Fallback: `<a download>` para baixar a imagem
+- `src/components/ShareWorkoutDialog.tsx` — modal com preview, upload de foto opcional, botões compartilhar/baixar.
 
 **Editar:**
-- `src/App.tsx` — montar o InstallPrompt globalmente
-- `src/pages/Install.tsx` — pequeno ajuste pra integrar com o novo modal
+- `src/pages/Training.tsx` — adicionar botão "Compartilhar treino" no card de resumo / ao concluir; calcular `totalVolume = Σ(weight × reps)` e `totalSets` a partir dos `workout_logs` do dia; estimar `durationMin` (diferença entre primeiro e último set salvo, ou registrar `startedAt` no início).
+- (Opcional) `src/hooks/useWorkoutLogs.ts` — helper `summarizeDay(logs)` retornando volume/séries/duração para reaproveitar.
 
-## Detalhes técnicos
-- Usa evento `beforeinstallprompt` (Android/Desktop) para instalação automática
-- Detecta `display-mode: standalone` e `navigator.standalone` (iOS) para saber se já está instalado
-- Detecta in-app browsers via UserAgent (Instagram, FBAN, Line, etc.)
-- Estado persistido em `localStorage` com chave versionada
-- Animação suave de entrada (slide-up) usando Tailwind
+**Asset:**
+- Usar `src/assets/evoria-logo-horizontal.png` (já existe) carregado em `<img>` antes de desenhar no canvas.
 
-## O que NÃO faz parte deste plano
-- Notificações push (já está implementado separadamente)
-- App nativo via Capacitor (decidimos manter PWA por enquanto)
-- Vídeo tutorial gravado (você grava depois e me envia, eu encaixo)
+## Detalhes técnicos importantes
 
----
+**Geração no canvas (não usa servidor, sem custo):**
+```ts
+const canvas = new OffscreenCanvas(1080, 1920);
+const ctx = canvas.getContext('2d');
+// 1. fundo + gradiente
+// 2. carregar foto do usuário (se houver) e desenhar com clip arredondado + overlay
+// 3. carregar logo (Image promise)
+// 4. await document.fonts.load('700 96px "Space Grotesk"')
+// 5. desenhar textos
+// 6. canvas.convertToBlob({ type: 'image/png' })
+```
 
-**Resultado final**: usuário leigo abre o site no celular, depois de 15s vê um aviso bonito embaixo da tela: "Instale o EVORIA". Toca em **Instalar** → no Android instala sozinho, no iPhone vê o tutorial visual. Pronto. Zero conhecimento técnico necessário.
+**Por que não publica 100% automático:** Instagram não expõe API pública de Stories para contas pessoais. O deep link `instagram-stories://share` exige que o app esteja instalado e mostra preview antes de publicar (1 toque do usuário). Web Share API é o caminho mais universal e já dá UX excelente — o usuário toca em "Instagram" no menu nativo e a imagem entra direto como sticker.
+
+**Duração do treino:** persistir `workoutStartedAt` em `localStorage` quando o primeiro set do dia é salvo, e calcular diff ao finalizar. Sem alteração de banco.
+
+**Sem mudanças no banco** — todos os dados (volume, séries) já existem em `workout_logs`.
+
+## Fora de escopo
+
+- Publicação 100% automática sem toque do usuário (impossível pelas regras das redes)
+- Suporte a TikTok/Facebook nesta primeira versão (focado só em Instagram + menu nativo de fallback)
+- Salvar histórico de stories compartilhados (pode virar feature futura para gamificação)
+
+## Estimativa de esforço
+
+Pequeno-médio: ~3 arquivos novos + 1 edição em Training.tsx. Nada de backend, edge function ou migração.
