@@ -142,6 +142,7 @@ const Training = () => {
   const [swapping, setSwapping] = useState<string | null>(null);
   const [swappedNames, setSwappedNames] = useState<Record<string, string>>({});
   const [showMobilityDrawer, setShowMobilityDrawer] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   const ai = useAIExplanation();
 
   const training = useMemo(
