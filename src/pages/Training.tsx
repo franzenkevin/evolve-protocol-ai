@@ -370,6 +370,43 @@ const Training = () => {
     return total;
   }, [day?.exercises, exerciseSets]);
 
+  // Total completed valid sets (for share card)
+  const totalCompletedSets = useMemo(() => {
+    if (!day?.exercises) return 0;
+    let n = 0;
+    for (const ex of day.exercises) {
+      const sets = exerciseSets[ex.id] || [];
+      for (const s of sets) if (s.type === "valid" && s.completed) n++;
+    }
+    return n;
+  }, [day?.exercises, exerciseSets]);
+
+  // Track workout start time in localStorage (set on first completed set of the day)
+  const startKey = `evoria-workout-start-${sessionDate}-${selectedDay}`;
+  useEffect(() => {
+    if (selectedDay < 0) return;
+    if (totalCompletedSets > 0 && !localStorage.getItem(startKey)) {
+      localStorage.setItem(startKey, String(Date.now()));
+    }
+  }, [totalCompletedSets, startKey, selectedDay]);
+
+  const durationMin = useMemo(() => {
+    const raw = localStorage.getItem(startKey);
+    if (!raw) return null;
+    const start = parseInt(raw, 10);
+    if (!start || Number.isNaN(start)) return null;
+    const mins = Math.max(1, Math.round((Date.now() - start) / 60000));
+    return mins > 360 ? null : mins; // ignore if > 6h (likely stale)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startKey, totalCompletedSets, showShareDialog]);
+
+  const workoutShareName = useMemo(() => {
+    const muscle = day?.muscleGroup || day?.name || "";
+    const wd = day?.weekday ? `${day.weekday}` : "";
+    if (muscle && wd) return `${wd} — ${muscle}`;
+    return muscle || wd || "Treino do dia";
+  }, [day?.muscleGroup, day?.name, day?.weekday]);
+
   // Check if all exercises are completed
   const isWorkoutComplete = useMemo(() => {
     if (!day?.exercises || day.exercises.length === 0) return false;
