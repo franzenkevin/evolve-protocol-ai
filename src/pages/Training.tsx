@@ -1122,6 +1122,16 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                   {saveLog.isPending ? <Loader2 size={14} className="mr-2 animate-spin" /> : <CheckCircle2 size={14} className="mr-2" />}
                   Finalizar treino
                 </Button>
+                {(isWorkoutComplete || totalCompletedSets > 0) && (
+                  <Button
+                    variant="outline"
+                    className="w-full mt-2 gap-2"
+                    onClick={() => setShowShareDialog(true)}
+                  >
+                    <Share2 size={14} />
+                    Compartilhar nos Stories
+                  </Button>
+                )}
                 {existingFeedback && (
                   <p className="text-[10px] text-muted-foreground text-center mt-2">
                     Feedback já registrado: {existingFeedback.rating}/5 ⭐
