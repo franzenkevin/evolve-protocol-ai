@@ -346,6 +346,11 @@ const AdminMobility = () => {
               value={draft.video_url ?? null}
               onChange={(url) => setDraft({ ...draft, video_url: url })}
             />
+            <ImageUploader
+              label="Imagem ilustrativa (usada quando não há vídeo)"
+              value={draft.image_url ?? null}
+              onChange={(url) => setDraft({ ...draft, image_url: url })}
+            />
             <div>
               <Label>Instruções</Label>
               <Textarea
