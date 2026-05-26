@@ -678,14 +678,14 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
                     <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted text-foreground flex items-center justify-center text-xs font-bold shrink-0">A1</div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-foreground leading-snug">Aquecimento 1 — 50% da carga (12 reps)</p>
-                      <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed mt-0.5">Movimento controlado, ativação muscular. Pode pular se já estiver bem aquecido.</p>
+                      <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed mt-0.5">Movimento controlado, ativação muscular. <span className="text-foreground font-medium">Se você já estiver bem aquecido</span> (vindo de outro exercício do mesmo grupo, por exemplo), pode <span className="text-foreground font-medium">pular este aquecimento</span> e fazer apenas o A2 — desde que tenha certeza de que está bem aquecido.</p>
                     </div>
                   </div>
                   <div className="flex gap-3">
                     <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted text-foreground flex items-center justify-center text-xs font-bold shrink-0">A2</div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-foreground leading-snug">Aquecimento 2 — 75% da carga (5–8 reps)</p>
-                      <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed mt-0.5">Preparação neural. Ainda longe da falha.</p>
+                      <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed mt-0.5">Preparação neural. Ainda longe da falha. <span className="text-foreground font-medium">Sempre faça este</span> antes das séries válidas.</p>
                     </div>
                   </div>
                   <div className="flex gap-3">
@@ -705,12 +705,12 @@ Seja direto, sem floreio. Máximo 180 palavras no total.`
 
                   <div className="mt-3 pt-3 border-t border-border/40 space-y-2">
                     <p className="text-xs sm:text-sm font-semibold text-foreground">Zona-alvo de repetições</p>
-                    <ul className="text-xs sm:text-[13px] text-muted-foreground space-y-1.5 pl-4 list-disc marker:text-primary/60 leading-relaxed">
-                      <li>Compostos pesados / força: <span className="text-foreground font-medium">5–9 reps</span></li>
-                      <li>Hipertrofia clássica: <span className="text-foreground font-medium">6–10 ou 8–12 reps</span></li>
-                      <li>Isolados / resistência: <span className="text-foreground font-medium">10–15 ou 15–20 reps</span></li>
-                    </ul>
+                    <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed">
+                      A zona-alvo de cada exercício é <span className="text-foreground font-medium">definida pela IA</span> com base no seu perfil, padrão de movimento e objetivo — está indicada no card de cada exercício abaixo (ex: <span className="text-foreground font-medium">6–10</span>, <span className="text-foreground font-medium">8–12</span>, <span className="text-foreground font-medium">10–15</span>).
+                      Trabalhe sempre <span className="text-foreground font-medium">dentro da zona proposta</span> e use a regra de progressão abaixo para ajustar carga semana a semana.
+                    </p>
                   </div>
+
 
                   <div className="mt-3 pt-3 border-t border-border/40 space-y-2">
                     <p className="text-xs sm:text-sm font-semibold text-foreground flex items-center gap-1.5">

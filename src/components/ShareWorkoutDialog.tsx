@@ -7,7 +7,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, Share2, Download, Image as ImageIcon, X } from "lucide-react";
+import { Loader2, Share2, Download, Image as ImageIcon, Camera, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   renderStoryToCanvas,
@@ -24,7 +24,8 @@ interface Props {
 
 const ShareWorkoutDialog = ({ open, onOpenChange, data }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const libraryInputRef = useRef<HTMLInputElement>(null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [rendering, setRendering] = useState(false);
   const [sharing, setSharing] = useState(false);
@@ -115,39 +116,60 @@ const ShareWorkoutDialog = ({ open, onOpenChange, data }: Props) => {
         </div>
 
         {/* Photo controls */}
-        <div className="flex items-center gap-2">
+        <div className="space-y-2">
           <input
-            ref={fileInputRef}
+            ref={cameraInputRef}
             type="file"
             accept="image/*"
-            capture="user"
+            capture="environment"
             className="hidden"
             onChange={handlePhotoPick}
           />
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="flex-1 gap-2"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={sharing}
-          >
-            <ImageIcon size={14} />
-            {photo ? "Trocar foto" : "Adicionar minha foto"}
-          </Button>
-          {photo && (
+          <input
+            ref={libraryInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handlePhotoPick}
+          />
+          <div className="flex items-center gap-2">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={() => setPhoto(null)}
+              className="flex-1 gap-2"
+              onClick={() => cameraInputRef.current?.click()}
               disabled={sharing}
-              aria-label="Remover foto"
             >
-              <X size={14} />
+              <Camera size={14} />
+              Tirar foto
             </Button>
-          )}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="flex-1 gap-2"
+              onClick={() => libraryInputRef.current?.click()}
+              disabled={sharing}
+            >
+              <ImageIcon size={14} />
+              Da galeria
+            </Button>
+            {photo && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setPhoto(null)}
+                disabled={sharing}
+                aria-label="Remover foto"
+              >
+                <X size={14} />
+              </Button>
+            )}
+          </div>
         </div>
+
 
         {/* Action buttons */}
         <div className="flex flex-col gap-2">
