@@ -64,19 +64,33 @@ const SOCIAL_PROOF_LINES = [
   "Quase lá — montando sua prévia…",
 ];
 
-// Imagens de body-shape por gênero (reaproveita as imagens BF que já temos)
+// Forma corporal ATUAL (4 opções por gênero — usam imagens BF como referência)
 const BODY_SHAPES_BY_GENDER: Record<string, { value: string; label: string; img: string }[]> = {
   male: [
     { value: "slim", label: "Magro", img: maleBF10 },
     { value: "average", label: "Médio", img: maleBF20 },
-    { value: "soft", label: "Acima do peso", img: maleBF30 },
-    { value: "athletic", label: "Atlético", img: shapeMaleAthletic },
+    { value: "soft", label: "Acima do peso", img: maleBF25 },
+    { value: "obese", label: "Bem acima do peso", img: maleBF35 },
   ],
   female: [
     { value: "slim", label: "Magra", img: femaleBF18 },
     { value: "average", label: "Média", img: femaleBF27 },
     { value: "soft", label: "Acima do peso", img: femaleBF37 },
-    { value: "athletic", label: "Atlética", img: shapeFemaleAthletic },
+    { value: "obese", label: "Bem acima do peso", img: femaleBF42 },
+  ],
+};
+
+// Forma corporal ALVO (3 opções por gênero, fotos dedicadas)
+const TARGET_SHAPES_BY_GENDER: Record<string, { value: string; label: string; img: string }[]> = {
+  male: [
+    { value: "lean", label: "Magro", img: targetMaleLean },
+    { value: "athletic", label: "Atlético", img: targetMaleAthletic },
+    { value: "bodybuilder", label: "Fisiculturista", img: targetMaleBodybuilder },
+  ],
+  female: [
+    { value: "slim", label: "Corpo slim", img: targetFemaleSlim },
+    { value: "volume", label: "Volume proporcional", img: targetFemaleVolume },
+    { value: "bodybuilder", label: "Fisiculturista", img: targetFemaleBodybuilder },
   ],
 };
 
