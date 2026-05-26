@@ -38,6 +38,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useLogAudit } from "@/hooks/useAuditLog";
 import VideoUploader from "@/components/admin/VideoUploader";
+import ImageUploader from "@/components/admin/ImageUploader";
 import { Plus, Pencil, Trash2, Search, Activity } from "lucide-react";
 
 const REGIONS = [
