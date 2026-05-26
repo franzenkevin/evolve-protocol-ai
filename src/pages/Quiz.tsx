@@ -792,7 +792,7 @@ function AnalyzingPhase() {
 
 // ============== PREVIEW ==============
 
-function PreviewPhase({ answers }: { answers: Record<string, any> }) {
+function PreviewPhase({ answers, physiqueResult }: { answers: Record<string, any>; physiqueResult?: any }) {
   const goal = answers.main_goal || "gain_muscle";
   const freq = answers.desired_frequency || "4";
   const dur = answers.session_duration || "60";
@@ -802,11 +802,12 @@ function PreviewPhase({ answers }: { answers: Record<string, any> }) {
     performance: "Performance esportiva",
   } as any)[goal] || "Construção muscular";
   const split = answers.split_pref === "ppl" ? "Push · Pull · Legs"
-    : answers.split_pref === "ab" ? "Superior · Inferior"
-    : answers.split_pref === "abc" ? "ABC"
-    : answers.split_pref === "abcd" ? "ABCD"
-    : answers.split_pref === "glute_focus" ? "Foco em glúteo + posterior"
-    : answers.split_pref === "full_body" ? "Full Body"
+    : answers.split_pref === "upper_lower" ? "Upper · Lower"
+    : answers.split_pref === "fb" ? "Full Body"
+    : answers.split_pref === "lpplu" ? "L · P · P · L · U (5x)"
+    : answers.split_pref === "fb_inf" ? "Full Body com ênfase inferior"
+    : answers.split_pref === "inf_sup_alt" ? "Inferior · Superior alternado"
+    : answers.split_pref === "inf_sup_glute" ? "Inf (quad) · Sup · Inf (post+glúteo)"
     : `${freq}x · Otimizada pelo sistema`;
   const w = Number(answers.weight) || 75;
   const calories = goal === "lose_fat" ? Math.round(w * 28) : goal === "gain_muscle" ? Math.round(w * 38) : Math.round(w * 33);
@@ -865,6 +866,36 @@ function PreviewPhase({ answers }: { answers: Record<string, any> }) {
           <li className="flex gap-2"><span className="text-primary">→</span> Recovery e sono entram na conta — não só treino.</li>
         </ul>
       </Card>
+
+      {physiqueResult && (
+        <Card className="p-5 bg-card/40 border-primary/30">
+          <div className="flex items-center gap-3 mb-3">
+            <Camera size={20} className="text-primary" />
+            <p className="text-xs uppercase tracking-wider text-primary font-bold">Leitura física por IA</p>
+          </div>
+          <div className="space-y-3 text-sm text-foreground/90">
+            {physiqueResult.posture && (
+              <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Postura</p><p className="leading-relaxed">{physiqueResult.posture}</p></div>
+            )}
+            {physiqueResult.symmetry && (
+              <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Simetria</p><p className="leading-relaxed">{physiqueResult.symmetry}</p></div>
+            )}
+            {Array.isArray(physiqueResult.priorities) && physiqueResult.priorities.length > 0 && (
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Pontos prioritários</p>
+                <ul className="space-y-1">
+                  {physiqueResult.priorities.slice(0, 3).map((p: string, i: number) => (
+                    <li key={i} className="flex gap-2"><span className="text-primary">→</span> {p}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {physiqueResult.recommendation && (
+              <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Recomendação inicial</p><p className="leading-relaxed">{physiqueResult.recommendation}</p></div>
+            )}
+          </div>
+        </Card>
+      )}
 
       <Card className="p-5 bg-primary/5 border-primary/30">
         <p className="text-xs uppercase tracking-wider text-primary font-bold mb-2">O que falta para liberar tudo</p>
@@ -1044,11 +1075,6 @@ function GuaranteePhase() {
         </p>
       </Card>
 
-      <Card className="p-5 bg-card/40 border-white/10 text-center">
-        <p className="text-sm text-muted-foreground">Já ajudamos mais de</p>
-        <p className="text-4xl font-heading font-bold text-gradient my-1">12.000+ pessoas</p>
-        <p className="text-sm text-muted-foreground">a estruturar treino, dieta e progresso</p>
-      </Card>
 
       <Card className="p-5 bg-primary/5 border-primary/30">
         <p className="text-xs uppercase tracking-wider text-primary font-bold mb-2">O que vem agora</p>
