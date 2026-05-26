@@ -13,16 +13,16 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import QuizShell from "@/components/quiz/QuizShell";
-import { quizSteps, TOTAL_QUIZ_STEPS, SPLITS_BY_GENDER, MUSCLE_OPTIONS, type QuizStep } from "@/lib/quizSteps";
+import { quizSteps, TOTAL_QUIZ_STEPS, SPLITS_BY_GENDER, type QuizStep } from "@/lib/quizSteps";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-// Imagens
+// Imagens body fat (slider visual)
+import maleBF5 from "@/assets/bodyfat/male-5.png";
 import maleBF10 from "@/assets/bodyfat/male-10.png";
 import maleBF15 from "@/assets/bodyfat/male-15.png";
 import maleBF20 from "@/assets/bodyfat/male-20.png";
 import maleBF25 from "@/assets/bodyfat/male-25.png";
-import maleBF30 from "@/assets/bodyfat/male-30.png";
 import maleBF35 from "@/assets/bodyfat/male-35.png";
 import femaleBF18 from "@/assets/bodyfat/female-18.png";
 import femaleBF22 from "@/assets/bodyfat/female-22.png";
@@ -30,10 +30,17 @@ import femaleBF27 from "@/assets/bodyfat/female-27.png";
 import femaleBF32 from "@/assets/bodyfat/female-32.png";
 import femaleBF37 from "@/assets/bodyfat/female-37.png";
 import femaleBF42 from "@/assets/bodyfat/female-42.png";
+// Gênero
 import genderMale from "@/assets/quiz/gender-male.jpg";
 import genderFemale from "@/assets/quiz/gender-female.jpg";
-import shapeMaleAthletic from "@/assets/quiz/shape-male-athletic.jpg";
-import shapeFemaleAthletic from "@/assets/quiz/shape-female-athletic.jpg";
+// Forma atual (reaproveita imagens BF)
+// Forma alvo (3 opções por gênero — novas fotos)
+import targetMaleLean from "@/assets/quiz/target-male-lean.jpg";
+import targetMaleAthletic from "@/assets/quiz/target-male-athletic.jpg";
+import targetMaleBodybuilder from "@/assets/quiz/target-male-bodybuilder.jpg";
+import targetFemaleSlim from "@/assets/quiz/target-female-slim.jpg";
+import targetFemaleVolume from "@/assets/quiz/target-female-volume.jpg";
+import targetFemaleBodybuilder from "@/assets/quiz/target-female-bodybuilder.jpg";
 
 type Phase =
   | { kind: "quiz"; index: number }
@@ -57,19 +64,33 @@ const SOCIAL_PROOF_LINES = [
   "Quase lá — montando sua prévia…",
 ];
 
-// Imagens de body-shape por gênero (reaproveita as imagens BF que já temos)
+// Forma corporal ATUAL (4 opções por gênero — usam imagens BF como referência)
 const BODY_SHAPES_BY_GENDER: Record<string, { value: string; label: string; img: string }[]> = {
   male: [
     { value: "slim", label: "Magro", img: maleBF10 },
     { value: "average", label: "Médio", img: maleBF20 },
-    { value: "soft", label: "Acima do peso", img: maleBF30 },
-    { value: "athletic", label: "Atlético", img: shapeMaleAthletic },
+    { value: "soft", label: "Acima do peso", img: maleBF25 },
+    { value: "obese", label: "Bem acima do peso", img: maleBF35 },
   ],
   female: [
     { value: "slim", label: "Magra", img: femaleBF18 },
     { value: "average", label: "Média", img: femaleBF27 },
     { value: "soft", label: "Acima do peso", img: femaleBF37 },
-    { value: "athletic", label: "Atlética", img: shapeFemaleAthletic },
+    { value: "obese", label: "Bem acima do peso", img: femaleBF42 },
+  ],
+};
+
+// Forma corporal ALVO (3 opções por gênero, fotos dedicadas)
+const TARGET_SHAPES_BY_GENDER: Record<string, { value: string; label: string; img: string }[]> = {
+  male: [
+    { value: "lean", label: "Magro", img: targetMaleLean },
+    { value: "athletic", label: "Atlético", img: targetMaleAthletic },
+    { value: "bodybuilder", label: "Fisiculturista", img: targetMaleBodybuilder },
+  ],
+  female: [
+    { value: "slim", label: "Corpo slim", img: targetFemaleSlim },
+    { value: "volume", label: "Volume proporcional", img: targetFemaleVolume },
+    { value: "bodybuilder", label: "Fisiculturista", img: targetFemaleBodybuilder },
   ],
 };
 
@@ -109,17 +130,17 @@ export default function Quiz() {
   function next() {
     if (phase.kind === "quiz") {
       const nextIdx = phase.index + 1;
-      if (nextIdx >= TOTAL_QUIZ_STEPS) setPhase({ kind: "loading" });
+      // Fim do quiz → análise IA opcional ANTES de gerar a prévia
+      if (nextIdx >= TOTAL_QUIZ_STEPS) setPhase({ kind: "physique-intro" });
       else setPhase({ kind: "quiz", index: nextIdx });
     }
   }
   function back() {
     if (phase.kind === "quiz" && phase.index > 0) setPhase({ kind: "quiz", index: phase.index - 1 });
-    else if (phase.kind === "preview") setPhase({ kind: "quiz", index: TOTAL_QUIZ_STEPS - 1 });
-    else if (phase.kind === "physique-intro") setPhase({ kind: "preview" });
+    else if (phase.kind === "physique-intro") setPhase({ kind: "quiz", index: TOTAL_QUIZ_STEPS - 1 });
     else if (phase.kind === "physique-upload") setPhase({ kind: "physique-intro" });
-    else if (phase.kind === "physique-result") setPhase({ kind: "physique-intro" });
-    else if (phase.kind === "plans") setPhase({ kind: "physique-intro" });
+    else if (phase.kind === "preview") setPhase({ kind: "physique-intro" });
+    else if (phase.kind === "plans") setPhase({ kind: "preview" });
     else if (phase.kind === "guarantee") setPhase({ kind: "plans" });
     else navigate("/");
   }
@@ -156,11 +177,11 @@ export default function Quiz() {
   if (phase.kind === "preview") {
     return (
       <QuizShell currentStep={TOTAL_QUIZ_STEPS} totalSteps={TOTAL_QUIZ_STEPS} onBack={back} hideProgress>
-        <PreviewPhase answers={answers} />
+        <PreviewPhase answers={answers} physiqueResult={physiqueResult} />
         <div className="fixed bottom-0 inset-x-0 z-30 bg-gradient-to-t from-black via-black/95 to-transparent pt-6 pb-5">
           <div className="max-w-xl mx-auto px-5">
-            <Button size="lg" className="w-full h-14 text-base font-semibold gap-2 glow" onClick={() => setPhase({ kind: "physique-intro" })}>
-              Continuar <ArrowRight size={18} />
+            <Button size="lg" className="w-full h-14 text-base font-semibold gap-2 glow" onClick={() => setPhase({ kind: "plans" })}>
+              Ver meu plano completo <ArrowRight size={18} />
             </Button>
           </div>
         </div>
@@ -189,7 +210,7 @@ export default function Quiz() {
             <Button size="lg" className="w-full h-14 text-base font-semibold gap-2 glow" onClick={() => setPhase({ kind: "physique-upload" })}>
               <Camera size={18} /> Fazer análise por IA
             </Button>
-            <Button variant="ghost" size="lg" className="w-full h-12 text-muted-foreground" onClick={() => setPhase({ kind: "plans" })}>
+            <Button variant="ghost" size="lg" className="w-full h-12 text-muted-foreground" onClick={() => { setAnswers((a) => ({ ...a, physique_pending: true })); setPhase({ kind: "loading" }); }}>
               Pular essa etapa
             </Button>
           </div>
@@ -218,12 +239,12 @@ export default function Quiz() {
                   if (error) throw error;
                   if (data?.error) throw new Error(data.error);
                   setPhysiqueResult(data);
-                  setPhase({ kind: "physique-result" });
+                  setPhase({ kind: "loading" });
                 } catch (e: any) {
                   console.error("[quiz] physique error", e);
                   toast.error("Não foi possível concluir a análise agora. Você poderá enviar suas fotos depois, no app.");
                   setAnswers((a) => ({ ...a, physique_pending: true }));
-                  setPhase({ kind: "plans" });
+                  setPhase({ kind: "loading" });
                 }
               }}
             >
@@ -235,7 +256,7 @@ export default function Quiz() {
               className="w-full h-12 text-muted-foreground"
               onClick={() => {
                 setAnswers((a) => ({ ...a, physique_pending: true }));
-                setPhase({ kind: "plans" });
+                setPhase({ kind: "loading" });
               }}
             >
               Enviar depois no app
@@ -307,7 +328,7 @@ export default function Quiz() {
 function StepRenderer({ step, value, allAnswers, onChange, onNext }: any) {
   if (step.type === "gender") return <GenderStep value={value} onChange={onChange} onNext={onNext} step={step} />;
   if (step.type === "choice") return <ChoiceStep step={step} value={value} onChange={onChange} onNext={onNext} allAnswers={allAnswers} />;
-  if (step.type === "muscle-choice") return <MuscleChoiceStep step={step} value={value} onChange={onChange} />;
+  // muscle-choice removido — não usamos mais priorização manual de músculos
   if (step.type === "slider") return <SliderStep step={step} value={value} onChange={onChange} />;
   if (step.type === "number") return <NumberStep step={step} value={value} onChange={onChange} allAnswers={allAnswers} />;
   if (step.type === "weight-target") return <WeightTargetStep step={step} value={value} onChange={onChange} />;
@@ -448,57 +469,7 @@ function ChoiceStep({ step, value, onChange, onNext, allAnswers }: any) {
   );
 }
 
-// ============== MUSCLE CHOICE (com cartões) ==============
-
-function MuscleChoiceStep({ step, value, onChange }: any) {
-  const arr: string[] = value || [];
-  function toggle(v: string) {
-    if (v === "coach") {
-      onChange(arr.includes("coach") ? [] : ["coach"]);
-      return;
-    }
-    const without = arr.filter((x) => x !== "coach");
-    onChange(without.includes(v) ? without.filter((x) => x !== v) : [...without, v]);
-  }
-  return (
-    <>
-      <StepHeader step={step} />
-      <div className="grid grid-cols-3 gap-2.5">
-        {MUSCLE_OPTIONS.filter((o) => o.value !== "coach").map((o) => {
-          const active = arr.includes(o.value);
-          return (
-            <button
-              key={o.value}
-              type="button"
-              onClick={() => toggle(o.value)}
-              className={cn(
-                "aspect-square rounded-2xl border flex flex-col items-center justify-center gap-1.5 transition-all",
-                active ? "border-primary bg-primary/15" : "border-white/10 bg-card/40 hover:border-white/25"
-              )}
-            >
-              <span className="text-3xl">{o.emoji}</span>
-              <span className="text-xs font-semibold text-foreground">{o.label}</span>
-            </button>
-          );
-        })}
-      </div>
-      <button
-        type="button"
-        onClick={() => toggle("coach")}
-        className={cn(
-          "w-full mt-3 rounded-2xl border p-4 flex items-center gap-3 text-left transition-all",
-          arr.includes("coach") ? "border-primary bg-primary/15" : "border-white/10 bg-card/40 hover:border-white/25"
-        )}
-      >
-        <span className="text-2xl">✨</span>
-        <div className="flex-1">
-          <p className="font-semibold">Deixar o coach decidir</p>
-          <p className="text-xs text-muted-foreground">Vamos analisar seus pontos fortes e fracos</p>
-        </div>
-      </button>
-    </>
-  );
-}
+// (MuscleChoiceStep removido — etapa de priorização manual foi excluída)
 
 // ============== SLIDER / NUMBER ==============
 
@@ -694,7 +665,8 @@ function InfoStep({ step }: any) {
 
 function BodyShapeStep({ step, value, onChange, onNext, allAnswers }: any) {
   const g = allAnswers?.gender === "female" ? "female" : "male";
-  const shapes = BODY_SHAPES_BY_GENDER[g];
+  const source = step.field === "target_shape" ? TARGET_SHAPES_BY_GENDER : BODY_SHAPES_BY_GENDER;
+  const shapes = source[g];
   return (
     <>
       <StepHeader step={step} />
@@ -727,20 +699,20 @@ function BodyShapeStep({ step, value, onChange, onNext, allAnswers }: any) {
 // ============== BODYFAT SLIDER ==============
 
 const MALE_BF_REFS = [
-  { v: 10, img: maleBF10, label: "8-12%" },
-  { v: 15, img: maleBF15, label: "13-17%" },
-  { v: 20, img: maleBF20, label: "18-22%" },
-  { v: 25, img: maleBF25, label: "23-27%" },
-  { v: 30, img: maleBF30, label: "28-32%" },
-  { v: 35, img: maleBF35, label: "33%+" },
+  { v: 5, img: maleBF5, label: "~5% (seco)" },
+  { v: 10, img: maleBF10, label: "8-12% (atlético)" },
+  { v: 15, img: maleBF15, label: "13-17% (em forma)" },
+  { v: 20, img: maleBF20, label: "18-22% (normal)" },
+  { v: 27, img: maleBF25, label: "23-30% (barriga saliente)" },
+  { v: 35, img: maleBF35, label: "30%+ (obeso)" },
 ];
 const FEMALE_BF_REFS = [
-  { v: 18, img: femaleBF18, label: "15-20%" },
-  { v: 22, img: femaleBF22, label: "21-25%" },
-  { v: 27, img: femaleBF27, label: "26-30%" },
-  { v: 32, img: femaleBF32, label: "31-35%" },
-  { v: 37, img: femaleBF37, label: "36-40%" },
-  { v: 42, img: femaleBF42, label: "41%+" },
+  { v: 18, img: femaleBF18, label: "15-20% (atlética)" },
+  { v: 22, img: femaleBF22, label: "21-25% (em forma)" },
+  { v: 27, img: femaleBF27, label: "26-30% (normal)" },
+  { v: 32, img: femaleBF32, label: "31-35% (saliente)" },
+  { v: 37, img: femaleBF37, label: "36-40% (acima do peso)" },
+  { v: 42, img: femaleBF42, label: "40%+ (obesa)" },
 ];
 
 function BodyFatStep({ value, onChange, allAnswers }: any) {
@@ -820,7 +792,7 @@ function AnalyzingPhase() {
 
 // ============== PREVIEW ==============
 
-function PreviewPhase({ answers }: { answers: Record<string, any> }) {
+function PreviewPhase({ answers, physiqueResult }: { answers: Record<string, any>; physiqueResult?: any }) {
   const goal = answers.main_goal || "gain_muscle";
   const freq = answers.desired_frequency || "4";
   const dur = answers.session_duration || "60";
@@ -830,11 +802,12 @@ function PreviewPhase({ answers }: { answers: Record<string, any> }) {
     performance: "Performance esportiva",
   } as any)[goal] || "Construção muscular";
   const split = answers.split_pref === "ppl" ? "Push · Pull · Legs"
-    : answers.split_pref === "ab" ? "Superior · Inferior"
-    : answers.split_pref === "abc" ? "ABC"
-    : answers.split_pref === "abcd" ? "ABCD"
-    : answers.split_pref === "glute_focus" ? "Foco em glúteo + posterior"
-    : answers.split_pref === "full_body" ? "Full Body"
+    : answers.split_pref === "upper_lower" ? "Upper · Lower"
+    : answers.split_pref === "fb" ? "Full Body"
+    : answers.split_pref === "lpplu" ? "L · P · P · L · U (5x)"
+    : answers.split_pref === "fb_inf" ? "Full Body com ênfase inferior"
+    : answers.split_pref === "inf_sup_alt" ? "Inferior · Superior alternado"
+    : answers.split_pref === "inf_sup_glute" ? "Inf (quad) · Sup · Inf (post+glúteo)"
     : `${freq}x · Otimizada pelo sistema`;
   const w = Number(answers.weight) || 75;
   const calories = goal === "lose_fat" ? Math.round(w * 28) : goal === "gain_muscle" ? Math.round(w * 38) : Math.round(w * 33);
@@ -893,6 +866,36 @@ function PreviewPhase({ answers }: { answers: Record<string, any> }) {
           <li className="flex gap-2"><span className="text-primary">→</span> Recovery e sono entram na conta — não só treino.</li>
         </ul>
       </Card>
+
+      {physiqueResult && (
+        <Card className="p-5 bg-card/40 border-primary/30">
+          <div className="flex items-center gap-3 mb-3">
+            <Camera size={20} className="text-primary" />
+            <p className="text-xs uppercase tracking-wider text-primary font-bold">Leitura física por IA</p>
+          </div>
+          <div className="space-y-3 text-sm text-foreground/90">
+            {physiqueResult.posture && (
+              <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Postura</p><p className="leading-relaxed">{physiqueResult.posture}</p></div>
+            )}
+            {physiqueResult.symmetry && (
+              <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Simetria</p><p className="leading-relaxed">{physiqueResult.symmetry}</p></div>
+            )}
+            {Array.isArray(physiqueResult.priorities) && physiqueResult.priorities.length > 0 && (
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Pontos prioritários</p>
+                <ul className="space-y-1">
+                  {physiqueResult.priorities.slice(0, 3).map((p: string, i: number) => (
+                    <li key={i} className="flex gap-2"><span className="text-primary">→</span> {p}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {physiqueResult.recommendation && (
+              <div><p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Recomendação inicial</p><p className="leading-relaxed">{physiqueResult.recommendation}</p></div>
+            )}
+          </div>
+        </Card>
+      )}
 
       <Card className="p-5 bg-primary/5 border-primary/30">
         <p className="text-xs uppercase tracking-wider text-primary font-bold mb-2">O que falta para liberar tudo</p>
@@ -1072,11 +1075,6 @@ function GuaranteePhase() {
         </p>
       </Card>
 
-      <Card className="p-5 bg-card/40 border-white/10 text-center">
-        <p className="text-sm text-muted-foreground">Já ajudamos mais de</p>
-        <p className="text-4xl font-heading font-bold text-gradient my-1">12.000+ pessoas</p>
-        <p className="text-sm text-muted-foreground">a estruturar treino, dieta e progresso</p>
-      </Card>
 
       <Card className="p-5 bg-primary/5 border-primary/30">
         <p className="text-xs uppercase tracking-wider text-primary font-bold mb-2">O que vem agora</p>

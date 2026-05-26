@@ -10,7 +10,6 @@ export type QuizOption = {
 export type QuizStep =
   | { id: string; type: "gender"; title: string; subtitle?: string }
   | { id: string; type: "choice"; title: string; subtitle?: string; options: QuizOption[]; multi?: boolean }
-  | { id: string; type: "muscle-choice"; title: string; subtitle?: string }
   | { id: string; type: "slider"; title: string; subtitle?: string; min: number; max: number; step?: number; unit?: string; defaultValue?: number }
   | { id: string; type: "number"; title: string; subtitle?: string; unit?: string; placeholder?: string; min?: number; max?: number; derived?: "bmi" }
   | { id: string; type: "weight-target"; title: string; subtitle?: string; unit?: string; placeholder?: string; min?: number; max?: number }
@@ -20,7 +19,7 @@ export type QuizStep =
   | { id: string; type: "bodyfat-slider"; title: string; subtitle?: string };
 
 export const quizSteps: QuizStep[] = [
-  // 1 — Gênero (com imagens, obrigatório)
+  // 1 — Gênero
   {
     id: "gender",
     type: "gender",
@@ -28,7 +27,7 @@ export const quizSteps: QuizStep[] = [
     subtitle: "Tudo é calibrado a partir daqui: treino, dieta e referências corporais.",
   },
 
-  // 2 — Prova social: método Kevin Franzen
+  // 2 — Método Kevin
   {
     id: "kevin_method",
     type: "info",
@@ -39,7 +38,7 @@ export const quizSteps: QuizStep[] = [
     variant: "kevin-method",
   },
 
-  // 3 — Objetivo (3 opções)
+  // 3 — Objetivo
   {
     id: "main_goal",
     type: "choice",
@@ -52,7 +51,7 @@ export const quizSteps: QuizStep[] = [
     ],
   },
 
-  // 4 — Forma corporal atual (fotos por gênero)
+  // 4 — Forma corporal atual
   {
     id: "current_shape",
     type: "body-shape",
@@ -61,7 +60,7 @@ export const quizSteps: QuizStep[] = [
     field: "current_shape",
   },
 
-  // 5 — Forma corporal alvo (fotos por gênero)
+  // 5 — Forma corporal alvo
   {
     id: "target_shape",
     type: "body-shape",
@@ -83,7 +82,7 @@ export const quizSteps: QuizStep[] = [
     ],
   },
 
-  // 7 — Histórico fitness (continua sendo útil aqui, define experiência técnica)
+  // 7 — Histórico fitness
   {
     id: "fitness_history",
     type: "choice",
@@ -115,6 +114,7 @@ export const quizSteps: QuizStep[] = [
     title: "Quantos dias por semana quer treinar?",
     subtitle: "Seja realista — consistência vale mais que volume.",
     options: [
+      { value: "2", label: "2 dias" },
       { value: "3", label: "3 dias" },
       { value: "4", label: "4 dias" },
       { value: "5", label: "5 dias" },
@@ -122,7 +122,7 @@ export const quizSteps: QuizStep[] = [
     ],
   },
 
-  // 10 — Tempo por sessão (45/60/90/120)
+  // 10 — Tempo por sessão
   {
     id: "session_duration",
     type: "choice",
@@ -148,7 +148,7 @@ export const quizSteps: QuizStep[] = [
     ],
   },
 
-  // 12 — Onde vai treinar (3 opções)
+  // 12 — Onde
   {
     id: "location",
     type: "choice",
@@ -160,25 +160,16 @@ export const quizSteps: QuizStep[] = [
     ],
   },
 
-  // 13 — Divisão de treino (vai variar por gênero no render)
+  // 13 — Divisão preferida (opções por gênero, alinhadas ao método)
   {
     id: "split_pref",
     type: "choice",
     title: "Tem preferência por algum tipo de divisão?",
     subtitle: "Se não tiver, o sistema escolhe a melhor para o seu caso.",
-    // Options são montadas dinamicamente conforme o gênero
     options: [],
   },
 
-  // 14 — Músculos prioritários (com imagens)
-  {
-    id: "priority_muscles",
-    type: "muscle-choice",
-    title: "Quer priorizar algum músculo?",
-    subtitle: "Marque os músculos que quer focar. Ou deixe o coach decidir pelos seus pontos fortes e fracos.",
-  },
-
-  // 15 — Lesões
+  // 14 — Lesões
   {
     id: "injuries",
     type: "choice",
@@ -194,7 +185,7 @@ export const quizSteps: QuizStep[] = [
     ],
   },
 
-  // 16 — Tentativas anteriores
+  // 15 — Tentativas anteriores
   {
     id: "previous_attempts",
     type: "choice",
@@ -207,7 +198,7 @@ export const quizSteps: QuizStep[] = [
     ],
   },
 
-  // 17 — Dia típico
+  // 16 — Dia típico
   {
     id: "typical_day",
     type: "choice",
@@ -220,7 +211,7 @@ export const quizSteps: QuizStep[] = [
     ],
   },
 
-  // 18 — Sono
+  // 17 — Sono
   {
     id: "sleep",
     type: "choice",
@@ -233,7 +224,7 @@ export const quizSteps: QuizStep[] = [
     ],
   },
 
-  // 19 — Água
+  // 18 — Água
   {
     id: "water",
     type: "choice",
@@ -246,7 +237,7 @@ export const quizSteps: QuizStep[] = [
     ],
   },
 
-  // 20 — Insight transitório
+  // 19 — Insight transitório
   {
     id: "quit_insight",
     type: "info",
@@ -257,7 +248,7 @@ export const quizSteps: QuizStep[] = [
     variant: "transition",
   },
 
-  // 21 — % gordura (slider visual)
+  // 20 — % gordura
   {
     id: "bodyfat",
     type: "bodyfat-slider",
@@ -265,7 +256,7 @@ export const quizSteps: QuizStep[] = [
     subtitle: "Não precisa ser exato — a referência visual ajuda.",
   },
 
-  // 22 — Altura
+  // 21 — Altura
   {
     id: "height",
     type: "number",
@@ -276,7 +267,7 @@ export const quizSteps: QuizStep[] = [
     max: 230,
   },
 
-  // 23 — Peso atual (+ IMC)
+  // 22 — Peso
   {
     id: "weight",
     type: "number",
@@ -288,7 +279,7 @@ export const quizSteps: QuizStep[] = [
     derived: "bmi",
   },
 
-  // 24 — Peso alvo (com "não tenho peso alvo")
+  // 23 — Peso alvo
   {
     id: "target_weight",
     type: "weight-target",
@@ -300,7 +291,7 @@ export const quizSteps: QuizStep[] = [
     max: 250,
   },
 
-  // 25 — Idade exata (no final, como pediu)
+  // 24 — Idade
   {
     id: "age",
     type: "number",
@@ -311,7 +302,7 @@ export const quizSteps: QuizStep[] = [
     max: 90,
   },
 
-  // 26 — Evento alvo (data + objetivo)
+  // 25 — Evento alvo
   {
     id: "target_event",
     type: "event-target",
@@ -322,32 +313,19 @@ export const quizSteps: QuizStep[] = [
 
 export const TOTAL_QUIZ_STEPS = quizSteps.length;
 
-// Helpers ===============================================================
-
+// Splits oficiais do método (workoutRules) ===============================
 export const SPLITS_BY_GENDER = {
   male: [
     { value: "ppl", label: "Push · Pull · Legs", description: "Empurrar, puxar, pernas — clássico para hipertrofia" },
-    { value: "abc", label: "ABC", description: "Peito+Tríceps · Costas+Bíceps · Pernas+Ombro" },
-    { value: "abcd", label: "ABCD", description: "Divisão por grupos para volume avançado" },
-    { value: "ab", label: "AB (Sup/Inf)", description: "Superior e Inferior alternados" },
+    { value: "upper_lower", label: "Upper · Lower", description: "Superior e Inferior alternados" },
+    { value: "fb", label: "Full Body", description: "Corpo todo a cada sessão — ótimo para 2-3 dias" },
+    { value: "lpplu", label: "L · P · P · L · U (5x)", description: "Perna · Push · Pull · Perna · Upper — alto volume" },
     { value: "system", label: "Deixar o sistema decidir", emoji: "✨", description: "Recomendado — calibrado pelo método" },
   ],
   female: [
-    { value: "glute_focus", label: "Foco em glúteo + posterior", description: "2 a 3 dias de inferior, prioridade glúteo" },
-    { value: "ab", label: "AB (Sup/Inf)", description: "Superior e Inferior alternados" },
-    { value: "abc", label: "ABC", description: "Inferior glúteo · Superior · Inferior quadríceps" },
-    { value: "full_body", label: "Full Body", description: "Corpo todo a cada sessão — ótimo para iniciantes" },
+    { value: "fb_inf", label: "Full Body com ênfase inferior", description: "Ideal para 2-3 dias, com prioridade glúteo/posterior" },
+    { value: "inf_sup_alt", label: "Inferior · Superior alternado", description: "Para 4-6 dias, foco em volume de inferior" },
+    { value: "inf_sup_glute", label: "Inf (quad) · Sup · Inf (post+glúteo)", description: "3 dias com divisão de inferior por ênfase" },
     { value: "system", label: "Deixar o sistema decidir", emoji: "✨", description: "Recomendado — calibrado pelo método" },
   ],
 } as const;
-
-export const MUSCLE_OPTIONS = [
-  { value: "chest", label: "Peito", emoji: "🫁" },
-  { value: "back", label: "Costas", emoji: "🦾" },
-  { value: "shoulders", label: "Ombros", emoji: "🏋️" },
-  { value: "arms", label: "Braços", emoji: "💪" },
-  { value: "glutes", label: "Glúteos", emoji: "🍑" },
-  { value: "legs", label: "Pernas", emoji: "🦵" },
-  { value: "core", label: "Abdômen", emoji: "🎯" },
-  { value: "coach", label: "Deixar o coach decidir", emoji: "✨", description: "Vamos analisar seus pontos fortes e fracos" } as any,
-];
