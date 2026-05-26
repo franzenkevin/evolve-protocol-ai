@@ -115,6 +115,7 @@ export default function Quiz() {
   const [photos, setPhotos] = useState<File[]>([]);
   const [physiqueResult, setPhysiqueResult] = useState<any>(null);
   const [selectedPlan, setSelectedPlan] = useState("monthly");
+  const { openCheckout, loading: checkoutLoading } = useStripeCheckout();
 
   useEffect(() => {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
