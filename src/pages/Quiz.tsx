@@ -311,8 +311,8 @@ export default function Quiz() {
         <GuaranteePhase />
         <div className="fixed bottom-0 inset-x-0 z-30 bg-gradient-to-t from-black via-black/95 to-transparent pt-6 pb-5">
           <div className="max-w-xl mx-auto px-5">
-            <Button size="lg" className="w-full h-14 text-base font-semibold gap-2 glow" onClick={goToSignup}>
-              Criar minha conta e pagar <ArrowRight size={18} />
+            <Button size="lg" disabled={checkoutLoading} className="w-full h-14 text-base font-semibold gap-2 glow" onClick={goToCheckout}>
+              {checkoutLoading ? "Abrindo checkout..." : <>Ir para o pagamento <ArrowRight size={18} /></>}
             </Button>
             <p className="text-center text-xs text-muted-foreground mt-3">
               Garantia de 7 dias · Cancela quando quiser
