@@ -644,7 +644,15 @@ function LoadingPhase() {
   );
 }
 
-function AnalyzingPhase() {
+function AnalyzingPhase({ onSkip }: { onSkip: () => void }) {
+  const MAX = 45;
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setElapsed((s) => Math.min(MAX, s + 1)), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const pct = Math.min(100, Math.round((elapsed / MAX) * 100));
+  const remaining = Math.max(0, MAX - elapsed);
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center px-6">
       <div className="relative w-24 h-24 mb-8">
@@ -653,7 +661,25 @@ function AnalyzingPhase() {
         <Brain size={32} className="text-primary absolute inset-0 m-auto" />
       </div>
       <h2 className="text-2xl font-heading font-bold text-center mb-2">IA analisando suas fotos…</h2>
-      <p className="text-muted-foreground text-center text-sm max-w-sm">Avaliando postura, simetria e proporção corporal.</p>
+      <p className="text-muted-foreground text-center text-sm max-w-sm mb-6">
+        Avaliando postura, simetria e proporção corporal.
+      </p>
+      <div className="w-full max-w-xs">
+        <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+          <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${pct}%` }} />
+        </div>
+        <p className="text-center text-xs text-muted-foreground mt-2 tabular-nums">
+          {remaining > 0 ? `~${remaining}s restantes` : "Finalizando…"}
+        </p>
+      </div>
+      {elapsed >= 12 && (
+        <button
+          onClick={onSkip}
+          className="mt-8 text-sm text-muted-foreground hover:text-foreground underline underline-offset-4"
+        >
+          Está demorando — enviar depois no app
+        </button>
+      )}
     </div>
   );
 }
