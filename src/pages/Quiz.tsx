@@ -16,6 +16,7 @@ import QuizShell from "@/components/quiz/QuizShell";
 import { quizSteps, TOTAL_QUIZ_STEPS, SPLITS_BY_GENDER, type QuizStep } from "@/lib/quizSteps";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 
 // Imagens body fat (slider visual)
 import maleBF5 from "@/assets/bodyfat/male-5.png";
@@ -114,6 +115,7 @@ export default function Quiz() {
   const [photos, setPhotos] = useState<File[]>([]);
   const [physiqueResult, setPhysiqueResult] = useState<any>(null);
   const [selectedPlan, setSelectedPlan] = useState("monthly");
+  const { openCheckout, loading: checkoutLoading } = useStripeCheckout();
 
   useEffect(() => {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
@@ -152,13 +154,14 @@ export default function Quiz() {
     }
   }, [phase]);
 
-  function goToSignup() {
-    const params = new URLSearchParams();
-    params.set("plan", selectedPlan);
-    params.set("from", "quiz");
-    // Marca para o Welcome saber que falta completar formulário pós-pagamento
-    sessionStorage.setItem("evoria_quiz_complete", "1");
-    navigate(`/signup?${params.toString()}`);
+  function goToCheckout() {
+    // Persiste respostas do quiz para serem aplicadas após o login pós-pagamento
+    try {
+      sessionStorage.setItem("evoria_quiz_complete", "1");
+      sessionStorage.setItem("evoria_quiz_answers", JSON.stringify(answers));
+    } catch {}
+    const priceId = selectedPlan === "annual" ? "hypertrophy_annual" : "hypertrophy_monthly";
+    openCheckout({ priceId });
   }
 
   // ===== RENDER =====
@@ -308,8 +311,8 @@ export default function Quiz() {
         <GuaranteePhase />
         <div className="fixed bottom-0 inset-x-0 z-30 bg-gradient-to-t from-black via-black/95 to-transparent pt-6 pb-5">
           <div className="max-w-xl mx-auto px-5">
-            <Button size="lg" className="w-full h-14 text-base font-semibold gap-2 glow" onClick={goToSignup}>
-              Criar minha conta e pagar <ArrowRight size={18} />
+            <Button size="lg" disabled={checkoutLoading} className="w-full h-14 text-base font-semibold gap-2 glow" onClick={goToCheckout}>
+              {checkoutLoading ? "Abrindo checkout..." : <>Ir para o pagamento <ArrowRight size={18} /></>}
             </Button>
             <p className="text-center text-xs text-muted-foreground mt-3">
               Garantia de 7 dias · Cancela quando quiser

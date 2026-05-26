@@ -448,8 +448,10 @@ const Onboarding = () => {
         return;
       }
 
+      // Fotos são opcionais — se nenhuma foi enviada, segue sem análise.
       if (Object.keys(assessmentPhotos).length === 0) {
-        setValidationError("Envie pelo menos uma foto para análise corporal.");
+        setValidationError("");
+        setStep((s) => (s < STEPS.length - 1 ? s + 1 : s));
         return;
       }
 
@@ -460,6 +462,7 @@ const Onboarding = () => {
       }
       return;
     }
+
 
     // Validate current step
     const error = validateStep();
@@ -948,8 +951,18 @@ const Onboarding = () => {
           {/* STEP 7 — Avaliação Física + Consentimento LGPD */}
           {step === 7 && (
             <>
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 mb-2">
+                <p className="text-sm text-foreground font-semibold mb-1">📸 Fotos do físico (opcional)</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  O envio das fotos é <strong className="text-foreground">opcional</strong>, mas é uma parte
+                  <strong className="text-foreground"> essencial</strong> do processo: elas permitem que a IA analise sua
+                  composição corporal, postura e simetria para montar um plano realmente assertivo e acompanhar sua
+                  evolução ao longo dos meses. Você pode pular agora e enviar depois pelo app.
+                </p>
+              </div>
               <BodyPhotoUpload photos={assessmentPhotos} onPhotosChange={setAssessmentPhotos} />
               <AssessmentResults assessment={assessment} loading={analyzing} />
+
 
               {/* LGPD CONSENT */}
               <div className="mt-6 p-4 rounded-lg border border-primary/40 bg-primary/5 space-y-3">
@@ -1014,7 +1027,7 @@ const Onboarding = () => {
           <div className="flex gap-3">
             {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving || analyzing}>Voltar</Button>}
             <Button onClick={next} className="flex-1 glow" disabled={saving || analyzing}>
-              {saving ? "Salvando suas respostas..." : analyzing ? "Analisando suas fotos..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar minhas fotos" : step === STEPS.length - 1 ? "Finalizar quiz" : "Próximo"}
+              {saving ? "Salvando suas respostas..." : analyzing ? "Analisando suas fotos..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar minhas fotos" : step === 7 && Object.keys(assessmentPhotos).length === 0 && !assessment ? "Pular fotos e finalizar" : step === STEPS.length - 1 ? "Finalizar quiz" : "Próximo"}
             </Button>
           </div>
         </div>
