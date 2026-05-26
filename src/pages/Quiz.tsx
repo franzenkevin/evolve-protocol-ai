@@ -199,7 +199,7 @@ export default function Quiz() {
       <QuizShell currentStep={TOTAL_QUIZ_STEPS} totalSteps={TOTAL_QUIZ_STEPS} onBack={back} hideProgress>
         <PhotoUpload photos={photos} setPhotos={setPhotos} />
         <div className="fixed bottom-0 inset-x-0 z-30 bg-gradient-to-t from-black via-black/95 to-transparent pt-6 pb-5">
-          <div className="max-w-xl mx-auto px-5">
+          <div className="max-w-xl mx-auto px-5 space-y-2">
             <Button
               size="lg"
               disabled={photos.length === 0}
@@ -207,28 +207,55 @@ export default function Quiz() {
               onClick={async () => {
                 setPhase({ kind: "physique-analyzing" });
                 try {
-                  const b64Photos = await Promise.all(photos.map(fileToDataUrl));
+                  const b64Photos = await Promise.all(photos.map((f) => compressImage(f, 1024, 0.78)));
                   const { data, error } = await supabase.functions.invoke("analyze-physique", {
                     body: { photos: b64Photos, context: answers },
                   });
                   if (error) throw error;
+                  if (data?.error) throw new Error(data.error);
                   setPhysiqueResult(data);
                   setPhase({ kind: "physique-result" });
                 } catch (e: any) {
-                  toast.error("Não foi possível concluir a análise agora. Tente novamente.");
-                  setPhase({ kind: "physique-upload" });
+                  console.error("[quiz] physique error", e);
+                  toast.error("Não foi possível concluir a análise agora. Você poderá enviar suas fotos depois, no app.");
+                  setAnswers((a) => ({ ...a, physique_pending: true }));
+                  setPhase({ kind: "email" });
                 }
               }}
             >
               Analisar minhas fotos <ArrowRight size={18} />
             </Button>
+            <Button
+              variant="ghost"
+              size="lg"
+              className="w-full h-12 text-muted-foreground"
+              onClick={() => {
+                setAnswers((a) => ({ ...a, physique_pending: true }));
+                setPhase({ kind: "email" });
+              }}
+            >
+              Enviar depois no app
+            </Button>
+            <p className="text-[11px] text-muted-foreground/80 text-center px-4">
+              Essa análise é <span className="text-primary">essencial</span> para personalizar seu protocolo. Você pode enviar agora ou direto no app após o cadastro.
+            </p>
           </div>
         </div>
       </QuizShell>
     );
   }
 
-  if (phase.kind === "physique-analyzing") return <AnalyzingPhase />;
+  if (phase.kind === "physique-analyzing") {
+    return (
+      <AnalyzingPhase
+        onSkip={() => {
+          setAnswers((a) => ({ ...a, physique_pending: true }));
+          toast.info("Sem problema — você poderá enviar suas fotos no app.");
+          setPhase({ kind: "email" });
+        }}
+      />
+    );
+  }
 
   if (phase.kind === "physique-result") {
     return (
@@ -617,7 +644,15 @@ function LoadingPhase() {
   );
 }
 
-function AnalyzingPhase() {
+function AnalyzingPhase({ onSkip }: { onSkip: () => void }) {
+  const MAX = 45;
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setElapsed((s) => Math.min(MAX, s + 1)), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const pct = Math.min(100, Math.round((elapsed / MAX) * 100));
+  const remaining = Math.max(0, MAX - elapsed);
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center px-6">
       <div className="relative w-24 h-24 mb-8">
@@ -626,7 +661,25 @@ function AnalyzingPhase() {
         <Brain size={32} className="text-primary absolute inset-0 m-auto" />
       </div>
       <h2 className="text-2xl font-heading font-bold text-center mb-2">IA analisando suas fotos…</h2>
-      <p className="text-muted-foreground text-center text-sm max-w-sm">Avaliando postura, simetria e proporção corporal.</p>
+      <p className="text-muted-foreground text-center text-sm max-w-sm mb-6">
+        Avaliando postura, simetria e proporção corporal.
+      </p>
+      <div className="w-full max-w-xs">
+        <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+          <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${pct}%` }} />
+        </div>
+        <p className="text-center text-xs text-muted-foreground mt-2 tabular-nums">
+          {remaining > 0 ? `~${remaining}s restantes` : "Finalizando…"}
+        </p>
+      </div>
+      {elapsed >= 12 && (
+        <button
+          onClick={onSkip}
+          className="mt-8 text-sm text-muted-foreground hover:text-foreground underline underline-offset-4"
+        >
+          Está demorando — enviar depois no app
+        </button>
+      )}
     </div>
   );
 }
@@ -947,5 +1000,30 @@ function fileToDataUrl(file: File): Promise<string> {
     r.onload = () => resolve(r.result as string);
     r.onerror = reject;
     r.readAsDataURL(file);
+  });
+}
+
+async function compressImage(file: File, maxSide = 1024, quality = 0.8): Promise<string> {
+  const dataUrl = await fileToDataUrl(file);
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return resolve(dataUrl);
+      ctx.drawImage(img, 0, 0, w, h);
+      try {
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      } catch {
+        resolve(dataUrl);
+      }
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
   });
 }
