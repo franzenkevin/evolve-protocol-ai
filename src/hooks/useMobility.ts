@@ -11,6 +11,7 @@ export interface MobilityExercise {
   side: string | null; // bilateral | unilateral
   equipment: string | null;
   video_url: string | null;
+  image_url: string | null;
   instructions: string | null;
   difficulty: string | null;
 }
