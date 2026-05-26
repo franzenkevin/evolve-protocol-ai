@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Upload, X, Sparkles, ShieldCheck, Star, Brain, Target, Dumbbell, Apple, Camera, Calendar as CalendarIcon, MessageCircle, Cpu } from "lucide-react";
+import { ArrowRight, Upload, X, Sparkles, ShieldCheck, Star, Brain, Target, Dumbbell, Apple, Camera, Calendar as CalendarIcon, MessageCircle, Cpu, ClipboardList, Clock, Zap, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -44,6 +44,7 @@ import targetFemaleVolume from "@/assets/quiz/target-female-volume.jpg";
 import targetFemaleBodybuilder from "@/assets/quiz/target-female-bodybuilder.jpg";
 
 type Phase =
+  | { kind: "intro" }
   | { kind: "quiz"; index: number }
   | { kind: "loading" }
   | { kind: "preview" }
@@ -110,7 +111,7 @@ export default function Quiz() {
       const raw = sessionStorage.getItem(PHASE_KEY);
       if (raw) return JSON.parse(raw);
     } catch {}
-    return { kind: "quiz", index: 0 };
+    return { kind: "intro" };
   });
   const [photos, setPhotos] = useState<File[]>([]);
   const [physiqueResult, setPhysiqueResult] = useState<any>(null);
@@ -130,7 +131,9 @@ export default function Quiz() {
   }
 
   function next() {
-    if (phase.kind === "quiz") {
+    if (phase.kind === "intro") {
+      setPhase({ kind: "quiz", index: 0 });
+    } else if (phase.kind === "quiz") {
       const nextIdx = phase.index + 1;
       // Fim do quiz → análise IA opcional ANTES de gerar a prévia
       if (nextIdx >= TOTAL_QUIZ_STEPS) setPhase({ kind: "physique-intro" });
@@ -138,7 +141,9 @@ export default function Quiz() {
     }
   }
   function back() {
-    if (phase.kind === "quiz" && phase.index > 0) setPhase({ kind: "quiz", index: phase.index - 1 });
+    if (phase.kind === "intro") navigate("/landing");
+    else if (phase.kind === "quiz" && phase.index > 0) setPhase({ kind: "quiz", index: phase.index - 1 });
+    else if (phase.kind === "quiz" && phase.index === 0) setPhase({ kind: "intro" });
     else if (phase.kind === "physique-intro") setPhase({ kind: "quiz", index: TOTAL_QUIZ_STEPS - 1 });
     else if (phase.kind === "physique-upload") setPhase({ kind: "physique-intro" });
     else if (phase.kind === "preview") setPhase({ kind: "physique-intro" });
@@ -166,6 +171,64 @@ export default function Quiz() {
   }
 
   // ===== RENDER =====
+  if (phase.kind === "intro") {
+    return (
+      <QuizShell currentStep={0} totalSteps={TOTAL_QUIZ_STEPS} onBack={back} hideProgress>
+        <div className="flex flex-col items-center text-center pt-4">
+          <div className="w-20 h-20 mx-auto rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center mb-6">
+            <ClipboardList className="text-primary" size={36} />
+          </div>
+          <h1 className="text-3xl font-heading font-bold leading-tight mb-4">
+            Descubra seu plano <span className="text-gradient">personalizado</span> em minutos
+          </h1>
+          <p className="text-muted-foreground mb-8 leading-relaxed max-w-sm">
+            Responda algumas perguntas rápidas sobre seus objetivos, rotina e histórico. Nossa IA elabora um protocolo de treino e dieta sob medida para o seu corpo e estilo de vida.
+          </p>
+
+          <div className="w-full grid grid-cols-1 gap-4 mb-8">
+            <div className="flex items-start gap-4 text-left p-4 rounded-xl bg-white/[0.03] border border-white/5">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <Clock size={20} className="text-primary" />
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">Leva poucos minutos</p>
+                <p className="text-sm text-muted-foreground">Quiz rápido e objetivo, sem enrolação.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4 text-left p-4 rounded-xl bg-white/[0.03] border border-white/5">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <Zap size={20} className="text-primary" />
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">100% personalizado</p>
+                <p className="text-sm text-muted-foreground">Cada detalhe calibrado pelas suas respostas e metas.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4 text-left p-4 rounded-xl bg-white/[0.03] border border-white/5">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <TrendingUp size={20} className="text-primary" />
+              </div>
+              <div>
+                <p className="font-semibold text-foreground">Protocolo pronto na hora</p>
+                <p className="text-sm text-muted-foreground">Após o quiz, seu plano é gerado instantaneamente.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="fixed bottom-0 inset-x-0 z-30 bg-gradient-to-t from-black via-black/95 to-transparent pt-6 pb-5">
+          <div className="max-w-xl mx-auto px-5">
+            <Button size="lg" className="w-full h-14 text-base font-semibold gap-2 glow" onClick={next}>
+              Iniciar quiz <ArrowRight size={18} />
+            </Button>
+            <p className="text-center text-xs text-muted-foreground mt-3">
+              Não leva mais que 3 minutos
+            </p>
+          </div>
+        </div>
+      </QuizShell>
+    );
+  }
+
   if (phase.kind === "quiz") {
     const step = quizSteps[phase.index];
     return (
