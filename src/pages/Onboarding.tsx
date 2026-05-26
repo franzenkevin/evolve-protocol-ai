@@ -16,6 +16,9 @@ import { BodyPhotoUpload } from "@/components/onboarding/BodyPhotoUpload";
 import { AssessmentResults } from "@/components/onboarding/AssessmentResults";
 import { ProtocolConfirmation, type ProtocolConfirmations, isConfirmationComplete } from "@/components/onboarding/ProtocolConfirmation";
 import type { Profile } from "@/hooks/useProfile";
+import { useSubscription } from "@/hooks/useSubscription";
+import { useCreateProtocol } from "@/hooks/useProtocol";
+import { generateProtocol } from "@/lib/generateProtocol";
 
 const STEPS = [
   "Dados Pessoais",
@@ -206,6 +209,9 @@ const Onboarding = () => {
   const persisted = typeof window !== "undefined" ? loadPersisted() : null;
   const [step, setStep] = useState<number>(persisted?.step ?? 0);
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [genElapsed, setGenElapsed] = useState(0);
+  const [genStage, setGenStage] = useState("");
   const [analyzeElapsed, setAnalyzeElapsed] = useState(0); // seconds
   const [analyzeStage, setAnalyzeStage] = useState("");
   const [assessmentPhotos, setAssessmentPhotos] = useState<Record<string, string>>(persisted?.assessmentPhotos ?? {});
@@ -221,6 +227,8 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const updateProfile = useUpdateProfile();
+  const createProtocol = useCreateProtocol();
+  const { data: subscription, refetch: refetchSubscription } = useSubscription();
 
   const { user } = useAuth();
   const [cloudLoaded, setCloudLoaded] = useState(false);
@@ -306,6 +314,31 @@ const Onboarding = () => {
     }, 1000);
     return () => clearInterval(id);
   }, [analyzing]);
+
+  // Timer + estágios para geração do protocolo (~1-3min)
+  useEffect(() => {
+    if (!generating) return;
+    setGenElapsed(0);
+    setGenStage("👨‍⚕️ Médico nutrólogo lendo seu perfil e avaliação corporal...");
+    const stages: { at: number; label: string }[] = [
+      { at: 12, label: "👨‍⚕️ Verificando lesões, intolerâncias e contraindicações..." },
+      { at: 28, label: "🏋️ Treinador escolhendo a divisão e os exercícios..." },
+      { at: 50, label: "🏋️ Priorizando seus pontos fracos no volume de treino..." },
+      { at: 75, label: "🥗 Nutricionista calculando macros e montando refeições..." },
+      { at: 105, label: "🥗 Calibrando refeições livres ao seu objetivo..." },
+      { at: 135, label: "🤝 Comitê validando treino + dieta juntos..." },
+      { at: 165, label: "✨ Finalizando seu protocolo personalizado..." },
+    ];
+    const t0 = Date.now();
+    const id = setInterval(() => {
+      setGenElapsed(Math.floor((Date.now() - t0) / 1000));
+      const sec = Math.floor((Date.now() - t0) / 1000);
+      const cur = [...stages].reverse().find((s) => sec >= s.at);
+      if (cur) setGenStage(cur.label);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [generating]);
+
 
   const update = (field: keyof FormData, value: any) => {
     setData((prev) => ({ ...prev, [field]: value }));
@@ -548,11 +581,90 @@ const Onboarding = () => {
 
       try { localStorage.removeItem(STORAGE_KEY); } catch {}
 
-      toast({
-        title: "Quiz finalizado! 🎉",
-        description: "Falta só liberar seu protocolo. Escolha um plano para continuar.",
-      });
-      navigate("/plans");
+      // Verifica se o usuário já tem assinatura ativa (caso normal pós-quiz).
+      // Se sim, gera o protocolo direto aqui e leva pro dashboard.
+      // Se não (fluxo legado), manda pra /plans.
+      const { data: freshSub } = await refetchSubscription();
+      const isActive =
+        freshSub &&
+        ["active", "trialing"].includes(freshSub.status) &&
+        (!freshSub.current_period_end || new Date(freshSub.current_period_end) > new Date());
+
+      if (!isActive) {
+        toast({
+          title: "Quiz finalizado! 🎉",
+          description: "Falta só liberar seu protocolo. Escolha um plano para continuar.",
+        });
+        navigate("/plans");
+        return;
+      }
+
+      // Gera o protocolo inline (sem passar por CheckoutSuccess)
+      setSaving(false);
+      setGenerating(true);
+      try {
+        const [{ data: bodyAssessment }, { data: draft }] = await Promise.all([
+          supabase
+            .from("body_assessments")
+            .select("*")
+            .eq("user_id", user!.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+          supabase
+            .from("onboarding_drafts")
+            .select("data")
+            .eq("user_id", user!.id)
+            .maybeSingle(),
+        ]);
+        const confirmationsDraft = (draft?.data as any)?.confirmations ?? confirmations;
+
+        let result: { training: any; diet: any };
+        try {
+          const { data: aiResult, error: aiError } = await supabase.functions.invoke(
+            "generate-protocol",
+            {
+              body: {
+                profile: { ...profileData, user_id: user!.id },
+                bodyAssessment,
+                bodyEmphasis: profileData.body_emphasis,
+                confirmations: confirmationsDraft,
+              },
+            },
+          );
+          if (aiError) throw aiError;
+          if (aiResult?.fallback) throw new Error("Fallback requested");
+          if (!aiResult?.training || !aiResult?.diet) throw new Error("Invalid AI response");
+          result = { training: aiResult.training, diet: aiResult.diet };
+        } catch (aiErr) {
+          console.warn("AI protocol generation failed, using rule-based fallback:", aiErr);
+          result = generateProtocol({ ...profileData, user_id: user!.id } as any);
+        }
+
+        await createProtocol.mutateAsync(result);
+
+        try {
+          await supabase.from("onboarding_drafts").delete().eq("user_id", user!.id);
+        } catch {}
+
+        toast({
+          title: "Tudo pronto! 🎉",
+          description: "Seu protocolo personalizado foi liberado.",
+        });
+        navigate("/dashboard", { replace: true });
+      } catch (genErr: any) {
+        console.error("Protocol generation failed:", genErr);
+        toast({
+          title: "Erro ao gerar protocolo",
+          description: genErr?.message || "Tentaremos novamente em instantes.",
+          variant: "destructive",
+        });
+        // fallback para a tela antiga que tem retry
+        navigate("/checkout/success", { replace: true });
+      } finally {
+        setGenerating(false);
+      }
+      return;
     } catch (err: any) {
       toast({ title: "Erro", description: err.message, variant: "destructive" });
     } finally {
@@ -562,6 +674,8 @@ const Onboarding = () => {
 
   const prev = () => { step > 0 && setStep(step - 1); setValidationError(""); };
   const progress = ((step + 1) / STEPS.length) * 100;
+
+
 
   const radioOption = (value: string, id: string, label: string) => (
     <div key={id} className="flex items-center gap-2 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors">
@@ -1025,10 +1139,11 @@ const Onboarding = () => {
             <p className="text-destructive text-sm mb-2 text-center">{validationError}</p>
           )}
           <div className="flex gap-3">
-            {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving || analyzing}>Voltar</Button>}
-            <Button onClick={next} className="flex-1 glow" disabled={saving || analyzing}>
-              {saving ? "Salvando suas respostas..." : analyzing ? "Analisando suas fotos..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar minhas fotos" : step === 7 && Object.keys(assessmentPhotos).length === 0 && !assessment ? "Pular fotos e finalizar" : step === STEPS.length - 1 ? "Finalizar quiz" : "Próximo"}
+            {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving || analyzing || generating}>Voltar</Button>}
+            <Button onClick={next} className="flex-1 glow" disabled={saving || analyzing || generating}>
+              {generating ? "Gerando seu protocolo..." : saving ? "Salvando suas respostas..." : analyzing ? "Analisando suas fotos..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar minhas fotos" : step === 7 && Object.keys(assessmentPhotos).length === 0 && !assessment ? "Pular fotos e finalizar" : step === STEPS.length - 1 ? "Finalizar e liberar protocolo" : "Próximo"}
             </Button>
+
           </div>
         </div>
       </div>
@@ -1057,17 +1172,42 @@ const Onboarding = () => {
         </div>
       )}
 
-      {saving && (
+      {saving && !generating && (
         <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
           <div className="max-w-sm w-full text-center space-y-4">
             <div className="text-5xl animate-pulse">💾</div>
             <h3 className="text-xl font-heading font-bold text-foreground">Salvando suas respostas</h3>
             <p className="text-sm text-muted-foreground">
-              Em seguida você escolhe seu plano para liberar a geração do protocolo.
+              Estamos preparando a geração do seu protocolo personalizado...
             </p>
           </div>
         </div>
       )}
+
+      {generating && (
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex items-center justify-center p-6 animate-fade-in">
+          <div className="max-w-sm w-full text-center space-y-5">
+            <div className="text-5xl animate-pulse">🤖</div>
+            <div>
+              <h3 className="text-xl font-heading font-bold text-foreground mb-1">Gerando seu protocolo</h3>
+              <p className="text-sm text-muted-foreground min-h-[2.5rem]">{genStage}</p>
+            </div>
+            <div className="space-y-2">
+              <Progress value={Math.min(100, (genElapsed / 180) * 100)} className="h-3" />
+              <p className="text-3xl font-bold text-primary font-heading tabular-nums">
+                {String(Math.floor(genElapsed / 60)).padStart(2, "0")}:{String(genElapsed % 60).padStart(2, "0")}
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                Tempo médio: 1–3 minutos. Mantenha esta tela aberta.
+              </p>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Treino, dieta e cardio sendo montados com base em todas as suas respostas.
+            </p>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
