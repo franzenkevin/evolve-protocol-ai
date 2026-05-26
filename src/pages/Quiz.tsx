@@ -154,13 +154,14 @@ export default function Quiz() {
     }
   }, [phase]);
 
-  function goToSignup() {
-    const params = new URLSearchParams();
-    params.set("plan", selectedPlan);
-    params.set("from", "quiz");
-    // Marca para o Welcome saber que falta completar formulário pós-pagamento
-    sessionStorage.setItem("evoria_quiz_complete", "1");
-    navigate(`/signup?${params.toString()}`);
+  function goToCheckout() {
+    // Persiste respostas do quiz para serem aplicadas após o login pós-pagamento
+    try {
+      sessionStorage.setItem("evoria_quiz_complete", "1");
+      sessionStorage.setItem("evoria_quiz_answers", JSON.stringify(answers));
+    } catch {}
+    const priceId = selectedPlan === "annual" ? "hypertrophy_annual" : "hypertrophy_monthly";
+    openCheckout({ priceId });
   }
 
   // ===== RENDER =====
