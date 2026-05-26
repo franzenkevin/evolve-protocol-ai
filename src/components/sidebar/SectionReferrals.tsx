@@ -49,6 +49,9 @@ const SectionReferrals = () => {
             <p className="text-[10px] text-muted-foreground/80 leading-relaxed">
               💡 Cashback fica <span className="text-warning font-medium">pendente por 14 dias</span> após o pagamento e depois é liberado automaticamente.
             </p>
+            <p className="text-[10px] text-muted-foreground/60 leading-relaxed">
+              ⚠️ Não é possível combinar cupons. Se houver uma promoção ativa (ex: lançamento) no checkout, o cupom de indicação não será acumulado.
+            </p>
           </div>
         </div>
 
