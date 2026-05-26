@@ -11,6 +11,18 @@ import QuizShell from "@/components/quiz/QuizShell";
 import { quizSteps, TOTAL_QUIZ_STEPS, type QuizStep } from "@/lib/quizSteps";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import maleBF10 from "@/assets/bodyfat/male-10.png";
+import maleBF15 from "@/assets/bodyfat/male-15.png";
+import maleBF20 from "@/assets/bodyfat/male-20.png";
+import maleBF25 from "@/assets/bodyfat/male-25.png";
+import maleBF30 from "@/assets/bodyfat/male-30.png";
+import maleBF35 from "@/assets/bodyfat/male-35.png";
+import femaleBF18 from "@/assets/bodyfat/female-18.png";
+import femaleBF22 from "@/assets/bodyfat/female-22.png";
+import femaleBF27 from "@/assets/bodyfat/female-27.png";
+import femaleBF32 from "@/assets/bodyfat/female-32.png";
+import femaleBF37 from "@/assets/bodyfat/female-37.png";
+import femaleBF42 from "@/assets/bodyfat/female-42.png";
 
 type Phase =
   | { kind: "quiz"; index: number }
@@ -374,7 +386,7 @@ function StepRenderer({ step, value, allAnswers, onChange, onNext }: any) {
   if (step.type === "number") return <NumberStep step={step} value={value} onChange={onChange} allAnswers={allAnswers} />;
   if (step.type === "info") return <InfoStep step={step} />;
   if (step.type === "body-shape") return <BodyShapeStep step={step} value={value} onChange={onChange} onNext={onNext} />;
-  if (step.type === "bodyfat-slider") return <BodyFatStep value={value} onChange={onChange} />;
+  if (step.type === "bodyfat-slider") return <BodyFatStep value={value} onChange={onChange} allAnswers={allAnswers} />;
   return null;
 }
 
@@ -574,22 +586,75 @@ function BodyShapeStep({ step, value, onChange, onNext }: any) {
   );
 }
 
-function BodyFatStep({ value, onChange }: any) {
-  const v = value ?? 20;
-  useEffect(() => { if (value === undefined) onChange(20); }, []);
+// Imagens de referência geradas por IA (homem e mulher em níveis de % de gordura)
+
+const MALE_BF_REFS = [
+  { v: 10, img: maleBF10, label: "8-12%" },
+  { v: 15, img: maleBF15, label: "13-17%" },
+  { v: 20, img: maleBF20, label: "18-22%" },
+  { v: 25, img: maleBF25, label: "23-27%" },
+  { v: 30, img: maleBF30, label: "28-32%" },
+  { v: 35, img: maleBF35, label: "33%+" },
+];
+const FEMALE_BF_REFS = [
+  { v: 18, img: femaleBF18, label: "15-20%" },
+  { v: 22, img: femaleBF22, label: "21-25%" },
+  { v: 27, img: femaleBF27, label: "26-30%" },
+  { v: 32, img: femaleBF32, label: "31-35%" },
+  { v: 37, img: femaleBF37, label: "36-40%" },
+  { v: 42, img: femaleBF42, label: "41%+" },
+];
+
+function BodyFatStep({ value, onChange, allAnswers }: any) {
+  const isFemale = allAnswers?.gender === "female";
+  const refs = isFemale ? FEMALE_BF_REFS : MALE_BF_REFS;
+  const min = refs[0].v;
+  const max = refs[refs.length - 1].v;
+  const v = value ?? refs[Math.floor(refs.length / 2)].v;
+  useEffect(() => {
+    if (value === undefined) onChange(refs[Math.floor(refs.length / 2)].v);
+  }, [isFemale]);
+
+  // Pré-carrega todas as imagens para evitar flicker ao arrastar
+  useEffect(() => {
+    refs.forEach((r) => {
+      const img = new window.Image();
+      img.src = r.img;
+    });
+  }, [isFemale]);
+
+  // Acha a referência mais próxima
+  const active = refs.reduce((best, r) =>
+    Math.abs(r.v - v) < Math.abs(best.v - v) ? r : best
+  , refs[0]);
+
   return (
     <>
       <StepHeader step={{ title: "Estime seu percentual de gordura", subtitle: "A referência visual ajuda. Não precisa ser exato." } as any} />
-      <Card className="p-8 bg-card/40 border-white/10 text-center mb-4">
-        <div className="text-7xl mb-3">
-          {v < 15 ? "💪" : v < 22 ? "🧑" : v < 30 ? "🧔" : "🧍"}
+      <div className="relative w-full h-[420px] mb-3 flex items-center justify-center overflow-hidden">
+        {refs.map((r) => (
+          <img
+            key={r.v}
+            src={r.img}
+            alt={`Referência ${r.label}`}
+            width={640}
+            height={1024}
+            loading="lazy"
+            className={`absolute inset-0 m-auto h-full w-auto object-contain transition-opacity duration-200 ${
+              r.v === active.v ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        ))}
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-sm font-bold shadow-lg tabular-nums">
+          {active.label}
         </div>
-        <div className="text-5xl font-heading font-bold text-primary mb-6 tabular-nums">{v}%</div>
-        <Slider min={5} max={45} step={1} value={[v]} onValueChange={([nv]) => onChange(nv)} />
-        <div className="flex justify-between mt-3 text-xs text-muted-foreground">
-          {BODYFAT_LEVELS.map((l) => <span key={l.value}>{l.label}</span>)}
+      </div>
+      <div className="px-1">
+        <Slider min={min} max={max} step={1} value={[v]} onValueChange={([nv]) => onChange(nv)} />
+        <div className="flex justify-between mt-3 text-[11px] text-muted-foreground">
+          {refs.map((r) => <span key={r.v}>{r.label}</span>)}
         </div>
-      </Card>
+      </div>
     </>
   );
 }
