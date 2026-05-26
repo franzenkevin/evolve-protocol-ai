@@ -16,6 +16,9 @@ import { BodyPhotoUpload } from "@/components/onboarding/BodyPhotoUpload";
 import { AssessmentResults } from "@/components/onboarding/AssessmentResults";
 import { ProtocolConfirmation, type ProtocolConfirmations, isConfirmationComplete } from "@/components/onboarding/ProtocolConfirmation";
 import type { Profile } from "@/hooks/useProfile";
+import { useSubscription } from "@/hooks/useSubscription";
+import { useCreateProtocol } from "@/hooks/useProtocol";
+import { generateProtocol } from "@/lib/generateProtocol";
 
 const STEPS = [
   "Dados Pessoais",
