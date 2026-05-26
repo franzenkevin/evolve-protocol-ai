@@ -38,6 +38,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useLogAudit } from "@/hooks/useAuditLog";
 import VideoUploader from "@/components/admin/VideoUploader";
+import ImageUploader from "@/components/admin/ImageUploader";
 import { Plus, Pencil, Trash2, Search, Activity } from "lucide-react";
 
 const REGIONS = [
@@ -64,6 +65,7 @@ const empty: Partial<MobilityExercise> = {
   side: "bilateral",
   equipment: "",
   video_url: null,
+  image_url: null,
   instructions: "",
   difficulty: "iniciante",
 };
@@ -126,6 +128,7 @@ const AdminMobility = () => {
       side: draft.side || "bilateral",
       equipment: draft.equipment?.trim() || null,
       video_url: draft.video_url || null,
+      image_url: draft.image_url || null,
       instructions: draft.instructions?.trim() || null,
       difficulty: draft.difficulty || "iniciante",
     };
@@ -342,6 +345,11 @@ const AdminMobility = () => {
             <VideoUploader
               value={draft.video_url ?? null}
               onChange={(url) => setDraft({ ...draft, video_url: url })}
+            />
+            <ImageUploader
+              label="Imagem ilustrativa (usada quando não há vídeo)"
+              value={draft.image_url ?? null}
+              onChange={(url) => setDraft({ ...draft, image_url: url })}
             />
             <div>
               <Label>Instruções</Label>

@@ -163,6 +163,17 @@ const MobilityDrawer = ({ open, onOpenChange, suggestedRegion }: MobilityDrawerP
                         </p>
                       )}
 
+                      {!m.video_url && m.image_url && !isPlaying && (
+                        <div className="rounded-lg overflow-hidden border border-border bg-black/40">
+                          <img
+                            src={m.image_url}
+                            alt={`Ilustração de ${m.name}`}
+                            className="w-full h-auto max-h-56 object-contain"
+                            loading="lazy"
+                          />
+                        </div>
+                      )}
+
                       {!isPlaying ? (
                         <Button
                           variant="outline"

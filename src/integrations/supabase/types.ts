@@ -667,6 +667,7 @@ export type Database = {
           duration_seconds: number | null
           equipment: string | null
           id: string
+          image_url: string | null
           instructions: string | null
           name: string
           region: string
@@ -682,6 +683,7 @@ export type Database = {
           duration_seconds?: number | null
           equipment?: string | null
           id?: string
+          image_url?: string | null
           instructions?: string | null
           name: string
           region: string
@@ -697,6 +699,7 @@ export type Database = {
           duration_seconds?: number | null
           equipment?: string | null
           id?: string
+          image_url?: string | null
           instructions?: string | null
           name?: string
           region?: string
