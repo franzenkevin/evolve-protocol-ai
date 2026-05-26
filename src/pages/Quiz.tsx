@@ -374,7 +374,7 @@ function StepRenderer({ step, value, allAnswers, onChange, onNext }: any) {
   if (step.type === "number") return <NumberStep step={step} value={value} onChange={onChange} allAnswers={allAnswers} />;
   if (step.type === "info") return <InfoStep step={step} />;
   if (step.type === "body-shape") return <BodyShapeStep step={step} value={value} onChange={onChange} onNext={onNext} />;
-  if (step.type === "bodyfat-slider") return <BodyFatStep value={value} onChange={onChange} />;
+  if (step.type === "bodyfat-slider") return <BodyFatStep value={value} onChange={onChange} allAnswers={allAnswers} />;
   return null;
 }
 
