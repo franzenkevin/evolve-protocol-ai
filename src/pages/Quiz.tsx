@@ -111,7 +111,7 @@ export default function Quiz() {
       const raw = sessionStorage.getItem(PHASE_KEY);
       if (raw) return JSON.parse(raw);
     } catch {}
-    return { kind: "quiz", index: 0 };
+    return { kind: "intro" };
   });
   const [photos, setPhotos] = useState<File[]>([]);
   const [physiqueResult, setPhysiqueResult] = useState<any>(null);
@@ -131,7 +131,9 @@ export default function Quiz() {
   }
 
   function next() {
-    if (phase.kind === "quiz") {
+    if (phase.kind === "intro") {
+      setPhase({ kind: "quiz", index: 0 });
+    } else if (phase.kind === "quiz") {
       const nextIdx = phase.index + 1;
       // Fim do quiz → análise IA opcional ANTES de gerar a prévia
       if (nextIdx >= TOTAL_QUIZ_STEPS) setPhase({ kind: "physique-intro" });
@@ -139,7 +141,9 @@ export default function Quiz() {
     }
   }
   function back() {
-    if (phase.kind === "quiz" && phase.index > 0) setPhase({ kind: "quiz", index: phase.index - 1 });
+    if (phase.kind === "intro") navigate("/landing");
+    else if (phase.kind === "quiz" && phase.index > 0) setPhase({ kind: "quiz", index: phase.index - 1 });
+    else if (phase.kind === "quiz" && phase.index === 0) setPhase({ kind: "intro" });
     else if (phase.kind === "physique-intro") setPhase({ kind: "quiz", index: TOTAL_QUIZ_STEPS - 1 });
     else if (phase.kind === "physique-upload") setPhase({ kind: "physique-intro" });
     else if (phase.kind === "preview") setPhase({ kind: "physique-intro" });
