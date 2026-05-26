@@ -24,7 +24,8 @@ interface Props {
 
 const ShareWorkoutDialog = ({ open, onOpenChange, data }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const libraryInputRef = useRef<HTMLInputElement>(null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [rendering, setRendering] = useState(false);
   const [sharing, setSharing] = useState(false);
