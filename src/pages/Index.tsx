@@ -75,7 +75,7 @@ const Index = () => {
   }, [user, authLoading, profile, profileLoading, subscription, subLoading, isAdmin, adminLoading, navigate]);
 
   const ctaPrimary = user ? "Continuar protocolo" : "Começar agora";
-  const ctaPrimaryTo = user ? "/welcome" : "/signup";
+  const ctaPrimaryTo = user ? "/welcome" : "/quiz";
 
   return (
     <div className="min-h-screen bg-background">
