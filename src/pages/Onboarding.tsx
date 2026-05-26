@@ -209,6 +209,9 @@ const Onboarding = () => {
   const persisted = typeof window !== "undefined" ? loadPersisted() : null;
   const [step, setStep] = useState<number>(persisted?.step ?? 0);
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [genElapsed, setGenElapsed] = useState(0);
+  const [genStage, setGenStage] = useState("");
   const [analyzeElapsed, setAnalyzeElapsed] = useState(0); // seconds
   const [analyzeStage, setAnalyzeStage] = useState("");
   const [assessmentPhotos, setAssessmentPhotos] = useState<Record<string, string>>(persisted?.assessmentPhotos ?? {});
@@ -224,6 +227,8 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const updateProfile = useUpdateProfile();
+  const createProtocol = useCreateProtocol();
+  const { data: subscription, refetch: refetchSubscription } = useSubscription();
 
   const { user } = useAuth();
   const [cloudLoaded, setCloudLoaded] = useState(false);
