@@ -64,6 +64,7 @@ const empty: Partial<MobilityExercise> = {
   side: "bilateral",
   equipment: "",
   video_url: null,
+  image_url: null,
   instructions: "",
   difficulty: "iniciante",
 };
