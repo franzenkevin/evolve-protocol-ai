@@ -960,12 +960,15 @@ function PhotoUpload({ photos, setPhotos }: any) {
 }
 
 function PhysiqueResult({ result }: any) {
-  const data = result || {
-    posture: "Postura geral alinhada com leve protrusão anterior do ombro.",
-    symmetry: "Boa simetria entre lados; ligeira dominância do hemisfério direito.",
-    priorities: ["Posterior de ombro e dorsais médias", "Glúteo médio e core", "Mobilidade torácica"],
-    recommendation: "Foco em puxadas horizontais, rotação externa e core anti-extensão nas primeiras 4 semanas.",
-  };
+  const data = result || {};
+  const posture = data.posture || "Postura geral alinhada com leve protrusão anterior do ombro.";
+  const postureScore = typeof data.posture_score === "number" ? data.posture_score : 7;
+  const postureIssues: string[] = Array.isArray(data.posture_issues) ? data.posture_issues : [];
+  const strengths: string[] = Array.isArray(data.strengths) ? data.strengths : (data.priorities ? [] : ["Estrutura óssea favorável", "Boa base muscular para evoluir"]);
+  const weaknesses: string[] = Array.isArray(data.weaknesses) ? data.weaknesses : (data.priorities || ["Posterior de ombro", "Glúteo médio", "Mobilidade torácica"]);
+  const symmetry = data.symmetry || "Boa simetria entre lados; ligeira dominância do hemisfério direito.";
+  const recommendation = data.recommendation || "Foco em puxadas horizontais, rotação externa e core anti-extensão nas primeiras 4 semanas.";
+
   return (
     <div className="pt-2 space-y-4">
       <div>
@@ -973,13 +976,47 @@ function PhysiqueResult({ result }: any) {
         <h1 className="text-2xl font-heading font-bold leading-tight">Sua leitura inicial está pronta.</h1>
         <p className="text-muted-foreground text-sm mt-2">Esta é uma estimativa computacional — não substitui avaliação profissional.</p>
       </div>
-      <Card className="p-5 bg-card/40 border-white/10"><p className="text-xs uppercase tracking-wider text-primary font-bold mb-2">Postura</p><p className="text-foreground/90 text-sm leading-relaxed">{data.posture}</p></Card>
-      <Card className="p-5 bg-card/40 border-white/10"><p className="text-xs uppercase tracking-wider text-primary font-bold mb-2">Simetria</p><p className="text-foreground/90 text-sm leading-relaxed">{data.symmetry}</p></Card>
+
       <Card className="p-5 bg-card/40 border-white/10">
-        <p className="text-xs uppercase tracking-wider text-primary font-bold mb-2">Pontos prioritários</p>
-        <ul className="space-y-2 text-sm text-foreground/90">{(data.priorities || []).map((p: string, i: number) => (<li key={i} className="flex gap-2"><span className="text-primary">→</span> {p}</li>))}</ul>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs uppercase tracking-wider text-primary font-bold">Análise postural</p>
+          <span className="text-sm font-heading font-bold text-primary tabular-nums">{postureScore}/10</span>
+        </div>
+        <div className="h-1.5 bg-black/40 rounded-full overflow-hidden mb-3">
+          <div className="h-full bg-primary rounded-full" style={{ width: `${(postureScore / 10) * 100}%` }} />
+        </div>
+        <p className="text-foreground/90 text-sm leading-relaxed">{posture}</p>
+        {postureIssues.length > 0 && (
+          <ul className="mt-3 space-y-1.5 text-sm text-foreground/80">
+            {postureIssues.map((p, i) => (<li key={i} className="flex gap-2"><span className="text-amber-400">⚠</span> {p}</li>))}
+          </ul>
+        )}
       </Card>
-      <Card className="p-5 bg-primary/5 border-primary/30"><p className="text-xs uppercase tracking-wider text-primary font-bold mb-2">Recomendação inicial</p><p className="text-foreground/90 text-sm leading-relaxed">{data.recommendation}</p></Card>
+
+      <Card className="p-5 bg-card/40 border-white/10">
+        <p className="text-xs uppercase tracking-wider text-primary font-bold mb-2">Simetria</p>
+        <p className="text-foreground/90 text-sm leading-relaxed">{symmetry}</p>
+      </Card>
+
+      <div className="grid grid-cols-1 gap-3">
+        <Card className="p-5 bg-emerald-500/5 border-emerald-500/30">
+          <p className="text-xs uppercase tracking-wider text-emerald-400 font-bold mb-2">Pontos fortes</p>
+          <ul className="space-y-2 text-sm text-foreground/90">
+            {strengths.map((p, i) => (<li key={i} className="flex gap-2"><span className="text-emerald-400">✓</span> {p}</li>))}
+          </ul>
+        </Card>
+        <Card className="p-5 bg-amber-500/5 border-amber-500/30">
+          <p className="text-xs uppercase tracking-wider text-amber-400 font-bold mb-2">Pontos a melhorar</p>
+          <ul className="space-y-2 text-sm text-foreground/90">
+            {weaknesses.map((p, i) => (<li key={i} className="flex gap-2"><span className="text-amber-400">→</span> {p}</li>))}
+          </ul>
+        </Card>
+      </div>
+
+      <Card className="p-5 bg-primary/5 border-primary/30">
+        <p className="text-xs uppercase tracking-wider text-primary font-bold mb-2">Recomendação inicial</p>
+        <p className="text-foreground/90 text-sm leading-relaxed">{recommendation}</p>
+      </Card>
     </div>
   );
 }
