@@ -1,6 +1,6 @@
 import { ChevronLeft } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import logo from "@/assets/evoria-logo.webp";
+import logo from "@/assets/evoria-logo-horizontal.png";
 
 interface QuizShellProps {
   currentStep: number;
