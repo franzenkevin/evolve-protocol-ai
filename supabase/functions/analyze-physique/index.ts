@@ -128,18 +128,28 @@ Deno.serve(async (req) => {
     let parsed: any = null;
     for (const a of attempts) {
       parsed = await callModel(a.model, content, a.timeoutMs);
-      if (parsed && (parsed.posture || parsed.priorities)) break;
+      if (parsed && (parsed.posture || parsed.strengths || parsed.weaknesses)) break;
     }
 
     // Garante resposta válida mesmo se todos os modelos falharem
     const safe = parsed ?? {};
     const result = {
       posture: safe.posture || FALLBACK.posture,
+      posture_score:
+        typeof safe.posture_score === "number" ? Math.max(0, Math.min(10, safe.posture_score)) : FALLBACK.posture_score,
+      posture_issues:
+        Array.isArray(safe.posture_issues) && safe.posture_issues.length
+          ? safe.posture_issues.slice(0, 5)
+          : FALLBACK.posture_issues,
       symmetry: safe.symmetry || FALLBACK.symmetry,
-      priorities:
-        Array.isArray(safe.priorities) && safe.priorities.length
-          ? safe.priorities.slice(0, 5)
-          : FALLBACK.priorities,
+      strengths:
+        Array.isArray(safe.strengths) && safe.strengths.length
+          ? safe.strengths.slice(0, 5)
+          : FALLBACK.strengths,
+      weaknesses:
+        Array.isArray(safe.weaknesses) && safe.weaknesses.length
+          ? safe.weaknesses.slice(0, 5)
+          : (Array.isArray(safe.priorities) && safe.priorities.length ? safe.priorities.slice(0, 5) : FALLBACK.weaknesses),
       recommendation: safe.recommendation || FALLBACK.recommendation,
       _degraded: !parsed,
     };
