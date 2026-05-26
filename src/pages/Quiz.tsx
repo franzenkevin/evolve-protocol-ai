@@ -44,6 +44,7 @@ import targetFemaleVolume from "@/assets/quiz/target-female-volume.jpg";
 import targetFemaleBodybuilder from "@/assets/quiz/target-female-bodybuilder.jpg";
 
 type Phase =
+  | { kind: "intro" }
   | { kind: "quiz"; index: number }
   | { kind: "loading" }
   | { kind: "preview" }
