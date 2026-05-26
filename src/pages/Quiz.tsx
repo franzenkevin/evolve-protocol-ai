@@ -130,17 +130,17 @@ export default function Quiz() {
   function next() {
     if (phase.kind === "quiz") {
       const nextIdx = phase.index + 1;
-      if (nextIdx >= TOTAL_QUIZ_STEPS) setPhase({ kind: "loading" });
+      // Fim do quiz → análise IA opcional ANTES de gerar a prévia
+      if (nextIdx >= TOTAL_QUIZ_STEPS) setPhase({ kind: "physique-intro" });
       else setPhase({ kind: "quiz", index: nextIdx });
     }
   }
   function back() {
     if (phase.kind === "quiz" && phase.index > 0) setPhase({ kind: "quiz", index: phase.index - 1 });
-    else if (phase.kind === "preview") setPhase({ kind: "quiz", index: TOTAL_QUIZ_STEPS - 1 });
-    else if (phase.kind === "physique-intro") setPhase({ kind: "preview" });
+    else if (phase.kind === "physique-intro") setPhase({ kind: "quiz", index: TOTAL_QUIZ_STEPS - 1 });
     else if (phase.kind === "physique-upload") setPhase({ kind: "physique-intro" });
-    else if (phase.kind === "physique-result") setPhase({ kind: "physique-intro" });
-    else if (phase.kind === "plans") setPhase({ kind: "physique-intro" });
+    else if (phase.kind === "preview") setPhase({ kind: "physique-intro" });
+    else if (phase.kind === "plans") setPhase({ kind: "preview" });
     else if (phase.kind === "guarantee") setPhase({ kind: "plans" });
     else navigate("/");
   }
@@ -177,11 +177,11 @@ export default function Quiz() {
   if (phase.kind === "preview") {
     return (
       <QuizShell currentStep={TOTAL_QUIZ_STEPS} totalSteps={TOTAL_QUIZ_STEPS} onBack={back} hideProgress>
-        <PreviewPhase answers={answers} />
+        <PreviewPhase answers={answers} physiqueResult={physiqueResult} />
         <div className="fixed bottom-0 inset-x-0 z-30 bg-gradient-to-t from-black via-black/95 to-transparent pt-6 pb-5">
           <div className="max-w-xl mx-auto px-5">
-            <Button size="lg" className="w-full h-14 text-base font-semibold gap-2 glow" onClick={() => setPhase({ kind: "physique-intro" })}>
-              Continuar <ArrowRight size={18} />
+            <Button size="lg" className="w-full h-14 text-base font-semibold gap-2 glow" onClick={() => setPhase({ kind: "plans" })}>
+              Ver meu plano completo <ArrowRight size={18} />
             </Button>
           </div>
         </div>
@@ -210,7 +210,7 @@ export default function Quiz() {
             <Button size="lg" className="w-full h-14 text-base font-semibold gap-2 glow" onClick={() => setPhase({ kind: "physique-upload" })}>
               <Camera size={18} /> Fazer análise por IA
             </Button>
-            <Button variant="ghost" size="lg" className="w-full h-12 text-muted-foreground" onClick={() => setPhase({ kind: "plans" })}>
+            <Button variant="ghost" size="lg" className="w-full h-12 text-muted-foreground" onClick={() => { setAnswers((a) => ({ ...a, physique_pending: true })); setPhase({ kind: "loading" }); }}>
               Pular essa etapa
             </Button>
           </div>
@@ -239,12 +239,12 @@ export default function Quiz() {
                   if (error) throw error;
                   if (data?.error) throw new Error(data.error);
                   setPhysiqueResult(data);
-                  setPhase({ kind: "physique-result" });
+                  setPhase({ kind: "loading" });
                 } catch (e: any) {
                   console.error("[quiz] physique error", e);
                   toast.error("Não foi possível concluir a análise agora. Você poderá enviar suas fotos depois, no app.");
                   setAnswers((a) => ({ ...a, physique_pending: true }));
-                  setPhase({ kind: "plans" });
+                  setPhase({ kind: "loading" });
                 }
               }}
             >
@@ -256,7 +256,7 @@ export default function Quiz() {
               className="w-full h-12 text-muted-foreground"
               onClick={() => {
                 setAnswers((a) => ({ ...a, physique_pending: true }));
-                setPhase({ kind: "plans" });
+                setPhase({ kind: "loading" });
               }}
             >
               Enviar depois no app
