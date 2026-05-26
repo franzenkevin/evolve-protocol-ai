@@ -161,7 +161,8 @@ export default function Quiz() {
       sessionStorage.setItem("evoria_quiz_answers", JSON.stringify(answers));
     } catch {}
     const priceId = selectedPlan === "annual" ? "hypertrophy_annual" : "hypertrophy_monthly";
-    openCheckout({ priceId });
+    const couponCode = selectedPlan === "annual" ? "LANCAMENTOANUAL" : "LANCAMENTO";
+    openCheckout({ priceId, couponCode });
   }
 
   // ===== RENDER =====
