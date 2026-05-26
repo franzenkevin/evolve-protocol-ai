@@ -12,12 +12,15 @@ interface Body {
   context?: Record<string, unknown>;
 }
 
-const SYSTEM = `Você é um avaliador físico estilo coach Evoria. Analise as fotos do usuário e devolva uma leitura inicial OBJETIVA, respeitosa e motivadora em pt-BR. Não diagnostique patologias. Responda APENAS em JSON com o schema:
+const SYSTEM = `Você é um avaliador físico estilo coach Evoria. Analise as fotos do usuário e devolva uma leitura inicial OBJETIVA, respeitosa e motivadora em pt-BR. Foque em ANÁLISE POSTURAL detalhada (cabeça, ombros, cintura escapular, pelve, joelhos, pés) e pontue de 0 a 10. Liste pontos fortes (genética, estrutura, partes já desenvolvidas) e pontos a melhorar. Não diagnostique patologias. Responda APENAS em JSON com o schema:
 {
-  "posture": string,          // 1-2 frases sobre postura geral
-  "symmetry": string,         // 1-2 frases sobre simetria
-  "priorities": string[],     // 3 pontos prioritários de desenvolvimento (curtos)
-  "recommendation": string    // 1-2 frases recomendando foco inicial de treino
+  "posture": string,              // 2-3 frases sobre postura geral (alinhamento, desvios visíveis)
+  "posture_score": number,        // 0-10, nota da postura geral
+  "posture_issues": string[],     // 2-4 desvios posturais específicos a corrigir (curtos)
+  "symmetry": string,             // 1-2 frases sobre simetria entre lados
+  "strengths": string[],          // 3 pontos fortes do físico (curtos)
+  "weaknesses": string[],         // 3 pontos a melhorar / grupos musculares prioritários (curtos)
+  "recommendation": string        // 1-2 frases recomendando foco inicial de treino
 }`;
 
 function json(status: number, body: unknown) {
@@ -28,9 +31,20 @@ function json(status: number, body: unknown) {
 }
 
 const FALLBACK = {
-  posture: "Postura geral alinhada, com pequenos ajustes possíveis em ombros e quadril.",
+  posture: "Postura geral alinhada, com leve protrusão anterior dos ombros e discreta anteversão pélvica — ajustes leves de mobilidade torácica e ativação de core devem corrigir.",
+  posture_score: 7,
+  posture_issues: [
+    "Protrusão anterior de ombros",
+    "Leve anteversão pélvica",
+    "Cabeça projetada à frente",
+  ],
   symmetry: "Simetria razoável entre os lados, com leve dominância natural de um hemisfério.",
-  priorities: [
+  strengths: [
+    "Estrutura óssea favorável para hipertrofia",
+    "Base muscular consistente para progredir",
+    "Proporção geral equilibrada",
+  ],
+  weaknesses: [
     "Posterior de ombro e dorsais médias",
     "Glúteo médio e core anti-extensão",
     "Mobilidade torácica",
@@ -114,18 +128,28 @@ Deno.serve(async (req) => {
     let parsed: any = null;
     for (const a of attempts) {
       parsed = await callModel(a.model, content, a.timeoutMs);
-      if (parsed && (parsed.posture || parsed.priorities)) break;
+      if (parsed && (parsed.posture || parsed.strengths || parsed.weaknesses)) break;
     }
 
     // Garante resposta válida mesmo se todos os modelos falharem
     const safe = parsed ?? {};
     const result = {
       posture: safe.posture || FALLBACK.posture,
+      posture_score:
+        typeof safe.posture_score === "number" ? Math.max(0, Math.min(10, safe.posture_score)) : FALLBACK.posture_score,
+      posture_issues:
+        Array.isArray(safe.posture_issues) && safe.posture_issues.length
+          ? safe.posture_issues.slice(0, 5)
+          : FALLBACK.posture_issues,
       symmetry: safe.symmetry || FALLBACK.symmetry,
-      priorities:
-        Array.isArray(safe.priorities) && safe.priorities.length
-          ? safe.priorities.slice(0, 5)
-          : FALLBACK.priorities,
+      strengths:
+        Array.isArray(safe.strengths) && safe.strengths.length
+          ? safe.strengths.slice(0, 5)
+          : FALLBACK.strengths,
+      weaknesses:
+        Array.isArray(safe.weaknesses) && safe.weaknesses.length
+          ? safe.weaknesses.slice(0, 5)
+          : (Array.isArray(safe.priorities) && safe.priorities.length ? safe.priorities.slice(0, 5) : FALLBACK.weaknesses),
       recommendation: safe.recommendation || FALLBACK.recommendation,
       _degraded: !parsed,
     };
