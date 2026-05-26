@@ -127,6 +127,7 @@ const AdminMobility = () => {
       side: draft.side || "bilateral",
       equipment: draft.equipment?.trim() || null,
       video_url: draft.video_url || null,
+      image_url: draft.image_url || null,
       instructions: draft.instructions?.trim() || null,
       difficulty: draft.difficulty || "iniciante",
     };
