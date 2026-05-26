@@ -1,5 +1,4 @@
-// Quiz Evoria — config dos 33 passos + telas extras
-// Inspirado no funil MyFitCoach, com copy e identidade Evoria
+// Quiz Evoria — funil completo (gênero é o passo 1; idade exata é perguntada no final)
 
 export type QuizOption = {
   value: string;
@@ -9,99 +8,38 @@ export type QuizOption = {
 };
 
 export type QuizStep =
-  | {
-      id: string;
-      type: "choice";
-      title: string;
-      subtitle?: string;
-      options: QuizOption[];
-      multi?: boolean;
-    }
-  | {
-      id: string;
-      type: "slider";
-      title: string;
-      subtitle?: string;
-      min: number;
-      max: number;
-      step?: number;
-      unit?: string;
-      defaultValue?: number;
-    }
-  | {
-      id: string;
-      type: "number";
-      title: string;
-      subtitle?: string;
-      unit?: string;
-      placeholder?: string;
-      min?: number;
-      max?: number;
-      derived?: "bmi";
-    }
-  | {
-      id: string;
-      type: "date";
-      title: string;
-      subtitle?: string;
-    }
-  | {
-      id: string;
-      type: "info";
-      title: string;
-      subtitle?: string;
-      body?: string;
-      variant?: "chart" | "social-proof" | "transition";
-    }
-  | {
-      id: string;
-      type: "body-shape";
-      title: string;
-      subtitle?: string;
-      field: "current_shape" | "target_shape";
-    }
-  | {
-      id: string;
-      type: "bodyfat-slider";
-      title: string;
-      subtitle?: string;
-    };
+  | { id: string; type: "gender"; title: string; subtitle?: string }
+  | { id: string; type: "choice"; title: string; subtitle?: string; options: QuizOption[]; multi?: boolean }
+  | { id: string; type: "muscle-choice"; title: string; subtitle?: string }
+  | { id: string; type: "slider"; title: string; subtitle?: string; min: number; max: number; step?: number; unit?: string; defaultValue?: number }
+  | { id: string; type: "number"; title: string; subtitle?: string; unit?: string; placeholder?: string; min?: number; max?: number; derived?: "bmi" }
+  | { id: string; type: "weight-target"; title: string; subtitle?: string; unit?: string; placeholder?: string; min?: number; max?: number }
+  | { id: string; type: "event-target"; title: string; subtitle?: string }
+  | { id: string; type: "info"; title: string; subtitle?: string; body?: string; variant?: "social-proof" | "transition" | "kevin-method" }
+  | { id: string; type: "body-shape"; title: string; subtitle?: string; field: "current_shape" | "target_shape" }
+  | { id: string; type: "bodyfat-slider"; title: string; subtitle?: string };
 
 export const quizSteps: QuizStep[] = [
-  // 1
+  // 1 — Gênero (com imagens, obrigatório)
   {
     id: "gender",
-    type: "choice",
-    title: "Vamos começar — qual seu gênero?",
-    subtitle: "Isso ajuda a calibrar treino, dieta e referências corporais.",
-    options: [
-      { value: "male", label: "Masculino", emoji: "♂️" },
-      { value: "female", label: "Feminino", emoji: "♀️" },
-      { value: "other", label: "Prefiro não dizer", emoji: "⚪" },
-    ],
+    type: "gender",
+    title: "Vamos começar — você é:",
+    subtitle: "Tudo é calibrado a partir daqui: treino, dieta e referências corporais.",
   },
-  // 2
+
+  // 2 — Prova social: método Kevin Franzen
   {
-    id: "age_range",
-    type: "choice",
-    title: "Qual sua faixa de idade?",
-    options: [
-      { value: "18-29", label: "18 — 29 anos" },
-      { value: "30-39", label: "30 — 39 anos" },
-      { value: "40-49", label: "40 — 49 anos" },
-      { value: "50+", label: "50+" },
-    ],
-  },
-  // 3
-  {
-    id: "social_proof_1",
+    id: "kevin_method",
     type: "info",
-    title: "Você não está sozinho.",
-    subtitle: "Mais de 12.000 pessoas já estruturaram a rotina com a Evoria.",
-    body: "97% dos usuários sentiram diferença nas primeiras 4 semanas seguindo o protocolo gerado.",
-    variant: "social-proof",
+    title: "Você não está sozinho nessa.",
+    subtitle: "O método por trás da Evoria é o mesmo que o Kevin Franzen aplica há anos.",
+    body:
+      "Mais de 1.000 linhas de regras de programação traduzem todo o conhecimento e ciência aplicada do Kevin em um sistema que monta seu treino, sua dieta e ainda responde como um treinador real — pelo chat integrado, com respostas humanas, calibradas pela mesma metodologia. Você não recebe um PDF genérico. Você recebe a cabeça do Kevin organizada em sistema.",
+    variant: "kevin-method",
   },
-  // 4
+
+  // 3 — Objetivo (3 opções)
   {
     id: "main_goal",
     type: "choice",
@@ -110,11 +48,11 @@ export const quizSteps: QuizStep[] = [
     options: [
       { value: "lose_fat", label: "Perder gordura", emoji: "🔥" },
       { value: "gain_muscle", label: "Ganhar massa muscular", emoji: "💪" },
-      { value: "recomp", label: "Recomposição (perder gordura e ganhar músculo)", emoji: "⚡" },
-      { value: "performance", label: "Performance e saúde", emoji: "🚀" },
+      { value: "performance", label: "Performance em outros esportes", emoji: "🚀" },
     ],
   },
-  // 5
+
+  // 4 — Forma corporal atual (fotos por gênero)
   {
     id: "current_shape",
     type: "body-shape",
@@ -122,7 +60,8 @@ export const quizSteps: QuizStep[] = [
     subtitle: "Escolha o que mais se parece — não precisa ser exato.",
     field: "current_shape",
   },
-  // 6
+
+  // 5 — Forma corporal alvo (fotos por gênero)
   {
     id: "target_shape",
     type: "body-shape",
@@ -130,7 +69,8 @@ export const quizSteps: QuizStep[] = [
     subtitle: "É a referência que vamos usar para projetar sua jornada.",
     field: "target_shape",
   },
-  // 7
+
+  // 6 — Frequência atual
   {
     id: "current_frequency",
     type: "choice",
@@ -142,7 +82,8 @@ export const quizSteps: QuizStep[] = [
       { value: "5+", label: "5 ou mais vezes por semana" },
     ],
   },
-  // 8
+
+  // 7 — Histórico fitness (continua sendo útil aqui, define experiência técnica)
   {
     id: "fitness_history",
     type: "choice",
@@ -153,7 +94,8 @@ export const quizSteps: QuizStep[] = [
       { value: "advanced", label: "Avançado", description: "Anos de treino sério com bom domínio técnico" },
     ],
   },
-  // 9
+
+  // 8 — Padrão de peso
   {
     id: "weight_pattern",
     type: "choice",
@@ -165,7 +107,8 @@ export const quizSteps: QuizStep[] = [
       { value: "losing", label: "Vem perdendo peso", emoji: "📉" },
     ],
   },
-  // 10
+
+  // 9 — Dias por semana
   {
     id: "desired_frequency",
     type: "choice",
@@ -178,19 +121,21 @@ export const quizSteps: QuizStep[] = [
       { value: "6", label: "6 dias" },
     ],
   },
-  // 11
+
+  // 10 — Tempo por sessão (45/60/90/120)
   {
     id: "session_duration",
     type: "choice",
     title: "Quanto tempo por sessão é viável?",
     options: [
-      { value: "30", label: "30 minutos" },
       { value: "45", label: "45 minutos" },
       { value: "60", label: "60 minutos" },
-      { value: "75+", label: "75 minutos ou mais" },
+      { value: "90", label: "90 minutos" },
+      { value: "120", label: "120 minutos" },
     ],
   },
-  // 12
+
+  // 11 — Horário preferido
   {
     id: "preferred_time",
     type: "choice",
@@ -202,71 +147,38 @@ export const quizSteps: QuizStep[] = [
       { value: "varied", label: "Varia bastante", emoji: "🔄" },
     ],
   },
-  // 13
+
+  // 12 — Onde vai treinar (3 opções)
   {
     id: "location",
     type: "choice",
     title: "Onde você vai treinar?",
     options: [
-      { value: "gym_big", label: "Academia completa", emoji: "🏋️" },
-      { value: "gym_small", label: "Academia pequena", emoji: "🏠" },
-      { value: "home_equip", label: "Em casa, com equipamento", emoji: "🧰" },
-      { value: "home_body", label: "Em casa, peso corporal", emoji: "🤸" },
+      { value: "gym_full", label: "Academia completa", description: "Máquinas, pesos livres, cabos — kit completo", emoji: "🏋️" },
+      { value: "gym_condo", label: "Academia de condomínio (básica)", description: "Equipamento limitado, sem muitas máquinas", emoji: "🏢" },
+      { value: "home", label: "Treino em casa", description: "Com ou sem equipamento — vamos adaptar", emoji: "🏠" },
     ],
   },
-  // 14
-  {
-    id: "gym_type",
-    type: "choice",
-    title: "Que tipo de equipamento você tem acesso?",
-    options: [
-      { value: "full", label: "Tudo — máquinas, livres, cabos" },
-      { value: "free", label: "Pesos livres e barras" },
-      { value: "minimal", label: "Halteres e elásticos" },
-      { value: "none", label: "Sem equipamento" },
-    ],
-  },
-  // 15
+
+  // 13 — Divisão de treino (vai variar por gênero no render)
   {
     id: "split_pref",
     type: "choice",
-    title: "Você tem preferência por algum tipo de divisão de treino?",
-    subtitle: "Se não, deixaremos o sistema escolher o ideal para você.",
-    options: [
-      { value: "ppl", label: "Push / Pull / Legs" },
-      { value: "ab", label: "AB (superior/inferior)" },
-      { value: "abcd", label: "ABCD" },
-      { value: "system", label: "Deixar o sistema decidir", emoji: "✨" },
-    ],
+    title: "Tem preferência por algum tipo de divisão?",
+    subtitle: "Se não tiver, o sistema escolhe a melhor para o seu caso.",
+    // Options são montadas dinamicamente conforme o gênero
+    options: [],
   },
-  // 16
-  {
-    id: "progress_chart",
-    type: "info",
-    title: "Veja a curva de progresso projetada.",
-    subtitle: "É o ritmo médio de quem segue o protocolo nas primeiras 4 semanas.",
-    body: "Este gráfico é apenas para fins ilustrativos.",
-    variant: "chart",
-  },
-  // 17
+
+  // 14 — Músculos prioritários (com imagens)
   {
     id: "priority_muscles",
-    type: "choice",
-    title: "Há músculos que você quer priorizar?",
-    multi: true,
-    subtitle: "Você pode escolher mais de um.",
-    options: [
-      { value: "chest", label: "Peito", emoji: "💪" },
-      { value: "back", label: "Costas", emoji: "🦾" },
-      { value: "shoulders", label: "Ombros" },
-      { value: "arms", label: "Braços" },
-      { value: "glutes", label: "Glúteos" },
-      { value: "legs", label: "Pernas" },
-      { value: "core", label: "Abdômen" },
-      { value: "none", label: "Nenhum — corpo todo" },
-    ],
+    type: "muscle-choice",
+    title: "Quer priorizar algum músculo?",
+    subtitle: "Marque os músculos que quer focar. Ou deixe o coach decidir pelos seus pontos fortes e fracos.",
   },
-  // 18
+
+  // 15 — Lesões
   {
     id: "injuries",
     type: "choice",
@@ -281,19 +193,8 @@ export const quizSteps: QuizStep[] = [
       { value: "none", label: "Nenhuma" },
     ],
   },
-  // 19
-  {
-    id: "motivation",
-    type: "choice",
-    title: "O que mais te motiva nessa jornada?",
-    options: [
-      { value: "health", label: "Saúde e longevidade" },
-      { value: "aesthetic", label: "Estética e autoestima" },
-      { value: "performance", label: "Performance esportiva" },
-      { value: "discipline", label: "Construir disciplina" },
-    ],
-  },
-  // 20
+
+  // 16 — Tentativas anteriores
   {
     id: "previous_attempts",
     type: "choice",
@@ -305,7 +206,8 @@ export const quizSteps: QuizStep[] = [
       { value: "first", label: "Esta é minha primeira tentativa séria" },
     ],
   },
-  // 21
+
+  // 17 — Dia típico
   {
     id: "typical_day",
     type: "choice",
@@ -317,17 +219,8 @@ export const quizSteps: QuizStep[] = [
       { value: "very_active", label: "Trabalho físico intenso" },
     ],
   },
-  // 22
-  {
-    id: "energy",
-    type: "slider",
-    title: "Como está seu nível de energia hoje?",
-    subtitle: "0 = exausto · 10 = no auge",
-    min: 0,
-    max: 10,
-    defaultValue: 5,
-  },
-  // 23
+
+  // 18 — Sono
   {
     id: "sleep",
     type: "choice",
@@ -339,7 +232,8 @@ export const quizSteps: QuizStep[] = [
       { value: "broken", label: "Fragmentado e ruim" },
     ],
   },
-  // 24
+
+  // 19 — Água
   {
     id: "water",
     type: "choice",
@@ -351,23 +245,27 @@ export const quizSteps: QuizStep[] = [
       { value: "high", label: "Mais de 3L" },
     ],
   },
-  // 25
+
+  // 20 — Insight transitório
   {
     id: "quit_insight",
     type: "info",
     title: "O motivo número 1 da desistência? Falta de estrutura.",
     subtitle: "Não força de vontade.",
-    body: "É exatamente esse o problema que a Evoria resolve. Sua rotina vira sistema — você só executa.",
+    body:
+      "É exatamente esse o problema que a Evoria resolve. Sua rotina vira sistema — você só executa.",
     variant: "transition",
   },
-  // 26
+
+  // 21 — % gordura (slider visual)
   {
     id: "bodyfat",
     type: "bodyfat-slider",
     title: "Estime seu percentual de gordura",
     subtitle: "Não precisa ser exato — a referência visual ajuda.",
   },
-  // 27
+
+  // 22 — Altura
   {
     id: "height",
     type: "number",
@@ -377,7 +275,8 @@ export const quizSteps: QuizStep[] = [
     min: 130,
     max: 230,
   },
-  // 28
+
+  // 23 — Peso atual (+ IMC)
   {
     id: "weight",
     type: "number",
@@ -388,10 +287,11 @@ export const quizSteps: QuizStep[] = [
     max: 250,
     derived: "bmi",
   },
-  // 29
+
+  // 24 — Peso alvo (com "não tenho peso alvo")
   {
     id: "target_weight",
-    type: "number",
+    type: "weight-target",
     title: "Qual seu peso alvo?",
     subtitle: "Onde você quer chegar nos próximos meses.",
     unit: "kg",
@@ -399,49 +299,55 @@ export const quizSteps: QuizStep[] = [
     min: 35,
     max: 250,
   },
-  // 30
+
+  // 25 — Idade exata (no final, como pediu)
   {
     id: "age",
     type: "number",
-    title: "Qual sua idade exata?",
+    title: "Qual sua idade?",
     unit: "anos",
     placeholder: "28",
     min: 14,
     max: 90,
   },
-  // 31
-  {
-    id: "fitness_profile",
-    type: "choice",
-    title: "Como descreveria seu perfil hoje?",
-    options: [
-      { value: "novice", label: "Estou começando do zero" },
-      { value: "returning", label: "Estou voltando após uma pausa" },
-      { value: "stuck", label: "Treino, mas estagnei" },
-      { value: "evolving", label: "Quero levar a outro nível" },
-    ],
-  },
-  // 32
+
+  // 26 — Evento alvo (data + objetivo)
   {
     id: "target_event",
-    type: "choice",
-    title: "Tem algum evento alvo?",
-    subtitle: "Casamento, viagem, competição, prazo pessoal — qualquer coisa.",
-    options: [
-      { value: "yes", label: "Sim, tenho uma data" },
-      { value: "no", label: "Não, é um objetivo contínuo" },
-    ],
-  },
-  // 33
-  {
-    id: "confidence",
-    type: "slider",
-    title: "Quão confiante você está em começar agora?",
-    subtitle: "0 = indeciso · 10 = totalmente decidido",
-    min: 0,
-    max: 10,
-    defaultValue: 7,
+    type: "event-target",
+    title: "Tem algum evento ou prazo?",
+    subtitle: "Casamento, viagem, competição, foto — qualquer marco pessoal.",
   },
 ];
 
 export const TOTAL_QUIZ_STEPS = quizSteps.length;
+
+// Helpers ===============================================================
+
+export const SPLITS_BY_GENDER = {
+  male: [
+    { value: "ppl", label: "Push · Pull · Legs", description: "Empurrar, puxar, pernas — clássico para hipertrofia" },
+    { value: "abc", label: "ABC", description: "Peito+Tríceps · Costas+Bíceps · Pernas+Ombro" },
+    { value: "abcd", label: "ABCD", description: "Divisão por grupos para volume avançado" },
+    { value: "ab", label: "AB (Sup/Inf)", description: "Superior e Inferior alternados" },
+    { value: "system", label: "Deixar o sistema decidir", emoji: "✨", description: "Recomendado — calibrado pelo método" },
+  ],
+  female: [
+    { value: "glute_focus", label: "Foco em glúteo + posterior", description: "2 a 3 dias de inferior, prioridade glúteo" },
+    { value: "ab", label: "AB (Sup/Inf)", description: "Superior e Inferior alternados" },
+    { value: "abc", label: "ABC", description: "Inferior glúteo · Superior · Inferior quadríceps" },
+    { value: "full_body", label: "Full Body", description: "Corpo todo a cada sessão — ótimo para iniciantes" },
+    { value: "system", label: "Deixar o sistema decidir", emoji: "✨", description: "Recomendado — calibrado pelo método" },
+  ],
+} as const;
+
+export const MUSCLE_OPTIONS = [
+  { value: "chest", label: "Peito", emoji: "🫁" },
+  { value: "back", label: "Costas", emoji: "🦾" },
+  { value: "shoulders", label: "Ombros", emoji: "🏋️" },
+  { value: "arms", label: "Braços", emoji: "💪" },
+  { value: "glutes", label: "Glúteos", emoji: "🍑" },
+  { value: "legs", label: "Pernas", emoji: "🦵" },
+  { value: "core", label: "Abdômen", emoji: "🎯" },
+  { value: "coach", label: "Deixar o coach decidir", emoji: "✨", description: "Vamos analisar seus pontos fortes e fracos" } as any,
+];
