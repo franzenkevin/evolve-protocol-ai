@@ -302,13 +302,6 @@ export const quizSteps: QuizStep[] = [
     max: 90,
   },
 
-  // 25 — Evento alvo
-  {
-    id: "target_event",
-    type: "event-target",
-    title: "Tem algum evento ou prazo?",
-    subtitle: "Casamento, viagem, competição, foto — qualquer marco pessoal.",
-  },
 ];
 
 export const TOTAL_QUIZ_STEPS = quizSteps.length;
