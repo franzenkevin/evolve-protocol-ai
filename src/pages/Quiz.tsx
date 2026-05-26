@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Upload, X, Sparkles, ShieldCheck, Star, Brain, Target, Dumbbell, Apple, Camera, Calendar as CalendarIcon, MessageCircle, Cpu } from "lucide-react";
+import { ArrowRight, Upload, X, Sparkles, ShieldCheck, Star, Brain, Target, Dumbbell, Apple, Camera, Calendar as CalendarIcon, MessageCircle, Cpu, ClipboardList, Clock, Zap, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
