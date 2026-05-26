@@ -116,39 +116,60 @@ const ShareWorkoutDialog = ({ open, onOpenChange, data }: Props) => {
         </div>
 
         {/* Photo controls */}
-        <div className="flex items-center gap-2">
+        <div className="space-y-2">
           <input
-            ref={fileInputRef}
+            ref={cameraInputRef}
             type="file"
             accept="image/*"
-            capture="user"
+            capture="environment"
             className="hidden"
             onChange={handlePhotoPick}
           />
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="flex-1 gap-2"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={sharing}
-          >
-            <ImageIcon size={14} />
-            {photo ? "Trocar foto" : "Adicionar minha foto"}
-          </Button>
-          {photo && (
+          <input
+            ref={libraryInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handlePhotoPick}
+          />
+          <div className="flex items-center gap-2">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={() => setPhoto(null)}
+              className="flex-1 gap-2"
+              onClick={() => cameraInputRef.current?.click()}
               disabled={sharing}
-              aria-label="Remover foto"
             >
-              <X size={14} />
+              <Camera size={14} />
+              Tirar foto
             </Button>
-          )}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="flex-1 gap-2"
+              onClick={() => libraryInputRef.current?.click()}
+              disabled={sharing}
+            >
+              <ImageIcon size={14} />
+              Da galeria
+            </Button>
+            {photo && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setPhoto(null)}
+                disabled={sharing}
+                aria-label="Remover foto"
+              >
+                <X size={14} />
+              </Button>
+            )}
+          </div>
         </div>
+
 
         {/* Action buttons */}
         <div className="flex flex-col gap-2">
