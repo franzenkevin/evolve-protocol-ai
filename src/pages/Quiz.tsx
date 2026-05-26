@@ -11,6 +11,18 @@ import QuizShell from "@/components/quiz/QuizShell";
 import { quizSteps, TOTAL_QUIZ_STEPS, type QuizStep } from "@/lib/quizSteps";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import maleBF10 from "@/assets/bodyfat/male-10.png";
+import maleBF15 from "@/assets/bodyfat/male-15.png";
+import maleBF20 from "@/assets/bodyfat/male-20.png";
+import maleBF25 from "@/assets/bodyfat/male-25.png";
+import maleBF30 from "@/assets/bodyfat/male-30.png";
+import maleBF35 from "@/assets/bodyfat/male-35.png";
+import femaleBF18 from "@/assets/bodyfat/female-18.png";
+import femaleBF22 from "@/assets/bodyfat/female-22.png";
+import femaleBF27 from "@/assets/bodyfat/female-27.png";
+import femaleBF32 from "@/assets/bodyfat/female-32.png";
+import femaleBF37 from "@/assets/bodyfat/female-37.png";
+import femaleBF42 from "@/assets/bodyfat/female-42.png";
 
 type Phase =
   | { kind: "quiz"; index: number }
