@@ -7,7 +7,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2, Share2, Download, Image as ImageIcon, X } from "lucide-react";
+import { Loader2, Share2, Download, Image as ImageIcon, Camera, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   renderStoryToCanvas,
