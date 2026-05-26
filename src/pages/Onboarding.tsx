@@ -448,8 +448,10 @@ const Onboarding = () => {
         return;
       }
 
+      // Fotos são opcionais — se nenhuma foi enviada, segue sem análise.
       if (Object.keys(assessmentPhotos).length === 0) {
-        setValidationError("Envie pelo menos uma foto para análise corporal.");
+        setValidationError("");
+        setStep((s) => (s < STEPS.length - 1 ? s + 1 : s));
         return;
       }
 
@@ -460,6 +462,7 @@ const Onboarding = () => {
       }
       return;
     }
+
 
     // Validate current step
     const error = validateStep();
