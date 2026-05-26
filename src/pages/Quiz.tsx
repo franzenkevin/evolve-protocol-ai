@@ -328,7 +328,7 @@ export default function Quiz() {
 function StepRenderer({ step, value, allAnswers, onChange, onNext }: any) {
   if (step.type === "gender") return <GenderStep value={value} onChange={onChange} onNext={onNext} step={step} />;
   if (step.type === "choice") return <ChoiceStep step={step} value={value} onChange={onChange} onNext={onNext} allAnswers={allAnswers} />;
-  if (step.type === "muscle-choice") return <MuscleChoiceStep step={step} value={value} onChange={onChange} />;
+  // muscle-choice removido — não usamos mais priorização manual de músculos
   if (step.type === "slider") return <SliderStep step={step} value={value} onChange={onChange} />;
   if (step.type === "number") return <NumberStep step={step} value={value} onChange={onChange} allAnswers={allAnswers} />;
   if (step.type === "weight-target") return <WeightTargetStep step={step} value={value} onChange={onChange} />;
@@ -469,57 +469,7 @@ function ChoiceStep({ step, value, onChange, onNext, allAnswers }: any) {
   );
 }
 
-// ============== MUSCLE CHOICE (com cartões) ==============
-
-function MuscleChoiceStep({ step, value, onChange }: any) {
-  const arr: string[] = value || [];
-  function toggle(v: string) {
-    if (v === "coach") {
-      onChange(arr.includes("coach") ? [] : ["coach"]);
-      return;
-    }
-    const without = arr.filter((x) => x !== "coach");
-    onChange(without.includes(v) ? without.filter((x) => x !== v) : [...without, v]);
-  }
-  return (
-    <>
-      <StepHeader step={step} />
-      <div className="grid grid-cols-3 gap-2.5">
-        {MUSCLE_OPTIONS.filter((o) => o.value !== "coach").map((o) => {
-          const active = arr.includes(o.value);
-          return (
-            <button
-              key={o.value}
-              type="button"
-              onClick={() => toggle(o.value)}
-              className={cn(
-                "aspect-square rounded-2xl border flex flex-col items-center justify-center gap-1.5 transition-all",
-                active ? "border-primary bg-primary/15" : "border-white/10 bg-card/40 hover:border-white/25"
-              )}
-            >
-              <span className="text-3xl">{o.emoji}</span>
-              <span className="text-xs font-semibold text-foreground">{o.label}</span>
-            </button>
-          );
-        })}
-      </div>
-      <button
-        type="button"
-        onClick={() => toggle("coach")}
-        className={cn(
-          "w-full mt-3 rounded-2xl border p-4 flex items-center gap-3 text-left transition-all",
-          arr.includes("coach") ? "border-primary bg-primary/15" : "border-white/10 bg-card/40 hover:border-white/25"
-        )}
-      >
-        <span className="text-2xl">✨</span>
-        <div className="flex-1">
-          <p className="font-semibold">Deixar o coach decidir</p>
-          <p className="text-xs text-muted-foreground">Vamos analisar seus pontos fortes e fracos</p>
-        </div>
-      </button>
-    </>
-  );
-}
+// (MuscleChoiceStep removido — etapa de priorização manual foi excluída)
 
 // ============== SLIDER / NUMBER ==============
 
@@ -715,7 +665,8 @@ function InfoStep({ step }: any) {
 
 function BodyShapeStep({ step, value, onChange, onNext, allAnswers }: any) {
   const g = allAnswers?.gender === "female" ? "female" : "male";
-  const shapes = BODY_SHAPES_BY_GENDER[g];
+  const source = step.field === "target_shape" ? TARGET_SHAPES_BY_GENDER : BODY_SHAPES_BY_GENDER;
+  const shapes = source[g];
   return (
     <>
       <StepHeader step={step} />
@@ -748,20 +699,20 @@ function BodyShapeStep({ step, value, onChange, onNext, allAnswers }: any) {
 // ============== BODYFAT SLIDER ==============
 
 const MALE_BF_REFS = [
-  { v: 10, img: maleBF10, label: "8-12%" },
-  { v: 15, img: maleBF15, label: "13-17%" },
-  { v: 20, img: maleBF20, label: "18-22%" },
-  { v: 25, img: maleBF25, label: "23-27%" },
-  { v: 30, img: maleBF30, label: "28-32%" },
-  { v: 35, img: maleBF35, label: "33%+" },
+  { v: 5, img: maleBF5, label: "~5% (seco)" },
+  { v: 10, img: maleBF10, label: "8-12% (atlético)" },
+  { v: 15, img: maleBF15, label: "13-17% (em forma)" },
+  { v: 20, img: maleBF20, label: "18-22% (normal)" },
+  { v: 27, img: maleBF25, label: "23-30% (barriga saliente)" },
+  { v: 35, img: maleBF35, label: "30%+ (obeso)" },
 ];
 const FEMALE_BF_REFS = [
-  { v: 18, img: femaleBF18, label: "15-20%" },
-  { v: 22, img: femaleBF22, label: "21-25%" },
-  { v: 27, img: femaleBF27, label: "26-30%" },
-  { v: 32, img: femaleBF32, label: "31-35%" },
-  { v: 37, img: femaleBF37, label: "36-40%" },
-  { v: 42, img: femaleBF42, label: "41%+" },
+  { v: 18, img: femaleBF18, label: "15-20% (atlética)" },
+  { v: 22, img: femaleBF22, label: "21-25% (em forma)" },
+  { v: 27, img: femaleBF27, label: "26-30% (normal)" },
+  { v: 32, img: femaleBF32, label: "31-35% (saliente)" },
+  { v: 37, img: femaleBF37, label: "36-40% (acima do peso)" },
+  { v: 42, img: femaleBF42, label: "40%+ (obesa)" },
 ];
 
 function BodyFatStep({ value, onChange, allAnswers }: any) {
