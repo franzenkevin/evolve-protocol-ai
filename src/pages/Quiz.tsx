@@ -644,8 +644,8 @@ function LoadingPhase() {
   );
 }
 
-function AnalyzingPhase({ onSkip }: { onSkip: () => void }) {
-  const MAX = 45;
+function AnalyzingPhase(_: { onSkip?: () => void }) {
+  const MAX = 180;
   const [elapsed, setElapsed] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setElapsed((s) => Math.min(MAX, s + 1)), 1000);
@@ -653,6 +653,8 @@ function AnalyzingPhase({ onSkip }: { onSkip: () => void }) {
   }, []);
   const pct = Math.min(100, Math.round((elapsed / MAX) * 100));
   const remaining = Math.max(0, MAX - elapsed);
+  const mm = String(Math.floor(remaining / 60)).padStart(1, "0");
+  const ss = String(remaining % 60).padStart(2, "0");
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center px-6">
       <div className="relative w-24 h-24 mb-8">
@@ -668,18 +670,13 @@ function AnalyzingPhase({ onSkip }: { onSkip: () => void }) {
         <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
           <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${pct}%` }} />
         </div>
-        <p className="text-center text-xs text-muted-foreground mt-2 tabular-nums">
-          {remaining > 0 ? `~${remaining}s restantes` : "Finalizando…"}
+        <p className="text-center text-3xl font-heading font-bold text-foreground mt-4 tabular-nums">
+          {mm}:{ss}
+        </p>
+        <p className="text-center text-xs text-muted-foreground mt-1">
+          Aguarde — a análise pode levar até 3 minutos
         </p>
       </div>
-      {elapsed >= 12 && (
-        <button
-          onClick={onSkip}
-          className="mt-8 text-sm text-muted-foreground hover:text-foreground underline underline-offset-4"
-        >
-          Está demorando — enviar depois no app
-        </button>
-      )}
     </div>
   );
 }
