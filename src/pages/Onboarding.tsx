@@ -1114,10 +1114,11 @@ const Onboarding = () => {
             <p className="text-destructive text-sm mb-2 text-center">{validationError}</p>
           )}
           <div className="flex gap-3">
-            {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving || analyzing}>Voltar</Button>}
-            <Button onClick={next} className="flex-1 glow" disabled={saving || analyzing}>
-              {saving ? "Salvando suas respostas..." : analyzing ? "Analisando suas fotos..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar minhas fotos" : step === 7 && Object.keys(assessmentPhotos).length === 0 && !assessment ? "Pular fotos e finalizar" : step === STEPS.length - 1 ? "Finalizar quiz" : "Próximo"}
+            {step > 0 && <Button variant="outline" onClick={prev} className="flex-1" disabled={saving || analyzing || generating}>Voltar</Button>}
+            <Button onClick={next} className="flex-1 glow" disabled={saving || analyzing || generating}>
+              {generating ? "Gerando seu protocolo..." : saving ? "Salvando suas respostas..." : analyzing ? "Analisando suas fotos..." : step === 7 && Object.keys(assessmentPhotos).length > 0 && !assessment ? "Analisar minhas fotos" : step === 7 && Object.keys(assessmentPhotos).length === 0 && !assessment ? "Pular fotos e finalizar" : step === STEPS.length - 1 ? "Finalizar e liberar protocolo" : "Próximo"}
             </Button>
+
           </div>
         </div>
       </div>
