@@ -16,6 +16,7 @@ import QuizShell from "@/components/quiz/QuizShell";
 import { quizSteps, TOTAL_QUIZ_STEPS, SPLITS_BY_GENDER, type QuizStep } from "@/lib/quizSteps";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 
 // Imagens body fat (slider visual)
 import maleBF5 from "@/assets/bodyfat/male-5.png";
