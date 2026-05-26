@@ -1,0 +1,1 @@
+ALTER TABLE public.mobility_exercises ADD COLUMN IF NOT EXISTS image_url text;
