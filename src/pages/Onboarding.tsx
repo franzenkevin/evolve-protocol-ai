@@ -315,6 +315,31 @@ const Onboarding = () => {
     return () => clearInterval(id);
   }, [analyzing]);
 
+  // Timer + estágios para geração do protocolo (~1-3min)
+  useEffect(() => {
+    if (!generating) return;
+    setGenElapsed(0);
+    setGenStage("👨‍⚕️ Médico nutrólogo lendo seu perfil e avaliação corporal...");
+    const stages: { at: number; label: string }[] = [
+      { at: 12, label: "👨‍⚕️ Verificando lesões, intolerâncias e contraindicações..." },
+      { at: 28, label: "🏋️ Treinador escolhendo a divisão e os exercícios..." },
+      { at: 50, label: "🏋️ Priorizando seus pontos fracos no volume de treino..." },
+      { at: 75, label: "🥗 Nutricionista calculando macros e montando refeições..." },
+      { at: 105, label: "🥗 Calibrando refeições livres ao seu objetivo..." },
+      { at: 135, label: "🤝 Comitê validando treino + dieta juntos..." },
+      { at: 165, label: "✨ Finalizando seu protocolo personalizado..." },
+    ];
+    const t0 = Date.now();
+    const id = setInterval(() => {
+      setGenElapsed(Math.floor((Date.now() - t0) / 1000));
+      const sec = Math.floor((Date.now() - t0) / 1000);
+      const cur = [...stages].reverse().find((s) => sec >= s.at);
+      if (cur) setGenStage(cur.label);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [generating]);
+
+
   const update = (field: keyof FormData, value: any) => {
     setData((prev) => ({ ...prev, [field]: value }));
     setValidationError("");
