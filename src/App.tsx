@@ -71,6 +71,7 @@ const Feedback = lazyWithRecovery(() => import("./pages/Feedback"));
 const MilestoneCheckin = lazyWithRecovery(() => import("./pages/MilestoneCheckin"));
 const Support = lazyWithRecovery(() => import("./pages/Support"));
 const Install = lazyWithRecovery(() => import("./pages/Install"));
+const Quiz = lazyWithRecovery(() => import("./pages/Quiz"));
 import InstallPrompt from "./components/InstallPrompt";
 import { UpdateAvailableBanner } from "./components/UpdateAvailableBanner";
 import { CURRENT_TERMS_VERSION } from "@/lib/terms";
