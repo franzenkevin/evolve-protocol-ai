@@ -587,18 +587,6 @@ function BodyShapeStep({ step, value, onChange, onNext }: any) {
 }
 
 // Imagens de referência geradas por IA (homem e mulher em níveis de % de gordura)
-import maleBF10 from "@/assets/bodyfat/male-10.png";
-import maleBF15 from "@/assets/bodyfat/male-15.png";
-import maleBF20 from "@/assets/bodyfat/male-20.png";
-import maleBF25 from "@/assets/bodyfat/male-25.png";
-import maleBF30 from "@/assets/bodyfat/male-30.png";
-import maleBF35 from "@/assets/bodyfat/male-35.png";
-import femaleBF18 from "@/assets/bodyfat/female-18.png";
-import femaleBF22 from "@/assets/bodyfat/female-22.png";
-import femaleBF27 from "@/assets/bodyfat/female-27.png";
-import femaleBF32 from "@/assets/bodyfat/female-32.png";
-import femaleBF37 from "@/assets/bodyfat/female-37.png";
-import femaleBF42 from "@/assets/bodyfat/female-42.png";
 
 const MALE_BF_REFS = [
   { v: 10, img: maleBF10, label: "8-12%" },
