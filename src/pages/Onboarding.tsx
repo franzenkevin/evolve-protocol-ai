@@ -556,20 +556,90 @@ const Onboarding = () => {
 
       try { localStorage.removeItem(STORAGE_KEY); } catch {}
 
-      toast({
-        title: "Quiz finalizado! 🎉",
-        description: "Falta só liberar seu protocolo. Escolha um plano para continuar.",
-      });
-      navigate("/plans");
-    } catch (err: any) {
-      toast({ title: "Erro", description: err.message, variant: "destructive" });
-    } finally {
-      setSaving(false);
-    }
-  };
+      // Verifica se o usuário já tem assinatura ativa (caso normal pós-quiz).
+      // Se sim, gera o protocolo direto aqui e leva pro dashboard.
+      // Se não (fluxo legado), manda pra /plans.
+      const { data: freshSub } = await refetchSubscription();
+      const isActive =
+        freshSub &&
+        ["active", "trialing"].includes(freshSub.status) &&
+        (!freshSub.current_period_end || new Date(freshSub.current_period_end) > new Date());
 
-  const prev = () => { step > 0 && setStep(step - 1); setValidationError(""); };
-  const progress = ((step + 1) / STEPS.length) * 100;
+      if (!isActive) {
+        toast({
+          title: "Quiz finalizado! 🎉",
+          description: "Falta só liberar seu protocolo. Escolha um plano para continuar.",
+        });
+        navigate("/plans");
+        return;
+      }
+
+      // Gera o protocolo inline (sem passar por CheckoutSuccess)
+      setSaving(false);
+      setGenerating(true);
+      try {
+        const [{ data: bodyAssessment }, { data: draft }] = await Promise.all([
+          supabase
+            .from("body_assessments")
+            .select("*")
+            .eq("user_id", user!.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+          supabase
+            .from("onboarding_drafts")
+            .select("data")
+            .eq("user_id", user!.id)
+            .maybeSingle(),
+        ]);
+        const confirmationsDraft = (draft?.data as any)?.confirmations ?? confirmations;
+
+        let result: { training: any; diet: any };
+        try {
+          const { data: aiResult, error: aiError } = await supabase.functions.invoke(
+            "generate-protocol",
+            {
+              body: {
+                profile: { ...profileData, user_id: user!.id },
+                bodyAssessment,
+                bodyEmphasis: profileData.body_emphasis,
+                confirmations: confirmationsDraft,
+              },
+            },
+          );
+          if (aiError) throw aiError;
+          if (aiResult?.fallback) throw new Error("Fallback requested");
+          if (!aiResult?.training || !aiResult?.diet) throw new Error("Invalid AI response");
+          result = { training: aiResult.training, diet: aiResult.diet };
+        } catch (aiErr) {
+          console.warn("AI protocol generation failed, using rule-based fallback:", aiErr);
+          result = generateProtocol({ ...profileData, user_id: user!.id } as any);
+        }
+
+        await createProtocol.mutateAsync(result);
+
+        try {
+          await supabase.from("onboarding_drafts").delete().eq("user_id", user!.id);
+        } catch {}
+
+        toast({
+          title: "Tudo pronto! 🎉",
+          description: "Seu protocolo personalizado foi liberado.",
+        });
+        navigate("/dashboard", { replace: true });
+      } catch (genErr: any) {
+        console.error("Protocol generation failed:", genErr);
+        toast({
+          title: "Erro ao gerar protocolo",
+          description: genErr?.message || "Tentaremos novamente em instantes.",
+          variant: "destructive",
+        });
+        // fallback para a tela antiga que tem retry
+        navigate("/checkout/success", { replace: true });
+      } finally {
+        setGenerating(false);
+      }
+      return;
 
   const radioOption = (value: string, id: string, label: string) => (
     <div key={id} className="flex items-center gap-2 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors">
