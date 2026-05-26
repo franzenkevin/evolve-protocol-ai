@@ -640,6 +640,17 @@ const Onboarding = () => {
         setGenerating(false);
       }
       return;
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const prev = () => { step > 0 && setStep(step - 1); setValidationError(""); };
+  const progress = ((step + 1) / STEPS.length) * 100;
+
+
 
   const radioOption = (value: string, id: string, label: string) => (
     <div key={id} className="flex items-center gap-2 p-3 rounded-lg border border-border hover:border-primary/50 transition-colors">
