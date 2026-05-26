@@ -144,7 +144,7 @@ export default function Quiz() {
     else if (phase.kind === "preview") setPhase({ kind: "physique-intro" });
     else if (phase.kind === "plans") setPhase({ kind: "preview" });
     else if (phase.kind === "guarantee") setPhase({ kind: "plans" });
-    else navigate("/");
+    else navigate("/landing");
   }
 
   useEffect(() => {
