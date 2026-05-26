@@ -199,7 +199,7 @@ export default function Quiz() {
       <QuizShell currentStep={TOTAL_QUIZ_STEPS} totalSteps={TOTAL_QUIZ_STEPS} onBack={back} hideProgress>
         <PhotoUpload photos={photos} setPhotos={setPhotos} />
         <div className="fixed bottom-0 inset-x-0 z-30 bg-gradient-to-t from-black via-black/95 to-transparent pt-6 pb-5">
-          <div className="max-w-xl mx-auto px-5">
+          <div className="max-w-xl mx-auto px-5 space-y-2">
             <Button
               size="lg"
               disabled={photos.length === 0}
@@ -207,28 +207,55 @@ export default function Quiz() {
               onClick={async () => {
                 setPhase({ kind: "physique-analyzing" });
                 try {
-                  const b64Photos = await Promise.all(photos.map(fileToDataUrl));
+                  const b64Photos = await Promise.all(photos.map((f) => compressImage(f, 1024, 0.78)));
                   const { data, error } = await supabase.functions.invoke("analyze-physique", {
                     body: { photos: b64Photos, context: answers },
                   });
                   if (error) throw error;
+                  if (data?.error) throw new Error(data.error);
                   setPhysiqueResult(data);
                   setPhase({ kind: "physique-result" });
                 } catch (e: any) {
-                  toast.error("Não foi possível concluir a análise agora. Tente novamente.");
-                  setPhase({ kind: "physique-upload" });
+                  console.error("[quiz] physique error", e);
+                  toast.error("Não foi possível concluir a análise agora. Você poderá enviar suas fotos depois, no app.");
+                  setAnswers((a) => ({ ...a, physique_pending: true }));
+                  setPhase({ kind: "email" });
                 }
               }}
             >
               Analisar minhas fotos <ArrowRight size={18} />
             </Button>
+            <Button
+              variant="ghost"
+              size="lg"
+              className="w-full h-12 text-muted-foreground"
+              onClick={() => {
+                setAnswers((a) => ({ ...a, physique_pending: true }));
+                setPhase({ kind: "email" });
+              }}
+            >
+              Enviar depois no app
+            </Button>
+            <p className="text-[11px] text-muted-foreground/80 text-center px-4">
+              Essa análise é <span className="text-primary">essencial</span> para personalizar seu protocolo. Você pode enviar agora ou direto no app após o cadastro.
+            </p>
           </div>
         </div>
       </QuizShell>
     );
   }
 
-  if (phase.kind === "physique-analyzing") return <AnalyzingPhase />;
+  if (phase.kind === "physique-analyzing") {
+    return (
+      <AnalyzingPhase
+        onSkip={() => {
+          setAnswers((a) => ({ ...a, physique_pending: true }));
+          toast.info("Sem problema — você poderá enviar suas fotos no app.");
+          setPhase({ kind: "email" });
+        }}
+      />
+    );
+  }
 
   if (phase.kind === "physique-result") {
     return (
