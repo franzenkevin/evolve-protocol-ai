@@ -13,16 +13,16 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import QuizShell from "@/components/quiz/QuizShell";
-import { quizSteps, TOTAL_QUIZ_STEPS, SPLITS_BY_GENDER, MUSCLE_OPTIONS, type QuizStep } from "@/lib/quizSteps";
+import { quizSteps, TOTAL_QUIZ_STEPS, SPLITS_BY_GENDER, type QuizStep } from "@/lib/quizSteps";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-// Imagens
+// Imagens body fat (slider visual)
+import maleBF5 from "@/assets/bodyfat/male-5.png";
 import maleBF10 from "@/assets/bodyfat/male-10.png";
 import maleBF15 from "@/assets/bodyfat/male-15.png";
 import maleBF20 from "@/assets/bodyfat/male-20.png";
 import maleBF25 from "@/assets/bodyfat/male-25.png";
-import maleBF30 from "@/assets/bodyfat/male-30.png";
 import maleBF35 from "@/assets/bodyfat/male-35.png";
 import femaleBF18 from "@/assets/bodyfat/female-18.png";
 import femaleBF22 from "@/assets/bodyfat/female-22.png";
@@ -30,10 +30,17 @@ import femaleBF27 from "@/assets/bodyfat/female-27.png";
 import femaleBF32 from "@/assets/bodyfat/female-32.png";
 import femaleBF37 from "@/assets/bodyfat/female-37.png";
 import femaleBF42 from "@/assets/bodyfat/female-42.png";
+// Gênero
 import genderMale from "@/assets/quiz/gender-male.jpg";
 import genderFemale from "@/assets/quiz/gender-female.jpg";
-import shapeMaleAthletic from "@/assets/quiz/shape-male-athletic.jpg";
-import shapeFemaleAthletic from "@/assets/quiz/shape-female-athletic.jpg";
+// Forma atual (reaproveita imagens BF)
+// Forma alvo (3 opções por gênero — novas fotos)
+import targetMaleLean from "@/assets/quiz/target-male-lean.jpg";
+import targetMaleAthletic from "@/assets/quiz/target-male-athletic.jpg";
+import targetMaleBodybuilder from "@/assets/quiz/target-male-bodybuilder.jpg";
+import targetFemaleSlim from "@/assets/quiz/target-female-slim.jpg";
+import targetFemaleVolume from "@/assets/quiz/target-female-volume.jpg";
+import targetFemaleBodybuilder from "@/assets/quiz/target-female-bodybuilder.jpg";
 
 type Phase =
   | { kind: "quiz"; index: number }
