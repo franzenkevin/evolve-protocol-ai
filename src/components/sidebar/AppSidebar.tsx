@@ -10,7 +10,7 @@ import SectionPlan from "./SectionPlan";
 import SectionMeetings from "./SectionMeetings";
 import SectionJournal from "./SectionJournal";
 import { Card } from "@/components/ui/card";
-import { Headphones, FileText, Shield, Star, MessageSquare, Mail, ShieldCheck, RefreshCw, LifeBuoy, GraduationCap, Smartphone } from "lucide-react";
+import { Headphones, FileText, Shield, Star, MessageSquare, Mail, ShieldCheck, RefreshCw, LifeBuoy, GraduationCap, Smartphone, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useAuth } from "@/contexts/AuthContext";
@@ -89,6 +89,19 @@ const AppSidebar = ({ open, onOpenChange }: AppSidebarProps) => {
             <SectionReferrals />
             <SectionPartnerships />
             <SectionPlan />
+
+            <Card
+              className="p-3 flex items-center gap-3 cursor-pointer card-gradient border-primary/30 hover:border-primary/50 transition-colors"
+              onClick={() => { onOpenChange(false); navigate("/food-diary"); }}
+            >
+              <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                <BookOpen size={14} className="text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-foreground font-semibold">Diário alimentar</p>
+                <p className="text-[10px] text-muted-foreground">Monte sua dieta com a base de alimentos e mantenha os macros</p>
+              </div>
+            </Card>
 
             <Card
               className="p-3 flex items-center gap-3 cursor-pointer card-gradient border-primary/30 hover:border-primary/50 transition-colors"

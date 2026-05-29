@@ -477,6 +477,65 @@ export type Database = {
         }
         Relationships: []
       }
+      food_diary_entries: {
+        Row: {
+          calories: number
+          carbs: number
+          created_at: string
+          entry_date: string
+          fat: number
+          fiber: number
+          food_id: string | null
+          grams: number
+          id: string
+          meal_label: string | null
+          name: string
+          protein: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          calories?: number
+          carbs?: number
+          created_at?: string
+          entry_date?: string
+          fat?: number
+          fiber?: number
+          food_id?: string | null
+          grams?: number
+          id?: string
+          meal_label?: string | null
+          name: string
+          protein?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          calories?: number
+          carbs?: number
+          created_at?: string
+          entry_date?: string
+          fat?: number
+          fiber?: number
+          food_id?: string | null
+          grams?: number
+          id?: string
+          meal_label?: string | null
+          name?: string
+          protein?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "food_diary_entries_food_id_fkey"
+            columns: ["food_id"]
+            isOneToOne: false
+            referencedRelation: "foods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       foods: {
         Row: {
           calories: number

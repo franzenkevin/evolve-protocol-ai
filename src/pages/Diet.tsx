@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import {
   Info,
   Leaf,
   RefreshCw,
+  BookOpen,
 } from "lucide-react";
 import { useActiveProtocol } from "@/hooks/useProtocol";
 import DietFeedbackCard from "@/components/DietFeedbackCard";
@@ -21,6 +23,7 @@ import { Calculator } from "lucide-react";
 import { normalizeSubstitutions } from "@/lib/dietNormalize";
 
 const Diet = () => {
+  const navigate = useNavigate();
   const { data: protocol, isLoading } = useActiveProtocol();
   const [expandedMeal, setExpandedMeal] = useState<number | null>(0);
   const [activeOption, setActiveOption] = useState<Record<number, number>>({});
@@ -60,6 +63,19 @@ const Diet = () => {
     <AppLayout>
       <div className="p-4 max-w-lg mx-auto space-y-4 animate-fade-in pb-24">
         <h1 className="text-2xl font-heading font-bold text-foreground pt-2">Dieta</h1>
+
+        {/* Food diary CTA */}
+        <Button
+          variant="outline"
+          className="w-full justify-between border-primary/40 hover:bg-primary/10"
+          onClick={() => navigate("/food-diary")}
+        >
+          <span className="flex items-center gap-2">
+            <BookOpen size={16} className="text-primary" />
+            <span className="font-medium">Calculadora de Diário Alimentar</span>
+          </span>
+          <span className="text-[10px] text-muted-foreground">flexibilizar</span>
+        </Button>
 
         {/* Macros summary */}
         <Card className="p-4 card-gradient border-border">
