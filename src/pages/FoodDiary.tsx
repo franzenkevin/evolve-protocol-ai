@@ -252,28 +252,36 @@ const FoodDiary = () => {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-              <Command>
+              <Command shouldFilter={false}>
                 <CommandInput
-                  placeholder="Buscar alimento..."
+                  placeholder={`Buscar entre ${foods.length} alimentos...`}
                   value={search}
                   onValueChange={setSearch}
                 />
-                <CommandList>
+                <CommandList className="max-h-72">
                   <CommandEmpty>Nenhum alimento encontrado.</CommandEmpty>
                   <CommandGroup>
-                    {foods.slice(0, 200).map((f) => (
-                      <CommandItem
-                        key={f.id}
-                        value={f.name}
-                        onSelect={() => handleAdd(f, Number(f.portion_grams) || 100)}
-                      >
-                        <span className="flex-1">{f.name}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {Math.round(f.calories)} kcal/{f.portion_grams}g
-                        </span>
-                      </CommandItem>
-                    ))}
+                    {(() => {
+                      const q = search.trim().toLowerCase();
+                      const filtered = q
+                        ? foods.filter((f) => f.name.toLowerCase().includes(q))
+                        : foods;
+                      return filtered.slice(0, 100).map((f) => (
+                        <CommandItem
+                          key={f.id}
+                          value={f.name}
+                          onSelect={() => handleAdd(f, Number(f.portion_grams) || 100)}
+                        >
+                          <span className="flex-1">{f.name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {Math.round(f.calories)} kcal/{f.portion_grams}g
+                          </span>
+                        </CommandItem>
+                      ));
+                    })()}
                   </CommandGroup>
+                </CommandList>
+
                 </CommandList>
               </Command>
             </PopoverContent>
