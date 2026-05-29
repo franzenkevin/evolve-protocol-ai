@@ -282,7 +282,6 @@ const FoodDiary = () => {
                   </CommandGroup>
                 </CommandList>
 
-                </CommandList>
               </Command>
             </PopoverContent>
           </Popover>
