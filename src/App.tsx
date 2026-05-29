@@ -72,6 +72,7 @@ const MilestoneCheckin = lazyWithRecovery(() => import("./pages/MilestoneCheckin
 const Support = lazyWithRecovery(() => import("./pages/Support"));
 const Install = lazyWithRecovery(() => import("./pages/Install"));
 const Quiz = lazyWithRecovery(() => import("./pages/Quiz"));
+const FoodDiary = lazyWithRecovery(() => import("./pages/FoodDiary"));
 import InstallPrompt from "./components/InstallPrompt";
 import { UpdateAvailableBanner } from "./components/UpdateAvailableBanner";
 import { CURRENT_TERMS_VERSION } from "@/lib/terms";
@@ -122,6 +123,7 @@ const App = () => (
               <Route path="/dashboard" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><Dashboard /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
               <Route path="/training" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><Training /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
               <Route path="/diet" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><Diet /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
+              <Route path="/food-diary" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><FoodDiary /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
               <Route path="/progress" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><Progress /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
               <Route path="/exams" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><Exams /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
               <Route path="/journal" element={<ProtectedRoute><StudentGate><OnboardingGate><SubscriptionGate><ProtocolGate><Journal /></ProtocolGate></SubscriptionGate></OnboardingGate></StudentGate></ProtectedRoute>} />
