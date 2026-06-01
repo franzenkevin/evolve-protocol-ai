@@ -90,63 +90,65 @@ export const renderStoryToCanvas = async (
 
   await ensureFonts();
 
-  // --- Pure black background ---
+  // --- Background ---
   ctx.fillStyle = COLORS.bg;
   ctx.fillRect(0, 0, W, H);
 
-  // --- Optional user photo (full canvas, cover) ---
   if (data.userPhoto) {
     try {
       const photo = await loadImage(data.userPhoto);
       drawCoverImage(ctx, photo, 0, 0, W, H);
-      // bottom gradient for text legibility
-      const overlay = ctx.createLinearGradient(0, H * 0.45, 0, H);
+      // soft bottom vignette for legibility (keeps photo dominant)
+      const overlay = ctx.createLinearGradient(0, H * 0.55, 0, H);
       overlay.addColorStop(0, "rgba(0,0,0,0)");
-      overlay.addColorStop(0.55, "rgba(0,0,0,0.75)");
-      overlay.addColorStop(1, "rgba(0,0,0,0.95)");
+      overlay.addColorStop(1, "rgba(0,0,0,0.78)");
       ctx.fillStyle = overlay;
       ctx.fillRect(0, 0, W, H);
     } catch {
-      /* ignore photo errors */
+      /* ignore */
     }
   }
 
-  // --- Bottom content block ---
   const padX = 80;
-
-  // Workout name (above the volume)
-  ctx.fillStyle = COLORS.muted;
-  ctx.font = '500 36px "Inter", system-ui, sans-serif';
   ctx.textAlign = "center";
-  const nameLines = wrapText(ctx, data.workoutName, W - padX * 2, 36);
-  let nameY = H - 560;
+
+  // Workout name — small, muted, uppercase tracking
+  ctx.fillStyle = "rgba(243,241,236,0.75)";
+  ctx.font = '500 34px "Inter", system-ui, sans-serif';
+  const nameLines = wrapText(ctx, data.workoutName.toUpperCase(), W - padX * 2, 34);
+  let nameY = H - 440;
   for (const line of nameLines.slice(0, 2)) {
     ctx.fillText(line, W / 2, nameY);
-    nameY += 48;
+    nameY += 44;
   }
 
-  // Volume — the hero number
+  // Hero volume number
   const volume = formatVolume(data.totalVolume);
   ctx.fillStyle = COLORS.text;
-  let size = 280;
+  let size = 240;
   ctx.font = `700 ${size}px "Space Grotesk", system-ui, sans-serif`;
   while (ctx.measureText(volume).width > W - padX * 2 && size > 120) {
     size -= 10;
     ctx.font = `700 ${size}px "Space Grotesk", system-ui, sans-serif`;
   }
-  ctx.textAlign = "center";
-  ctx.fillText(volume, W / 2, H - 280);
+  ctx.fillText(volume, W / 2, H - 260);
 
-  // "VOLUME TOTAL" label under the number
-  ctx.fillStyle = COLORS.primary;
-  ctx.font = '600 32px "Inter", system-ui, sans-serif';
-  ctx.fillText("VOLUME TOTAL", W / 2, H - 220);
+  // tiny "volume" caption under number
+  ctx.fillStyle = "rgba(243,241,236,0.6)";
+  ctx.font = '400 28px "Inter", system-ui, sans-serif';
+  ctx.fillText("volume total", W / 2, H - 210);
 
-  // --- Footer ---
-  ctx.fillStyle = COLORS.muted;
-  ctx.font = '400 30px "Inter", system-ui, sans-serif';
-  ctx.textAlign = "center";
-  ctx.fillText("evoriacoach.com", W / 2, H - 110);
+  // --- Logo at the bottom ---
+  try {
+    const logo = await loadImage(logoUrl);
+    const logoH = 70;
+    const logoW = (logo.naturalWidth / logo.naturalHeight) * logoH;
+    ctx.drawImage(logo, (W - logoW) / 2, H - 130, logoW, logoH);
+  } catch {
+    ctx.fillStyle = COLORS.text;
+    ctx.font = '700 44px "Space Grotesk", system-ui, sans-serif';
+    ctx.fillText("EVORIA", W / 2, H - 90);
+  }
 };
 
 
